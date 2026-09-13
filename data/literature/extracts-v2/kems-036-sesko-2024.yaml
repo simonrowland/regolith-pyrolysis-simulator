@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_crucible_deposit_edx
   experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'EAC-1A_solar_pyrolysis_crucible_deposit' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -81,13 +85,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_Fe_edx_qualitative
   experiment_id: 10.1016/j.actaastro.2024.08.009::15
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'EAC-1A_crucible_deposit' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -158,13 +166,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_K_edx_range
   experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'EAC-1A_crucible_deposit' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -234,13 +246,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_deposit_Si_edx_range
   experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-09-06-data-pilot/rh50/tables.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'EAC-1A_crucible_deposit' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -310,13 +326,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_fig6_16_figure_only_blocked
   experiment_id: 10.1016/j.actaastro.2024.08.009::6
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FactSage_Mare_24999_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -372,7 +392,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -397,13 +417,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_table1_eac1_simulant_composition
   experiment_id: 10.1016/j.actaastro.2024.08.009::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_simulant_EAC-1A' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -474,13 +498,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_table1_literature_feedstock_compositions
   experiment_id: 10.1016/j.actaastro.2024.08.009::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_compositions_used_for_factsage' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -551,13 +579,17 @@ observations:
 - observation_id: kems-036-sesko-2024::sesko_2024_table2_factsage_and_literature_o2_yield
   experiment_id: 10.1016/j.actaastro.2024.08.009::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FactSage_8_1_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -613,7 +645,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-038-matchett-2006::matchett_2006_fig11_mare_PT_figure_only_blocked
   experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::11
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'mare_regolith_HSC_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -88,13 +92,17 @@ observations:
 - observation_id: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
   experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -165,13 +173,17 @@ observations:
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
   experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

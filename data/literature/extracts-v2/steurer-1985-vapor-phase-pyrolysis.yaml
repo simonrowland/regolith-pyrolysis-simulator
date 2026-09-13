@@ -5,13 +5,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_fig2_psat_figure_only
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -84,13 +88,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -146,7 +154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -162,13 +170,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -224,7 +236,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -240,13 +252,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_sio2_induction_experiment
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silica_feedstock_induction_heated' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -319,13 +335,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -381,7 +401,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -398,13 +418,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -460,7 +484,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -477,13 +501,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -539,7 +567,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -556,13 +584,17 @@ observations:
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_with_and_without_Fe_beneficiation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -618,7 +650,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

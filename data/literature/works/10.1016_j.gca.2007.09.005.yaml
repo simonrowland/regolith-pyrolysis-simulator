@@ -96,6 +96,13 @@ experiments:
           table: '1'
           paragraph: R3-12 Init area 22.4 mm2
           source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        inference:
+          relation: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          inputs:
+          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md'',
+            ''table'': ''1'', ''paragraph'': ''R3-12 Init area 22.4 mm2''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2007.09.005::2
   kind: literature
   method:

@@ -5,13 +5,17 @@ observations:
 - observation_id: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
   experiment_id: 10.1016/j.gca.2019.06.021::sossi_2019_na_open_furnace_apparent
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

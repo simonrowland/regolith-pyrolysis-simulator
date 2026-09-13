@@ -5,13 +5,17 @@ observations:
 - observation_id: pending-mgcl2-measured-vp::anchor_MgCl2_pure_Psat
   experiment_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7::PENDING#MgCl2_measured_VP
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MgCl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_MgCl2_to_MgCl2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

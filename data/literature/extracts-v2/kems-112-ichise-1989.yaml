@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_activities_figure_only
   experiment_id: 10.2355/isijinternational.29.843::4
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -83,58 +87,62 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
   experiment_id: 10.2355/isijinternational.29.843::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use subtype
-    per:
       tag: unknown
-      reason: source does not state per
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use reference_state
+      reason: profile ion_intensity does not use reference_state
     reservoir:
-      tag: unknown
-      reason: source does not state reservoir
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
     composition:
-      tag: unknown
-      reason: source does not state composition
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
-      tag: unknown
-      reason: source does not state sweep_gas
+      tag: not_applicable
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
-      tag: unknown
-      reason: source does not state exposure
+      tag: not_applicable
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
-      tag: unknown
-      reason: source does not state sample_mass_kg
+      tag: not_applicable
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -161,13 +169,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_infinite_dilution_gamma
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ta
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -227,7 +239,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -252,13 +264,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -329,13 +345,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_quoted_gamma0_literature
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Nb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -415,13 +435,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe
   experiment_id: 10.2355/isijinternational.29.843::1
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -503,13 +527,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography
   experiment_id: 10.2355/isijinternational.29.843::2
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ta
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: phase_identification
@@ -589,13 +617,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
   experiment_id: 10.2355/isijinternational.29.843::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ta
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: phase_boundary_composition
@@ -676,13 +708,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
   experiment_id: 10.2355/isijinternational.29.843::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -738,7 +774,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -763,13 +799,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe
   experiment_id: 10.2355/isijinternational.29.843::5
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -851,13 +891,17 @@ observations:
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
   experiment_id: 10.2355/isijinternational.29.843::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -913,7 +957,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

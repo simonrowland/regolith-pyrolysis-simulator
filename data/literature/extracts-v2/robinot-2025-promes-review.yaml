@@ -5,13 +5,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
   experiment_id: 10.1016/j.actaastro.2025.05.008::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_li_2022_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -163,13 +171,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_li_2023_fe2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Fe2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -242,13 +254,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_li_2023_fetio3_fe2o3_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -321,13 +337,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_li_2023_regolith_simulant
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Regolith_Simulant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -400,13 +420,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_li_2024_feo
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -479,13 +503,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_al2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Al2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -558,13 +586,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_fetio3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -637,13 +669,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mgsio3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MgSiO3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -716,13 +752,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mls1a
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MLS-1a' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -795,13 +835,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_cao
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -874,13 +918,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_ms1
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MS1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -953,13 +1001,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1032,13 +1084,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_zno
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_ZnO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1111,13 +1167,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_senior_1991_caal2sio8
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_CaAl2SiO8' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1190,13 +1250,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_senior_1991_fetio3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1269,13 +1333,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_sesko_2024_eac1
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_EAC-1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1348,13 +1416,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_feo_fe2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeO_Fe2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1427,13 +1499,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_fetio3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1506,13 +1582,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_lms1
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_LMS-1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1585,13 +1665,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_steurer_1985_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1664,13 +1748,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_tanaka_2019_al2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Al2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1743,13 +1831,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t2_zhao_2023_tio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_TiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1822,13 +1914,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t3_li_2023_fe2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_Fe2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1901,13 +1997,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t3_li_2023_fetio3_fe2o3_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1980,13 +2080,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t3_li_2023_regolith_simulant
   experiment_id: 10.1016/j.actaastro.2025.05.008::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_Regolith_Simulant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2059,13 +2163,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t4_li_2023_fe2o3
   experiment_id: 10.1016/j.actaastro.2025.05.008::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_deposit_Fe2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2138,13 +2246,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t4_li_2023_fetio3_fe2o3_sio2
   experiment_id: 10.1016/j.actaastro.2025.05.008::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_deposit_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2217,13 +2329,17 @@ observations:
 - observation_id: robinot-2025-promes-review::robinot_2025_t4_li_2023_regolith_simulant
   experiment_id: 10.1016/j.actaastro.2025.05.008::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'laser_vacuum_pyrolysis_deposit_Regolith_Simulant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

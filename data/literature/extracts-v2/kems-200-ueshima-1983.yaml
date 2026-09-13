@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_geometry
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_annealed_samples' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_invariant_this_work
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_sigma_decomposition' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: invariant_reaction
@@ -171,13 +179,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::1
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: heat_treated_phase_identification
@@ -249,13 +261,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::2
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: EPMA_phase_boundary_composition
@@ -329,13 +345,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig1_epma_calibration_figure_only
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_standards' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -407,13 +427,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig2_epma_results_figure_only
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::2
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: EPMA_phase_boundaries_plot
@@ -485,13 +509,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig3_phase_diagram_figure_only
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_binary' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: revised_phase_diagram
@@ -564,13 +592,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_pure_Fe_melting_check
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: pure_Fe_melting_onset
@@ -653,13 +685,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_activities
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_binary' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -731,13 +767,17 @@ observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_thermal_analysis
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_invariants' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: quoted_kems_invariant_temperatures

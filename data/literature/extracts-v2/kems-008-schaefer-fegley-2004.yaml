@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide_literature_survey' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -68,8 +72,16 @@ observations:
       value: compilation_assessed
     original_method_class: review_compilation
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-008-schaefer-fegley-2004::sf2004_t10_r07_al2o3
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -80,13 +92,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Mg2SiO4_s_l_literature' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -142,8 +158,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-008-schaefer-fegley-2004::sf2004_t10_r18_mg
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '10'
+        line_range: 649-661
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -154,13 +178,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide_literature_survey' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -217,8 +245,16 @@ observations:
       value: compilation_assessed
     original_method_class: review_compilation
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-008-schaefer-fegley-2004::sf2004_t10_r12_mgo
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -229,13 +265,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide_literature_survey' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -292,8 +332,16 @@ observations:
       value: compilation_assessed
     original_method_class: review_compilation
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-008-schaefer-fegley-2004::sf2004_t10_r16_sio2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '10'
+        paragraph: Vaporization coefficients for oxides and silicates
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -304,13 +352,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_silicate_literature_survey' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -368,8 +420,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-008-schaefer-fegley-2004::sf2004_t10_r18_sio
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '10'
+        line_range: 649-661
+        source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -380,13 +440,17 @@ observations:
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r01_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -446,17 +510,8 @@ observations:
 
       Al2O3 (s) | 1800–1900 | 0.24–0.49 | Peleg and Alcock (1974)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=1; Al2O3 (s); Peleg and Alcock (1974)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -464,17 +519,21 @@ observations:
     table: '10'
     note: row=1; Al2O3 (s); Peleg and Alcock (1974)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r02_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -534,17 +593,8 @@ observations:
 
       Al2O3 (s) | 2000 | 0.14 | Krönert and Boehm (1972)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=2; Al2O3 (s); Krönert and Boehm (1972)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -552,17 +602,21 @@ observations:
     table: '10'
     note: row=2; Al2O3 (s); Krönert and Boehm (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r03_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -622,17 +676,8 @@ observations:
 
       Al2O3 (s) | 2000 | 0.067 | Wolff and Alcock (1962)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=3; Al2O3 (s); Wolff and Alcock (1962)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -640,17 +685,21 @@ observations:
     table: '10'
     note: row=3; Al2O3 (s); Wolff and Alcock (1962)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r04_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -710,17 +759,8 @@ observations:
 
       Al2O3 (s) | 2195 | 0.08 | Farber et al. (1972)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=4; Al2O3 (s); Farber et al. (1972)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -728,17 +768,21 @@ observations:
     table: '10'
     note: row=4; Al2O3 (s); Farber et al. (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r05_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -798,17 +842,8 @@ observations:
 
       Al2O3 (s) | 2290 | ∼ 0.80 | Alcock and Peleg (1967)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=5; Al2O3 (s); Alcock and Peleg (1967)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -816,17 +851,21 @@ observations:
     table: '10'
     note: row=5; Al2O3 (s); Alcock and Peleg (1967)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r06_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -888,17 +927,8 @@ observations:
 
       Al2O3 (s) | 2310a | 0.3 ± 0.05 | Burns (1966)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=6; Al2O3 (s); Burns (1966)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -906,17 +936,21 @@ observations:
     table: '10'
     note: row=6; Al2O3 (s); Burns (1966)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r07_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -976,17 +1010,8 @@ observations:
 
       Al2O3 (l) | 2310a | 1.0 | Burns (1966)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=7; Al2O3 (l); Burns (1966)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -994,17 +1019,21 @@ observations:
     table: '10'
     note: row=7; Al2O3 (l); Burns (1966)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r08_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1064,17 +1093,8 @@ observations:
 
       MgO (s) | 1800 | 0.25 | Peleg and Alcock (1974)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=8; MgO (s); Peleg and Alcock (1974)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1082,17 +1102,21 @@ observations:
     table: '10'
     note: row=8; MgO (s); Peleg and Alcock (1974)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r09_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1152,17 +1176,8 @@ observations:
 
       MgO (s) | 1900 | 0.4 | Peleg and Alcock (1974)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=9; MgO (s); Peleg and Alcock (1974)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1170,17 +1185,21 @@ observations:
     table: '10'
     note: row=9; MgO (s); Peleg and Alcock (1974)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r10_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1240,17 +1259,8 @@ observations:
 
       MgO (s) | 1820–1960 | ∼ 0.25 | Alcock and Peleg (1967)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=10; MgO (s); Alcock and Peleg (1967)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1258,17 +1268,21 @@ observations:
     table: '10'
     note: row=10; MgO (s); Alcock and Peleg (1967)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r11_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1328,17 +1342,8 @@ observations:
 
       MgO (s) | 2273 | 0.09 | Krönert and Boehm (1972)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=11; MgO (s); Krönert and Boehm (1972)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1346,17 +1351,21 @@ observations:
     table: '10'
     note: row=11; MgO (s); Krönert and Boehm (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r12_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1416,17 +1425,8 @@ observations:
 
       MgO (s) | 1873–2173 | 0.12–0.22 | Hashimoto (1990)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=12; MgO (s); Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1434,17 +1434,21 @@ observations:
     table: '10'
     note: row=12; MgO (s); Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r13_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1506,17 +1510,8 @@ observations:
 
       SiO2 (s) | 1823–1983 | 0.022 ± 0.008 | Nagai et al. (1973)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=13; SiO2 (s); Nagai et al. (1973)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1524,17 +1519,21 @@ observations:
     table: '10'
     note: row=13; SiO2 (s); Nagai et al. (1973)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r14_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1596,17 +1595,8 @@ observations:
 
       SiO2 (s) | 1700–1950 | 0.022 ± 0.003 | Shornikov et al. (1999)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=14; SiO2 (s); Shornikov et al. (1999)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1614,17 +1604,21 @@ observations:
     table: '10'
     note: row=14; SiO2 (s); Shornikov et al. (1999)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r15_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1684,17 +1678,8 @@ observations:
 
       SiO2 (s) | 1833–1958 | 0.11–0.015 | Hashimoto (1990)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=15; SiO2 (s); Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1702,17 +1687,21 @@ observations:
     table: '10'
     note: row=15; SiO2 (s); Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r16_sio
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1774,17 +1763,8 @@ observations:
 
       These show vaporization coefficients for SiO (g) of ∼ 0.04 in the 2173–2373 K range over liquid silica'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=16; SiO2 (liq); Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1792,17 +1772,21 @@ observations:
     table: '10'
     note: row=16; SiO2 (liq); Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r16_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1862,17 +1846,8 @@ observations:
 
       SiO2 (liq) | 2173–2373 | 0.038–0.048 | Hashimoto (1990)'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=16; SiO2 (liq); Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1880,17 +1855,21 @@ observations:
     table: '10'
     note: row=16; SiO2 (liq); Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r17_mg
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1952,17 +1931,8 @@ observations:
 
       The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=17; Mg2SiO4 (s)b; Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -1970,17 +1940,21 @@ observations:
     table: '10'
     note: row=17; Mg2SiO4 (s)b; Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r17_sio
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2042,17 +2016,8 @@ observations:
 
       The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=17; Mg2SiO4 (s)b; Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -2060,17 +2025,21 @@ observations:
     table: '10'
     note: row=17; Mg2SiO4 (s)b; Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r18_mg
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2132,17 +2101,8 @@ observations:
 
       The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=18; Mg2SiO4 (l)b; Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -2150,17 +2110,21 @@ observations:
     table: '10'
     note: row=18; Mg2SiO4 (l)b; Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r18_sio
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2222,17 +2186,8 @@ observations:
 
       The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
-    decided_by:
-      worker: ocr-phase2b-gk
-      date: '2026-08-03'
-      evidence:
-        page: 235
-        table: '10'
-        note: row=18; Mg2SiO4 (l)b; Hashimoto (1990)
-        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-008-schaefer-fegley-2004
   locator:
@@ -2240,17 +2195,21 @@ observations:
     table: '10'
     note: row=18; Mg2SiO4 (l)b; Hashimoto (1990)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_1
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2304,7 +2263,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2317,17 +2276,21 @@ observations:
     table: '2'
     note: row=K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_2
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2381,7 +2344,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2394,17 +2357,21 @@ observations:
     table: '2'
     note: row=K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_3
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2458,7 +2425,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2471,17 +2438,21 @@ observations:
     table: '2'
     note: row=K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_4
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2535,7 +2506,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2548,17 +2519,21 @@ observations:
     table: '2'
     note: row=0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_5
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2612,7 +2587,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2625,17 +2600,21 @@ observations:
     table: '2'
     note: row=Na (g) = Na+ (g) + e− (g)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_6
   experiment_id: 10.1016/j.icarus.2003.08.023::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2689,7 +2668,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2702,17 +2681,21 @@ observations:
     table: '2'
     note: row=K (g) = K+ (g) + e− (g)
     source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_al
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2766,7 +2749,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2779,17 +2762,21 @@ observations:
     table: '4'
     note: row=Al
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_al2o
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2843,7 +2830,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2856,17 +2843,21 @@ observations:
     table: '4'
     note: row=Al2 O
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_alo
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2920,7 +2911,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2933,17 +2924,21 @@ observations:
     table: '4'
     note: row=AlO
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_ca
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2997,7 +2992,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3010,17 +3005,21 @@ observations:
     table: '4'
     note: row=Ca
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_cao
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3074,7 +3073,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3087,17 +3086,21 @@ observations:
     table: '4'
     note: row=CaO
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_mg
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3151,7 +3154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3164,17 +3167,21 @@ observations:
     table: '4'
     note: row=Mg
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3228,7 +3235,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3241,17 +3248,21 @@ observations:
     table: '4'
     note: row=MgO
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_o
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3305,7 +3316,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3318,17 +3329,21 @@ observations:
     table: '4'
     note: row=O
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_o2
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3382,7 +3397,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3395,17 +3410,21 @@ observations:
     table: '4'
     note: row=O2
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_sio
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3459,7 +3478,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3472,17 +3491,21 @@ observations:
     table: '4'
     note: row=SiO
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3536,7 +3559,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3549,17 +3572,21 @@ observations:
     table: '4'
     note: row=SiO2
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t4_total
   experiment_id: 10.1016/j.icarus.2003.08.023::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3613,7 +3640,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3626,17 +3653,21 @@ observations:
     table: '4'
     note: row=Total
     source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_alkalis
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3690,7 +3721,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3703,17 +3734,21 @@ observations:
     table: '7'
     note: row=Alkalis
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_cais
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3767,7 +3802,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3780,17 +3815,21 @@ observations:
     table: '7'
     note: row=CAIs
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_dunite
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3844,7 +3883,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3857,17 +3896,21 @@ observations:
     table: '7'
     note: row=Dunite
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_komatiites
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3921,7 +3964,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3934,17 +3977,21 @@ observations:
     table: '7'
     note: row=Komatiites
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_morbs
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3998,7 +4045,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4011,17 +4058,21 @@ observations:
     table: '7'
     note: row=MORBs
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_oibs
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -4075,7 +4126,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4088,17 +4139,21 @@ observations:
     table: '7'
     note: row=OIBs
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t7_tholeiites
   experiment_id: 10.1016/j.icarus.2003.08.023::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: bulk_lava
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -4152,7 +4207,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4165,17 +4220,21 @@ observations:
     table: '7'
     note: row=Tholeiites
     source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_al_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4229,7 +4288,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4242,17 +4301,21 @@ observations:
     table: '8'
     note: row=Al
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_al_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4321,17 +4384,21 @@ observations:
     table: '8'
     note: row=Al
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_ca_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4385,7 +4452,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4398,17 +4465,21 @@ observations:
     table: '8'
     note: row=Ca
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_ca_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4477,17 +4548,21 @@ observations:
     table: '8'
     note: row=Ca
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_fe_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4541,7 +4616,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4554,17 +4629,21 @@ observations:
     table: '8'
     note: row=Fe
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_fe_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4633,17 +4712,21 @@ observations:
     table: '8'
     note: row=Fe
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_k_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4697,7 +4780,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4710,17 +4793,21 @@ observations:
     table: '8'
     note: row=K
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_k_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4789,17 +4876,21 @@ observations:
     table: '8'
     note: row=K
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_na_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4853,7 +4944,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4866,17 +4957,21 @@ observations:
     table: '8'
     note: row=Na
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_na_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4945,17 +5040,21 @@ observations:
     table: '8'
     note: row=Na
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_si_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -5009,7 +5108,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5022,17 +5121,21 @@ observations:
     table: '8'
     note: row=Si
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_si_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -5101,17 +5204,21 @@ observations:
     table: '8'
     note: row=Si
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_ti_model
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -5165,7 +5272,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5178,17 +5285,21 @@ observations:
     table: '8'
     note: row=Ti
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t8_ti_observational_comparison
   experiment_id: 10.1016/j.icarus.2003.08.023::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -5257,17 +5368,21 @@ observations:
     table: '8'
     note: row=Ti
     source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_eminus
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: e-
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5321,7 +5436,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5334,17 +5449,21 @@ observations:
     table: '9'
     note: row=e−
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_fe
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5398,7 +5517,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5411,17 +5530,21 @@ observations:
     table: '9'
     note: row=Fe
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_feo
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5475,7 +5598,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5488,17 +5611,21 @@ observations:
     table: '9'
     note: row=FeO
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_k
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5552,7 +5679,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5565,17 +5692,21 @@ observations:
     table: '9'
     note: row=K
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_kplus
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: K+
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5629,7 +5760,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5642,17 +5773,21 @@ observations:
     table: '9'
     note: row=K+
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_mg
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5706,7 +5841,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5719,17 +5854,21 @@ observations:
     table: '9'
     note: row=Mg
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_na
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5783,7 +5922,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5796,17 +5935,21 @@ observations:
     table: '9'
     note: row=Na
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_nao
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5860,7 +6003,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5873,17 +6016,21 @@ observations:
     table: '9'
     note: row=NaO
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_naplus
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na+
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -5937,7 +6084,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -5950,17 +6097,21 @@ observations:
     table: '9'
     note: row=Na+
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_o
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -6014,7 +6165,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -6027,17 +6178,21 @@ observations:
     table: '9'
     note: row=O
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_o2
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -6091,7 +6246,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -6104,17 +6259,21 @@ observations:
     table: '9'
     note: row=O2
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_sio
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -6168,7 +6327,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -6181,17 +6340,21 @@ observations:
     table: '9'
     note: row=SiO
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t9_sio2
   experiment_id: 10.1016/j.icarus.2003.08.023::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -6245,7 +6408,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -6258,4 +6421,4 @@ observations:
     table: '9'
     note: row=SiO2
     source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: tables:kems-008-schaefer-fegley-2004

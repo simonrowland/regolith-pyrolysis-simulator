@@ -77,6 +77,12 @@ experiments:
         locator:
           page: 1277
           paragraph: The diameter of the effusion orifice was 0.5 mm
+        inference:
+          relation: area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          inputs:
+          - '{''page'': 1277, ''paragraph'': ''The diameter of the effusion orifice was 0.5 mm''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.2355/isijinternational.32.1276::2
   kind: literature
   method:
@@ -123,6 +129,12 @@ experiments:
         locator:
           page: 1277
           paragraph: The diameter of the effusion orifice was 0.5 mm
+        inference:
+          relation: area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          inputs:
+          - '{''page'': 1277, ''paragraph'': ''The diameter of the effusion orifice was 0.5 mm''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.2355/isijinternational.32.1276::4
   kind: literature
   method:

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_eq4_fayalite_mechanism_mueller
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe2SiO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_alumina_discarded
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_in_alumina' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -160,13 +168,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_cc_eq2
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -225,7 +237,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -241,13 +253,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_conclusions_mean
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -303,7 +319,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -320,13 +336,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_thoria' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -385,8 +405,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -404,13 +425,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_thoria' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -470,9 +495,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -490,13 +514,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::3
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_zirconia' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -555,8 +583,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -574,13 +603,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::3
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_zirconia' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -640,9 +673,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 3. Vaporiazation with the use of a zirconia cell; log (I+T) vs. 1/T
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -660,13 +692,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -725,8 +761,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -744,13 +781,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -810,9 +851,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -830,13 +870,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -895,8 +939,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -914,13 +959,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -980,9 +1029,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 5. Partial pressures of gaseous phase components, and total pressure vs. temperature.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -1000,13 +1048,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_vs_pure_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1065,8 +1117,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -1084,13 +1137,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_vs_pure_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1151,9 +1208,8 @@ observations:
     attribution: Fig. 6. A comparison of the temperature dependence of Fe and SiO partial pressures established in the present
       study, with published partial pressure values for these components over pure Fe and SiO2.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -1171,13 +1227,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::I
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1238,7 +1298,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1255,13 +1315,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_feo_highT_re_detected_not_tabulated
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium_above_melting' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1332,13 +1396,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_kems_geometry_and_calibration
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite_Knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1414,13 +1482,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_cc_eq2
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1479,7 +1551,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1495,13 +1567,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1560,8 +1636,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -1581,13 +1658,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1647,9 +1728,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -1669,13 +1749,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_fraction_of_total_P
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1746,13 +1830,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::I
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1813,7 +1901,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1829,13 +1917,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_absent_oxide_cells
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_alumina_thoria_zirconia' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1906,13 +1998,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_cc_eq3
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1971,7 +2067,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1987,13 +2083,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2052,8 +2152,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2073,13 +2174,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2139,9 +2244,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 4. Vaporization with the use of a rhenium cell; log (I+T) vs. 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2161,13 +2265,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_platinum_insufficient
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_in_platinum' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2238,13 +2346,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_table1_second_law
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::I
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite_in_rhenium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2303,7 +2415,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2319,13 +2431,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_cc_eq2
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2384,7 +2500,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2400,13 +2516,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2465,8 +2585,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2486,13 +2607,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2552,9 +2677,8 @@ observations:
     original_method_class: measured_direct
     attribution: Fig. 2. Vaporization with the use of a thoria cell; log (I+T) vs. 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2574,13 +2698,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_vs_cristobalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2639,8 +2767,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only_quoted
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2658,13 +2787,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only_quoted
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_olivine_vs_cristobalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2725,9 +2858,8 @@ observations:
     attribution: Fig. 6. A comparison of the temperature dependence of Fe and SiO partial pressures established in the present
       study, with published partial pressure values for these components over pure Fe and SiO2.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
     decided_by:
       worker: DEEP-kems-093-piacente-1975
       date: '2026-09-06'
@@ -2745,13 +2877,17 @@ observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::I
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2812,7 +2948,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

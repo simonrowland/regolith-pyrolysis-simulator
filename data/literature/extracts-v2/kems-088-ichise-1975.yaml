@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3
   experiment_id: 10.2355/isijinternational1966.15.115::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -68,7 +72,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -85,13 +89,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fe_heat_of_vaporization_fig8
   experiment_id: 10.2355/isijinternational1966.15.115::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_iron' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -148,7 +156,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -165,13 +173,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig10_e_S_comparison_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::10
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -227,7 +239,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -244,13 +256,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig1_chamber_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -322,13 +338,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig2_cell_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -400,13 +420,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -478,13 +502,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig4_integration_1550C_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -540,7 +568,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -557,13 +585,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -619,7 +651,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -636,13 +668,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -698,7 +734,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -715,13 +751,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -777,7 +817,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -794,13 +834,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::8
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -872,13 +916,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_fig9_holder_heating_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -950,13 +998,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2
   experiment_id: 10.2355/isijinternational1966.15.115::2
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1028,13 +1080,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational1966.15.115::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1107,13 +1163,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1169,7 +1229,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1186,13 +1246,17 @@ observations:
 - observation_id: kems-088-ichise-1975::ichise_1975_table1_pure_iron_composition
   experiment_id: 10.2355/isijinternational1966.15.115::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'starting_iron' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: ref-032-ca::anchor_Ca_pure_Psat
   experiment_id: f3056a1f1870b1398f67983e33a255b48e3437aa22210cc2ef6d314efca7245a::REF-032#Ca
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ca_to_Ca_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

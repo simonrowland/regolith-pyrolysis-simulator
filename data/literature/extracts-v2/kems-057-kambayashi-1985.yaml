@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe_crucible_internal_standard' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -85,13 +89,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -147,7 +155,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -165,13 +173,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::2
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'PbO-P2O5_oxide_melt_in_Pd_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -243,13 +255,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig3_time_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -321,13 +337,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig4_time_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -399,13 +419,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig5_temperature_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -477,13 +501,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig6_henrian_a_p2o5_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -555,13 +583,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig7_raoultian_activities_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -617,7 +649,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -634,58 +666,62 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig8_ion_current_vs_1T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::8
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe_crucible_internal_standard' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
+      tag: unknown
+      reason: source does not state subtype
     per:
       tag: not_applicable
-      reason: profile p_sat does not use per
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile p_sat does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile p_sat does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile p_sat does not use reference_state
+      reason: profile ion_intensity does not use reference_state
     reservoir:
-      tag: unknown
-      reason: source does not state reservoir
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile p_sat does not use composition
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile p_sat does not use exposure
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile p_sat does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -712,13 +748,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -777,7 +817,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -793,13 +833,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -873,13 +917,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'PbO-P2O5_and_FetO-P2O5_oxide_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -953,13 +1001,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::6
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1015,7 +1067,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1032,13 +1084,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: P4O10
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'P4O10_s_saturation_used_as_P2O5_solid_standard' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1094,7 +1150,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1111,13 +1167,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::3
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: PbO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'PbO-P2O5_oxide_melt_in_Pd_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1189,13 +1249,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Pd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Pd_crucible_internal_standard' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1268,13 +1332,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::6
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1330,7 +1398,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1347,13 +1415,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_PbO-P2O5_and_FetO-P2O5_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1425,13 +1497,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'literature_AP_comparison' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1504,13 +1580,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_PbO-P2O5_and_FetO-P2O5_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1582,13 +1662,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::3
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'PbO-P2O5_oxide_melt_in_Pd_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1672,13 +1756,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1750,13 +1838,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::5
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1829,13 +1921,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1892,7 +1988,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1909,13 +2005,17 @@ observations:
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1972,7 +2072,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

@@ -5,10 +5,14 @@ observations:
 - observation_id: ivtan-mno-coo-thermo::ivtan_CoO_gibbs
   experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1335
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CoO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -89,10 +93,14 @@ observations:
 - observation_id: ivtan-mno-coo-thermo::ivtan_MnO_gibbs
   experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1436
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal

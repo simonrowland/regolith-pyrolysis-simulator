@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig3_fe_v_integration_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-V liquid; Al-added vs without Al' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig5_fe_p_p_p2_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::5
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-P alloys' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -161,58 +169,62 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig6_fe_mo_ion_intensity_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe on Mo; solid/liquid iron and alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
+      tag: unknown
+      reason: source does not state subtype
     per:
       tag: not_applicable
-      reason: profile p_sat does not use per
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile p_sat does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile p_sat does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile p_sat does not use reference_state
+      reason: profile ion_intensity does not use reference_state
     reservoir:
-      tag: unknown
-      reason: source does not state reservoir
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
     composition:
       tag: not_applicable
-      reason: profile p_sat does not use composition
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
       tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile p_sat does not use exposure
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile p_sat does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -239,13 +251,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig7_fe_ge_ion_ratio_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::7
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ge; homogeneous liquid and solid plus two-phase' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -317,13 +333,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig8_fe_ge_phase_diagram_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::8
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ge liquid, alpha, epsilon, beta' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: phase_boundary
@@ -395,13 +415,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_p300_al2o3_cell_a_al_model_derived
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Al in iron vs Al2O3 cell; Fe-V example' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -457,7 +481,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -474,13 +498,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_al_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -552,13 +580,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_au_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Au
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -630,13 +662,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_co_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Co
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -708,13 +744,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cr_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -786,13 +826,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cu_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -864,13 +908,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_fe_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -942,13 +990,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ge_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1020,13 +1072,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1098,13 +1154,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mo_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1176,13 +1236,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_nb_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Nb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1254,13 +1318,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ni_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ni
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1332,13 +1400,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_p_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-P at 1 mass% (not pure P)' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1410,13 +1482,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_pd_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Pd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1488,13 +1564,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_s_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-S at 1 mass% (not pure S)' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1566,13 +1646,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_si_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1644,13 +1728,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_sn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1722,13 +1810,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ta_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ta
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1800,13 +1892,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ti_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1878,13 +1974,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_v_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1956,13 +2056,17 @@ observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_w_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: W
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_element_ranking_at_1873_K' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

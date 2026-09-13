@@ -165,6 +165,12 @@ experiments:
         locator:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
+        inference:
+          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          inputs:
+          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S2
   kind: literature
   method:
@@ -213,6 +219,12 @@ experiments:
         locator:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
+        inference:
+          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          inputs:
+          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
   kind: literature
   method:
@@ -260,6 +272,12 @@ experiments:
         locator:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
+        inference:
+          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          inputs:
+          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
   kind: literature
   method:
@@ -307,6 +325,12 @@ experiments:
         locator:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
+        inference:
+          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          inputs:
+          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
   kind: literature
   method:
@@ -356,3 +380,9 @@ experiments:
         locator:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
+        inference:
+          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          inputs:
+          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
+          parameters: []
+          output_unit: m2

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_cao_epsilon_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -92,13 +96,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_feto_t_and_pO2_gate
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -154,7 +162,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -171,13 +179,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_fig1_a_p2o5_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -249,13 +261,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_fig2_ln_gamma_vs_Ni_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -327,13 +343,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -389,7 +409,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -406,13 +426,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_interaction_parameters_1643k
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_P2O5_in_FetO_with_CaO_MgO_MnO_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -472,7 +496,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -499,13 +523,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_iwasaki_quoted_Lp
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'quoted_FeO-CaO-SiO2_carbon_saturated_iron' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -576,13 +604,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -666,13 +698,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_mgo_epsilon_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -728,7 +764,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -753,13 +789,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_mno_epsilon_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -815,7 +855,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -840,13 +880,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_p2_table1_partial_pressure
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -902,7 +946,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -919,13 +963,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_p4o10_sat_janaf_1643k
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: P4O10
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'P4O10_s_saturation_used_as_P2O5_solid_standard' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -981,7 +1029,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1008,13 +1056,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_po2_table1_partial_pressure
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1070,7 +1122,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1087,13 +1139,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_sio2_epsilon_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1149,7 +1205,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1174,13 +1230,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_table1_ion_current_ratios_1643k
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1262,13 +1322,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_table1_partial_pressures_1643k
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1324,7 +1388,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1351,13 +1415,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1413,7 +1481,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1430,13 +1498,17 @@ observations:
 - observation_id: kems-058-ohara-1987::ohara_1987_turkdogan_quoted_ln_gamma_eq11
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-rich_steelmaking_slag_quoted' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype

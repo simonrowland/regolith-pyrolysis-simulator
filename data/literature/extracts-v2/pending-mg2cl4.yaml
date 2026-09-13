@@ -5,13 +5,17 @@ observations:
 - observation_id: pending-mg2cl4::anchor_Mg2Cl4_dimer_partial
   experiment_id: 4b109afec4c950d5778190fc96b4c6f8cb2baef5964bfc64298aa475bd264bfc::PENDING#Mg2Cl4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg2Cl4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgCl2_system_to_Mg2Cl4_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

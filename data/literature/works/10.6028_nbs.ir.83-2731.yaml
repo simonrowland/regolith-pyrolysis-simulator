@@ -154,6 +154,13 @@ experiments:
           paragraph: An effusion orifice diameter of 0.5 cm was used
           line_range: '163'
           source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        inference:
+          relation: area = π (d/2)^2 from stated effusion orifice diameter 0.5 cm
+          inputs:
+          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md'',
+            ''paragraph'': ''An effusion orifice diameter of 0.5 cm was used'', ''line_range'': ''163''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.6028/nbs.ir.83-2731::20
   kind: literature
   method:

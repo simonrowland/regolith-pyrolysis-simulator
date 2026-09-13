@@ -10,18 +10,18 @@ work:
       tag: unknown
       reason: INDEX does not give corpus commit
     files:
-    - asset_id: pdf:REF-016
-      role: pdf
+    - asset_id: unknown:REF-016
+      role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give sha256
+        reason: INDEX does not give an asset
 experiments:
 - experiment_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752::iron_olivine_kems
   kind: literature
   method:
     tag: value
-    value: langmuir_free_evaporation
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:

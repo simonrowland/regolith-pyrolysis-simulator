@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_crucible_area_numeric_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -79,13 +83,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -146,35 +154,32 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_cu_specific_evaporation_constant
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '519'
-        table: '5'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '519'
     table: '5'
   read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -222,7 +227,7 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -254,17 +259,21 @@ observations:
     table: '2'
     note: Melt 6503-11
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -312,7 +321,289 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 148.5; l(g) 145.3
+
+      t(min) 10; l0(g) 152.4; l(g) 143.7
+
+      t(min) 15; l0(g) 149.1; l(g) 142.7
+
+      t(min) 20; l0(g) 149.5; l(g) 139.8'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-11
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 148.5; l(g) 145.3
+
+      t(min) 10; l0(g) 152.4; l(g) 143.7
+
+      t(min) 15; l0(g) 149.1; l(g) 142.7
+
+      t(min) 20; l0(g) 149.5; l(g) 139.8'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-11
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 148.5; l(g) 145.3
+
+      t(min) 10; l0(g) 152.4; l(g) 143.7
+
+      t(min) 15; l0(g) 149.1; l(g) 142.7
+
+      t(min) 20; l0(g) 149.5; l(g) 139.8'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-11
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -344,17 +635,21 @@ observations:
     table: '2'
     note: Melt 6503-12
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -402,7 +697,289 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.1; l(g) 147.5
+
+      t(min) 10; l0(g) 152.8; l(g) 148.4
+
+      t(min) 15; l0(g) 151.2; l(g) 144.3
+
+      t(min) 20; l0(g) 150.8; l(g) 141.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-12
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.1; l(g) 147.5
+
+      t(min) 10; l0(g) 152.8; l(g) 148.4
+
+      t(min) 15; l0(g) 151.2; l(g) 144.3
+
+      t(min) 20; l0(g) 150.8; l(g) 141.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-12
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.1; l(g) 147.5
+
+      t(min) 10; l0(g) 152.8; l(g) 148.4
+
+      t(min) 15; l0(g) 151.2; l(g) 144.3
+
+      t(min) 20; l0(g) 150.8; l(g) 141.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-12
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -434,17 +1011,21 @@ observations:
     table: '2'
     note: Melt 6503-16
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -492,7 +1073,289 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.3; l(g) 147.1
+
+      t(min) 10; l0(g) 150.8; l(g) 144.8
+
+      t(min) 15; l0(g) 150.4; l(g) 143.1
+
+      t(min) 20; l0(g) 149.8; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-16
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.3; l(g) 147.1
+
+      t(min) 10; l0(g) 150.8; l(g) 144.8
+
+      t(min) 15; l0(g) 150.4; l(g) 143.1
+
+      t(min) 20; l0(g) 149.8; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-16
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.3; l(g) 147.1
+
+      t(min) 10; l0(g) 150.8; l(g) 144.8
+
+      t(min) 15; l0(g) 150.4; l(g) 143.1
+
+      t(min) 20; l0(g) 149.8; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-16
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -524,17 +1387,303 @@ observations:
     table: '2'
     note: Melt 6503-28
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.0; l(g) 144.5
+
+      t(min) 10; l0(g) 150.7; l(g) 144.8
+
+      t(min) 15; l0(g) 151.0; l(g) 142.6
+
+      t(min) 20; l0(g) 149.6; l(g) 139.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-28
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.0; l(g) 144.5
+
+      t(min) 10; l0(g) 150.7; l(g) 144.8
+
+      t(min) 15; l0(g) 151.0; l(g) 142.6
+
+      t(min) 20; l0(g) 149.6; l(g) 139.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-28
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.0; l(g) 144.5
+
+      t(min) 10; l0(g) 150.7; l(g) 144.8
+
+      t(min) 15; l0(g) 151.0; l(g) 142.6
+
+      t(min) 20; l0(g) 149.6; l(g) 139.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-28
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -590,8 +1739,18 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_experimental_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF pp. 3-4 / printed pp. 517-518
+        table: '2'
+        line_range: 166-168
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -604,13 +1763,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -667,8 +1830,15 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -678,13 +1848,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -749,33 +1923,29 @@ observations:
     original_method_class: measured_direct
     attribution: alpha_Cu(exp.) 51
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: 517–518
-        table: '2'
-        source_path: tables/kems-001-homma-1966/table-2.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
     table: '2'
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_experimental_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -864,33 +2034,29 @@ observations:
 
       '
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: 517–518
-        table: '2'
-        source_path: tables/kems-001-homma-1966/table-2.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
     table: '2'
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_theoretical_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -946,7 +2112,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -958,17 +2124,21 @@ observations:
     page: 517–518
     table: '2'
     source_path: tables/kems-001-homma-1966/table-2.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_cu_specific_evaporation_constant
   experiment_id: 10.2320/jinstmet1952.30.6_515::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1024,8 +2194,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '5'
+        line_range: 216-218
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -1036,13 +2214,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::4, 5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1103,35 +2285,32 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_mn_specific_evaporation_constant
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '519'
-        table: 4, 5
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '519'
     table: 4, 5
   read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1179,7 +2358,7 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -1209,17 +2388,21 @@ observations:
     table: '1'
     note: Melt 6412-14
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1267,7 +2450,191 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.4; l(g) 144.2
+
+      t(min) 10; l0(g) 150.2; l(g) 141.1
+
+      t(min) 15; l0(g) 150.3; l(g) 137.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6412-14
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.4; l(g) 144.2
+
+      t(min) 10; l0(g) 150.2; l(g) 141.1
+
+      t(min) 15; l0(g) 150.3; l(g) 137.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6412-14
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -1297,17 +2664,21 @@ observations:
     table: '1'
     note: Melt 6502-1
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1355,7 +2726,191 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.6; l(g) 146.5
+
+      t(min) 10; l0(g) 151.0; l(g) 144.6
+
+      t(min) 15; l0(g) 150.6; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-1
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.6; l(g) 146.5
+
+      t(min) 10; l0(g) 151.0; l(g) 144.6
+
+      t(min) 15; l0(g) 150.6; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-1
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -1385,17 +2940,205 @@ observations:
     table: '1'
     note: Melt 6502-2
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 146.1
+
+      t(min) 10; l0(g) 149.6; l(g) 143.3
+
+      t(min) 15; l0(g) 149.6; l(g) 142.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-2
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 146.1
+
+      t(min) 10; l0(g) 149.6; l(g) 143.3
+
+      t(min) 15; l0(g) 149.6; l(g) 142.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-2
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1454,8 +3197,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_experimental_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '1'
+        line_range: 162-164
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -1466,13 +3217,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1529,8 +3284,15 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -1540,13 +3302,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1611,33 +3377,29 @@ observations:
     original_method_class: measured_direct
     attribution: alpha_Mn(exp.) 115
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '517'
-        table: '1'
-        source_path: tables/kems-001-homma-1966/table-1.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '517'
     table: '1'
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_experimental_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1726,33 +3488,29 @@ observations:
 
       '
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '517'
-        table: '1'
-        source_path: tables/kems-001-homma-1966/table-1.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '517'
     table: '1'
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_theoretical_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1808,7 +3566,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1820,17 +3578,21 @@ observations:
     page: '517'
     table: '1'
     source_path: tables/kems-001-homma-1966/table-1.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_mn_specific_evaporation_constant
   experiment_id: 10.2320/jinstmet1952.30.6_515::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1888,8 +3650,17 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '4'
+        paragraph: English abstract specific evaporation constants
+        line_range: 5-7
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -1901,13 +3672,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1968,35 +3743,32 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_sn_specific_evaporation_constant
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '519'
-        table: '5'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '519'
     table: '5'
   read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2044,7 +3816,7 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -2076,17 +3848,21 @@ observations:
     table: '3'
     note: Melt 6503-14
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2134,7 +3910,289 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.3; l(g) 147.7
+
+      t(min) 10; l0(g) 150.1; l(g) 146.3
+
+      t(min) 15; l0(g) 148.1; l(g) 143.0
+
+      t(min) 20; l0(g) 148.5; l(g) 142.4'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-14
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.3; l(g) 147.7
+
+      t(min) 10; l0(g) 150.1; l(g) 146.3
+
+      t(min) 15; l0(g) 148.1; l(g) 143.0
+
+      t(min) 20; l0(g) 148.5; l(g) 142.4'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-14
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.3; l(g) 147.7
+
+      t(min) 10; l0(g) 150.1; l(g) 146.3
+
+      t(min) 15; l0(g) 148.1; l(g) 143.0
+
+      t(min) 20; l0(g) 148.5; l(g) 142.4'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-14
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -2166,17 +4224,21 @@ observations:
     table: '3'
     note: Melt 6503-15
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2224,7 +4286,289 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.5; l(g) 149.4
+
+      t(min) 10; l0(g) 150.7; l(g) 147.3
+
+      t(min) 15; l0(g) 151.8; l(g) 146.7
+
+      t(min) 20; l0(g) 151.1; l(g) 146.0'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-15
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.5; l(g) 149.4
+
+      t(min) 10; l0(g) 150.7; l(g) 147.3
+
+      t(min) 15; l0(g) 151.8; l(g) 146.7
+
+      t(min) 20; l0(g) 151.1; l(g) 146.0'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-15
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.5; l(g) 149.4
+
+      t(min) 10; l0(g) 150.7; l(g) 147.3
+
+      t(min) 15; l0(g) 151.8; l(g) 146.7
+
+      t(min) 20; l0(g) 151.1; l(g) 146.0'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-15
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:0
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -2256,17 +4600,303 @@ observations:
     table: '3'
     note: Melt 6504-1
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 144.7
+
+      t(min) 10; l0(g) 150.1; l(g) 145.5
+
+      t(min) 15; l0(g) 150.0; l(g) 144.1
+
+      t(min) 20; l0(g) 149.8; l(g) 144.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6504-1
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 144.7
+
+      t(min) 10; l0(g) 150.1; l(g) 145.5
+
+      t(min) 15; l0(g) 150.0; l(g) 144.1
+
+      t(min) 20; l0(g) 149.8; l(g) 144.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6504-1
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 144.7
+
+      t(min) 10; l0(g) 150.1; l(g) 145.5
+
+      t(min) 15; l0(g) 150.0; l(g) 144.1
+
+      t(min) 20; l0(g) 149.8; l(g) 144.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6504-1
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2322,8 +4952,18 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_experimental_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 4 / printed p. 518
+        table: '3'
+        line_range: 174-176
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -2336,13 +4976,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2399,8 +5043,15 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:
@@ -2410,13 +5061,17 @@ observations:
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2481,33 +5136,29 @@ observations:
     original_method_class: measured_direct
     attribution: alpha_Sn(exp.) 19
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '518'
-        table: '3'
-        source_path: tables/kems-001-homma-1966/table-3.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '518'
     table: '3'
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_experimental_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2596,33 +5247,29 @@ observations:
 
       '
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
-    decided_by:
-      worker: langmuir-ingest-gr-t544
-      date: '2026-08-07'
-      evidence:
-        page: '518'
-        table: '3'
-        source_path: tables/kems-001-homma-1966/table-3.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-001-homma-1966
   locator:
     page: '518'
     table: '3'
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_theoretical_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2678,7 +5325,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2690,17 +5337,21 @@ observations:
     page: '518'
     table: '3'
     source_path: tables/kems-001-homma-1966/table-3.csv
-  read_from: pdf:kems-001-homma-1966
+  read_from: tables:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_sn_specific_evaporation_constant
   experiment_id: 10.2320/jinstmet1952.30.6_515::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2756,8 +5407,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: '5'
+        line_range: 216-218
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   notices: []
   source_id: kems-001-homma-1966
   locator:

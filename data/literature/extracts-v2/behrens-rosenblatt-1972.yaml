@@ -5,13 +5,17 @@ observations:
 - observation_id: behrens-rosenblatt-1972::NIST_BR72_arsenolite_As4O6
   experiment_id: eb65a543482a415e4c10004f575f8839cd6f5050018fa5891629c3ebfed89ec3::NIST_BR72_arsenolite_As4O6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: As4O6
-      phase: g
+      phase:
+        tag: value
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: arsenolite
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

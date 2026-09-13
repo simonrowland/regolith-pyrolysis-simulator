@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-al-o-gas-species::anchor_Al2O3_gas_deltafG
   experiment_id: 10.1063/1.555799::LH87#Al_O_gas_species
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al2O3_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_Al2O3_to_Al_O_gas_mix' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

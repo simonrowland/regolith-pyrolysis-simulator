@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-geo-g::anchor_GeO_pure_Psat
   experiment_id: a5c796b924a40b5e0cb7067965c0b62fdad98b4ee073b4e4caa34abeb8135c34::LH87#GeO_g
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: GeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_GeO_to_GeO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

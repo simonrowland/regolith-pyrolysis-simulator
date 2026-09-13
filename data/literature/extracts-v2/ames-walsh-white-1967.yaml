@@ -5,10 +5,14 @@ observations:
 - observation_id: ames-walsh-white-1967::Ames67_EuO_dissociation
   experiment_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5::Ames67_EuO_dissociation
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Eu_metal_and_EuO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -78,10 +82,14 @@ observations:
 - observation_id: ames-walsh-white-1967::Ames67_YbO_dissociation
   experiment_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5::Ames67_YbO_dissociation
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Yb_metal_and_YbO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal

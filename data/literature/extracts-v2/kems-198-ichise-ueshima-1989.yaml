@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_ag_tm_tb_table1
   experiment_id: 10.5702/massspec.37.295::I
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Ag_melting_point_temperature_correction' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: Tm_minus_Tb_temperature_correction
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_15p6at_solidus_liquidus_prose
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-rich_Ag-Mn_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: solidus_and_liquidus
@@ -161,13 +169,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_table2_invariant_temperatures
   experiment_id: 10.5702/massspec.37.295::II
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_alloy_invariant_and_solidus_liquidus' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: invariant_reaction_and_solidus_liquidus_temperatures
@@ -240,13 +252,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_table3_relative_heat_q
   experiment_id: 10.5702/massspec.37.295::III
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_alloy_invariant_arrests' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -318,13 +334,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fe_a4_tb_table1
   experiment_id: 10.5702/massspec.37.295::I
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Fe_A4_temperature_correction' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: TA4_minus_Tb_temperature_correction
@@ -397,13 +417,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig2_ionization_efficiency_figure_only
   experiment_id: 10.5702/massspec.37.295::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag_and_Mn_vapor_in_ion_source' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -475,13 +499,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig3_ion_intensity_heating_figure_only
   experiment_id: 10.5702/massspec.37.295::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'AgMn(6)_92.8_at_pct_Mn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -553,13 +581,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig4_ion_intensity_cooling_figure_only
   experiment_id: 10.5702/massspec.37.295::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'AgMn(6)_92.8_at_pct_Mn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -631,13 +663,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig5_monovariant_figure_only
   experiment_id: 10.5702/massspec.37.295::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'AgMn(8)_solid_liquid_two_phase' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -709,13 +745,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig6_lnIT_vs_1T_figure_only
   experiment_id: 10.5702/massspec.37.295::6
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'AgMn(6)_XMn_0.928' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -787,13 +827,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig7_q_vs_xmn_figure_only
   experiment_id: 10.5702/massspec.37.295::7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -865,13 +909,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_kems_geometry_and_calibration
   experiment_id: 10.5702/massspec.37.295::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_liquid_and_solid_alloys_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -945,13 +993,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table4_sensitivity_model
   experiment_id: 10.5702/massspec.37.295::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_metal_vapor_and_thermocouple' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1007,7 +1059,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1024,13 +1076,17 @@ observations:
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants
   experiment_id: 10.5702/massspec.37.295::V
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: quoted_and_present_invariant_temperatures

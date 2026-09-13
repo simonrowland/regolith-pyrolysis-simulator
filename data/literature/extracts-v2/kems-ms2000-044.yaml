@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0500_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -70,8 +74,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0500_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.500 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -83,13 +96,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0500_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -149,17 +166,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.500 1473 6.44×10-3 6.52×10-3 5.38×10-8 5.32×10-8
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0500_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.500 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -171,13 +179,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0543_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -236,8 +248,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0543_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.543 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -249,13 +270,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0543_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -315,17 +340,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.543 1473 9.69×10-3 9.61×10-3 3.50×10-8 3.48×10-8
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0543_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.543 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -337,13 +353,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0591_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -402,8 +422,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0591_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.591 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -415,13 +444,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0591_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -481,17 +514,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.591 1323 1.11×10-2 1.12×10-2 1.35×10-9 1.33×10-9
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0591_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.591 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -503,13 +527,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -568,8 +596,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.630 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -581,13 +618,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -647,17 +688,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.630 1323 1.87×10-2 1.90×10-2 5.84×10-10 5.77×10-10
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.630 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -669,13 +701,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1523
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -734,8 +770,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1523_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.630 T=1523 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -747,13 +792,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1523_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -813,17 +862,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.630 1523 2.67×10-2 2.64×10-2 2.01×10-8 1.98×10-8
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0630_t1523
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.630 T=1523 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -835,13 +875,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0674_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -900,8 +944,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0674_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.674 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -913,13 +966,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0674_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -979,17 +1036,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.674 1373 0.101 0.101 7.54×10-11 7.41×10-11
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0674_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.674 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1001,13 +1049,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1066,8 +1118,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.722 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1079,13 +1140,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1145,17 +1210,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.722 1323 0.381 0.384 1.15×10-12 1.14×10-12
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.722 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1167,13 +1223,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1673
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1232,8 +1292,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1673_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.722 T=1673 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1245,13 +1314,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1673_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1311,17 +1384,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.722 1673 0.389 0.394 8.80×10-10 8.71×10-10
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0722_t1673
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.722 T=1673 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1333,13 +1397,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0770_t1073
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1398,8 +1466,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0770_t1073_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.770 T=1073 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1411,13 +1488,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0770_t1073_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1477,17 +1558,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.770 1073 0.597 0.601 1.87×10-16 1.87×10-16
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0770_t1073
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.770 T=1073 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1499,13 +1571,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1564,8 +1640,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.811 T=1173 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1577,13 +1662,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1643,17 +1732,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.811 1173 0.745 0.737 2.50×10-15 2.47×10-13
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.811 T=1173 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1665,13 +1745,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0848_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1730,8 +1814,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0848_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.848 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1743,13 +1836,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0848_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1809,17 +1906,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.848 1573 0.808 0.809 1.45×10-11 1.47×10-11
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0848_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.848 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1831,13 +1919,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0892_t1723_contested
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1896,8 +1988,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0892_t1723_contested_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.892 T=1723 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1909,13 +2010,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0892_t1723_contested_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1975,17 +2080,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.892 1723 0.880 0.878 8.981×0-11 8.92×10-11
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0892_t1723_contested
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.892 T=1723 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -1997,13 +2093,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0349_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2062,8 +2162,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0349_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.349 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2075,13 +2184,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0349_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2141,17 +2254,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.349 1373 3.77×10−6 3.80×10−6 8.62×10−5 8.55×10−5
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0349_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.349 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2163,13 +2267,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0382_t1383
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2228,8 +2336,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0382_t1383_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.382 T=1383 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2241,13 +2358,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0382_t1383_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2307,17 +2428,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.382 1383 4.76×10−5 4.73×10−5 2.43×10−5 2.44×10−5
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0382_t1383
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.382 T=1383 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2329,13 +2441,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0405_t1423
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2394,8 +2510,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0405_t1423_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.405 T=1423 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2407,13 +2532,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0405_t1423_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2473,17 +2602,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.405 1423 1.38×10−4 1.40×10−4 2.01×10−5 1.98×10−5
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0405_t1423
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.405 T=1423 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2495,13 +2615,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0430_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2560,8 +2684,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0430_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.430 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2573,13 +2706,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0430_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2639,17 +2776,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.430 1473 3.80×10−4 3.83×10−4 1.83×10−5 1.83×10−5
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0430_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.430 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2661,13 +2789,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0477_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2726,8 +2858,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0477_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.477 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2739,13 +2880,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0477_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2805,17 +2950,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.477 1373 1.75×10−3 1.77×10−3 1.32×10−6 1.31×10−6
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0477_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.477 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2827,13 +2963,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0524_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2892,8 +3032,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0524_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.524 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2905,13 +3054,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0524_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2971,17 +3124,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.524 1573 0.0204 0.0201 1.53×10−6 1.56×10−6
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0524_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.524 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -2993,13 +3137,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0573_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3058,8 +3206,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0573_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.573 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3071,13 +3228,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0573_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3137,17 +3298,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.573 1473 0.0703 0.0698 1.02×10−7 1.01×10−7
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0573_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.573 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3159,13 +3311,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0625_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3224,8 +3380,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0625_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.625 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3237,13 +3402,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0625_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3303,17 +3472,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.625 1573 0.199 0.196 7.63×10−8 7.65×10−8
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0625_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.625 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3325,13 +3485,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0671_t1173
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3390,8 +3554,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0671_t1173_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.671 T=1173 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3403,13 +3576,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0671_t1173_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3469,17 +3646,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.671 1173 0.342 0.337 4.67×10−11 4.72×10−11
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0671_t1173
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.671 T=1173 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3491,13 +3659,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3556,8 +3728,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.709 T=1673 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3569,13 +3750,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3635,17 +3820,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.709 1673 0.536 0.537 3.24×10−8 3.24×10−8
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0709_t1673
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.709 T=1673 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3657,13 +3833,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0753_t1273
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3722,8 +3902,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0753_t1273_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.753 T=1273 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3735,13 +3924,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0753_t1273_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3801,17 +3994,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.753 1273 0.735 0.729 5.29×10−11 5.35×10−11
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0753_t1273
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.753 T=1273 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3823,13 +4007,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0805_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3888,8 +4076,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0805_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3901,13 +4098,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0805_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3967,17 +4168,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.805 1473 0.860 0.854 7.19×10−10 7.13×10−10
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_na2o_activity_xsio2_0805_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -3989,13 +4181,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4054,8 +4250,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.500 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4067,13 +4272,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4132,17 +4341,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.500 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4154,13 +4354,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4219,8 +4423,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.543 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4232,13 +4445,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4297,17 +4514,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.543 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4319,13 +4527,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4384,8 +4596,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.591 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4397,13 +4618,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4462,17 +4687,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.591 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4484,13 +4700,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4549,8 +4769,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.630 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4562,13 +4791,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4627,17 +4860,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.630 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4649,13 +4873,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4714,8 +4942,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.630 T=1523 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4727,13 +4964,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4792,17 +5033,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.630 T=1523 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4814,13 +5046,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4879,8 +5115,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.674 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4892,13 +5137,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -4957,17 +5206,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.674 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -4979,13 +5219,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5044,8 +5288,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.722 T=1323 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5057,13 +5310,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5122,17 +5379,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.722 T=1323 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5144,13 +5392,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5209,8 +5461,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.722 T=1673 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5222,13 +5483,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5287,17 +5552,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.722 T=1673 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5309,13 +5565,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5374,8 +5634,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.770 T=1073 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5387,13 +5656,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5452,17 +5725,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.770 T=1073 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5474,13 +5738,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5539,8 +5807,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.811 T=1173 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5552,13 +5829,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5617,17 +5898,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.811 T=1173 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5639,13 +5911,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5704,8 +5980,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.848 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5717,13 +6002,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5782,17 +6071,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.848 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5804,13 +6084,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5869,8 +6153,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=K2O-SiO2 x(SiO2)=0.892 T=1723 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5882,13 +6175,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -5947,17 +6244,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=K2O-SiO2 x(SiO2)=0.892 T=1723 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -5969,13 +6257,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6034,8 +6326,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.349 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6047,13 +6348,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6112,17 +6417,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.349 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6134,13 +6430,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6199,8 +6499,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.382 T=1383 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6212,13 +6521,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6277,17 +6590,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.382 T=1383 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6299,13 +6603,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6364,8 +6672,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.405 T=1423 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6377,13 +6694,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6442,17 +6763,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.405 T=1423 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6464,13 +6776,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6529,8 +6845,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.430 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6542,13 +6867,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6607,17 +6936,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.430 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6629,13 +6949,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6694,8 +7018,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.477 T=1373 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6707,13 +7040,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6772,17 +7109,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.477 T=1373 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6794,13 +7122,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6859,8 +7191,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.524 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6872,13 +7213,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -6937,17 +7282,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.524 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -6959,13 +7295,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7024,8 +7364,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.573 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7037,13 +7386,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7102,17 +7455,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.573 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7124,13 +7468,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7189,8 +7537,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.625 T=1573 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7202,13 +7559,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7267,17 +7628,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.625 T=1573 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7289,13 +7641,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7354,8 +7710,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.671 T=1173 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7367,13 +7732,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7432,17 +7801,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.671 T=1173 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7454,13 +7814,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7519,8 +7883,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.709 T=1673 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7532,13 +7905,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7597,17 +7974,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.709 T=1673 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7619,13 +7987,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7684,8 +8056,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.753 T=1273 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7697,13 +8078,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7762,17 +8147,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.753 T=1273 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7784,13 +8160,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7849,8 +8229,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 22
+        table: '1'
+        note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7862,13 +8251,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -7927,17 +8320,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 22
-        table: '1'
-        note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -7949,13 +8333,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -8013,8 +8401,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -8025,13 +8421,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -8087,20 +8487,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived_second_law_fit
     model: model_derived_second_law_fit
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 23
-        table: '2'
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -8111,13 +8503,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -8176,8 +8572,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   notices: []
   source_id: kems-ms2000-044
   locator:
@@ -8188,13 +8592,17 @@ observations:
 - observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -8254,16 +8662,8 @@ observations:
       reason: 'page_grounded: method_class model_derived_and_compiled'
     original_method_class: model_derived_and_compiled
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3
-    decided_by:
-      worker: fix-deep-ms2000
-      date: '2026-09-06'
-      evidence:
-        page: PDF p. 23
-        table: '3'
-        source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-ms2000-044
   locator:

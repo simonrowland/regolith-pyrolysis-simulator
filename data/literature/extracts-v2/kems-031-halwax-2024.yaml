@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
   experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -67,8 +71,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:0
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        section: III. EXPERIMENTAL
+        line_range: 220-230
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -79,13 +91,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: lime
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -145,8 +161,17 @@ observations:
       reason: 'page_grounded: method_class third_law_kems'
     original_method_class: third_law_kems
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: IV
+        line_range: 595-607
+        note: Third-law standard formation enthalpy for pure solid CaO
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -158,13 +183,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
   experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_MgO_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -221,8 +250,15 @@ observations:
       reason: 'page_grounded: method_class method_only'
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        paragraph: Ir Knudsen cell geometry; explicitly not HKL α
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -232,13 +268,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_MgO_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -301,19 +341,8 @@ observations:
       reason: 'page_grounded: method_class method_only'
     original_method_class: method_only
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
-    decided_by:
-      worker: DEEP-kems-031-halwax-2024
-      date: '2026-09-06'
-      evidence:
-        page: 825
-        published_page: 825
-        pdf_page_index: 5
-        paragraph: experimental
-        note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in
-          the lid of the cell had a diameter of 0.3 mm.
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -327,13 +356,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
   experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -391,8 +424,17 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        section: III. EXPERIMENTAL
+        line_range: 220-230
+        note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -404,13 +446,17 @@ observations:
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: periclase
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -470,8 +516,17 @@ observations:
       reason: 'page_grounded: method_class third_law_kems'
     original_method_class: third_law_kems
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        table: IV
+        line_range: 595-607
+        note: Third-law standard formation enthalpy for pure solid MgO
+        source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -480,16 +535,20 @@ observations:
     note: Third-law standard formation enthalpy for pure solid MgO
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: pdf:kems-031-halwax-2024
-- observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:0
   experiment_id: 10.1007/s11663-024-02995-6::I
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -537,7 +596,7 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -551,37 +610,29 @@ observations:
 
       2nd measurement | 49.51 | 45.72'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
-    decided_by:
-      worker: DEEP-kems-031-halwax-2024
-      date: '2026-09-06'
-      evidence:
-        page: 825
-        published_page: 825
-        pdf_page_index: 5
-        table: I
-        source_path: tables/kems-031-halwax-2024/t1.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    published_page: 825
     pdf_page_index: 5
     table: I
-    source_path: tables/kems-031-halwax-2024/t1.csv
-  read_from: pdf:kems-031-halwax-2024
-- observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses
+  read_from: tables:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::I
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
-      formula: MgO
-      phase: g
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -629,7 +680,91 @@ observations:
       reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed uncertainty on Table I mass cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: '1st measurement | 53.93 | 45.06
+
+      2nd measurement | 49.51 | 45.72'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 825
+    pdf_page_index: 5
+    table: I
+  read_from: tables:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
+  experiment_id: 10.1007/s11663-024-02995-6::I
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: printed
     verbatim:
@@ -643,37 +778,113 @@ observations:
 
       2nd measurement | 51.58 | 48.28'
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
-    decided_by:
-      worker: DEEP-kems-031-halwax-2024
-      date: '2026-09-06'
-      evidence:
-        page: 825
-        published_page: 825
-        pdf_page_index: 5
-        table: I
-        source_path: tables/kems-031-halwax-2024/t1.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-031-halwax-2024
   locator:
     page: 825
-    published_page: 825
     pdf_page_index: 5
     table: I
-    source_path: tables/kems-031-halwax-2024/t1.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
+  experiment_id: 10.1007/s11663-024-02995-6::I
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series point 1 has no liftable numeric value
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed uncertainty on Table I mass cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: '1st measurement | 53.67 | 49.25
+
+      2nd measurement | 51.58 | 48.28'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 825
+    pdf_page_index: 5
+    table: I
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
   experiment_id: 10.1007/s11663-024-02995-6::II
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ni
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Ni' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -757,17 +968,21 @@ observations:
     pdf_page_index: 6
     table: II
     source_path: tables/kems-031-halwax-2024/t2.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_this_study
   experiment_id: 10.1007/s11663-024-02995-6::II
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ni
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Ni' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -842,17 +1057,21 @@ observations:
     table: II
     note: row=This Study
     source_path: tables/kems-031-halwax-2024/t2.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iii_ionization_cross_sections
   experiment_id: 10.1007/s11663-024-02995-6::III
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'calibration_constants' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -930,17 +1149,21 @@ observations:
     pdf_page_index: 6
     table: III
     source_path: tables/kems-031-halwax-2024/t3.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_1st_measurement
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1015,17 +1238,21 @@ observations:
     table: IV
     note: row=1st measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_2nd_measurement
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1100,17 +1327,21 @@ observations:
     table: IV
     note: row=2nd measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_literature_and_factps
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1211,17 +1442,21 @@ observations:
     pdf_page_index: 10
     table: IV
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: lime
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1285,19 +1520,8 @@ observations:
       reason: 'page_grounded: method_class third_law_kems'
     original_method_class: third_law_kems
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
-    decided_by:
-      worker: DEEP-kems-031-halwax-2024
-      date: '2026-09-06'
-      evidence:
-        page: 830
-        published_page: 830
-        pdf_page_index: 10
-        table: IV
-        note: row=mean
-        source_path: tables/kems-031-halwax-2024/t4.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -1307,17 +1531,21 @@ observations:
     table: IV
     note: row=mean
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_1st_measurement
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1392,17 +1620,21 @@ observations:
     table: IV
     note: row=1st measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1477,17 +1709,21 @@ observations:
     table: IV
     note: row=2nd measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_literature_and_factps
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1588,17 +1824,21 @@ observations:
     pdf_page_index: 10
     table: IV
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
   experiment_id: 10.1007/s11663-024-02995-6::IV
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: periclase
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1664,19 +1904,8 @@ observations:
       reason: 'page_grounded: method_class third_law_kems'
     original_method_class: third_law_kems
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
-    decided_by:
-      worker: DEEP-kems-031-halwax-2024
-      date: '2026-09-06'
-      evidence:
-        page: 830
-        published_page: 830
-        pdf_page_index: 10
-        table: IV
-        note: row=mean
-        source_path: tables/kems-031-halwax-2024/t4.csv
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-031-halwax-2024
   locator:
@@ -1686,17 +1915,21 @@ observations:
     table: IV
     note: row=mean
     source_path: tables/kems-031-halwax-2024/t4.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_v_huber_holley_ca_composition
   experiment_id: 10.1007/s11663-024-02995-6::V
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ca_metal_sample_ref_11' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1776,17 +2009,21 @@ observations:
     pdf_page_index: 10
     table: V
     source_path: tables/kems-031-halwax-2024/t5.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_vi_liang_cao_solution_reactions
   experiment_id: 10.1007/s11663-024-02995-6::VI
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_CaO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1864,17 +2101,21 @@ observations:
     pdf_page_index: 11
     table: VI
     source_path: tables/kems-031-halwax-2024/t6.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024
 - observation_id: kems-031-halwax-2024::halwax_2024_table_vii_shomate_huffman_reactions
   experiment_id: 10.1007/s11663-024-02995-6::VII
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_solid_MgO' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1956,4 +2197,4 @@ observations:
     pdf_page_index: 13
     table: VII
     source_path: tables/kems-031-halwax-2024/t7.csv
-  read_from: pdf:kems-031-halwax-2024
+  read_from: tables:kems-031-halwax-2024

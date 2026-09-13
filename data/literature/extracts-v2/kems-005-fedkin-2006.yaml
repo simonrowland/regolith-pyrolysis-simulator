@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_fe_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -65,7 +69,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -81,13 +85,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -160,13 +168,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_k_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_chondrule_analog_Yu2003' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -225,7 +237,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -241,13 +253,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -320,13 +336,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_mg_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -380,7 +400,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -396,13 +416,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -473,13 +497,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_na_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_chondrule_analog_Yu2003' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -537,7 +565,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -553,13 +581,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -631,13 +663,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_langmuir_table3
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -705,13 +741,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
   experiment_id: 10.1016/j.gca.2005.08.014::3
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -770,7 +810,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -787,13 +827,17 @@ observations:
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_alexander_2001_inverse
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -850,7 +894,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived_inverse_fit
     model: model_derived_inverse_fit
   admission:
@@ -871,17 +915,21 @@ observations:
     table: '4'
     note: row=Mg; Alexander (2001)
     source_path: tables/kems-005-fedkin-2006/t4.csv
-  read_from: pdf:kems-005-fedkin-2006
+  read_from: tables:kems-005-fedkin-2006
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -942,7 +990,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived_inverse_fit
     model: model_derived_inverse_fit
   admission:
@@ -963,17 +1011,21 @@ observations:
     table: '4'
     note: row=Mg; This work
     source_path: tables/kems-005-fedkin-2006/t4.csv
-  read_from: pdf:kems-005-fedkin-2006
+  read_from: tables:kems-005-fedkin-2006
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1030,7 +1082,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived_inverse_fit
     model: model_derived_inverse_fit
   admission:
@@ -1051,17 +1103,21 @@ observations:
     table: '4'
     note: row=SiO; Alexander (2001)
     source_path: tables/kems-005-fedkin-2006/t4.csv
-  read_from: pdf:kems-005-fedkin-2006
+  read_from: tables:kems-005-fedkin-2006
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse
   experiment_id: 10.1016/j.gca.2005.08.014::4
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1122,7 +1178,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived_inverse_fit
     model: model_derived_inverse_fit
   admission:
@@ -1143,4 +1199,4 @@ observations:
     table: '4'
     note: row=SiO; This work
     source_path: tables/kems-005-fedkin-2006/t4.csv
-  read_from: pdf:kems-005-fedkin-2006
+  read_from: tables:kems-005-fedkin-2006

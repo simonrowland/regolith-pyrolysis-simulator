@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
   experiment_id: 10.2205/2011nz000234::kems-029-yakovlev-shornikov-2011
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated
   experiment_id: 10.2205/2011nz000234::O2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -146,7 +154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -163,13 +171,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_complementary_vapor_wt_pct
   experiment_id: 10.2205/2011nz000234::kems-029-yakovlev-shornikov-2011
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_and_ordinary_chondrite_melts_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -225,7 +237,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: derived_from_measured_kems_hertz_knudsen
     model: derived_from_measured_kems_hertz_knudsen
   admission:
@@ -243,13 +255,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
   experiment_id: 10.2205/2011nz000234::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_and_ordinary_chondrite_melts_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -321,13 +337,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
   experiment_id: 10.2205/2011nz000234::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -399,13 +419,17 @@ observations:
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_kems_method_geometry
   experiment_id: 10.2205/2011nz000234::kems-029-yakovlev-shornikov-2011
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'chondrite_and_CAI_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig4_rga_test12_figure_only
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MLS-1A_effluent_RGA' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -82,13 +86,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig5_ilmenite_EDS_ratios
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: FeTiO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ilmenite_slag_surface_EDS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -159,13 +167,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MLS-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -221,7 +233,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -237,13 +249,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: MLS-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -299,7 +315,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -315,13 +331,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig9_PT_figure_only
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MLS-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MLS-1A_vaporization_envelope' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -392,13 +412,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_psu_10g_mls1a_vaporization
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::8
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MLS-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MLS-1A_in_PSU_high_temperature_vacuum_furnace' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -478,13 +502,17 @@ observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MLS-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

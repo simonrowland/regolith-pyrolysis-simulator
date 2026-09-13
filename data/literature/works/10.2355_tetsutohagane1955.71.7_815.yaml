@@ -135,6 +135,13 @@ experiments:
           page: 2
           published_page: 816
           paragraph: 3-2 実験方法 inner diameter 15 mm
+        inference:
+          relation: 'area = π (d/2)^2 from stated graphite-crucible inner diameter 15 mm (section 3-2). Same crucible class
+            used for the a_Na2O runs (4-1: apparatus identical except Fe-Csat omitted).'
+          inputs:
+          - '{''page'': 2, ''published_page'': 816, ''paragraph'': ''3-2 実験方法 inner diameter 15 mm''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.2355/tetsutohagane1955.71.7_815::8
   kind: literature
   method:

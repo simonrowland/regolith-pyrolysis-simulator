@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-040-stolyarova-2015::stolyarova_2015_fig1_2_isoactivity_figure_only_blocked
   experiment_id: 10.4236/msce.2015.37009::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Bi2O3-B2O3-SiO2_and_Bi2O3-GeO2-SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -88,13 +92,17 @@ observations:
 - observation_id: kems-040-stolyarova-2015::stolyarova_2015_table1_vapour_species_map
   experiment_id: 10.4236/msce.2015.37009::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ternary_glass_forming_oxide_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

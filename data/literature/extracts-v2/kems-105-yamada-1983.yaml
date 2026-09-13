@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_Fe_P_Cu_Mn_not_measurable
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-Cu_and_Fe-P-Mn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_Al_body_4p0_printed
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -172,13 +180,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -235,7 +247,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -262,13 +274,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
   experiment_id: 10.2355/isijinternational1966.23.51::2
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -361,13 +377,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig1_Si_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -449,13 +469,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig2_Al_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -537,13 +561,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig3_3d_metals_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -625,13 +653,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig4_Nb_Mo_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -713,13 +745,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::5(a)
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -801,13 +837,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_fig5b_epsilon_S_quoted_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::5(b)
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S-i_quoted' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -889,13 +929,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -979,13 +1023,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
   experiment_id: 10.2355/isijinternational1966.23.51::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1057,13 +1105,17 @@ observations:
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
   experiment_id: 10.2355/isijinternational1966.23.51::2
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: P
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

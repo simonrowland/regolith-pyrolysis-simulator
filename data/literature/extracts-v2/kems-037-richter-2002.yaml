@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-037-richter-2002::richter_2002_mg_cai_langmuir_gamma
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Type_B_CAI_like' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-037-richter-2002::richter_2002_mg_table1_per_run_areas_b1
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Type_B_CAI_like' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -158,13 +166,17 @@ observations:
 - observation_id: kems-037-richter-2002::richter_2002_sio_cai_langmuir_gamma
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Type_B_CAI_like' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -232,13 +244,17 @@ observations:
 - observation_id: kems-037-richter-2002::richter_2002_sio_table1_per_run_areas_b1
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Type_B_CAI_like' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

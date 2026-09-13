@@ -5,10 +5,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_GEF_segments
   experiment_id: 10.1063/1.555706::LH84_Cs2O_g_GEF_segments
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cs2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -79,10 +83,14 @@ observations:
   experiment_id: '10.1063/1.555706::Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R
     = 1.66 kK'
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cs2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -157,10 +165,14 @@ observations:
   experiment_id: '10.1063/1.555706::Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
     = 1.50 kK'
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Li2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -234,13 +246,17 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Li2O_s_formation
   experiment_id: 10.1063/1.555706::LH84_Li2O_s_formation
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Li2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -310,13 +326,17 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_fusion
   experiment_id: 10.1063/1.555706::Table 1
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -391,13 +411,17 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_l_GEF_segments
   experiment_id: 10.1063/1.555706::Table 2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -469,13 +493,17 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_s_GEF_segments
   experiment_id: 10.1063/1.555706::Table 2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -547,13 +575,17 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_s_formation
   experiment_id: 10.1063/1.555706::Table 4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -627,10 +659,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na_g_GEF_segments
   experiment_id: 10.1063/1.555706::Table 2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -705,10 +741,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na_g_formation
   experiment_id: 10.1063/1.555706::Table 4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -785,10 +825,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_O2_g_GEF_segments
   experiment_id: 10.1063/1.555706::Table 2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -863,10 +907,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_O2_g_formation
   experiment_id: 10.1063/1.555706::Table 4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -943,10 +991,14 @@ observations:
   experiment_id: '10.1063/1.555706::Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R
     = 1.66 kK'
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Rb2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1020,10 +1072,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Rb2O_s_formation
   experiment_id: 10.1063/1.555706::LH84_Rb2O_s_formation
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Rb2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1096,10 +1152,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::NEA05_Se2_g
   experiment_id: 10.1063/1.555706::NEA05_Se2_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se_n_ladder
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1170,10 +1230,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::NEA05_Se5_g
   experiment_id: 10.1063/1.555706::NEA05_Se5_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se_n_ladder
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1243,10 +1307,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::NEA05_Se6_g
   experiment_id: 10.1063/1.555706::NEA05_Se6_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se_n_ladder
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1316,10 +1384,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::illustrative_dissociation_reaction
   experiment_id: 10.1063/1.555706::illustrative_dissociation_reaction
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1389,10 +1461,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::sublimation_BaO_s_to_BaO_g
   experiment_id: 10.1063/1.555706::sublimation_BaO_s_to_BaO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: BaO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1462,10 +1538,14 @@ observations:
 - observation_id: lamoreaux-hildenbrand-1984::sublimation_SrO_s_to_SrO_g
   experiment_id: 10.1063/1.555706::sublimation_SrO_s_to_SrO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SrO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal

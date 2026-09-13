@@ -5,13 +5,17 @@ observations:
 - observation_id: ref-052-k-o-gas::anchor_K2O_gas_deltafG
   experiment_id: 10.1063/1.555706::REF-052#K_O_gas
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2O_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_K2O_to_K_O_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: janaf-4th::Cr_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -78,13 +82,17 @@ observations:
 - observation_id: janaf-4th::Cr_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -151,13 +159,17 @@ observations:
 - observation_id: janaf-4th::Fe_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -226,13 +238,17 @@ observations:
 - observation_id: janaf-4th::Fe_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -301,10 +317,14 @@ observations:
 - observation_id: janaf-4th::JANAF1998_P2_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-012
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -382,14 +402,18 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF1998_P2_formation_tabulation
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P4O10_gas_formation_tabulation
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4O10
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -475,13 +499,17 @@ observations:
 - observation_id: janaf-4th::JANAF1998_P4O10_pure_solid_sublimation_screening
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P4O10_pure_solid_sublimation_screening
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4O10
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -548,10 +576,14 @@ observations:
 - observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-087
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4O6
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -633,14 +665,18 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::JANAF1998_P4_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-013
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -724,14 +760,18 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF1998_P4_formation_tabulation
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-032
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -823,14 +863,18 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF1998_PO2_formation_tabulation
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::JANAF1998_PO_formation_tabulation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-004
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -923,17 +967,21 @@ observations:
       (Phosphorus Oxide, PO, g), pp. ~1642
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF1998_PO_formation_tabulation
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::KCl_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: KCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1000,13 +1048,17 @@ observations:
 - observation_id: janaf-4th::KCl_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: KCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1074,13 +1126,17 @@ observations:
 - observation_id: janaf-4th::MgCl2_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: MgCl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1147,13 +1203,17 @@ observations:
 - observation_id: janaf-4th::Mn_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1220,13 +1280,17 @@ observations:
 - observation_id: janaf-4th::Mn_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mn
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1293,13 +1357,17 @@ observations:
 - observation_id: janaf-4th::NaCl_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NaCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1368,13 +1436,17 @@ observations:
 - observation_id: janaf-4th::NaCl_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NaCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1443,13 +1515,17 @@ observations:
 - observation_id: janaf-4th::NaF_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NaF
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1517,13 +1593,17 @@ observations:
 - observation_id: janaf-4th::NaF_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NaF
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1591,13 +1671,17 @@ observations:
 - observation_id: janaf-4th::Na_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1666,13 +1750,17 @@ observations:
 - observation_id: janaf-4th::Na_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1740,13 +1828,17 @@ observations:
 - observation_id: janaf-4th::Na_triple_point_temperature
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1814,13 +1906,17 @@ observations:
 - observation_id: janaf-4th::Si_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1888,13 +1984,17 @@ observations:
 - observation_id: janaf-4th::Si_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1961,13 +2061,17 @@ observations:
 - observation_id: janaf-4th::Ti_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2034,13 +2138,17 @@ observations:
 - observation_id: janaf-4th::Ti_normal_boiling_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2107,13 +2215,17 @@ observations:
 - observation_id: janaf-4th::Ti_solid_solid_transition
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::solid_solid_transition
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2180,13 +2292,17 @@ observations:
 - observation_id: janaf-4th::anchor_BaO_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#BaO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: BaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_BaO_to_BaO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2255,13 +2371,17 @@ observations:
 - observation_id: janaf-4th::anchor_Cr2O3_gas_melt_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#CrO2_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr2O3_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Cr2O3_condensed_to_Cr_O_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2331,13 +2451,17 @@ observations:
 - observation_id: janaf-4th::anchor_FeO_gas_melt_partial_or_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#FeO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeO_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_condensed_or_melt_to_FeO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2407,13 +2531,17 @@ observations:
 - observation_id: janaf-4th::anchor_K2Cl2_dimer_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#K2Cl2_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K2Cl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_KCl_to_K2Cl2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2481,13 +2609,17 @@ observations:
 - observation_id: janaf-4th::anchor_MnO_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#MnO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MnO_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_MnO_to_MnO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2555,13 +2687,17 @@ observations:
 - observation_id: janaf-4th::anchor_NaF_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#NaF
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: NaF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_NaF_to_NaF_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2629,13 +2765,17 @@ observations:
 - observation_id: janaf-4th::anchor_NiO_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#NiO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: NiO_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_NiO_to_NiO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2703,13 +2843,17 @@ observations:
 - observation_id: janaf-4th::anchor_O_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#O_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2779,13 +2923,17 @@ observations:
 - observation_id: janaf-4th::anchor_P2_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#P2_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_P4_P2_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2853,13 +3001,17 @@ observations:
 - observation_id: janaf-4th::anchor_PO2_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#PO2_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'phosphate_to_PO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2927,13 +3079,17 @@ observations:
 - observation_id: janaf-4th::anchor_PO_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#PO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'phosphate_melt_to_PO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3001,13 +3157,17 @@ observations:
 - observation_id: janaf-4th::anchor_S2_pure_Psat_or_speciation
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#S2_g
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: S2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_S_to_S2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3075,13 +3235,17 @@ observations:
 - observation_id: janaf-4th::anchor_SO3_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#SO3_l_g_deltafG_crosscheck
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_SO3_to_SO3_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3151,13 +3315,17 @@ observations:
 - observation_id: janaf-4th::anchor_SiO2_gas_melt_partial
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#SiO2_g_minority
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_to_SiO_g_not_SiO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3227,13 +3395,17 @@ observations:
 - observation_id: janaf-4th::anchor_TiO2_gas_deltafG
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#TiO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: TiO2_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_TiO2_to_TiO_TiO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3302,13 +3474,17 @@ observations:
 - observation_id: janaf-4th::anchor_Ti_pure_Psat
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF-4th#Ti_g
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti_to_Ti_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -3378,13 +3554,17 @@ observations:
 - observation_id: janaf-4th::extreme_reduction_from_phosphate
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-012
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3449,17 +3629,21 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: extreme_reduction_from_phosphate
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::extreme_reduction_from_phosphate_P4
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-013
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3524,17 +3708,21 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: extreme_reduction_from_phosphate_P4
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::janaf_P2_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-012
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3601,17 +3789,21 @@ observations:
     note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF P-012
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::janaf_P4O6_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-087
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3678,17 +3870,21 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF O-087
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::janaf_P4_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-013
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3755,17 +3951,21 @@ observations:
     note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF P-013
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::janaf_PO2_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-032
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3830,17 +4030,21 @@ observations:
     note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF O-032
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th
 - observation_id: janaf-4th::janaf_PO_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-004
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3906,4 +4110,4 @@ observations:
       (Phosphorus Oxide, PO, g), pp. ~1642
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF O-004
-  read_from: pdf:janaf-4th
+  read_from: tables:janaf-4th

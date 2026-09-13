@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-mgo-g::anchor_MgO_gas_deltafG
   experiment_id: 10.1063/1.555799::LH87#MgO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO_gas
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_MgO_to_MgO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

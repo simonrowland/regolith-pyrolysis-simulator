@@ -5,13 +5,17 @@ observations:
 - observation_id: nist-webbook::Al_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -79,13 +83,17 @@ observations:
 - observation_id: nist-webbook::Al_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -153,13 +161,17 @@ observations:
 - observation_id: nist-webbook::Al_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -227,13 +239,17 @@ observations:
 - observation_id: nist-webbook::Br2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Br2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -300,13 +316,17 @@ observations:
 - observation_id: nist-webbook::CH4_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: CH4
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -373,13 +393,17 @@ observations:
 - observation_id: nist-webbook::CO2_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -447,13 +471,17 @@ observations:
 - observation_id: nist-webbook::CO_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -520,13 +548,17 @@ observations:
 - observation_id: nist-webbook::CO_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -593,13 +625,17 @@ observations:
 - observation_id: nist-webbook::Ca_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -666,13 +702,17 @@ observations:
 - observation_id: nist-webbook::Ca_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -740,13 +780,17 @@ observations:
 - observation_id: nist-webbook::Ca_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -814,13 +858,17 @@ observations:
 - observation_id: nist-webbook::Cl2_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Cl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -887,13 +935,17 @@ observations:
 - observation_id: nist-webbook::Cl2_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Cl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -960,13 +1012,17 @@ observations:
 - observation_id: nist-webbook::H2O_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1033,13 +1089,17 @@ observations:
 - observation_id: nist-webbook::H2O_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1107,13 +1167,17 @@ observations:
 - observation_id: nist-webbook::H2O_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1181,13 +1245,17 @@ observations:
 - observation_id: nist-webbook::H2S_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1254,13 +1322,17 @@ observations:
 - observation_id: nist-webbook::H2S_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1327,13 +1399,17 @@ observations:
 - observation_id: nist-webbook::H2S_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1400,13 +1476,17 @@ observations:
 - observation_id: nist-webbook::HCHO_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HCHO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1473,13 +1553,17 @@ observations:
 - observation_id: nist-webbook::HCHO_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HCHO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1546,13 +1630,17 @@ observations:
 - observation_id: nist-webbook::HCHO_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HCHO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1619,13 +1707,17 @@ observations:
 - observation_id: nist-webbook::HCl_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1692,13 +1784,17 @@ observations:
 - observation_id: nist-webbook::HF_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HF
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1765,13 +1861,17 @@ observations:
 - observation_id: nist-webbook::HF_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: HF
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1838,13 +1938,17 @@ observations:
 - observation_id: nist-webbook::K_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1911,13 +2015,17 @@ observations:
 - observation_id: nist-webbook::K_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1985,13 +2093,17 @@ observations:
 - observation_id: nist-webbook::K_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2059,13 +2171,17 @@ observations:
 - observation_id: nist-webbook::Mg_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2132,13 +2248,17 @@ observations:
 - observation_id: nist-webbook::Mg_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2206,13 +2326,17 @@ observations:
 - observation_id: nist-webbook::Mg_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2280,13 +2404,17 @@ observations:
 - observation_id: nist-webbook::N2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2353,13 +2481,17 @@ observations:
 - observation_id: nist-webbook::N2_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2426,13 +2558,17 @@ observations:
 - observation_id: nist-webbook::N2_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2499,13 +2635,17 @@ observations:
 - observation_id: nist-webbook::NH3_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NH3
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2572,13 +2712,17 @@ observations:
 - observation_id: nist-webbook::NIST_Stull47_As2O3_highT
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull47_As2O3_highT
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: As4O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'highT_compiled' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2655,13 +2799,17 @@ observations:
 - observation_id: nist-webbook::NIST_Stull_Se_total_P
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull_Se_total_P
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Se_n_ladder
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2730,13 +2878,17 @@ observations:
 - observation_id: nist-webbook::NO2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2803,13 +2955,17 @@ observations:
 - observation_id: nist-webbook::NO2_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: NO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2878,13 +3034,17 @@ observations:
 - observation_id: nist-webbook::O2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -2951,13 +3111,17 @@ observations:
 - observation_id: nist-webbook::O2_normal_boiling_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -3024,13 +3188,17 @@ observations:
 - observation_id: nist-webbook::O2_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -3097,13 +3265,17 @@ observations:
 - observation_id: nist-webbook::Pb_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -3170,10 +3342,14 @@ observations:
 - observation_id: nist-webbook::Rau74_critical_constants
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::Rau74_critical_constants
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se_n_ladder
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -3243,13 +3419,17 @@ observations:
 - observation_id: nist-webbook::SO2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: SO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -3316,13 +3496,17 @@ observations:
 - observation_id: nist-webbook::SO2_triple_point_temperature
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: SO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

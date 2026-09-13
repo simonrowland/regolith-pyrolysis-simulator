@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_knudsen_detected_species
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -82,13 +86,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si2c_formation_enthalpies
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -142,7 +150,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -160,13 +168,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si_activation_enthalpy
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -226,7 +238,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -242,13 +254,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si_assumed_entropy_alpha
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -302,7 +318,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -329,13 +345,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si_equilibrium_enthalpy_and_barrier
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -389,7 +409,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -406,13 +426,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si_langmuir_intensity_induction
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -481,13 +505,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_si_langmuir_vs_extrapolated_knudsen
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -567,13 +595,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_activation_enthalpy
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -633,7 +665,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -649,13 +681,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_assumed_entropy_alpha
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -709,7 +745,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -736,13 +772,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_equilibrium_enthalpy_and_barrier
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -796,7 +836,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -813,13 +853,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_sic2_formation_enthalpies
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -873,7 +917,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -891,13 +935,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -958,7 +1006,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -974,13 +1022,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1041,7 +1093,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1057,13 +1109,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1124,7 +1180,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1140,13 +1196,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1207,7 +1267,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1223,13 +1283,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_second_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1290,7 +1354,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1306,13 +1370,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_second_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1373,7 +1441,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1389,13 +1457,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_third_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1456,7 +1528,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1472,13 +1544,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_si_third_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1539,7 +1615,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1555,13 +1631,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1622,7 +1702,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1638,13 +1718,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1705,7 +1789,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1721,13 +1805,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_reference_10
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1788,7 +1876,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1804,13 +1892,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_this_work
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1871,7 +1963,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1884,16 +1976,20 @@ observations:
     table: '1'
     note: column=third_law this_work; quote=152.1±1.6
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::point:0
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1901,8 +1997,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1800'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1940,14 +2036,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.0001317225'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1958,18 +2054,35 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=reference_10; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::point:1
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Si2C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1977,8 +2090,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2016,14 +2129,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.0101325'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2034,18 +2147,407 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=this_work; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::point:2
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si2C
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.3546375'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si2C
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.012159'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::point:1
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si2C
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.5775525'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work::point:2
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si2C
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '14.1855'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -2053,8 +2555,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1800'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2092,14 +2594,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.008815275'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2110,18 +2612,35 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=reference_10; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::point:1
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -2129,8 +2648,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2168,14 +2687,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.2735775'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2186,18 +2705,407 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=this_work; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::point:2
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '4.4583'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.12159'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::point:1
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.938425'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_si_this_work::point:2
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '38.5035'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -2205,8 +3113,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1800'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2244,14 +3152,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.0001519875'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2262,18 +3170,35 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=reference_10; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::point:1
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiC2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -2281,8 +3206,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -2320,14 +3245,14 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.01317225'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2338,18 +3263,407 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=this_work; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::point:2
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiC2
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.4762275'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiC2
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0036477'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::point:1
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiC2
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.2330475'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work::point:2
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiC2
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6.68745'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: total_vapor
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2357,8 +3671,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1800'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -2396,14 +3710,14 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.00911925'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2414,18 +3728,35 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=reference_10; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
-- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::point:1
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: total_vapor
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2433,8 +3764,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -2472,14 +3803,14 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: point
+    point: '0.2938425'
   uncertainty:
     kind: none
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2490,18 +3821,407 @@ observations:
   locator:
     page: 136
     table: '2'
-    note: column=this_work; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
   read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::point:2
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: total_vapor
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '5.2689'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::point:0
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: total_vapor
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.141855'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::point:1
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: total_vapor
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '3.749025'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work::point:2
+  experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: total_vapor
+      phase:
+        tag: unknown
+        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '59.78175'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: table destination model_derived; source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-184-behrens-1979
+  locator:
+    page: 136
+    table: '2'
+  read_from: pdf:kems-184-behrens-1979
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 136
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-184-behrens-1979
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-184-behrens-1979::behrens_1979_total_flux_time_dependence
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: total_vapor
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2555,7 +4275,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: directly_reduced_measurement
     model: directly_reduced_measurement
   admission:
@@ -2572,13 +4292,17 @@ observations:
 - observation_id: kems-184-behrens-1979::behrens_1979_total_initial_langmuir_flux
   experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: total_vapor
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2632,7 +4356,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: directly_reduced_measurement
     model: directly_reduced_measurement
   admission:

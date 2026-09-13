@@ -6,10 +6,14 @@ observations:
   experiment_id: 42669027800b66ae20c68dd1b646610ffb82a22896dee6bc95eec78848807bf0::Table 1 (equations); Figs. 1–4; comparison
     to Berkowitz points
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: VO_VO2
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal

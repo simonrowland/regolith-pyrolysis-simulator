@@ -29,12 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
-    - asset_id: pdf:nist-janaf-4th
-      role: pdf
+    - asset_id: unknown:nist-janaf-4th
+      role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give sha256
+        reason: INDEX does not give an asset
 experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-001
   kind: literature
@@ -155,8 +155,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-005
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -2155,8 +2155,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-074
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -2589,8 +2589,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-092
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -2704,8 +2704,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-096
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -16478,8 +16478,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Ca-030
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -35470,8 +35470,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P2_formation_tabulation
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -35554,8 +35554,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -35582,8 +35582,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P4_formation_tabulation
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -35610,8 +35610,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_PO2_formation_tabulation
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -35638,8 +35638,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_PO_formation_tabulation
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -37638,8 +37638,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Mg-011
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -42480,8 +42480,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-001
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -42800,8 +42800,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-012
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -43786,8 +43786,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-046
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48689,8 +48689,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::anchor_P2_deltafG
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48717,8 +48717,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::anchor_PO2_deltafG
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48745,8 +48745,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::anchor_PO_deltafG
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48773,8 +48773,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::extreme_reduction_from_phosphate
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48801,8 +48801,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::extreme_reduction_from_phosphate_P4
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48829,8 +48829,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf_P2_298_anchors
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48857,8 +48857,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf_P4O6_298_anchors
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48885,8 +48885,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf_P4_298_anchors
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48913,8 +48913,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf_PO2_298_anchors
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48941,8 +48941,8 @@ experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf_PO_298_anchors
   kind: literature
   method:
-    tag: value
-    value: tabulation
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:

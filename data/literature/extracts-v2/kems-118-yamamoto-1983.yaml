@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_critical_mixing_author_estimate
   experiment_id: 10.2355/isijinternational1966.23.56::14
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: consolute_temperature
@@ -91,13 +95,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_figs_activities_figure_only
   experiment_id: 10.2355/isijinternational1966.23.56::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -153,7 +161,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -170,13 +178,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_figs_ion_ratios_figure_only
   experiment_id: 10.2355/isijinternational1966.23.56::1
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -248,13 +260,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_gamma_inf_and_epsilon
   experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -311,7 +327,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -327,13 +343,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -404,13 +424,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table1_materials
   experiment_id: 10.2355/isijinternational1966.23.56::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -481,13 +505,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios
   experiment_id: 10.2355/isijinternational1966.23.56::2
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -559,13 +587,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
   experiment_id: 10.2355/isijinternational1966.23.56::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -621,7 +653,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -637,13 +669,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C
   experiment_id: 10.2355/isijinternational1966.23.56::4
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -723,13 +759,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table5_FeSnCu
   experiment_id: 10.2355/isijinternational1966.23.56::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -785,7 +825,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -801,13 +841,17 @@ observations:
 - observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
   experiment_id: 10.2355/isijinternational1966.23.56::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_eq5_log_gamma_p2o5_model_derived
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'melts saturated with CaO or Ca3P2O8; x_P2O5 ~= 0.1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_eq5_log_gamma_sio2_cao_saturated_model_derived
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-saturated Ca,Fe silicates; x_SiO2 ~= 0.1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -146,7 +154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -163,13 +171,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig1_cao_sio2_cs_curve_figure_only
   experiment_id: 10.2355/isijinternational.41.930::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -241,13 +253,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig2_cao_mgo_sio2_figure_only
   experiment_id: 10.2355/isijinternational.41.930::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-MgO-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -319,13 +335,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig3_cao_al2o3_sio2_figure_only
   experiment_id: 10.2355/isijinternational.41.930::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -397,13 +417,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig4_cao_mgo_al2o3_sio2_figure_only
   experiment_id: 10.2355/isijinternational.41.930::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-MgO-Al2O3-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -475,13 +499,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig5_cao_feo_sio2_figure_only
   experiment_id: 10.2355/isijinternational.41.930::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'iron-saturated CaO-FeO-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -553,13 +581,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig6_mno_al2o3_sio2_computed_figure_only
   experiment_id: 10.2355/isijinternational.41.930::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-Al2O3-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -615,7 +647,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -632,13 +664,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig7_mno_sio2_gamma_figure_only
   experiment_id: 10.2355/isijinternational.41.930::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-SiO2 and MnO-Al2O3-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -710,13 +746,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_fig8_mno_ox_gamma_figure_only
   experiment_id: 10.2355/isijinternational.41.930::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MnO-SiO2 and MnO-Al2O3-SiO2 melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -788,13 +828,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_liquid_sio2_about_minus_2p5_quoted
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-saturated Ca,Fe silicates' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -850,7 +894,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -867,13 +911,17 @@ observations:
 - observation_id: kems-048-turkdogan-2001-sio2-gamma::turkdogan_2001_p2o5_about_minus_15_to_18_quoted
   experiment_id: 10.2355/isijinternational.41.930::kems-048-turkdogan-2001-sio2-gamma
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ca, Fe silicophosphate melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -929,7 +977,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

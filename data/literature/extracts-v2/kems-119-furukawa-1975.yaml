@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_HM_fe_infinite_dilution
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::9
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_HM_v_infinite_dilution
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -146,7 +154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -162,13 +170,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -240,13 +252,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig12_ternary_activities_figure_only
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::12
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -302,7 +318,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -319,13 +335,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::4
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -397,13 +417,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig6_fe_v_activities_figure_only
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -459,7 +483,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -476,13 +500,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_fig7_av_comparison_figure_only
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -554,13 +582,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_fe_1600c
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -616,7 +648,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -632,13 +664,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_v_1600c
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -695,7 +731,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -711,13 +747,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_fe_binary_fit
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -773,7 +813,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -800,13 +840,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv02_fits
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -862,7 +906,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -879,13 +923,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv03_fits
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -941,7 +989,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -958,13 +1006,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_v_fe_binary_fit
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1020,7 +1072,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1047,13 +1099,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V_and_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1128,13 +1184,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_liquidus_solidus_1600c
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-V_solid_liquid_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: liquidus_and_solidus_at_1600C
@@ -1206,13 +1266,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_chipman_dastur_gamma0_v
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1284,13 +1348,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_fruehan_gamma_v
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1362,13 +1430,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_kay_kontopoulos_gamma0_v
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1440,13 +1512,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'starting_metals' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1518,13 +1594,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::2
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: V
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1607,13 +1687,17 @@ observations:
 - observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

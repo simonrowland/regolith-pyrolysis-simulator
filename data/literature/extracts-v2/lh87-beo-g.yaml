@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-beo-g::anchor_BeO_deltafG
   experiment_id: 09310c6c4bd8461f68016dba454deda7c4e6979ca554c60edc0b256ecf9930c1::LH87#BeO_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: BeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_BeO_to_BeO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

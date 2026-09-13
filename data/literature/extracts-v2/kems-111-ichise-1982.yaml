@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_deltaG_henrian_1wt_pct
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -71,7 +75,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -87,58 +91,62 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig1_ion_intensity_A4_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use subtype
-    per:
       tag: unknown
-      reason: source does not state per
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use reference_state
+      reason: profile ion_intensity does not use reference_state
     reservoir:
-      tag: unknown
-      reason: source does not state reservoir
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
     composition:
-      tag: unknown
-      reason: source does not state composition
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
-      tag: unknown
-      reason: source does not state sweep_gas
+      tag: not_applicable
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
-      tag: unknown
-      reason: source does not state exposure
+      tag: not_applicable
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
-      tag: unknown
-      reason: source does not state sample_mass_kg
+      tag: not_applicable
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile mass_loss_rate does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -164,58 +172,62 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig2_low_Mo_procedure_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
       tag: unknown
-      reason: source does not state per
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: source does not state reference_state
+      tag: not_applicable
+      reason: profile ion_intensity does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile ion_intensity does not use reservoir
     composition:
-      tag: unknown
-      reason: source does not state composition
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -241,58 +253,62 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig3_Ag_standard_procedure_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: ion_intensity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
       tag: unknown
-      reason: source does not state per
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source does not state temperature_K
     standard_pressure_Pa:
       tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
+      reason: profile ion_intensity does not use standard_pressure_Pa
     reaction:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
+      reason: profile ion_intensity does not use reaction
     formation_elements:
       tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: source does not state reference_state
+      tag: not_applicable
+      reason: profile ion_intensity does not use reference_state
     reservoir:
       tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
+      reason: profile ion_intensity does not use reservoir
     composition:
-      tag: unknown
-      reason: source does not state composition
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
     fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
     sweep_gas:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
+      reason: profile ion_intensity does not use sweep_gas
     exposure:
       tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
+      reason: profile ion_intensity does not use exposure
     sample_mass_kg:
       tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
+      reason: profile ion_intensity does not use sample_mass_kg
     wall:
       tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -318,13 +334,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig4_activities_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::4
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -395,13 +415,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig5_ln_gamma_Fe_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -457,7 +481,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -473,13 +497,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_fig6_error_estimate_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -535,7 +563,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -551,13 +579,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_infinite_dilution_gamma
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -622,7 +654,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -647,13 +679,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_interaction_parameters_liquid
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
-    quantity: interaction_parameter
+    quantity:
+      tag: value
+      value: interaction_parameter
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -712,7 +748,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -737,13 +773,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_kems_geometry_and_calibration
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -814,13 +854,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_quoted_Mo_psat
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -900,13 +944,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda
   experiment_id: 10.2355/isijinternational1966.22.552::1
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -978,13 +1026,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
   experiment_id: 10.2355/isijinternational1966.22.552::2
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -1067,13 +1119,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries
   experiment_id: 10.2355/isijinternational1966.22.552::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: phase_boundary_composition
@@ -1155,13 +1211,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K
   experiment_id: 10.2355/isijinternational1966.22.552::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1218,7 +1278,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1245,13 +1305,17 @@ observations:
 - observation_id: kems-111-ichise-1982::ichise_1982_table5_heats
   experiment_id: 10.2355/isijinternational1966.22.552::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

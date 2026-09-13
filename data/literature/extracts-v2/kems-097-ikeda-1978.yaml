@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
   experiment_id: 10.5702/massspec1953.26.159::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -69,7 +73,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
     model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
@@ -86,13 +90,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al2o_psat_figs3to6_figure_only
   experiment_id: 10.5702/massspec1953.26.159::3
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_refractory_metal_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -164,13 +172,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al2o_third_law_rxn3_average
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_over_Al2O3_in_tungsten_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -227,7 +239,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
     model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
@@ -244,13 +256,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_mo_al2o3_psat_fig4_figure_only
   experiment_id: 10.5702/massspec1953.26.159::4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_molybdenum_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -322,13 +338,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_nb_al2o3_psat_fig6_figure_only
   experiment_id: 10.5702/massspec1953.26.159::6
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_niobium_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -400,13 +420,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_figure_only
   experiment_id: 10.5702/massspec1953.26.159::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -462,12 +486,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_model_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 168
+        pdf_page_index: 10
+        figure: '7'
+        note: P(Al) at 1920 K versus free energy of formation of presumed cell-metal oxides
   notices: []
   source_id: kems-097-ikeda-1978
   locator:
@@ -489,13 +522,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_model_quoted
   experiment_id: 10.5702/massspec1953.26.159::7
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -552,21 +589,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_figure_only
-    decided_by:
-      worker: wave-W2-ikeda-1978-r2
-      date: '2026-09-06'
-      evidence:
-        published_page: 168
-        pdf_page_index: 10
-        figure: '7'
-        note: P(Al) at 1920 K versus free energy of formation of presumed cell-metal oxides
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-097-ikeda-1978
   locator:
@@ -588,13 +616,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_ta_al2o3_psat_fig5_figure_only
   experiment_id: 10.5702/massspec1953.26.159::5
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tantalum_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -666,13 +698,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_w_al2o3_psat_fig3_figure_only
   experiment_id: 10.5702/massspec1953.26.159::3
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -744,13 +780,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_alo_psat_figs3to6_figure_only
   experiment_id: 10.5702/massspec1953.26.159::3
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_refractory_metal_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -822,13 +862,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_alo_third_law_rxn2_average
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_over_Al2O3_in_tungsten_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -885,7 +929,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped measured_reduced but source does not supply lineage
+      reason: table destination measured_reduced; source does not supply lineage
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
     model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
@@ -902,13 +946,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_kems_geometry_and_calibration
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_refractory_metal_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -982,13 +1030,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_W_or_Mo_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1044,12 +1096,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=estimated_not_direct is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o_model_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 161
+        pdf_page_index: 3
+        paragraph: From the estimated decomposition equilibrium constant, the partial pressures of O2 were about one order
+          smaller than those of O atom
   notices: []
   source_id: kems-097-ikeda-1978
   locator:
@@ -1061,13 +1122,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o_model_quoted
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_W_or_Mo_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1123,21 +1188,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o
-    decided_by:
-      worker: wave-W2-ikeda-1978-r2
-      date: '2026-09-06'
-      evidence:
-        published_page: 161
-        pdf_page_index: 3
-        paragraph: From the estimated decomposition equilibrium constant, the partial pressures of O2 were about one order
-          smaller than those of O atom
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-097-ikeda-1978
   locator:
@@ -1149,13 +1205,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o_ta_nb_true_absence
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_Ta_or_Nb_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1227,13 +1287,17 @@ observations:
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o_w_mo_psat_figs3_4_figure_only
   experiment_id: 10.5702/massspec1953.26.159::3
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_W_or_Mo_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype

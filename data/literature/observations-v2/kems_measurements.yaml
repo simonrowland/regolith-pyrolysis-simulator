@@ -5,13 +5,17 @@ observations:
 - observation_id: cao_p_ca_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -61,12 +65,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -77,7 +84,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=8; polythermal_published_page=827
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:
@@ -91,13 +98,17 @@ observations:
 - observation_id: cao_p_o2_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -147,12 +158,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -163,7 +177,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=10; polythermal_published_page=827
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:
@@ -177,13 +191,17 @@ observations:
 - observation_id: cao_p_o_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -233,12 +251,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -249,7 +270,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=9; polythermal_published_page=827
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:
@@ -263,13 +284,17 @@ observations:
 - observation_id: mgo_p_mg_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -319,12 +344,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -335,7 +363,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=11; polythermal_published_page=827
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:
@@ -349,13 +377,17 @@ observations:
 - observation_id: mgo_p_o2_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -405,12 +437,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -421,7 +456,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=13; polythermal_published_page=828
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:
@@ -435,13 +470,17 @@ observations:
 - observation_id: mgo_p_o_isothermal
   experiment_id: 10.1007/s11663-024-02995-6::7
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -491,12 +530,15 @@ observations:
     kind: unavailable
     unavailable_reason: absent_not_digitized_source_figure_only
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      temperature_K: '5'
+      observable_pa: null
+      observable_status: not_reported
   evidence:
     class:
-      tag: value
-      value: figure_only
-    original_method_class: absent_not_digitized_source_figure_only
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -507,7 +549,7 @@ observations:
     pdf_page_index: 5
     figure: 7
     note: polythermal_figure=12; polythermal_published_page=827
-  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  read_from: unknown:halwax_sergeev_mueller_schenk_2024
   point_conditions:
     temperature_K:
       state:

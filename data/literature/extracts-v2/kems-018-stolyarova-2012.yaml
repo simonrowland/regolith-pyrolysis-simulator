@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-018-stolyarova-2012::stolyarova_2012_ternary_ionic_silicate_vapour_map_table1
   experiment_id: 028d3eb8663727a29df2e7cba455aefbaf092fc56d887e858d60351e66877058::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ternary_ionic_silicate_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

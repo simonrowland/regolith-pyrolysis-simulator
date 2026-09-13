@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-in2o-g::anchor_In2O_deltafG
   experiment_id: 3188f741e2b7cc102aa18be49fbad3304d9847f2b9a796203acc0c5c598d0674::LH87#In2O_g
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_In2O3_to_In2O_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

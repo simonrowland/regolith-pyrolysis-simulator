@@ -79,6 +79,13 @@ experiments:
           published_page: 113
           paragraph: experimental
           note: 0.3 mm diameter effusion holes drilled in the centres
+        inference:
+          relation: area = π (d/2)^2 from stated effusion orifice diameter 0.3 mm
+          inputs:
+          - '{''published_page'': 113, ''paragraph'': ''experimental'', ''note'': ''0.3 mm diameter effusion holes drilled
+            in the centres''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.3406/bulmi.1983.7673::2
   kind: literature
   method:

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig6_fe_psat_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -82,13 +86,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig6_mg_psat_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -158,13 +166,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig6_o2_psat_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -234,13 +246,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig6_o_psat_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -310,13 +326,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig6_sio_psat_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -386,13 +406,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig7_activities_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -462,13 +486,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_fig8_fe_mg_ratio_figure_only
   experiment_id: 10.1016/j.icarus.2017.02.006::8
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -538,13 +566,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_gamma_fa_regular_solution
   experiment_id: 10.1016/j.icarus.2017.02.006::kems-133-costa-2017
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -615,13 +647,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_solidus
   experiment_id: 10.1016/j.icarus.2017.02.006::kems-133-costa-2017
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: solidus
@@ -699,13 +735,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t1_olivine_composition
   experiment_id: 10.1016/j.icarus.2017.02.006::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -777,13 +817,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t2_fe_appearance_potentials
   experiment_id: 10.1016/j.icarus.2017.02.006::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -858,13 +902,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t2_mg_appearance_potential
   experiment_id: 10.1016/j.icarus.2017.02.006::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -937,13 +985,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t2_o2_appearance_potential
   experiment_id: 10.1016/j.icarus.2017.02.006::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1015,13 +1067,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t2_o_appearance_potential
   experiment_id: 10.1016/j.icarus.2017.02.006::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1093,13 +1149,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t2_sio_appearance_potential
   experiment_id: 10.1016/j.icarus.2017.02.006::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1171,13 +1231,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t3_feo_partial_molar_enthalpy
   experiment_id: 10.1016/j.icarus.2017.02.006::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1250,13 +1314,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t3_mgo_partial_molar_enthalpy
   experiment_id: 10.1016/j.icarus.2017.02.006::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1327,13 +1395,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t3_sio2_partial_molar_enthalpy
   experiment_id: 10.1016/j.icarus.2017.02.006::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1404,13 +1476,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t4_fayalite_delta_h_vap
   experiment_id: 10.1016/j.icarus.2017.02.006::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fo95Fa5_olivine_pseudo_binary' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1483,13 +1559,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t4_forsterite_delta_h_vap
   experiment_id: 10.1016/j.icarus.2017.02.006::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fo95Fa5_olivine_pseudo_binary' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1560,13 +1640,17 @@ observations:
 - observation_id: kems-133-costa-2017::costa_2017_t5_hre_fe_mg_model
   experiment_id: 10.1016/j.icarus.2017.02.006::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MAGMA_HRE_silicate_vapor_atmosphere' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1622,7 +1706,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

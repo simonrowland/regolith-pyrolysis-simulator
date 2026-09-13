@@ -5,13 +5,17 @@ observations:
 - observation_id: costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems
   experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_fe_olivine_kems
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems
   experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_sio_olivine_kems
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_solution_olivine' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

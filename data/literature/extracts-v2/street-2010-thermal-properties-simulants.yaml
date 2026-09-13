@@ -5,13 +5,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_anorthosite_water_mass_loss_0p1_pct
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'anorthosite_NU_LHT_2M_feedstock' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_apparatus_n2_tga_dta
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1AF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_powders_in_alumina_crucibles' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -159,13 +167,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_fig1_jsc1af_dta_tga_figure_only
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1AF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1AF_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -241,13 +253,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_fig3_nulht2m_dta_tga_figure_only
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NU-LHT-2M
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -323,13 +339,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_jsc1af_tga_ftir_windows
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1AF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1AF_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -398,13 +418,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_quoted_jsc1af_mineralogy_carpenter_taylor
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: JSC-1AF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1AF' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -473,13 +497,17 @@ observations:
 - observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: JSC-1AF
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: dta_transition_temperatures

@@ -5,13 +5,17 @@ observations:
 - observation_id: chromium_solid_langmuir_knudsen
   experiment_id: 10.1063/1.3253096::chromium_solid_langmuir_knudsen
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cr
-      phase: cr
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
         tag: unknown
-        reason: source does not state polymorph
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -67,8 +71,8 @@ observations:
       uncertainty_absolute: '0.1'
   evidence:
     class:
-      tag: value
-      value: measured_direct
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -77,17 +81,21 @@ observations:
   locator:
     note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
     record: chromium_solid_langmuir_knudsen
-  read_from: pdf:REF-040
+  read_from: unknown:REF-040
 - observation_id: iron_olivine_kems
   experiment_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752::iron_olivine_kems
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Fe
-      phase: l
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -145,8 +153,8 @@ observations:
       - '0.02'
   evidence:
     class:
-      tag: value
-      value: measured_direct
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -155,17 +163,21 @@ observations:
   locator:
     note: Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321
     record: iron_olivine_kems
-  read_from: pdf:REF-016
+  read_from: unknown:REF-016
 - observation_id: potassium_silicate_vacuum
   experiment_id: 10.1016/j.gca.2005.08.014::potassium_silicate_vacuum
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: K
-      phase: l
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -221,8 +233,8 @@ observations:
       uncertainty_absolute: '0.02'
   evidence:
     class:
-      tag: value
-      value: measured_direct
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -232,7 +244,7 @@ observations:
     note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011),
       Meteorit. Planet. Sci. 46
     record: potassium_silicate_vacuum
-  read_from: pdf:REF-014
+  read_from: unknown:REF-014
   point_conditions:
     temperature_K:
       state:

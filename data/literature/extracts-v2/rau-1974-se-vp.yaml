@@ -5,13 +5,17 @@ observations:
 - observation_id: rau-1974-se-vp::anchor_Se6_pure_Psat_total_plus_speciation
   experiment_id: dfaaa841a84a86c7f0cfdfdde01ebc7e25da2125e3f679fbb1d5140488d58129::Rau-1974#Se_VP
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Se6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_Se_to_Se_n_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

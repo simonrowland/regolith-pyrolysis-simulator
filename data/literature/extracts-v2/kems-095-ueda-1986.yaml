@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig10_activities_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::10
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig11_enthalpy_integrand_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::11
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -162,13 +170,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig12_partial_enthalpies_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::12
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -224,7 +236,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -241,13 +253,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig13_mixing_1873K_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::13
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -303,7 +319,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -320,13 +336,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig1_phase_diagram_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::1
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: Fig. 1 Ti-Co binary phase diagram.
@@ -398,13 +418,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig2_apparatus_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -476,13 +500,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig3_cell_assembly_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -554,13 +582,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig4_time_dependence_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -632,13 +664,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig5_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -710,13 +746,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig6_oxygen_vs_N_Co_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::6
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -788,13 +828,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig7_integration_path_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -850,7 +894,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -867,13 +911,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig8_binary_integration_1973K_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -929,7 +977,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -946,13 +994,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_fig9_ternary_integration_1973K_figure_only
   experiment_id: 10.2320/jinstmet1952.50.12_1081::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1008,7 +1060,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1025,13 +1077,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2
   experiment_id: 10.2320/jinstmet1952.50.12_1081::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Co
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1088,7 +1144,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1105,13 +1161,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2
   experiment_id: 10.2320/jinstmet1952.50.12_1081::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1167,7 +1227,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1184,13 +1244,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_kems_geometry_and_calibration
   experiment_id: 10.2320/jinstmet1952.50.12_1081::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co_in_Y2O3_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1263,13 +1327,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_mixing_functions
   experiment_id: 10.2320/jinstmet1952.50.12_1081::kems-095-ueda-1986
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1325,7 +1393,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1342,13 +1410,17 @@ observations:
 - observation_id: kems-095-ueda-1986::ueda_1986_table1_xrd
   experiment_id: 10.2320/jinstmet1952.50.12_1081::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ti
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solidified_Ti-Co_after_run' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

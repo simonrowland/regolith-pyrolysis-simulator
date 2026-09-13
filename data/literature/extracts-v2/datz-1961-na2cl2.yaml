@@ -5,13 +5,17 @@ observations:
 - observation_id: datz-1961-na2cl2::anchor_Na2Cl2_dimer_partial
   experiment_id: 10.1063/1.1700984::Datz-1961#Na2Cl2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2Cl2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_NaCl_to_Na2Cl2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

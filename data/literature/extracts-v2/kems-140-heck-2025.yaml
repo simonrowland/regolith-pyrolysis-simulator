@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_abstract_reported_ranges
   experiment_id: 10.1016/j.gca.2025.05.007::kems-140-heck-2025
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -81,13 +85,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig10_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::10
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -157,13 +165,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig11_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::11
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -233,13 +245,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig12_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::12
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'magma_ocean_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -295,7 +311,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -310,13 +326,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig1_printed_bead_radii
   experiment_id: 10.1016/j.gca.2025.05.007::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -386,13 +406,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig2_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -462,13 +486,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig3_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -538,13 +566,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig4_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -614,13 +646,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig5_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -690,13 +726,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig6_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -766,13 +806,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig7_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -842,13 +886,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig8_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::8
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -918,13 +966,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_fig9_figure_only
   experiment_id: 10.1016/j.gca.2025.05.007::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -994,13 +1046,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_s1_experimental_conditions_epma
   experiment_id: 10.1016/j.gca.2025.05.007::S1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1070,13 +1126,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_s2_mvce_laicpms_profiles
   experiment_id: 10.1016/j.gca.2025.05.007::S2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_glass_quenched_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1146,13 +1206,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_s3_kstar_fitting_concentrations
   experiment_id: 10.1016/j.gca.2025.05.007::S3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1208,7 +1272,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1223,13 +1287,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_s4_metal_wire_mvce
   experiment_id: 10.1016/j.gca.2025.05.007::S4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Pt_or_Re_wire_loop' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1299,13 +1367,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_s5_3L_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::S5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1361,7 +1433,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1376,13 +1448,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t1_experimental_conditions
   experiment_id: 10.1016/j.gca.2025.05.007::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1460,13 +1536,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t2_starting_major_compositions
   experiment_id: 10.1016/j.gca.2025.05.007::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_glass_starting_materials' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1536,13 +1616,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_ag_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1612,13 +1696,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_as_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: As
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1688,13 +1776,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_cd_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1764,13 +1856,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_cu_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1840,13 +1936,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_ge_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1916,13 +2016,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_in_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1992,13 +2096,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_pb_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2068,13 +2176,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t3_initial_zn_ppm
   experiment_id: 10.1016/j.gca.2025.05.007::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2144,13 +2256,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2206,7 +2322,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2221,13 +2337,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: As
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2283,7 +2403,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2298,13 +2418,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_cd_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2360,7 +2484,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2375,13 +2499,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_ge_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2437,7 +2565,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2452,13 +2580,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_pb_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2514,7 +2646,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2529,13 +2661,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t4_zn_diffusivity_inverse_model
   experiment_id: 10.1016/j.gca.2025.05.007::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2591,7 +2727,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2606,13 +2742,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2668,7 +2808,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2683,13 +2823,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: As
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2745,7 +2889,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2760,13 +2904,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2822,7 +2970,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2837,13 +2985,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2899,7 +3051,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2914,13 +3066,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2976,7 +3132,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2991,13 +3147,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_InOg_in
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3053,7 +3213,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3068,13 +3228,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3130,7 +3294,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3145,13 +3309,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3207,7 +3375,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3222,13 +3390,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3284,7 +3456,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3299,13 +3471,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn
   experiment_id: 10.1016/j.gca.2025.05.007::5
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3361,7 +3537,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3376,13 +3552,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_agop5_agg_ag_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3442,7 +3622,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3457,13 +3637,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_aso1p5_asog_as_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: As
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3523,7 +3707,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3538,13 +3722,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_cuop5_cug_cu_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cu
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3604,7 +3792,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3619,13 +3807,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_geo2_geog_ge_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ge
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3685,7 +3877,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3700,13 +3892,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_ino1p5_ing_in_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3766,7 +3962,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3781,13 +3977,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_ino1p5_inog_in_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3847,7 +4047,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3862,13 +4062,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_pbo_pbg_pb_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3928,7 +4132,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3943,13 +4147,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_pbo_pbog_pb_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Pb
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4009,7 +4217,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -4024,13 +4232,17 @@ observations:
 - observation_id: kems-140-heck-2025::heck_2025_t6_zno_zng_zn_HS
   experiment_id: 10.1016/j.gca.2025.05.007::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4090,7 +4302,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

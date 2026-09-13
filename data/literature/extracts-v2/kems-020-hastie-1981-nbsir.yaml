@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized
   experiment_id: 10.6028/nbs.ir.81-2279::11
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -71,8 +75,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -85,13 +99,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::11
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -150,18 +168,8 @@ observations:
     attribution: KMS data for variation of K2O activity coefficient with temperature and composition for the K1 slag. The
       numbers, ranging from 0.154 to 0.08, refer to the mole fraction of K2O remaining in the sample at each measurement point.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 52
-        published_page: 52
-        pdf_page_index: 57
-        figure: '11'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -174,13 +182,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed
   experiment_id: 10.6028/nbs.ir.81-2279::15
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: KCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'KCl_reference_on_fig15' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -239,8 +251,16 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_foreign
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 63
+        pdf_page_index: 75
+        figure: '15'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -251,13 +271,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::15
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: KCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'KCl_reference_on_fig15' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -314,17 +338,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 52
-        published_page: 52
-        pdf_page_index: 57
-        figure: '15'
+    status: pending
+    reason: source admission_status=equipment_metadata is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -336,13 +351,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange
   experiment_id: 10.6028/nbs.ir.81-2279::15
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: NaCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_on_K1_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -401,8 +420,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 63
+        pdf_page_index: 75
+        figure: '15'
+        paragraph: report p. 35-36
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -414,13 +442,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::15
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: NaCl
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_on_K1_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -486,18 +518,8 @@ observations:
       NaCl was converted to Na2O (slag) ... About six percent of the available K2O was converted to KCl vapor ... The remaining
       ten percent NaCl was lost by vaporization ... (20 to 40 min. region of fig. 15) ... P_KCl / P_K(no NaCl) ~ 10^4
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 36
-        published_page: 36
-        pdf_page_index: 41
-        figure: '15'
-        section: '10.8'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -510,13 +532,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
   experiment_id: 10.6028/nbs.ir.81-2279::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'illite_and_MHD_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -574,8 +600,9 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906
     decided_by:
       worker: hunt-RH-47-r2
       date: '2026-09-06'
@@ -593,13 +620,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'illite_and_MHD_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -657,18 +688,8 @@ observations:
     original_method_class: figure_only
     attribution: Partial pressure data for K, O2, and SiO over illite.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 51
-        published_page: 51
-        pdf_page_index: 56
-        figure: '4'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -681,13 +702,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized
   experiment_id: 10.6028/nbs.ir.81-2279::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -747,8 +772,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -760,13 +794,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -824,18 +862,8 @@ observations:
     original_method_class: figure_only
     attribution: Partial pressure data for K, O2, and SiO over illite.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 51
-        published_page: 51
-        pdf_page_index: 56
-        figure: '4'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -848,13 +876,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
   experiment_id: 10.6028/nbs.ir.81-2279::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -912,8 +944,9 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
     decided_by:
       worker: hunt-RH-47-r2
       date: '2026-09-06'
@@ -929,13 +962,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -994,18 +1031,8 @@ observations:
     attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
       (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 51
-        published_page: 51
-        pdf_page_index: 56
-        figure: '5'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1018,13 +1045,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized
   experiment_id: 10.6028/nbs.ir.81-2279::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1084,8 +1115,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1097,13 +1137,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1162,18 +1206,8 @@ observations:
     attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
       (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 51
-        published_page: 51
-        pdf_page_index: 56
-        figure: '5'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1186,13 +1220,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only
   experiment_id: 10.6028/nbs.ir.81-2279::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1250,8 +1288,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 60
+        pdf_page_index: 66
+        figure: '6'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1262,13 +1308,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1326,18 +1376,8 @@ observations:
     original_method_class: figure_only
     attribution: Activity coefficient data (TMS) for Na2CO3 (0.45 wt.%) in glass
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 51
-        published_page: 51
-        pdf_page_index: 56
-        figure: '6'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1350,13 +1390,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm
   experiment_id: 10.6028/nbs.ir.81-2279::20
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2_slag_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1414,8 +1458,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=equipment_metadata is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 28
+        figure: '20'
+        paragraph: relatively small effusion orifice (0.34 mm diameter)
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1426,13 +1478,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::20
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2_slag_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1489,17 +1545,8 @@ observations:
       reason: 'page_grounded: method_class derived'
     original_method_class: derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 53
-        published_page: 53
-        pdf_page_index: 58
-        figure: '20'
+    status: pending
+    reason: source admission_status=equipment_metadata is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1511,13 +1558,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O_liquid_reference' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1576,8 +1627,17 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 22
+        published_page: 22
+        pdf_page_index: 28
+        equation: '6'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1589,13 +1649,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O_liquid_reference' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1649,21 +1713,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 22
-        published_page: 22
-        pdf_page_index: 27
-        paragraph: unnumbered log Kp expression below equation (6)
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1675,13 +1730,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na2SO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2SO4_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: second_law_deltaH_deltaS
@@ -1740,8 +1799,17 @@ observations:
       value: compilation_assessed
     original_method_class: compilation_foreign
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 13
+        published_page: 13
+        pdf_page_index: 19
+        paragraph: Kohl et al. (1975), who give
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1763,13 +1831,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2SO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2SO4_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1830,21 +1902,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 13
-        published_page: 13
-        pdf_page_index: 18
-        section: '7.1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1856,13 +1919,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na2SO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2SO4_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: second_law_deltaH_deltaS
@@ -1921,8 +1988,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 12
+        published_page: 12
+        pdf_page_index: 18
+        paragraph: Na2SO4(l) = 2Na + SO2 + O2
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1944,13 +2020,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2SO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2SO4_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2013,21 +2093,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 12
-        published_page: 12
-        pdf_page_index: 17
-        section: '7.1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2039,13 +2110,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_gas_dimerization' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: second_law_deltaH_deltaS
@@ -2104,8 +2179,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: 2NaCl (g) = (NaCl)2 (g)
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2127,13 +2211,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_gas_dimerization' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2196,21 +2284,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 12
-        published_page: 12
-        pdf_page_index: 17
-        section: '7.1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2222,13 +2301,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose
   experiment_id: 10.6028/nbs.ir.81-2279::docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2289,8 +2372,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2303,13 +2396,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaCl_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2375,21 +2472,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 11
-        published_page: 11
-        pdf_page_index: 16
-        section: '7.1'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2401,13 +2489,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2465,8 +2557,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=figure_only_or_proxy is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 51
+        section: '15'
+        note: figure captions report pp. 51-53; figures PDF 61-81
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2477,13 +2577,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::21
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2542,18 +2646,8 @@ observations:
     attribution: Computer-calculated distribution of alkali-containing vapor species as a function of temperature for the
       non-ideal solution glass-combustion gas system specified in table 3.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 53
-        published_page: 53
-        pdf_page_index: 58
-        figure: '21'
-        note: Caption locator; plotted pages recorded in completeness ledger.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2566,13 +2660,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note
   experiment_id: 10.6028/nbs.ir.81-2279::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-Al2O3-SiO2_phases_uncertain' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2630,8 +2728,18 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=note_parent_unaltered is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: rotated Table 2 ~17[K2O] row; report p. 23
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2644,13 +2752,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K2O-Al2O3-SiO2_phases_uncertain' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2705,21 +2817,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 23
-        published_page: 23
-        pdf_page_index: 28
-        table: '2'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2731,13 +2834,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients
   experiment_id: 10.6028/nbs.ir.81-2279::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2797,8 +2904,19 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2812,13 +2930,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2892,22 +3014,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 23
-        published_page: 23
-        pdf_page_index: 28
-        table: '2'
-        note: Table spans printed pp. 23–25, physical PDF pages 29–31; pdf_page_index is zero-based.
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -2920,13 +3032,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
   experiment_id: 10.6028/nbs.ir.81-2279::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2982,12 +3098,22 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -3011,13 +3137,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3071,21 +3201,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 43
-        published_page: 43
-        pdf_page_index: 48
-        table: '3'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -3097,13 +3218,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
   experiment_id: 10.6028/nbs.ir.81-2279::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3159,12 +3284,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+        table: '3'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -3186,13 +3320,17 @@ observations:
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3246,21 +3384,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
-    decided_by:
-      worker: hunt-RH-47-r2
-      date: '2026-09-06'
-      evidence:
-        page: 43
-        published_page: 43
-        pdf_page_index: 48
-        table: '3'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:

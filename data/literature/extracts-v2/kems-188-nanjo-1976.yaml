@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_fig7_activities_714k_figure_only
   experiment_id: 10.2320/jinstmet1952.40.9_958::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Te
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Se-Te' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -94,13 +98,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_gamma_Te_regular_714k
   experiment_id: 10.2320/jinstmet1952.40.9_958::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Te
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Se-Te' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -156,7 +164,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -183,13 +191,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_kems_geometry_and_calibration
   experiment_id: 10.2320/jinstmet1952.40.9_958::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Se-Te' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -261,13 +273,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_literature_deltaHvap
   experiment_id: 10.2320/jinstmet1952.40.9_958::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Te
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'literature_comparison' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -339,13 +355,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap
   experiment_id: 10.2320/jinstmet1952.40.9_958::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Te
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Te_and_Se-Te_vapor' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -417,13 +437,17 @@ observations:
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se
   experiment_id: 10.2320/jinstmet1952.40.9_958::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Se
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Se_and_Se-Te_vapor' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

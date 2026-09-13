@@ -5,13 +5,17 @@ observations:
 - observation_id: cao_raw_pCa_0
   experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[0]
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -64,8 +68,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: measured_tabulated
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -73,7 +77,7 @@ observations:
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa[0]
-  read_from: pdf:shornikov-2025-cao
+  read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
       state:
@@ -81,16 +85,32 @@ observations:
         value: '1812'
       locator:
         record: raw_pCa[0]
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-2025-cao
+    parameters:
+    - - pressure_atm
+      - state:
+          tag: value
+          value: '0.0000000659'
+        locator:
+          record: raw_pCa[0]
+    output_unit: Pa
 - observation_id: cao_raw_pCa_1
   experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[1]
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -143,8 +163,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: measured_tabulated
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -152,7 +172,7 @@ observations:
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa[1]
-  read_from: pdf:shornikov-2025-cao
+  read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
       state:
@@ -160,16 +180,32 @@ observations:
         value: '1913'
       locator:
         record: raw_pCa[1]
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-2025-cao
+    parameters:
+    - - pressure_atm
+      - state:
+          tag: value
+          value: '0.000000409'
+        locator:
+          record: raw_pCa[1]
+    output_unit: Pa
 - observation_id: cao_raw_pCa_2
   experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[2]
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -222,8 +258,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: measured_tabulated
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -231,7 +267,7 @@ observations:
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa[2]
-  read_from: pdf:shornikov-2025-cao
+  read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
       state:
@@ -239,16 +275,32 @@ observations:
         value: '2000'
       locator:
         record: raw_pCa[2]
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-2025-cao
+    parameters:
+    - - pressure_atm
+      - state:
+          tag: value
+          value: '0.00000176'
+        locator:
+          record: raw_pCa[2]
+    output_unit: Pa
 - observation_id: cao_raw_pCa_3
   experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[3]
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -301,8 +353,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: measured_tabulated
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -310,7 +362,7 @@ observations:
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa[3]
-  read_from: pdf:shornikov-2025-cao
+  read_from: unknown:shornikov-2025-cao
   point_conditions:
     temperature_K:
       state:
@@ -318,16 +370,32 @@ observations:
         value: '2100'
       locator:
         record: raw_pCa[3]
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-2025-cao
+    parameters:
+    - - pressure_atm
+      - state:
+          tag: value
+          value: '0.00000785'
+        locator:
+          record: raw_pCa[3]
+    output_unit: Pa
 - observation_id: refractory:condensed_log10_kf:Al2O3
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-096
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: Al2O3
-      phase: cr
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
         tag: unknown
-        reason: source does not state polymorph
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -380,8 +448,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -402,13 +470,17 @@ observations:
 - observation_id: refractory:log10_kf:Al
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-005
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -461,8 +533,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -483,13 +555,17 @@ observations:
 - observation_id: refractory:log10_kf:Al2O
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-092
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -542,8 +618,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -564,13 +640,17 @@ observations:
 - observation_id: refractory:log10_kf:AlO
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-074
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -623,8 +703,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -645,13 +725,17 @@ observations:
 - observation_id: refractory:log10_kf:CaO
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Ca-030
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -704,8 +788,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -726,13 +810,17 @@ observations:
 - observation_id: refractory:log10_kf:MgO
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Mg-011
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -785,8 +873,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -807,13 +895,17 @@ observations:
 - observation_id: refractory:log10_kf:O
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-001
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -866,8 +958,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -888,13 +980,17 @@ observations:
 - observation_id: refractory:log10_kf:SiO
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-012
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -947,8 +1043,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status
@@ -969,13 +1065,17 @@ observations:
 - observation_id: refractory:log10_kf:TiO2
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::O-046
   identity:
-    quantity: log10_Kf
+    quantity:
+      tag: value
+      value: log10_Kf
     species:
       formula: TiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -1028,8 +1128,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: compilation_assessed
+      tag: unknown
+      reason: source does not state method_class
   admission:
     status: pending
     reason: source does not state admission_status

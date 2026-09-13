@@ -5,13 +5,17 @@ observations:
 - observation_id: pound-1972-cr-langmuir-knudsen::pound_1972_cr_langmuir_knudsen
   experiment_id: 10.1063/1.3253096::pound_1972_cr_langmuir_knudsen
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_metal' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

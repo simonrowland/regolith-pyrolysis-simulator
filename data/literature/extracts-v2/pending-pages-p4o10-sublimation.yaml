@@ -5,13 +5,17 @@ observations:
 - observation_id: pending-pages-p4o10-sublimation::anchor_P4O10_pure_Psat
   experiment_id: bc76c238033836c5e5e2513d0b3266ce56725d291a6feafd934013e328a5c87d::PENDING-pages#P4O10_sublimation
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: P4O10
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_P4O10_to_P4O10_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

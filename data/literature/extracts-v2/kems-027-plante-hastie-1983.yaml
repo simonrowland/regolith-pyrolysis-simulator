@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -67,16 +71,8 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_true_absence
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 44
-        pdf_page_index: 50
-        section: 8. Figure Captions
+    status: pending
+    reason: source admission_status=true_absence is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -87,13 +83,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_true_absence
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -151,8 +151,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=true_absence is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 44
+        pdf_page_index: 50
+        note: §8 figure captions and all numbered tables; no evaporation/condensation coefficient
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -163,13 +171,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_1200K
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cs
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -228,8 +240,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 36
+        pdf_page_index: 42
+        paragraph: section 4.1.1 Cs
+        note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -251,13 +272,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cs
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -313,20 +338,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_1200K
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 16
-        pdf_page_index: 22
-        figure: '6'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -346,13 +363,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cs
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -410,20 +431,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -434,13 +447,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cs
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -494,7 +511,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -510,13 +527,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -578,16 +599,8 @@ observations:
       as high as 1500 °C are in the region of 10^-7 atm with an inert atmosphere and 10^-6 atm with H2O or the reactive gas
       mixture present.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_ru_re_sr_undetected
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 35
-        pdf_page_index: 41
-        section: '4.1'
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -598,13 +611,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cs
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -663,8 +680,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -677,13 +704,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Li
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -742,8 +773,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -755,13 +795,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -821,8 +865,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -835,13 +889,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
   experiment_id: 10.6028/nbs.ir.83-2731::20
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -897,12 +955,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model
     model: model
   admission:
-    status: pending
-    reason: source admission_status=model_proxy is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 71
+        figure: '20'
+        note: Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements.
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -914,13 +981,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_kms_pt_cell_geometry
   experiment_id: 10.6028/nbs.ir.83-2731::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -991,13 +1062,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Li
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1056,8 +1131,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '6'
+        note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1069,13 +1153,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Li
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1131,20 +1219,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 16
-        pdf_page_index: 22
-        figure: '6'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1155,13 +1235,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Li
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1219,20 +1303,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1243,13 +1319,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_approx
   experiment_id: 10.6028/nbs.ir.83-2731::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1308,8 +1388,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 16
+        pdf_page_index: 22
+        figure: '7'
+        note: 'Prose after Table 2: activity of NaBO2 in SNW glass is approximately 0.01 with a slight T dependence, from
+          P/P°(JANAF NaBO2,l) on the NaBO2 plot. Printed plate is Figure 7; §8 caption 5.'
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1322,13 +1412,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1384,20 +1478,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_approx
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 16
-        pdf_page_index: 22
-        figure: '5'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1408,13 +1494,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::19
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1472,20 +1562,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1496,13 +1578,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::7 caption; plate 5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1558,16 +1644,8 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_o2_kms_figure_only
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 44
-        pdf_page_index: 50
-        figure: 7 caption; plate 5
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1578,13 +1656,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_o2_kms_figure_only
   experiment_id: 10.6028/nbs.ir.83-2731::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1643,8 +1725,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 50
+        pdf_page_index: 56
+        figure: '5'
+        note: Printed plate Figure 5 is the O2 Series I plot (caption 7). No printed LS coefficients. Five lowest-T points
+          rejected in the authors' LS. Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1657,13 +1749,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::4
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1717,20 +1813,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 33
-        pdf_page_index: 39
-        table: '4'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1741,13 +1829,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_ru_re_sr_undetected
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1806,8 +1898,16 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 18
+        pdf_page_index: 24
+        paragraph: Search for Ru, Re, and Sr-containing Species
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1818,13 +1918,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table1_snw_glass_composition
   experiment_id: 10.6028/nbs.ir.83-2731::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1896,13 +2000,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table3_mass_loss
   experiment_id: 10.6028/nbs.ir.83-2731::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1975,13 +2083,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
   experiment_id: 10.6028/nbs.ir.83-2731::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'industrial_offgas_model' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2037,12 +2149,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model
     model: model
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 33
+        pdf_page_index: 39
+        table: '4'
+        note: NASA CEC 76 model of industrial off-gas at 1 atm; not a glass measurement
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -2054,13 +2175,17 @@ observations:
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
   experiment_id: 10.6028/nbs.ir.83-2731::20
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: source does not state phase
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -2114,20 +2239,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
-    decided_by:
-      worker: hunt-RH-48
-      date: '2026-09-06'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '20'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:

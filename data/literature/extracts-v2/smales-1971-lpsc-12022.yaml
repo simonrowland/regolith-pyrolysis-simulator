@@ -5,13 +5,17 @@ observations:
 - observation_id: smales-1971-lpsc-12022::smales_1971_apollo_12022_bulk_composition_tables1_2_3
   experiment_id: 48aee2c0553ceda33d388352530f665c4897067add0d77b35760b762ebcccabf::docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_basalt_12022' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: smales-1971-lpsc-12022::smales_1971_apollo_12065_bulk_composition_tables1_2_3
   experiment_id: 48aee2c0553ceda33d388352530f665c4897067add0d77b35760b762ebcccabf::docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_basalt_12065' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

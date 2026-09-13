@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fe_detected_kems
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -70,8 +74,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fe_detected_kems_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: Mg, Fe, and SiO are the dominant species 1675-1875 K
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -84,13 +98,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fe_detected_kems_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -150,17 +168,8 @@ observations:
     original_method_class: measured_direct
     attribution: Mg, Fe, and SiO are the dominant species detected in the equilibrium gas-phase between 1675-1875 K.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fe_detected_kems
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -172,13 +181,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_mg_IT_figure_only
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -237,8 +250,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_mg_IT_figure_only_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1 van't Hoff plot of log(I+T) vs 1e4/T; Mg series
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -251,13 +274,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_mg_IT_figure_only_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -318,17 +345,8 @@ observations:
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T;
       a similar plot is obtained for Fe. Each data point is an average of up to five measurements at a given temperature.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_mg_IT_figure_only
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -340,13 +358,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_mg_slope_second_law
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -403,12 +425,22 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_mg_slope_second_law_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
+        note: 'Figure 1 printed annotation: Mg slope = 2.76(1)'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -421,13 +453,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_mg_slope_second_law_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -484,21 +520,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_mg_slope_second_law
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -510,13 +537,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio2_IT_figure_only
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -575,8 +606,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio2_IT_figure_only_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -588,13 +628,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio2_IT_figure_only_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -654,17 +698,8 @@ observations:
     original_method_class: measured_direct
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio2_IT_figure_only
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -676,13 +711,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio2_slope_second_law
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -739,12 +778,22 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio2_slope_second_law_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
+        note: 'Figure 1 printed annotation: SiO2 slope = -2.7(8)'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -757,13 +806,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio2_slope_second_law_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -820,21 +873,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio2_slope_second_law
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -846,13 +890,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio_IT_figure_only
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -911,8 +959,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio_IT_figure_only_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -924,13 +981,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio_IT_figure_only_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -990,17 +1051,8 @@ observations:
     original_method_class: measured_direct
     attribution: Figure 1, a van't Hoff plot, shows the linear behavior of I⁺T for the Mg, SiO and SiO2 as a function of 1/T.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio_IT_figure_only
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1012,13 +1064,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio_slope_second_law
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1075,12 +1131,22 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio_slope_second_law_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '1'
+        note: 'Figure 1 printed annotation: SiO slope = -2.13(4)'
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1093,13 +1159,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig1_sio_slope_second_law_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -1156,21 +1226,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig1_sio_slope_second_law
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '1'
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1182,13 +1243,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig2_mg_fe_ratio_figure_only
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1247,8 +1312,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_fig2_mg_fe_ratio_figure_only_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: '2'
+        note: Figure 2 I+(Mg)/(I+(Mg)+I+(Fe)) vs T(C)
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1261,13 +1336,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_fig2_mg_fe_ratio_figure_only_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1329,17 +1408,8 @@ observations:
       same trend as the Mg/(Mg+Fe) ratio in the gas phase, but the plotted ordinate values are probably slightly different
       due to unknown relative ionization cross sections of Mg and Fe.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_fig2_mg_fe_ratio_figure_only
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 2
-        published_page: 1048
-        pdf_page_index: 2
-        figure: '2'
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1351,13 +1421,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_mg_detected_kems
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1417,8 +1491,19 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_mg_detected_kems_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: Results paragraph, printed p.1047. Mg, Fe, and SiO dominant 1675-1875 K. Absolute pressures not determined;
+          P proportional to I+T (sentence continues onto p.1048).
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1432,13 +1517,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_mg_detected_kems_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1504,17 +1593,8 @@ observations:
       times while cycling the temperature up and down in the range. Mg, Fe, and SiO are the dominant species detected in the
       equilibrium gas-phase between 1675-1875 K.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_mg_detected_kems
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1526,13 +1606,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_mgo_not_detected
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1591,8 +1675,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=bound_not_point is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_mgo_not_detected_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1604,13 +1697,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_mgo_not_detected_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1671,17 +1768,8 @@ observations:
     attribution: Other oxides of Si (SiO3 and SiO4) and of Mg and Fe, in particular MgO, were not detected at the 0.1% level
       relative to Mg and SiO
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_mgo_not_detected
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source admission_status=bound_not_point is not a closed v2.1 token
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1693,13 +1781,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_o2_abundant_not_quantitative
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1758,8 +1850,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_o2_abundant_not_quantitative_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -1771,13 +1872,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_o2_abundant_not_quantitative_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1836,93 +1941,6 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
     attribution: Oxygen was also abundant as O and O2, but high background signals prevented quantitative measurements
-  admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_o2_abundant_not_quantitative
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
-  notices: []
-  source_id: kems-114-nichols-1995
-  locator:
-    page: 1
-    published_page: 1047
-    pdf_page_index: 1
-    paragraph: results
-  read_from: pdf:kems-114-nichols-1995
-- observation_id: kems-114-nichols-1995::nichols_1995_o_abundant_not_quantitative
-  experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
-  identity:
-    quantity: mass_loss_rate
-    species:
-      formula: O
-      phase: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: unknown
-      reason: source does not state sweep_gas
-    exposure:
-      tag: unknown
-      reason: source does not state exposure
-    sample_mass_kg:
-      tag: unknown
-      reason: source does not state sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use wall
-  value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: not quantitative; no sigma printed
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
   admission:
     status: pending
     reason: source does not state admission_status
@@ -1934,16 +1952,111 @@ observations:
     pdf_page_index: 1
     paragraph: results
   read_from: pdf:kems-114-nichols-1995
+- observation_id: kems-114-nichols-1995::nichols_1995_o_abundant_not_quantitative
+  experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: O
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not quantitative; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_o_abundant_not_quantitative_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+  notices: []
+  source_id: kems-114-nichols-1995
+  locator:
+    page: 1
+    published_page: 1047
+    pdf_page_index: 1
+    paragraph: results
+  read_from: pdf:kems-114-nichols-1995
 - observation_id: kems-114-nichols-1995::nichols_1995_o_abundant_not_quantitative_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2003,17 +2116,8 @@ observations:
     original_method_class: measured_direct
     attribution: Oxygen was also abundant as O and O2, but high background signals prevented quantitative measurements
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_o_abundant_not_quantitative
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -2025,13 +2129,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_sio2_detected_kems
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2090,8 +2198,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_sio2_detected_kems_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -2103,13 +2220,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_sio2_detected_kems_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2170,17 +2291,8 @@ observations:
     attribution: SiO2 is observed at the higher temperatures of this range, but only in an abundance relative to SiO similar
       to those observed by [9] for solid SiO2.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_sio2_detected_kems
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -2192,13 +2304,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_sio_detected_kems
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2257,8 +2373,18 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-114-nichols-1995::nichols_1995_sio_detected_kems_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: SiO dominant Si-bearing species; summary p.1048 repeats 1675-1875 K
   notices: []
   source_id: kems-114-nichols-1995
   locator:
@@ -2271,13 +2397,17 @@ observations:
 - observation_id: kems-114-nichols-1995::nichols_1995_sio_detected_kems_quoted
   experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2338,17 +2468,8 @@ observations:
     attribution: Mg, Fe, and SiO are the dominant species detected in the equilibrium gas-phase between 1675-1875 K. SiO is
       clearly the most abundant Si-species in the equilibrium vapor of forsterite between 1675 and 1875 K.
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-114-nichols-1995::nichols_1995_sio_detected_kems
-    decided_by:
-      worker: wave-W2-kems-114-nichols-1995
-      date: '2026-09-06'
-      evidence:
-        page: 1
-        published_page: 1047
-        pdf_page_index: 1
-        paragraph: results
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-114-nichols-1995
   locator:

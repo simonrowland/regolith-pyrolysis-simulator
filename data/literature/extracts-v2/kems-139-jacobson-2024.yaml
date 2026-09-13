@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_fig16_au_vant_hoff_figure_only
   experiment_id: 10.1002/rcm.9744::16
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Au
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Au' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -94,13 +98,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_hfo_delta_fH_kems_vs_ccsdt
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: HfO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'HfO_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -173,13 +181,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_demaria_observed_species
   experiment_id: 10.1002/rcm.9744::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_basalt_12022' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -252,13 +264,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat
   experiment_id: 10.1002/rcm.9744::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -314,7 +330,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -332,13 +348,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_snyder_12022_composition
   experiment_id: 10.1002/rcm.9744::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_basalt_12022' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -411,13 +431,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_second_law_narrative
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: HfO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Hf_plus_HfO2_univariant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -474,7 +498,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -491,13 +515,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_average_narrative
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: HfO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Hf_plus_HfO2_univariant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -570,13 +598,17 @@ observations:
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation
   experiment_id: 10.1002/rcm.9744::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: HfO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Hf_plus_HfO2_univariant' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

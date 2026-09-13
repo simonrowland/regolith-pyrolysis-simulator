@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_fig8_ag_in_activities_figure_only
   experiment_id: 10.2320/matertrans1989.30.575::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -94,13 +98,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_fig9_ag_ga_activities_figure_only
   experiment_id: 10.2320/matertrans1989.30.575::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -156,7 +164,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -183,13 +191,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_gamma0_Ga_in_Ag
   experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -245,7 +257,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -262,13 +274,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_gamma0_T_equations
   experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -324,7 +340,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -341,13 +357,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_gamma0_T_equations_Ag
   experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In_and_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -403,7 +423,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -420,13 +440,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_kems_geometry_and_calibration
   experiment_id: 10.2320/matertrans1989.30.575::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In_and_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -498,13 +522,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
   experiment_id: 10.2320/matertrans1989.30.575::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'literature_IP' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -576,13 +604,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_table1_ionization_potentials_this_work
   experiment_id: 10.2320/matertrans1989.30.575::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_Ag-In_and_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -654,13 +686,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
   experiment_id: 10.2320/matertrans1989.30.575::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_liquid_metals' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -716,7 +752,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -733,13 +769,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
   experiment_id: 10.2320/matertrans1989.30.575::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -811,13 +851,17 @@ observations:
 - observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
   experiment_id: 10.2320/matertrans1989.30.575::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

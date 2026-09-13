@@ -5,10 +5,14 @@ observations:
 - observation_id: habermann-daane-1964::Hab64_Eu_metal_third_law
   experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Eu_metal_third_law
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Eu_metal_and_EuO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -78,13 +82,17 @@ observations:
 - observation_id: habermann-daane-1964::Hab64_Yb_metal_antoine
   experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Yb_metal_antoine
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Yb_metal_and_YbO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sublimation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

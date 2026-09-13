@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_al_cas_vapor_ions_and_gibbs
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_CAS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -79,13 +83,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_binary_wilson_model_parameters_table2
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'binary_oxide_silicate_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -156,13 +164,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_cao_cas_gibbs_table1
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_CAS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -230,13 +242,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_fe_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -304,13 +320,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -381,13 +401,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_k2o_in_nks_gibbs_table3
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -455,13 +479,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_mg_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -529,13 +557,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_B2O3_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -604,13 +636,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -679,13 +715,17 @@ observations:
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_silicate_kems_geometry_activities
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype

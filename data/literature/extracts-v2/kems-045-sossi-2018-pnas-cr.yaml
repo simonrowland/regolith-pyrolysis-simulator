@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_CrO2_stability_quoted_janaf
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CrO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CrO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bhvo2_measured
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'USGS_BHVO2_reference_material' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -167,13 +175,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bonnand_2016_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_mare_basalts_literature' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -246,13 +258,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bse_filtered_mean_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_Earth_filtered_ultramafic_compilation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -311,7 +327,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -329,13 +345,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_chromite_opx_fractionation_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_silicate_melt_chromite_and_orthopyroxene' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -392,7 +412,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -421,13 +441,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_costa2017_kems_T_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'forsterite_rich_olivine_kems' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -500,13 +524,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr2plus_fraction_quoted_berry
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -590,13 +618,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr_abundance_moon_earth_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_Moon_vs_BSE' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -655,7 +687,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -672,13 +704,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_delta53Cr_moon_earth_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_vs_bulk_silicate_Moon' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -739,7 +775,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -756,13 +792,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_demaria1971_kems_T_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_mare_basalt_12002_kems' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -833,13 +873,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_eq3_fractionation_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_CrO_l_in_equilibrium_with_CrO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -899,7 +943,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -916,13 +960,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig1_figure_only
   experiment_id: 10.1073/pnas.1809060115::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_and_terrestrial_samples' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -994,13 +1042,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig2_figure_only
   experiment_id: 10.1073/pnas.1809060115::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_like_silicate_melt_liquid_vapor_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1056,7 +1108,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1073,13 +1125,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig3_caption_model
   experiment_id: 10.1073/pnas.1809060115::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'protolunar_disk_and_accreting_Moon' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1135,7 +1191,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1152,13 +1208,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_gamma_CrO_quoted_berry
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: CrO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_BSE_like' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1229,13 +1289,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO2_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CrO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CrO2_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1292,7 +1356,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1308,13 +1372,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO3_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CrO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CrO3_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1371,7 +1439,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1387,13 +1455,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CrO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CrO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1450,7 +1522,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1467,13 +1539,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_mcicpms_method
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'dissolved_rock_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1546,13 +1622,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_moon_filtered_mean_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_Moon_filtered_lunar_samples' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1611,7 +1691,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1628,13 +1708,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_schoenberg_bse_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_Earth_literature' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1706,13 +1790,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured
   experiment_id: 10.1073/pnas.1809060115::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'terrestrial_ultramafic_rocks_and_lunar_samples' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1785,13 +1873,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_terrestrial_20sample_average_measured
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'terrestrial_ultramafic_rocks_this_study' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1866,13 +1958,18 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_vapor_delta_and_T_window_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cr
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_like_silicate_melt_in_equilibrium_with_CrO2_bearing_vapor' is not in the closed automatic
+          map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1932,7 +2029,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1951,13 +2048,17 @@ observations:
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_visscher_fegley_fO2_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'impact_generated_silicate_melt_vapor' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

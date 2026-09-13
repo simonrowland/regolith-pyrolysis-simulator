@@ -5,13 +5,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq13_gamma_SiO2_quadratic
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2_binary_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -86,13 +90,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq16_oxygen_distribution_dG
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'steelmaking_silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -148,7 +156,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -166,13 +174,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq17_gamma_FeO_expansion
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'steelmaking_silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -228,7 +240,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -245,13 +257,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq23_24_ferrous_ferric
   experiment_id: 10.2355/isijinternational.33.2::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-CaO and FetO-CaO-SiO2 slags' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -307,7 +323,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -325,13 +341,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq27_28_manganese_distribution
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-MnO-CaO-MgO-SiO2 slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -387,7 +407,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -404,13 +424,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq32_a_MnO_s
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-SiO2-MnO slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -466,7 +490,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -483,13 +507,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq33_a_FetO_l
   experiment_id: 10.2355/isijinternational.33.2::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-SiO2-MnO slag in equilibrium with solid iron' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -545,7 +573,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -563,13 +591,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq34_a_SiO2_crist
   experiment_id: 10.2355/isijinternational.33.2::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-SiO2-MnO slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -625,7 +657,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -643,13 +675,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq37_38_phosphorus_distribution
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-Fe2O3-P2O5-SiO2-CaO-MgO slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -706,7 +742,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -723,13 +759,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq40_P2_dG
   experiment_id: 10.2355/isijinternational.33.2::12
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-bearing steelmaking slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -786,7 +826,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -804,13 +844,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq42_turkdogan_pearson_P2O5
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure liquid P2O5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -866,7 +910,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -883,13 +927,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq47_hydroxyl_dG
   experiment_id: 10.2355/isijinternational.33.2::14
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'binary silicate melts SiO2-MO (MO = CaO, Na2O, K2O, Li2O)' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -945,7 +993,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -963,13 +1011,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2_binary_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1025,7 +1077,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1043,13 +1095,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig10_figure_only
   experiment_id: 10.2355/isijinternational.33.2::10
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1105,7 +1161,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1124,13 +1180,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig11_figure_only
   experiment_id: 10.2355/isijinternational.33.2::11
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1186,7 +1246,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1204,13 +1264,18 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig11_printed_logK_P1_fit
   experiment_id: 10.2355/isijinternational.33.2::11
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-FeO1.5-PO2.5 slags saturated with CaO, MgO, SiO2 or combinations as labelled' is not in
+          the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1267,7 +1332,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1285,13 +1350,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig12_figure_only
   experiment_id: 10.2355/isijinternational.33.2::12
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1347,7 +1416,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1365,13 +1434,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig12_printed_logK_P2_fit
   experiment_id: 10.2355/isijinternational.33.2::12
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-FeO1.5-PO2.5 slags as labelled on Fig. 12' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1428,7 +1501,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1446,13 +1519,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig13_figure_only
   experiment_id: 10.2355/isijinternational.33.2::13
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1508,7 +1585,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1526,13 +1603,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig14_figure_only
   experiment_id: 10.2355/isijinternational.33.2::14
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1588,7 +1669,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1606,13 +1687,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig15_figure_only
   experiment_id: 10.2355/isijinternational.33.2::15
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1668,7 +1753,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1687,13 +1772,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig16_figure_only
   experiment_id: 10.2355/isijinternational.33.2::16
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1749,7 +1838,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1768,13 +1857,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig17_figure_only
   experiment_id: 10.2355/isijinternational.33.2::17
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1830,7 +1923,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1848,13 +1941,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig18_figure_only
   experiment_id: 10.2355/isijinternational.33.2::18
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1910,7 +2007,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1928,13 +2025,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig1_figure_only
   experiment_id: 10.2355/isijinternational.33.2::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1990,7 +2091,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2008,13 +2109,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig2_figure_only
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2070,7 +2175,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2088,13 +2193,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig3_figure_only
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2150,7 +2259,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2169,13 +2278,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig4_figure_only
   experiment_id: 10.2355/isijinternational.33.2::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2231,7 +2344,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2250,13 +2363,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig5_figure_only
   experiment_id: 10.2355/isijinternational.33.2::5
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2312,7 +2429,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2331,13 +2448,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig6_figure_only
   experiment_id: 10.2355/isijinternational.33.2::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2393,7 +2514,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2411,13 +2532,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig7_figure_only
   experiment_id: 10.2355/isijinternational.33.2::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2473,7 +2598,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2491,13 +2616,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig7_printed_logK_Mn_fit
   experiment_id: 10.2355/isijinternational.33.2::7
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-MnO-SiO2 with CaO and/or MgO as labelled on Fig. 7' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2553,7 +2682,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2571,13 +2700,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig8_figure_only
   experiment_id: 10.2355/isijinternational.33.2::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2633,7 +2766,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2651,13 +2784,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_fig9_figure_only
   experiment_id: 10.2355/isijinternational.33.2::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2713,7 +2850,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2732,13 +2869,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table1_Al3_row
   experiment_id: 10.2355/isijinternational.33.2::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'steelmaking_silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2794,7 +2935,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2812,13 +2953,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table1_alpha_ij_major
   experiment_id: 10.2355/isijinternational.33.2::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'steelmaking_silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2874,7 +3019,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2892,13 +3037,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table2_H_pairs
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -2954,7 +3103,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2972,13 +3121,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table2_K_Si_alpha
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3034,7 +3187,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3052,13 +3205,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table2_Li_Si_alpha
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Li2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3114,7 +3271,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3132,13 +3289,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table2_Ti_pairs
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: TiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3194,7 +3355,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3212,13 +3373,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table2_alpha_ij_other
   experiment_id: 10.2355/isijinternational.33.2::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_phosphate_aluminate_slag' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -3274,7 +3439,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3292,13 +3457,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_CaO_conversions
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3354,7 +3523,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3372,13 +3541,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_MgO_conversions
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3434,7 +3607,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3452,13 +3625,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_MnO_conversions
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MnO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3514,7 +3691,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3532,13 +3709,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_Na2O_conversion
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3594,7 +3775,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3612,13 +3793,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_P2O5_conversion
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: P2O5
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3674,7 +3859,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3692,13 +3877,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_SiO2_conversions
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3754,7 +3943,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3772,13 +3961,17 @@ observations:
 - observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors
   experiment_id: 10.2355/isijinternational.33.2::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3834,7 +4027,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

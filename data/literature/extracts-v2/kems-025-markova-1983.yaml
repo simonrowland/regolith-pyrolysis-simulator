@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_al2o2_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al2O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_al2o_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -162,13 +170,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_al_alo_al2o_proportion_bound
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -239,13 +251,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_al_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -317,13 +333,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_alo_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -395,13 +415,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_ca_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -473,13 +497,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_cao_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -551,13 +579,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_fe_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -629,13 +661,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_feo_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -707,13 +743,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_initial_compositions_table
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::unnumbered
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'initial_high_Al_samples_before_vaporization' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -785,13 +825,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_k_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -863,13 +907,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_kems_method_and_inventory
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -941,13 +989,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_mg_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1019,13 +1071,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_mgo_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1098,13 +1154,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_na_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1176,13 +1236,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_o2_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1255,13 +1319,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_o_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1334,13 +1402,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_po2_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: PO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1413,13 +1485,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_po_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: PO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1492,13 +1568,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_sio_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1570,13 +1650,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_tio2_detected_not_tabulated
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: TiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1649,13 +1733,17 @@ observations:
 - observation_id: kems-025-markova-1983::markova_1983_tio_psat_figs_figure_only
   experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::2,4
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: TiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype

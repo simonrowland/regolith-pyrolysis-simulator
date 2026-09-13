@@ -10,19 +10,19 @@ work:
       tag: unknown
       reason: INDEX does not give corpus commit
     files:
-    - asset_id: pdf:shornikov-2025-cao
-      role: pdf
+    - asset_id: unknown:shornikov-2025-cao
+      role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give sha256
+        reason: INDEX does not give an asset
   doi: 10.1007/978-3-031-80664-3_20
 experiments:
 - experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[0]
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -48,8 +48,8 @@ experiments:
 - experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[1]
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -75,8 +75,8 @@ experiments:
 - experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[2]
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -102,8 +102,8 @@ experiments:
 - experiment_id: 10.1007/978-3-031-80664-3_20::raw_pCa[3]
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:

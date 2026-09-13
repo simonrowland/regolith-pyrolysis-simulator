@@ -5,13 +5,17 @@ observations:
 - observation_id: fray-schmitt-2009-nh3::anchor_NH3_pure_Psat
   experiment_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95::Fray-Schmitt-2009#NH3
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: NH3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_NH3_to_NH3_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

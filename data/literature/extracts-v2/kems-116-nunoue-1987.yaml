@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_consolute_author_estimate
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::5
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: consolute_temperature
@@ -93,13 +97,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig1_literature_gap_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::1
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: miscibility_gap
@@ -170,13 +178,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig2_ion_ratio_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::2
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -247,13 +259,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig3_ion_ratio_gap_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::3
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -324,13 +340,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig5_gap_this_work_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::5
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: miscibility_gap
@@ -401,13 +421,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig6_isothermal_ion_ratio_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::6
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -478,13 +502,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig7_activities_1550C_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::7
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -555,13 +583,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig8_activities_1600C_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::8
   identity:
-    quantity: activity
+    quantity:
+      tag: value
+      value: activity
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity does not use subtype
@@ -632,13 +664,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::kems-116-nunoue-1987
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -709,13 +745,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table1_starting_materials
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -786,13 +826,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::2
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: miscibility_gap_temperature
@@ -864,13 +908,17 @@ observations:
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Sn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype

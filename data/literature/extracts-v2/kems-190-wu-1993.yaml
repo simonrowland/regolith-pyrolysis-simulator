@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-190-wu-1993::wu_1993_calculated_ternary_peritectic
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: ternary_peritectic_temperature_and_phase_compositions
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -145,7 +153,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -161,13 +169,17 @@ observations:
 - observation_id: kems-190-wu-1993::wu_1993_reported_ternary_peritectic
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: ternary_peritectic_temperature_and_phase_compositions
@@ -238,13 +250,17 @@ observations:
 - observation_id: kems-190-wu-1993::wu_1993_table1_fe2sio4_optimized_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe2SiO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe2SiO4_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -300,7 +316,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -313,17 +329,21 @@ observations:
     table: '1'
     note: row=Fe2SiO4(s)
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_feo_compiled_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'stoichiometric_FeO_liquid_and_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -379,7 +399,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -392,17 +412,21 @@ observations:
     table: '1'
     note: FeO liquid and solid rows
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_fesio3_optimized_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeSiO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeSiO3_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -458,7 +482,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -471,17 +495,21 @@ observations:
     table: '1'
     note: row=FeSiO3(s)
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_mg2sio4_optimized_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Mg2SiO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Mg2SiO4_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -537,7 +565,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -550,17 +578,21 @@ observations:
     table: '1'
     note: row=Mg2SiO4(s)
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_mgo_compiled_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_MgO_liquid_and_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -628,17 +660,21 @@ observations:
     table: '1'
     note: MgO liquid and solid rows
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_mgsio3_optimized_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgSiO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgSiO3_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -694,7 +730,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -707,17 +743,21 @@ observations:
     table: '1'
     note: row=MgSiO3(s)
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table1_sio2_compiled_thermochemistry
   experiment_id: 10.2355/isijinternational.33.26::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_SiO2_liquid_and_solid_polymorphs' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -785,17 +825,21 @@ observations:
     table: '1'
     note: SiO2 liquid, tridymite, and cristobalite rows
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
   experiment_id: 10.2355/isijinternational.33.26::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -852,7 +896,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -865,17 +909,21 @@ observations:
     table: '2'
     note: FeO-SiO2 system, RT ln gamma_FeO columns
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
   experiment_id: 10.2355/isijinternational.33.26::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -932,7 +980,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -945,17 +993,21 @@ observations:
     table: '2'
     note: FeO-SiO2 system, RT ln gamma_SiO2 columns
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
   experiment_id: 10.2355/isijinternational.33.26::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: MgO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1012,7 +1064,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1025,17 +1077,21 @@ observations:
     table: '2'
     note: MgO-SiO2 system, RT ln gamma_MgO columns
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
   experiment_id: 10.2355/isijinternational.33.26::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1092,7 +1148,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1105,17 +1161,21 @@ observations:
     table: '2'
     note: MgO-SiO2 system, RT ln gamma_SiO2 columns
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
   experiment_id: 10.2355/isijinternational.33.26::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: composition_dependent_solidus_points
@@ -1171,7 +1231,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1184,17 +1244,21 @@ observations:
     table: '3'
     note: Calculated column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993
 - observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
   experiment_id: 10.2355/isijinternational.33.26::3
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: composition_dependent_solidus_points
@@ -1262,4 +1326,4 @@ observations:
     table: '3'
     note: Reported column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
-  read_from: pdf:kems-190-wu-1993
+  read_from: tables:kems-190-wu-1993

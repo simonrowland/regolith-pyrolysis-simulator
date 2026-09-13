@@ -5,13 +5,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_ch4_major_gas_model_claim
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CH4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'equilibrium_gas_over_average_ordinary_chondrite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -84,13 +88,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_gas_chemistry_figures_figure_only
   experiment_id: 10.1016/j.icarus.2006.09.002::2–17
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'equilibrium_gas_over_average_ordinary_chondrite' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -146,7 +154,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -162,13 +170,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_hebe_tp_program_printed
   experiment_id: 10.1016/j.icarus.2006.09.002::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'asteroid_6_Hebe_thermal_profile' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -224,7 +236,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -243,13 +255,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_brett_sato_1984_fo2
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondrite_solid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -305,7 +321,7 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_literature
     attribution: For example, at 1200 K Brett and Sato (1984) measured log fO2 (bars) = −17.1 ± 0.6 for the Ochansk H4 chondrite
       and −17.3 ± 0.6 for the Guareña H6 chondrite. At the same temperature we calculate log fO2 = −17.4 ± 0.4 for H chondritic
@@ -336,13 +352,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_gooding_muenow_1977_holbrook
   experiment_id: 10.1016/j.icarus.2006.09.002::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Holbrook_L6_quoted_stepwise_vacuum_heating' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -398,7 +418,7 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_literature
     attribution: They found that H2O and CO2 were the primary hydrogen and carbon bearing species, with S2 and minor amounts
       of SO2 becoming abundant above 1073 K. Our results (Fig. 2) show that H2O and CO2 are the most abundant gases below
@@ -419,13 +439,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_muenow_1995_heating
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondrite_vacuum_heating_quoted' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -481,7 +505,7 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_literature
     attribution: Muenow et al. (1995) heated several ordinary chondrites in a vacuum and measured the gases that were evolved.
       They found that H2O and CH4 outgassed below ∼900 K. Carbon dioxide formed around 1023 K, and CO was released from ∼1100–1300
@@ -501,13 +525,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: H_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_H_chondrite_falls' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -581,13 +609,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: L_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_L_chondrite_falls' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -661,13 +693,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: LL_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_LL_chondrite_falls' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -741,13 +777,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_h_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: H_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -820,13 +860,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_l_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: L_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -899,13 +943,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_ll_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: LL_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -978,13 +1026,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_h_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: H_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_H_chondrite_normative_vs_calculated' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1057,13 +1109,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_l_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: L_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_L_chondrite_normative_vs_calculated' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1136,13 +1192,17 @@ observations:
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_ll_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: LL_chondrite
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_LL_chondrite_normative_vs_calculated' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

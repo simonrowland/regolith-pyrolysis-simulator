@@ -49,12 +49,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
-    - asset_id: pdf:REF-014
-      role: pdf
+    - asset_id: unknown:REF-014
+      role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give sha256
+        reason: INDEX does not give an asset
   doi: 10.1016/j.gca.2005.08.014
 experiments:
 - experiment_id: 10.1016/j.gca.2005.08.014::3
@@ -262,8 +262,9 @@ experiments:
 - experiment_id: 10.1016/j.gca.2005.08.014::potassium_silicate_vacuum
   kind: literature
   method:
-    tag: value
-    value: langmuir_free_evaporation
+    tag: unknown
+    reason: regime 'vacuum_langmuir_flux_against_equilibrium_reference' is not a closed method token (kems_effusion alone
+      is insufficient)
   sample: {}
   conditions:
     temperature_K:

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-103-fraser-1983::fraser_1983_appendix1_ln_INa_IK
   experiment_id: 10.3406/bulmi.1983.7673::appendix1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NaAlSi2O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -84,13 +88,17 @@ observations:
 - observation_id: kems-103-fraser-1983::fraser_1983_kems_mo_cell_geometry
   experiment_id: 10.3406/bulmi.1983.7673::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NaAlSi2O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -162,13 +170,17 @@ observations:
 - observation_id: kems-103-fraser-1983::fraser_1983_table1_ln_INa_IK_regression
   experiment_id: 10.3406/bulmi.1983.7673::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: NaAlSi2O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -225,7 +237,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: derived_least_squares
     model: derived_least_squares
   admission:
@@ -242,13 +254,17 @@ observations:
 - observation_id: kems-103-fraser-1983::fraser_1983_table2_gamma_NaAlSi2O6
   experiment_id: 10.3406/bulmi.1983.7673::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: NaAlSi2O6
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi2O6-KAlSi2O6_pseudobinary_silicate_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -307,7 +323,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: derived_gibbs_duhem_integration
     model: derived_gibbs_duhem_integration
   admission:

@@ -5,13 +5,17 @@ observations:
 - observation_id: ref-032-mg::anchor_Mg_pure_Psat
   experiment_id: 1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29::REF-032#Mg
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Mg_to_Mg_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

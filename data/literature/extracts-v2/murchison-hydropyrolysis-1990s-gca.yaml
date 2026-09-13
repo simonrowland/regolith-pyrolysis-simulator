@@ -5,13 +5,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_gcms_chromatograms_figure_only
   experiment_id: 10.1016/j.gca.2003.08.019::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Murchison_CM2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysate_GCMS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -81,13 +85,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_murchison_h2_pyrolysis_method
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Murchison_CM2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_solvent_extracted_whole_rock_with_Mo_catalyst' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -157,13 +165,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
   experiment_id: 10.1016/j.gca.2003.08.019::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -233,13 +245,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
   experiment_id: 10.1016/j.gca.2003.08.019::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -312,13 +328,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
   experiment_id: 10.1016/j.gca.2003.08.019::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: N
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -388,13 +408,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_total_pyrolysate_mass_balance
   experiment_id: 10.1016/j.gca.2003.08.019::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_mass_balance' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -448,7 +472,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -465,13 +489,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms
   experiment_id: 10.1016/j.gca.2003.08.019::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -541,13 +569,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table2_component_classification_quoted
   experiment_id: 10.1016/j.gca.2003.08.019::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Murchison_CM2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_HF_HCl_residue_combustion_components' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -617,13 +649,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
   experiment_id: 10.1016/j.gca.2003.08.019::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: C
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -695,13 +731,17 @@ observations:
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
   experiment_id: 10.1016/j.gca.2003.08.019::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: N
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only
   experiment_id: 10.1016/j.calphad.2022.102507::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -70,8 +74,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '5'
+        note: Fig. 5a-c P(T) of Ga2O, Ga, GaO; no numeric table besides printed 1752 K points
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -83,13 +96,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -148,18 +165,8 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only
-    decided_by:
-      worker: wave-W2-kems-138-bischof-2023
-      date: '2026-09-06'
-      evidence:
-        published_page: 9
-        pdf_page_index: 9
-        figure: '5'
-        note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
-          within a temperature range of 1510–1752 K.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -172,13 +179,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only
   experiment_id: 10.1016/j.calphad.2022.102507::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -237,8 +248,16 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -249,13 +268,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::6
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -314,18 +337,8 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only
-    decided_by:
-      worker: wave-W2-kems-138-bischof-2023
-      date: '2026-09-06'
-      evidence:
-        published_page: 9
-        pdf_page_index: 9
-        figure: '6'
-        note: quote=Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
-          within a temperature range of 1210–1611 K.
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -338,13 +351,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fig7_11_lnK_figure_only
   experiment_id: 10.1016/j.calphad.2022.102507::7
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_M2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -417,13 +434,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_fragmentation_f_i
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_calibration' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -495,13 +516,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_kems_ir_cell_geometry
   experiment_id: 10.1016/j.calphad.2022.102507::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -575,13 +600,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ga2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -654,13 +683,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_ga_1752k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -733,13 +766,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_gao_1752k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: GaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -812,13 +849,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: In2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -891,13 +932,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_in_1611k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -970,13 +1015,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_psat_ino_1611k
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: InO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1049,13 +1098,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_sigma_O2
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_calibration' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1127,13 +1180,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_ga2o_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::10
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1206,10 +1263,14 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio
   experiment_id: 10.1016/j.calphad.2022.102507::10
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: GaO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1268,12 +1329,21 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 14
+        pdf_page_index: 15
+        table: '10'
+        note: quote=GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1285,10 +1355,14 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::10
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: GaO
-      phase: g
+      phase:
+        tag: value
+        value: g
       polymorph:
         tag: not_applicable
         reason: not crystal
@@ -1347,21 +1421,12 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model
     model: model
   admission:
-    status: superseded
-    reason: source supersedes link resolved
-    superseded_by: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio
-    decided_by:
-      worker: wave-W2-kems-138-bischof-2023
-      date: '2026-09-06'
-      evidence:
-        published_page: 14
-        pdf_page_index: 14
-        table: '10'
-        note: Pets04, FACTSG column; GaO(g) = Ga(g) + O(g) row; quote=129404
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1373,13 +1438,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::10
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: GaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1451,13 +1520,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table11_in2o_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::11
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1530,13 +1603,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table11_ino_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::11
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: InO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1609,13 +1686,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::12
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: In2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1687,13 +1768,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::12
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1765,13 +1850,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table12_o2_psat_derived
   experiment_id: 10.1016/j.calphad.2022.102507::12
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1843,13 +1932,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_ga2o_2nd_law_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::13
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'homogeneous_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1905,7 +1998,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1922,13 +2015,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_ga2o_homogeneous_3rd
   experiment_id: 10.1016/j.calphad.2022.102507::13
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'homogeneous_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2000,13 +2097,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_in2o_homogeneous_3rd
   experiment_id: 10.1016/j.calphad.2022.102507::13
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'homogeneous_gas' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2078,13 +2179,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table3_ga2o3_runs
   experiment_id: 10.1016/j.calphad.2022.102507::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_alpha_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2156,13 +2261,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table3_in2o3_runs
   experiment_id: 10.1016/j.calphad.2022.102507::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_alpha_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2234,13 +2343,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table6_po2_equations
   experiment_id: 10.1016/j.calphad.2022.102507::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_M2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2313,13 +2426,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table7_ga_isotherm_intensities
   experiment_id: 10.1016/j.calphad.2022.102507::7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2407,13 +2524,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table8_ga_2nd_law_and_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2469,7 +2590,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2486,13 +2607,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table8_ga_3rd_law_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::8
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ga
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2564,13 +2689,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table9_in_2nd_law_and_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::9
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -2626,7 +2755,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -2643,13 +2772,17 @@ observations:
 - observation_id: kems-138-bischof-2023::bischof_2023_table9_in_3rd_law_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::9
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: In
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

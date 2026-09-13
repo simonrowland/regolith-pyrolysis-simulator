@@ -5,13 +5,17 @@ observations:
 - observation_id: yam1983::yam1983_na2o_prose_activity_range
   experiment_id: 10.2320/jinstmet1952.47.9_736::yam1983
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -80,13 +84,17 @@ observations:
 - observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B
   experiment_id: 10.2320/jinstmet1952.47.9_736::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Na2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -163,13 +171,17 @@ observations:
 - observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B
   experiment_id: 10.2320/jinstmet1952.47.9_736::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: SiO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype

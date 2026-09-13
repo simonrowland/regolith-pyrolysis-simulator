@@ -5,13 +5,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_boudouard_kp_model_derived
   experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_phase_Boudouard_equilibrium' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -65,7 +69,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -82,13 +86,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_cm2_method_and_feedstock
   experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Murchison_CM2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM2_powder_in_quartz_boat' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -158,13 +166,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_ir_fig3_figure_only
   experiment_id: 10.1134/s0038094623050064::3
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_residue_after_anneal' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -234,13 +246,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CH4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -314,13 +330,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co2_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -394,13 +414,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_co_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -474,13 +498,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_cos_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: COS
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -554,13 +582,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -634,13 +666,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2o_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -714,13 +750,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_h2s_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -794,13 +834,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_n2_table1
   experiment_id: 10.1134/s0038094623050064::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -874,13 +918,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_ch4_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CH4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -953,13 +1001,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co2_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1032,13 +1084,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_co_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1111,13 +1167,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_cos_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: COS
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1190,13 +1250,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1269,13 +1333,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2o_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1348,13 +1416,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_h2s_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1427,13 +1499,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2
   experiment_id: 10.1134/s0038094623050064::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Murchison_CM2_powder_in_He' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1506,13 +1582,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_ch4
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CH4
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1582,13 +1662,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_co
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1658,13 +1742,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_co2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1734,13 +1822,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_cos
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: COS
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1810,13 +1902,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1886,13 +1982,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2o
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1962,13 +2062,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_h2s
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -2038,13 +2142,17 @@ observations:
 - observation_id: murchison-degassing-2023-springer::voropaev_2023_table4_chelyabinsk_quoted_n2
   experiment_id: 10.1134/s0038094623050064::4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: N2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'gas_evolved_from_Chelyabinsk_LL5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

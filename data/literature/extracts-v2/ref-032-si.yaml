@@ -5,13 +5,17 @@ observations:
 - observation_id: ref-032-si::anchor_Si_pure_Psat
   experiment_id: e120eefb04423637700bccb393af85d793acf6a8cf9bdc36a0e4b5b6b442e282::REF-032#Si
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Si_to_Si_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

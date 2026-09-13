@@ -30,19 +30,19 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
-    - asset_id: pdf:halwax_sergeev_mueller_schenk_2024
-      role: pdf
+    - asset_id: unknown:halwax_sergeev_mueller_schenk_2024
+      role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give sha256
+        reason: INDEX does not give an asset
   doi: 10.1007/s11663-024-02995-6
 experiments:
 - experiment_id: 10.1007/s11663-024-02995-6::7
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -121,6 +121,13 @@ experiments:
           page: 825
           paragraph: experimental
           note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
+        inference:
+          relation: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          inputs:
+          - '{''page'': 825, ''paragraph'': ''experimental'', ''quote'': ''The orifice in the lid of the cell had a diameter
+            of 0.3 mm''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1007/s11663-024-02995-6::II
   kind: literature
   method:
@@ -359,6 +366,13 @@ experiments:
           paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
           line_range: '222'
           source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        inference:
+          relation: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          inputs:
+          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md'',
+            ''paragraph'': ''The orifice in the lid of the cell had a diameter of 0.3 mm'', ''line_range'': ''222''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   kind: literature
   method:
@@ -409,3 +423,10 @@ experiments:
           page: 825
           paragraph: experimental
           note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
+        inference:
+          relation: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          inputs:
+          - '{''page'': 825, ''paragraph'': ''experimental'', ''quote'': ''The orifice in the lid of the cell had a diameter
+            of 0.3 mm''}'
+          parameters: []
+          output_unit: m2

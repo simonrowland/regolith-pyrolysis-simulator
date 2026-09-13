@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-009-safarian-2013::safarian_2013_si_pure_langmuir_theory
   experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_liquid_metal_theory' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-009-safarian-2013::safarian_2013_si_pure_liquid_alpha_b1
   experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_elemental_Si_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

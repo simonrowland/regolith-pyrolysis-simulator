@@ -5,13 +5,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_release_window_500_750_C
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -80,13 +84,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_total_loss_wt_pct
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -161,13 +169,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_release_window_50_200_C
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -236,13 +248,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_total_loss_wt_pct
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -317,13 +333,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_co2_page4_figure_only
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -399,13 +419,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_h2o_page4_figure_only
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -481,13 +505,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_so2_page4_figure_only
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -563,13 +591,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_idealized_ht_tg_page8_figure_only
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -645,13 +677,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -732,13 +768,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_thermal_program
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -807,13 +847,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_he_thermal_program
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -882,13 +926,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_vacuum_thermal_program
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -957,13 +1005,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_release_window_1000_C_plus
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1032,13 +1084,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_total_loss_wt_pct
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1113,13 +1169,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_suspected_reactions_hypothesis
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1189,13 +1249,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_bubbling_above_1100_C_qualitative
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: JSC-1A
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_melt_or_glass' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: vacuum_bubbling_onset_qualitative
@@ -1265,13 +1329,17 @@ observations:
 - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_ms_h2o_page5_figure_only
   experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

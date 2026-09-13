@@ -5,13 +5,17 @@ observations:
 - observation_id: safarian-engh-2013-si-pure-langmuir::safarian_engh_2013_si_pure_langmuir
   experiment_id: 10.1007/s11661-012-1464-2::safarian_engh_2013_si_pure_langmuir
   identity:
-    quantity: evaporation_coefficient_alpha
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Si
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'pure_liquid_or_solid_elemental_Si' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_fig7_ion_intensity_figure_only
   experiment_id: 10.2320/jinstmet1952.40.5_526::7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Cd-Zn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_fig9_activities_667k_figure_only
   experiment_id: 10.2320/jinstmet1952.40.5_526::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Cd-Zn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -145,7 +153,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -172,13 +180,17 @@ observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_gamma_Zn_667k
   experiment_id: 10.2320/jinstmet1952.40.5_526::kems-169-nakazawa-1976
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Zn
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Cd-Zn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -234,7 +246,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -259,13 +271,17 @@ observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_gamma_regular_667k
   experiment_id: 10.2320/jinstmet1952.40.5_526::kems-169-nakazawa-1976
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Cd-Zn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -321,7 +337,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -346,13 +362,17 @@ observations:
 - observation_id: kems-169-nakazawa-1976::nakazawa_1976_kems_geometry_and_calibration
   experiment_id: 10.2320/jinstmet1952.40.5_526::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Cd
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Cd-Zn' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype

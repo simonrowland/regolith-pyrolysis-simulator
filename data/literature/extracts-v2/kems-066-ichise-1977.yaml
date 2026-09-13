@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_1600C_fig4_extrapolation_rejected
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -67,7 +71,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -102,13 +106,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -164,7 +172,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -191,13 +199,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_eq10_11_ion_ratio_integrand_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -253,7 +265,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -270,13 +282,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -332,7 +348,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -359,13 +375,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::10
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -437,13 +457,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig11_quadratic_Al2O_plot_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::11
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -499,7 +523,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -516,13 +540,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::12
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -594,13 +622,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig2_temperature_correction_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -672,13 +704,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::3
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -750,13 +786,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::4
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -828,13 +868,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig5_solidus_liquidus_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::5
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: solidus_and_liquidus
@@ -906,13 +950,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig6_integration_curve_1400C_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::6
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -968,7 +1016,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -985,13 +1033,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig7_activities_1400C_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1047,7 +1099,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1064,13 +1116,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::8
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1126,7 +1182,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1143,13 +1199,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::9
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1205,7 +1265,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1222,13 +1282,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1310,13 +1374,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_this_study_1600C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1372,7 +1440,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1399,13 +1467,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_from_Al2O_ratio_rejected
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1462,7 +1534,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1489,13 +1561,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_ion_ratio_NAl_0p5_1470C_30V
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: ion_intensity_ratio
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_NAl_0.5_in_alumina_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
       reason: source does not state subtype
@@ -1577,13 +1653,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Al-Fe_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -1658,13 +1738,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_limiting_molar_heat_of_mixing_Al
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'infinite_dilution_Al_in_Fe' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1720,7 +1804,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1737,13 +1821,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_ln_gamma_al_temperature_equations
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_Darken_quadratic_range' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1799,7 +1887,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1816,13 +1904,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_ln_gamma_fe_temperature_equations
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: activity_coefficient
+    quantity:
+      tag: value
+      value: activity_coefficient
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile activity_coefficient does not use subtype
@@ -1879,7 +1971,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1897,13 +1989,17 @@ observations:
 - observation_id: kems-066-ichise-1977::ichise_1977_p_Al2O_p_Al_1500C_author_estimate
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_NAl_0.5' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype

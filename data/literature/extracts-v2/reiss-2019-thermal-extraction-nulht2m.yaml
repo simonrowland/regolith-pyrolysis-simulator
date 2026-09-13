@@ -5,13 +5,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
   experiment_id: 10.1016/j.pss.2019.05.001::2-4
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NU-LHT-2M
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_in_stainless_steel_holder' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -90,13 +94,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
   experiment_id: 10.1016/j.pss.2019.05.001::6,10
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_mineral_decomposition' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -169,13 +177,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_fig5_printed_adsorption_fits
   experiment_id: 10.1016/j.pss.2019.05.001::5
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_humidified_nitrogen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -231,7 +243,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -248,13 +260,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
   experiment_id: 10.1016/j.pss.2019.05.001::6-7
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -327,13 +343,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
   experiment_id: 10.1016/j.pss.2019.05.001::9
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2S
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_mineral_decomposition' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -407,13 +427,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
   experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_phase2_desorption' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -470,7 +494,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -487,13 +511,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
   experiment_id: 10.1016/j.pss.2019.05.001::6
   identity:
-    quantity: transition_temperature
+    quantity:
+      tag: value
+      value: transition_temperature
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: value
       value: printed_release_peak_temperature_bands
@@ -570,13 +598,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
   experiment_id: 10.1016/j.pss.2019.05.001::6-11
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: H2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -650,13 +682,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
   experiment_id: 10.1016/j.pss.2019.05.001::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: NU-LHT-2M
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_highland_simulant_sieved_fractions' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -730,13 +766,17 @@ observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table2_nulht2m_mineralogy_quoted
   experiment_id: 10.1016/j.pss.2019.05.001::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: NU-LHT-2M
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'NU-LHT-2M_single_phase_particles' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -792,7 +832,7 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_literature
     attribution: 'Table 2: Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012). Plagioclase
       62 / 59; Glass 18.7 / 17.3; Total 99.5 / 99.2.'

@@ -170,6 +170,12 @@ experiments:
         locator:
           page: 28
           paragraph: relatively small effusion orifice (0.34 mm diameter)
+        inference:
+          relation: area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          inputs:
+          - '{''page'': 28, ''paragraph'': ''relatively small effusion orifice (0.34 mm diameter)''}'
+          parameters: []
+          output_unit: m2
 - experiment_id: 10.6028/nbs.ir.81-2279::21
   kind: literature
   method:

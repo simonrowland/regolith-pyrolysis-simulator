@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-033-shornikov-2010::shornikov_2010_cai_start_quoted_paque_stolper
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::kems-033-shornikov-2010
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'average_CAI_starting_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -82,13 +86,17 @@ observations:
 - observation_id: kems-033-shornikov-2010::shornikov_2010_fig1_cai_calc_figure_only
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CAI_average_composition_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -144,7 +152,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -161,13 +169,17 @@ observations:
 - observation_id: kems-033-shornikov-2010::shornikov_2010_fig2_lunar_calc_figure_only
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::2
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Al2O3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ap-16_68415_40_lunar_basalt_melt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -223,7 +235,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -240,13 +252,17 @@ observations:
 - observation_id: kems-033-shornikov-2010::shornikov_2010_lunar_basalt_start_quoted_markova
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::kems-033-shornikov-2010
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CaO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ap-16_68415_40_lunar_basalt' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -317,13 +333,17 @@ observations:
 - observation_id: kems-033-shornikov-2010::shornikov_2010_reducing_pO_pO2_model
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'preset_reducing_atmosphere_for_calculation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -379,7 +399,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:

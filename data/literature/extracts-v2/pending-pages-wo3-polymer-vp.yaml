@@ -5,13 +5,17 @@ observations:
 - observation_id: pending-pages-wo3-polymer-vp::anchor_WO3_pure_Psat
   experiment_id: 966c6319416885f2a3eb4cfb9f787c04dfe6b1dfbcd177572846d6ce7284b0b3::PENDING-pages#WO3_polymer_VP
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: WO3
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'solid_WO3_to_WO3_n_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

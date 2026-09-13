@@ -266,3 +266,10 @@ experiments:
         locator:
           paragraph: commercial alumina crucible CP-2 ID 38 mm
           source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        inference:
+          relation: A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
+          inputs:
+          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md'',
+            ''paragraph'': ''commercial alumina crucible CP-2 ID 38 mm''}'
+          parameters: []
+          output_unit: m2

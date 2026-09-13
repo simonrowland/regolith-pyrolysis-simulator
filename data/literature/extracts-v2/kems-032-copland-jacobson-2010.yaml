@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-032-copland-jacobson-2010::copland_2010_clausing_bare_float_L_over_r_1_b1
   experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::I
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_monograph' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -80,13 +84,17 @@ observations:
 - observation_id: kems-032-copland-jacobson-2010::copland_2010_clausing_table_I_fe_package
   experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::I
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_monograph' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -156,13 +164,17 @@ observations:
 - observation_id: kems-032-copland-jacobson-2010::copland_2010_clausing_table_I_verbatim_full_b1
   experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::I
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_monograph' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -232,13 +244,17 @@ observations:
 - observation_id: kems-032-copland-jacobson-2010::copland_2010_kems_method_geometry_fe_package
   experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_monograph' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -308,13 +324,17 @@ observations:
 - observation_id: kems-032-copland-jacobson-2010::copland_2010_kems_method_geometry_sio_package
   experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'method_monograph' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype

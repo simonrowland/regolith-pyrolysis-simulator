@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_CAI_Al2O_in_suboxide_fraction
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Al2O
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -82,13 +86,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_CAI_Al_suboxide_fraction
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: AlO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -160,13 +168,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_CAI_SiO_max_1875C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -237,13 +249,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::Po2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: O2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -299,7 +315,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -317,13 +333,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_fig1_murchison_psat_figure_only
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::1
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -395,13 +415,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_fig2_CAI_psat_figure_only
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::2
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -473,13 +497,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_kems_method
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_and_Efremovka_CAI_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -550,13 +578,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Al_max_2100C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Al
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -628,13 +660,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -705,13 +741,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_max_1950_2025C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Ca
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -782,13 +822,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_FeO_top_1650C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: FeO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -859,13 +903,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_max_1450_1725C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -936,13 +984,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_troilite_1050C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Fe
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1014,13 +1066,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_K_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: K
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1091,13 +1147,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Mg
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1168,13 +1228,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Na_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: Na
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1246,13 +1310,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: SiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1323,13 +1391,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_TiO_gt_TiO2_at_Ca_max
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: TiO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype
@@ -1400,13 +1472,17 @@ observations:
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_sulfur_900_1000C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
-    quantity: p_partial
+    quantity:
+      tag: value
+      value: p_partial
     species:
       formula: S2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_partial does not use subtype

@@ -5,13 +5,17 @@ observations:
 - observation_id: lh87-pbo-g::anchor_PbO_pure_Psat_or_deltafG
   experiment_id: 6a78053653c1a482d92f91b5bf79fef6acae51b4054ff553f29b1b368655d269::LH87#PbO_g
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: PbO
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'condensed_PbO_to_PbO_g' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype

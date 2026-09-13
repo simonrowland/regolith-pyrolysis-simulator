@@ -5,13 +5,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig1_cs_ion_current_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::1
   identity:
-    quantity: mass_loss_rate
+    quantity:
+      tag: value
+      value: mass_loss_rate
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_kems_vapor' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile mass_loss_rate does not use subtype
@@ -83,13 +87,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig2_csbo2_psat_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::2
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_s' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -161,13 +169,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig3_eq12_sigma_plot_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::3
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_second_law_sigma_plot' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -223,7 +235,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -241,13 +253,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig4_third_law_H_vs_T_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::4
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_third_law_evaluation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -303,7 +319,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -320,13 +336,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig5_ag_psat_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::5
   identity:
-    quantity: p_sat
+    quantity:
+      tag: value
+      value: p_sat
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag_s_l' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile p_sat does not use subtype
@@ -398,13 +418,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig6_eq12_ag_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::6
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag_second_law_sigma_plot' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -460,7 +484,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -478,13 +502,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig7_third_law_H_vs_T_ag_figure_only
   experiment_id: 10.5702/massspectrometry.s0055::7
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag_third_law_evaluation' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -540,7 +568,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -557,13 +585,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_kems_method_metadata
   experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_prepared_from_Cs2CO3_and_H3BO3' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -637,13 +669,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law
   experiment_id: 10.5702/massspectrometry.s0055::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_s_and_l_literature' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -699,7 +735,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -716,13 +752,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law
   experiment_id: 10.5702/massspectrometry.s0055::1
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: CsBO2
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'CsBO2_s' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -778,7 +818,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -795,13 +835,17 @@ observations:
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
   experiment_id: 10.5702/massspectrometry.s0055::2
   identity:
-    quantity: delta_fG
+    quantity:
+      tag: value
+      value: delta_fG
     species:
       formula: Ag
-      phase: g
+      phase:
+        tag: unknown
+        reason: phase string 'Ag_s_l' is not in the closed automatic map
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -857,7 +901,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: mapped model_derived but source does not supply lineage
+      reason: table destination model_derived; source does not supply lineage
     original_method_class: model_derived
     model: model_derived
   admission:
