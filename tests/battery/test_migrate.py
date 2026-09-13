@@ -708,6 +708,10 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     obs = next(iter(result.observations.values()))
     assert obs.evidence.class_.is_value
     assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert report.hard_issues == ()
 
 
 def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:

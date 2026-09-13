@@ -1473,7 +1473,12 @@ def evidence_for(
             class_=State.of(mapped),
             original_method_class=original,
             attribution=attribution,
-            model=model or (original if mapped is EvidenceClass.AUTHOR_ESTIMATE else None),
+            model=model
+            or (
+                original
+                if mapped in {EvidenceClass.AUTHOR_ESTIMATE, EvidenceClass.MODEL_DERIVED}
+                else None
+            ),
         ),
         None,
     )
