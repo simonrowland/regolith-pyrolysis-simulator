@@ -1,0 +1,119 @@
+# Binary-pot battery compositions (engine arm).
+#
+# Oxide-pair pots plus one ternary, in wt%. Each pot is a Kato 1993 Table 4
+# oxide-melt system (kems-049, published p. 308) or a recipe-relevant
+# endmember pair the melt engines will actually accept. Single-oxide pots
+# are not used: the melt engines cannot take a single species.
+#
+# Temperature and pO2 grids live here, not in code. Residuals are the
+# result; this file does not encode a pass/fail gate.
+
+temperature_grid_K:
+  start: 1500
+  stop: 2300
+  step: 100
+
+# Engine default: whatever MeltBackend.equilibrate uses when fO2 is omitted
+# or left at the signature default (ThermoEngine intrinsic None; others -9).
+# Commanded extra: 1e-8 bar, applied only when the engine accepts fO2_log.
+po2_bar:
+  engine_default: true
+  commanded:
+    - 1.0e-8
+
+pots:
+  sio2_al2o3_50_50:
+    kato_1993_table4_system: Al2O3-SiO2
+    # Kato Table 4 lists Al2O3-SiO2(l) (Dhima, Stafa, and Allibert 1986,
+    # multiple-cell KEMS). Equal-weight pair is the simplest two-oxide pot
+    # on that binary; mullite-region activities are a later scoring-arm
+    # concern, not this engine-vs-engine residual.
+    why: >
+      Kato 1993 Table 4 Al2O3-SiO2 liquid; 50/50 wt% is the equal-weight
+      endmember pair on that reviewed KEMS binary.
+    composition_wt_pct:
+      SiO2: 50.0
+      Al2O3: 50.0
+
+  sio2_al2o3_80_20:
+    kato_1993_table4_system: Al2O3-SiO2
+    # Same Table 4 binary, silica-rich side. 80/20 is a high-silica recipe
+    # endmember (Stage 3 silica / industrial glass) on the same system.
+    why: >
+      Kato 1993 Table 4 Al2O3-SiO2 liquid; 80/20 wt% is the silica-rich
+      end of the same reviewed binary, recipe-relevant for silica-rich melt.
+    composition_wt_pct:
+      SiO2: 80.0
+      Al2O3: 20.0
+
+  cao_sio2_40_60:
+    kato_1993_table4_system: CaO-SiO2
+    # Kato Table 4 lists CaO-SiO2(l) (Stolyarova, Shornikov, Ivanov, and
+    # Schultz 1991). 40/60 is a wollastonite-side pair, not a single oxide.
+    why: >
+      Kato 1993 Table 4 CaO-SiO2 liquid; 40/60 wt% is a two-oxide pot on
+      that reviewed binary (calcium-silicate slag endmember).
+    composition_wt_pct:
+      CaO: 40.0
+      SiO2: 60.0
+
+  cao_al2o3_50_50:
+    kato_1993_table4_system: Al2O3-CaO
+    # Kato Table 4 lists Al2O3-CaO (l, s) (Allibert, Chatillon, Jacob, and
+    # Lourtau 1981, multiple-cell). Equal-weight pair on the CA slag binary.
+    why: >
+      Kato 1993 Table 4 Al2O3-CaO liquid/solid; 50/50 wt% is the equal-weight
+      pair on that reviewed calcium-aluminate binary.
+    composition_wt_pct:
+      CaO: 50.0
+      Al2O3: 50.0
+
+  mgo_sio2_40_60:
+    kato_1993_table4_system: MgO-SiO2
+    # Kato Table 4 lists MgO-SiO2(l) twice (Kambayashi and Kato 1983 and
+    # 1984, ratio/G-D). 40/60 sits on the enstatite/forsterite-silica join.
+    why: >
+      Kato 1993 Table 4 MgO-SiO2 liquid (Kambayashi and Kato KEMS);
+      40/60 wt% is a two-oxide pot on that reviewed binary.
+    composition_wt_pct:
+      MgO: 40.0
+      SiO2: 60.0
+
+  feo_sio2_40_60:
+    kato_1993_table4_system: FeO-SiO2
+    # Kato Table 4 lists FeO-SiO2(l) (Dhima, Stafa, and Allibert 1986,
+    # multiple-cell). 40/60 is a fayalite-silica pair, recipe-relevant for
+    # mare Fe extraction.
+    why: >
+      Kato 1993 Table 4 FeO-SiO2 liquid; 40/60 wt% is a two-oxide pot on
+      that reviewed binary (fayalite-silica / mare-Fe endmember).
+    composition_wt_pct:
+      FeO: 40.0
+      SiO2: 60.0
+
+  na2o_sio2_25_75:
+    kato_1993_table4_system: null
+    # Na2O-SiO2 is not a Kato 1993 Table 4 row (that table's alkali row is
+    # Na2O-P2O5). This is the recipe-relevant alkali-silicate endmember
+    # pair for Stage 4 Na extraction; the melt engines still need a second
+    # oxide.
+    why: >
+      Recipe-relevant Na2O-SiO2 endmember pair (Stage 4 alkali extraction),
+      not a Kato Table 4 oxide-melt row. 25/75 wt% keeps a two-oxide pot
+      the engines will accept.
+    composition_wt_pct:
+      Na2O: 25.0
+      SiO2: 75.0
+
+  feo_mgo_sio2_30_20_50:
+    kato_1993_table4_system: FeO-MgO-SiO2
+    # Kato Table 4 lists FeO-MgO-SiO2(l) (Plante, Hastie, and Kowalska
+    # 1992, ratio/G-D). 30/20/50 is a ternary olivine/pyroxene pot on that
+    # reviewed system and a mare-relevant Fe-Mg-Si recipe endmember.
+    why: >
+      Kato 1993 Table 4 FeO-MgO-SiO2 liquid; 30/20/50 wt% is the one ternary
+      pot, on that reviewed system and a mare Fe-Mg-Si recipe endmember.
+    composition_wt_pct:
+      FeO: 30.0
+      MgO: 20.0
+      SiO2: 50.0
