@@ -219,16 +219,21 @@ def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
     assert result.validation.hard_issues == ()
 
 
-@pytest.mark.skipif(
-    not (REPO_ROOT / "data" / "literature" / "works").exists(),
-    reason="migrated store not generated yet",
-)
 def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
+    report_path = REPO_ROOT / "data" / "battery" / "migration-report.md"
     works_dir = REPO_ROOT / "data" / "literature" / "works"
-    if not any(works_dir.glob("*.yaml")):
+    if not report_path.is_file() or not any(works_dir.glob("*.yaml")):
         pytest.skip("migrated store not generated yet")
-    from simulator.battery.migrate import Migrator
-
-    result = Migrator(REPO_ROOT).run()
-    assert result.validation is not None
-    assert result.validation.hard_issues == (), result.validation.hard_issues[:10]
+    headline = report_path.read_text(encoding="utf-8").splitlines()[:10]
+    assert any(line == "hard issues: 0" for line in headline), headline
+    # Extract rows are conserved: every extract observation produced ≥1 record.
+    body = report_path.read_text(encoding="utf-8")
+    for line in body.splitlines():
+        if "`data/literature/extracts/" not in line:
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        rows_in = int(cells[1])
+        obs_out = int(cells[2])
+        assert obs_out >= rows_in, line

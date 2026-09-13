@@ -871,20 +871,48 @@ def fill_identity(
     species: Species,
     **known: Any,
 ) -> Identity:
+    """Fill required axes as unknown and permitted-N/A as not_applicable.
+
+    A VALUE on an axis the profile does not require is invalid (v2.1), not an
+    extra key. Transition temperatures store T as the observable, never as
+    ``identity.temperature_K``.
+    """
+
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        known.pop("temperature_K", None)
     identity = Identity(quantity=quantity, species=species, **known)
-    profile = profile_for(identity)
-    updates: dict[str, Any] = {}
-    for name in profile.required:
-        if getattr(identity, name) is None:
-            updates[name] = State.unknown(f"source does not state {name}")
-    for name in profile.permitted_not_applicable:
-        if getattr(identity, name) is None:
-            updates[name] = State.not_applicable(
-                f"profile {quantity.value} does not use {name}"
-            )
-    if updates:
+    from simulator.battery.identity import _AXIS_NAMES
+
+    for _ in range(4):
+        profile = profile_for(identity)
         payload = {item.name: getattr(identity, item.name) for item in fields(identity)}
-        payload.update(updates)
+        changed = False
+        for name in profile.required:
+            state = payload.get(name)
+            if state is None or (isinstance(state, State) and state.is_not_applicable):
+                payload[name] = State.unknown(f"source does not state {name}")
+                changed = True
+        for name in profile.permitted_not_applicable:
+            state = payload.get(name)
+            if state is None:
+                payload[name] = State.not_applicable(
+                    f"profile {quantity.value} does not use {name}"
+                )
+                changed = True
+            elif isinstance(state, State) and state.is_value:
+                payload[name] = State.not_applicable(
+                    f"profile {quantity.value} does not use {name}"
+                )
+                changed = True
+        for name in _AXIS_NAMES:
+            if name in profile.required or name in profile.permitted_not_applicable:
+                continue
+            state = payload.get(name)
+            if isinstance(state, State) and state.is_value:
+                payload[name] = None
+                changed = True
+        if not changed:
+            break
         identity = Identity(**payload)
     return identity
 
@@ -1545,10 +1573,18 @@ class Migrator:
             measured.series += 1
 
         ident_kwargs: dict[str, Any] = {}
-        if t_known is not None:
+        if t_known is not None and quantity is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
+        if quantity is Quantity.TRANSITION_TEMPERATURE and isinstance(values.get("quantity"), str):
+            ident_kwargs["subtype"] = State.of(str(values["quantity"]))
+        if (
+            quantity is Quantity.TRANSITION_TEMPERATURE
+            and t_known is not None
+            and value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
+        ):
+            value = Value.point_of(t_known)
         identity = fill_identity(quantity, species, **ident_kwargs)
 
         experiment_id = self._experiment_id(work.work_id, locator, source_id)
@@ -2519,11 +2555,6 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         dump_yaml(payload, works_dir / work_filename(work_id))
 
     extract_stems = {p.stem for p in discover_extracts(root / "data" / "literature" / "extracts")}
-    by_file: dict[str, list[Observation]] = defaultdict(list)
-    for oid, obs in result.observations.items():
-        source = result.observations_by_source
-        # invert: we stored lists per source key
-        pass
     source_of: dict[str, str] = {}
     for src, ids in result.observations_by_source.items():
         for oid in ids:
@@ -2533,17 +2564,40 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     for oid, obs in result.observations.items():
         grouped[source_of.get(oid, "unknown")].append(obs)
 
+    # Extracts: one sibling file per extract. Compilations: one file per
+    # family (not per harvested JSON record). Named sidecars keep their stem.
+    family_groups: dict[str, tuple[Path, list[Observation], list[str]]] = {}
     for src, observations in grouped.items():
-        stem = Path(src).stem
+        src_path = Path(src)
+        if src.startswith("data/literature/extracts/") or src_path.stem in extract_stems:
+            dest = extracts_v2 / f"{src_path.stem}.yaml"
+            key = f"extract:{src_path.stem}"
+        elif src.startswith("data/literature/compilations/"):
+            parts = src_path.parts
+            family = parts[3] if len(parts) > 3 else src_path.stem
+            dest = observations_v2 / f"compilations-{family}.yaml"
+            key = f"compilation:{family}"
+        else:
+            dest = observations_v2 / f"{src_path.stem}.yaml"
+            key = f"named:{src_path.stem}"
+        if key not in family_groups:
+            family_groups[key] = (dest, [], [])
+        dest_path, obs_list, sources = family_groups[key]
+        obs_list.extend(observations)
+        sources.append(src)
+
+    if observations_v2.exists():
+        for stale in observations_v2.glob("*.yaml"):
+            stale.unlink()
+    for _, (dest, observations, sources) in sorted(family_groups.items()):
         payload = {
             "schema_version": "battery_observations.v2.1",
-            "source": src,
-            "observations": [to_plain(o) for o in sorted(observations, key=lambda x: x.observation_id)],
+            "sources": sorted(set(sources)),
+            "observations": [
+                to_plain(o) for o in sorted(observations, key=lambda x: x.observation_id)
+            ],
         }
-        if stem in extract_stems or src.startswith("data/literature/extracts/"):
-            dump_yaml(payload, extracts_v2 / f"{stem}.yaml")
-        else:
-            dump_yaml(payload, observations_v2 / f"{stem}.yaml")
+        dump_yaml(payload, dest)
 
     dump_yaml(
         {
