@@ -262,6 +262,65 @@ def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None
         migrate(root, write=False)
 
 
+def _write_janaf_table_compilation(
+    root: Path,
+    *,
+    doc_rail: str | None = None,
+    table_rail: str | None = None,
+    row_rail: str | None = None,
+) -> Path:
+    dest = root / "data" / "literature" / "compilations" / "janaf-fixture"
+    dest.mkdir(parents=True, exist_ok=True)
+    row: dict = {
+        "temperature": {"value": 298.15},
+        "formation_gibbs_energy": {"value": 0.0},
+        "log10_formation_equilibrium_constant": {"value": 0.0},
+    }
+    if row_rail is not None:
+        row["rail"] = row_rail
+    table: dict = {
+        "table_id": "Na-001",
+        "index_entry": {"formula": "Na", "state": "g"},
+        "standard_state_as_published": "p° = 0.1 MPa",
+        "values": [row],
+    }
+    if table_rail is not None:
+        table["rail"] = table_rail
+    doc: dict = {
+        "schema_version": "literature_compilation.v1",
+        "source_id": "janaf-fixture",
+        "source": {"citation": "JANAF fixture"},
+        "table": table,
+    }
+    if doc_rail is not None:
+        doc["rail"] = doc_rail
+    (dest / "Na-001.yaml").write_text(
+        yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
+    )
+    return root
+
+
+def test_j03_compilation_document_unknown_rail_raises(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _write_janaf_table_compilation(root, doc_rail="gibbs_thermochemistry")
+    with pytest.raises(UnknownRailSpellingError):
+        migrate(root, write=False)
+
+
+def test_j03_compilation_table_unknown_rail_raises(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _write_janaf_table_compilation(root, table_rail="gibbs_thermochemistry")
+    with pytest.raises(UnknownRailSpellingError):
+        migrate(root, write=False)
+
+
+def test_j03_compilation_nested_row_unknown_rail_still_raises(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _write_janaf_table_compilation(root, row_rail="gibbs_thermochemistry")
+    with pytest.raises(UnknownRailSpellingError):
+        migrate(root, write=False)
+
+
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     result = migrate(root, write=True)

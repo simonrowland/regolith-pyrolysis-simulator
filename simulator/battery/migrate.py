@@ -3558,11 +3558,11 @@ class Migrator:
             original_method_class=str((role or {}).get("kind") or "compilation"),
             model=str((role or {}).get("kind") or ""),
         )
+        require_rail_if_stated(doc)
         table = doc.get("table") if isinstance(doc.get("table"), Mapping) else None
         if table is not None:
             self._lift_janaf_table(work, source_id, rel, count, table, evidence, doc)
             return
-        require_rail_if_stated(doc)
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(doc.get("formula") or record_id)
@@ -3689,6 +3689,7 @@ class Migrator:
         evidence: Evidence,
         doc: Mapping[str, Any],
     ) -> None:
+        require_rail_if_stated(table)
         table_id = str(table.get("table_id") or "table")
         index_entry = table.get("index_entry") if isinstance(table.get("index_entry"), Mapping) else {}
         formula = str((index_entry or {}).get("formula") or table_id)
