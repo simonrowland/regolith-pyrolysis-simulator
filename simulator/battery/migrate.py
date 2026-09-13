@@ -285,6 +285,7 @@ METHOD_TOKENS = {m.value: m for m in MethodToken}
 REGIME_TO_METHOD = {
     "kems_effusion": None,  # insufficient by spec; page_grounded
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
+    "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "transpiration": MethodToken.TRANSPIRATION,
     "tga": MethodToken.TGA,
@@ -1914,14 +1915,9 @@ class Migrator:
                     quantity=Quantity.P_PARTIAL,
                     species=species,
                     value=value,
-                    evidence=Evidence(
-                        class_=State.of(EvidenceClass.FIGURE_ONLY)
-                        if point.get("status") == "absent"
-                        else State.unknown("kems sidecar does not state method_class"),
-                        original_method_class=str(point.get("extraction_method") or ""),
-                    ),
+                    evidence=evidence_for(point.get("method_class"))[0],
                     temperature_K=t,
-                    method=State.of(MethodToken.KNUDSEN_EFFUSION),
+                    method=map_method(point.get("regime") or point.get("method")),
                 )
 
     def _migrate_mre(self, path: Path) -> None:
@@ -2067,10 +2063,10 @@ class Migrator:
                 quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
                 species=make_species(formula, phase),
                 value=value,
-                evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_DIRECT)),
+                evidence=evidence_for(meas.get("method_class"))[0],
                 temperature_K=t,
                 uncertainty=unc,
-                method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+                method=map_method(meas.get("regime") or meas.get("method")),
             )
 
     def _migrate_refractory(self, path: Path) -> None:
@@ -2122,10 +2118,10 @@ class Migrator:
                         value=Value.point_of(val) if _as_dec_or_none(val) is not None else Value(
                             ValueKind.UNAVAILABLE, unavailable_reason="missing log10_Kf"
                         ),
-                        evidence=Evidence(class_=State.of(EvidenceClass.COMPILATION_ASSESSED)),
+                        evidence=evidence_for(payload.get("method_class"))[0],
                         temperature_K=t,
                         standard_pressure_Pa=p_std,
-                        method=State.of(MethodToken.TABULATION),
+                        method=map_method(payload.get("method") or payload.get("regime")),
                     )
         cao = doc.get("cao_reducing_cell_kems") or {}
         if isinstance(cao, Mapping):
@@ -2153,9 +2149,9 @@ class Migrator:
                     value=Value.point_of(pa) if pa is not None else Value(
                         ValueKind.UNAVAILABLE, unavailable_reason="missing pressure_atm"
                     ),
-                    evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_TABULATED)),
+                    evidence=evidence_for(row.get("method_class"))[0],
                     temperature_K=t,
-                    method=State.of(MethodToken.KNUDSEN_EFFUSION),
+                    method=map_method(row.get("method") or row.get("regime")),
                 )
 
     def _migrate_ledger(self, path: Path) -> None:
@@ -2206,12 +2202,9 @@ class Migrator:
                 quantity=Quantity.DELTA_FG,
                 species=make_species(formula, map_phase(point.get("phase"))[0]),
                 value=value,
-                evidence=Evidence(
-                    class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
-                    original_method_class=str(point.get("provenance_class") or ""),
-                ),
+                evidence=evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
                 temperature_K=t if t is not None and t > 0 else None,
-                method=State.of(MethodToken.TABULATION),
+                method=map_method(point.get("method") or point.get("regime")),
             )
             if t is not None and t <= 0:
                 self.result.add_queue(

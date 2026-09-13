@@ -9,7 +9,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, IdentityEqualKind, Phase, Rail, StateTag
+from simulator.battery.enums import (
+    AdmissionStatus,
+    EvidenceClass,
+    IdentityEqualKind,
+    MethodToken,
+    Phase,
+    Rail,
+    StateTag,
+)
 from simulator.battery.identity import atm_to_pa, identity_equal
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -369,6 +377,75 @@ def test_g01_identity_unknown_phase_never_equals() -> None:
         [F.observation("unk-phase", exp.experiment_id, unknown, 1)],
     )
     assert report.hard_issues == ()
+
+
+def test_g02_iron_olivine_kems_is_knudsen_not_langmuir(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "langmuir_knudsen_flux_validation.v1",
+                "measurements": {
+                    "iron_olivine_kems": {
+                        "species": "Fe",
+                        "material": "Fo93Fa7_olivine",
+                        "regime": "knudsen_effusion_mass_spectrometry",
+                        "temperature_range_k": [1700, 1800],
+                        "measured_langmuir_to_effusion_flux_ratio": {"range": [0.011, 0.020]},
+                        "source": {
+                            "citation_id": "REF-016",
+                            "citation": "Costa & Jacobson (2015)",
+                        },
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    obs = result.observations["iron_olivine_kems"]
+    exp = result.experiments[obs.experiment_id]
+    assert exp.method.is_value
+    assert exp.method.value is MethodToken.KNUDSEN_EFFUSION
+    assert exp.method.value is not MethodToken.LANGMUIR_FREE_EVAPORATION
+    assert obs.evidence.class_.is_unknown
+    assert obs.evidence.class_.value is not EvidenceClass.MEASURED_DIRECT
+
+
+def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "kems_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "sources": {"kems-src": {"citation": "KEMS sidecar fixture"}},
+                "cases": {
+                    "case": {
+                        "source_id": "kems-src",
+                        "points": [
+                            {
+                                "observable_id": "kems_no_method",
+                                "species": "Ca",
+                                "status": "absent",
+                                "coordinate": {"temperature_K": 2000.0},
+                                "partial_pressure_pa": None,
+                                "source_locator": {"figure": 1},
+                            }
+                        ],
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    obs = result.observations["kems_no_method"]
+    exp = result.experiments[obs.experiment_id]
+    assert exp.method.is_unknown
+    assert obs.evidence.class_.is_unknown
+    assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 
 
 def test_g01_map_phase_refuses_heuristics() -> None:
