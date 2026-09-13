@@ -2259,6 +2259,41 @@ def test_r09_engine_only_opposite_quantity_is_not_invalid_source() -> None:
     assert any(i.reason is RefusalReason.INVALID_SOURCE for i in printed.issues)
 
 
+def test_r09_engine_reference_printed_logk_is_not_invalid_source() -> None:
+    """Engine ΔfG=0 reference is not a printed table half (validate.py:268).
+
+    Same-identity engine candidate + printed O2 log10_Kf=-59.154 in the
+    tabulation must stay a SAME_INPUT MATCH diagnostic, not invalid_source.
+    """
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.engine_obs("r09-engref-ref", exp.experiment_id, ident_g, Decimal("0"))
+    cand = F.engine_obs("r09-engref-cand", exp.experiment_id, ident_g, Decimal("0"))
+    printed_log = F.observation(
+        "r09-engref-printed-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    own = F.residual(
+        "r09-engref-own",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.SAME_INPUT,
+        score_eligible=False,
+    )
+    report = validate_corpus([w], [exp], [ref, printed_log, cand], [own])
+    assert report.ok
+    assert not any(i.reason is RefusalReason.INVALID_SOURCE for i in report.issues)
+
+
 def test_r06_engine_evaluation_commanded_value_needs_no_locator() -> None:
     """C(empirical value): synthetic engine commands are not literature locators."""
 
