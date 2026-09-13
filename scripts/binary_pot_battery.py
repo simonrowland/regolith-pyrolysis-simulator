@@ -47,6 +47,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="resolve engines, print availability, and exit without equilibrate()",
     )
+    parser.add_argument(
+        "--progress-log",
+        type=Path,
+        default=None,
+        help="append one line per cell (and START/DONE) for detached polling",
+    )
     return parser.parse_args(argv)
 
 
@@ -66,7 +72,9 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
 
-    report = run_engine_arm(pots_path=args.pots)
+    report = run_engine_arm(
+        pots_path=args.pots, progress_log=args.progress_log
+    )
     json_path, markdown_path = write_reports(report, args.output_dir)
     print(f"hostname={report['hostname']}")
     print(f"n_cells={report['n_cells']}")

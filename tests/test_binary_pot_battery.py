@@ -20,6 +20,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     Po2Request,
     classify_equilibrate_outcome,
     equilibrate_cell,
+    extract_reported_quantities,
     load_binary_pots,
     pairwise_residuals,
     render_report_markdown,
@@ -240,6 +241,96 @@ def test_report_renders_from_fixture(tmp_path: Path) -> None:
     json_path, md_path = write_reports(report, tmp_path)
     assert json_path.name == "binary-pot-engine-arm.json"
     assert md_path.read_text(encoding="utf-8") == markdown
+
+
+def test_extract_reads_vaporock_full_speciation_when_pressures_blank() -> None:
+    activities, pressures = extract_reported_quantities(
+        SimpleNamespace(
+            activity_coefficients={"SiO2": 0.4},
+            vapor_pressures_Pa={},
+            vaporock_full_speciation_Pa={"Na": 12.0, "SiO": 0.0, "K": 3.5},
+        )
+    )
+    assert activities == {"SiO2": 0.4}
+    assert pressures == {"Na": 12.0, "K": 3.5}
+
+
+def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
+    pot = BinaryPot(
+        pot_id="fixture_pot",
+        kato_1993_table4_system="Al2O3-SiO2",
+        why="fixture",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    captured: dict[str, object] = {}
+
+    class _SubprocessBackend:
+        _mode = "subprocess"
+
+        def equilibrate(self, **kwargs):
+            captured.update(kwargs)
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"SiO2": 0.5},
+                vapor_pressures_Pa={"Na": 1.0},
+                liquid_fraction=1.0,
+                phase_assemblage_available=True,
+            )
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_SubprocessBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
+    assert cell.status == "ok"
+    assert captured["subprocess_run_mode"] == "isothermal"
+    assert captured["pressure_bar"] == 1.0
+    assert cell.melt_activities == {"SiO2": 0.5}
+    assert cell.gas_partial_pressures_Pa == {"Na": 1.0}
+    assert handle.available is True
+
+
+def test_domain_exception_does_not_kill_engine_handle() -> None:
+    pot = BinaryPot(
+        pot_id="fixture_pot",
+        kato_1993_table4_system="Al2O3-SiO2",
+        why="fixture",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+
+    class _DomainBackend:
+        closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+        def equilibrate(self, **kwargs):
+            raise RuntimeError(
+                "fo2_requires_iron: ThermoEngine cannot impose absolute fO2"
+            )
+
+    backend = _DomainBackend()
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
+    assert cell.status == "refusal"
+    assert handle.available is True
+    assert handle.backend is backend
+    assert backend.closed is False
 
 
 def test_battery_engine_names_match_backends_py_surface() -> None:

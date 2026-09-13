@@ -461,8 +461,11 @@ def extract_reported_quantities(
     """Record EquilibriumResult fields the engine actually exposed.
 
     Melt activities live on the legacy field ``activity_coefficients``.
-    Gas partial pressures live on ``vapor_pressures_Pa``. Extra attributes
-    are not invented.
+    Gas partial pressures live on ``vapor_pressures_Pa``. VapoRock's
+    non-authoritative path keeps the live speciation on
+    ``vaporock_full_speciation_Pa`` and blanks ``vapor_pressures_Pa``
+    (same consumer order as ``engine_crosscheck._run_vaporock_cell``).
+    Extra attributes are not invented.
     """
 
     activities: dict[str, float] = {}
@@ -470,12 +473,33 @@ def extract_reported_quantities(
         number = _finite_float(value)
         if number is not None and number > 0.0:
             activities[str(name)] = number
+    raw_pressures = (
+        getattr(result, "vaporock_full_speciation_Pa", None)
+        or getattr(result, "vapor_pressures_Pa", None)
+        or {}
+    )
     pressures: dict[str, float] = {}
-    for name, value in dict(getattr(result, "vapor_pressures_Pa", None) or {}).items():
+    for name, value in dict(raw_pressures).items():
         number = _finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
     return activities, pressures
+
+
+def _utc_stamp() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _emit_progress(progress_log: Path | None, message: str) -> None:
+    line = message.rstrip()
+    print(line, flush=True)
+    if progress_log is None:
+        return
+    path = Path(progress_log)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(line + "\n")
+        fh.flush()
 
 
 def _haystack(*parts: Any) -> str:
@@ -762,11 +786,22 @@ def equilibrate_cell(
     temperature_C = float(temperature_K) - 273.15
     fo2_log = _fo2_log_for_request(handle, po2)
     timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
+    physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+    pressure_bar = physical_pressure_bar
+    if handle.name == "alphamelts":
+        from simulator.alphamelts_reference_pressure import (
+            alphamelts_condensed_phase_pressure_bar,
+        )
+
+        pressure_bar = alphamelts_condensed_phase_pressure_bar(
+            physical_pressure_bar,
+            transport=getattr(handle.backend, "_mode", None),
+        )
     kwargs: dict[str, Any] = {
         "temperature_C": temperature_C,
         "composition_kg": composition_kg,
         "composition_mol": composition_mol,
-        "pressure_bar": _DEFAULT_PRESSURE_BAR,
+        "pressure_bar": pressure_bar,
     }
     try:
         signature = inspect.signature(handle.backend.equilibrate)
@@ -777,6 +812,8 @@ def equilibrate_cell(
         kwargs["fO2_log"] = fo2_log
     if "call_timeout_s" in parameters:
         kwargs["call_timeout_s"] = timeout
+    if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:
+        kwargs["subprocess_run_mode"] = "isothermal"
 
     try:
         result = _call_with_hard_timeout(
@@ -796,12 +833,21 @@ def equilibrate_cell(
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
-        closer = getattr(handle.backend, "close", None)
-        if callable(closer):
-            try:
-                closer()
-            except Exception:  # noqa: BLE001 - close is best-effort after timeout
-                pass
+        # A domain refusal is a row. Closing the handle would stamp every
+        # later cell unavailable (ThermoEngine fo2_requires_iron on one
+        # Fe-free commanded-pO2 cell killed the rest of that column).
+        is_timeout = (
+            refusal == REFUSAL_TIMEOUT
+            or isinstance(exc, TimeoutError)
+            or "timeout" in type(exc).__name__.lower()
+        )
+        if is_timeout:
+            closer = getattr(handle.backend, "close", None)
+            if callable(closer):
+                try:
+                    closer()
+                except Exception:  # noqa: BLE001 - close is best-effort after timeout
+                    pass
             handle.backend = None
             handle.available = False
             handle.unavailable_reason = engine_reason
@@ -823,6 +869,7 @@ def run_engine_arm(
     handles: Mapping[str, EngineHandle] | None = None,
     pots: Sequence[BinaryPot] | None = None,
     grid: BatteryGrid | None = None,
+    progress_log: Path | None = None,
 ) -> dict[str, Any]:
     """Run every pot × engine × T × pO2 cell and build the report."""
 
@@ -835,6 +882,19 @@ def run_engine_arm(
     hostname = _hostname()
     resolved = dict(handles) if handles is not None else probe_battery_engines(engine_names)
 
+    n_expected = 0
+    for pot in pots:
+        for name in engine_names:
+            handle = resolved.get(name) or open_battery_engine(name)
+            resolved[name] = handle
+            n_expected += len(grid.temperatures_K) * len(
+                po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
+            )
+    _emit_progress(
+        progress_log,
+        f"{_utc_stamp()} START hostname={hostname} n_expected={n_expected}",
+    )
+
     cells: list[EquilibrateCell] = []
     for pot in pots:
         for name in engine_names:
@@ -843,13 +903,30 @@ def run_engine_arm(
             requests = po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
             for temperature_K in grid.temperatures_K:
                 for po2 in requests:
-                    cells.append(
-                        equilibrate_cell(
-                            handle,
-                            pot,
-                            temperature_K=float(temperature_K),
-                            po2=po2,
-                        )
+                    cell = equilibrate_cell(
+                        handle,
+                        pot,
+                        temperature_K=float(temperature_K),
+                        po2=po2,
+                    )
+                    cells.append(cell)
+                    po2_label = (
+                        "default"
+                        if po2.mode == PO2_ENGINE_DEFAULT
+                        else f"{po2.po2_bar:g}"
+                    )
+                    _emit_progress(
+                        progress_log,
+                        (
+                            f"{_utc_stamp()} {len(cells)}/{n_expected} "
+                            f"pot={cell.pot_id} engine={cell.engine} "
+                            f"T={cell.temperature_K:g} po2={po2_label} "
+                            f"status={cell.status} "
+                            f"reason={cell.refusal_reason or '-'} "
+                            f"n_act={len(cell.melt_activities)} "
+                            f"n_gas={len(cell.gas_partial_pressures_Pa)} "
+                            f"wall={cell.wall_s:.3f}"
+                        ),
                     )
                     if not handle.available:
                         # Re-open once after a kill; if still dead, stamp the rest.
@@ -869,6 +946,17 @@ def run_engine_arm(
         wall_s=time.perf_counter() - wall0,
         cpu_s=time.process_time() - cpu0,
         engine_names=engine_names,
+    )
+    _emit_progress(
+        progress_log,
+        (
+            f"{_utc_stamp()} DONE hostname={report['hostname']} "
+            f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
+            f"n_refused={report['n_refused']} "
+            f"n_matched_residuals={report['n_matched_residuals']} "
+            f"wall={report['receipt']['wall_s']:.3f} "
+            f"cpu={report['receipt']['cpu_s']:.3f}"
+        ),
     )
     return report
 
