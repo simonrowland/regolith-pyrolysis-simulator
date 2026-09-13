@@ -70,8 +70,8 @@ observations:
       note: not applicable
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -169,7 +169,7 @@ observations:
     page: 18
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
-  read_from: pdf:kems-038-matchett-2006
+  read_from: unknown:kems-038-matchett-2006
 - observation_id: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
   experiment_id: 9770cfacbdd823ba8b941267b87a13ee9cbd8784c94d74f36fc6ac5ce375d63d::3
   identity:
@@ -249,4 +249,4 @@ observations:
     page: 27
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
-  read_from: pdf:kems-038-matchett-2006
+  read_from: unknown:kems-038-matchett-2006

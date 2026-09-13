@@ -30,6 +30,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-012-sossi-2019
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:sossi-et-al-2019
       role: pdf
       path: raw/sossi-et-al-2019/sossi-et-al-2019.pdf
@@ -48,6 +54,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:sossi-et-al-2019
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2019.06.021
 experiments:
 - experiment_id: 10.1016/j.gca.2019.06.021::1
@@ -104,6 +116,29 @@ experiments:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -190,6 +225,29 @@ experiments:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -307,6 +365,29 @@ experiments:
         paragraph: 1-atm vertical tube gas-mixing furnaces
         line_range: '408'
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

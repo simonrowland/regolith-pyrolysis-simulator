@@ -242,9 +242,11 @@ observations:
       note: R^2 printed; no ± on K, qmax, csat
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Figure 5: Mass gain and temperature over relative humidity for a long-time exposure of NU-LHT-2M to humidified
+      nitrogen gas. Type I: K = 0.02, qmax = 0.25, R² = 0.995. Type II: K = 12.50, qmax = 0.13, csat = 250.51, R² = 0.998.'
     model: model_derived
   admission:
     status: pending
@@ -493,9 +495,13 @@ observations:
         band
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The samples with default particle size and mass (70 µm to 80 µm, 33 mg to 36 mg), conditioned at a relative
+      humidity between 10 % and 70 %, yielded a mass content of m/z 18 between 0.2 % and 0.3 %. The larger particle fraction
+      yielded a significantly lower mass content of m/z 18, between 0.1 % and 0.2 %. test run 1 and 4 yielded a mass fraction
+      of 6.2 % and 6.3 % for m/z 18 respectively ... test run 2 and 3 yielded only 3.4 % and 0.4 % for m/z 18 respectively.
     model: model_derived
   admission:
     status: pending

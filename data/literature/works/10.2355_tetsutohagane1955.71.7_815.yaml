@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:ts1985
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.71.7_815
 experiments:
 - experiment_id: 10.2355/tetsutohagane1955.71.7_815::1
@@ -52,6 +58,29 @@ experiments:
         page: 3
         published_page: 817
         table: '1'
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 3
+              published_page: 817
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 817
+              table: '1'
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -98,6 +127,29 @@ experiments:
         page: 2
         published_page: 816
         paragraph: 実験原理 / eq. (4)
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 2
+              published_page: 816
+              paragraph: 実験原理 / eq. (4)
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 816
+              paragraph: 実験原理 / eq. (4)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -162,6 +214,29 @@ experiments:
         page: 2
         published_page: 816
         paragraph: 実験原理 / eq. (4)
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 2
+              published_page: 816
+              paragraph: 実験原理 / eq. (4)
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 816
+              paragraph: 実験原理 / eq. (4)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

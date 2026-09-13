@@ -68,9 +68,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Extrapolating these results down to a temperature of 1000 K results in α ≈ 0.013. This value is used in the
+      following considerations.
     model: model_derived
   admission:
     status: pending
@@ -157,9 +159,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: α(T) = 0.52 exp(−3685/T)
     model: model_derived
   admission:
     status: pending
@@ -260,7 +263,7 @@ observations:
     line_range: 317-329
     note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  read_from: pdf:kems-011-wetzel-gail-2013
+  read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
   experiment_id: 10.1051/0004-6361/201220803::4a
   identity:
@@ -347,7 +350,7 @@ observations:
     figure: 4a
     paragraph: SiO film growth Arrhenius α(T)
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  read_from: pdf:kems-011-wetzel-gail-2013
+  read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
   experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
   identity:
@@ -425,7 +428,7 @@ observations:
     section: 2.1. Experimental setup
     line_range: 49-53
     source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  read_from: pdf:kems-011-wetzel-gail-2013
+  read_from: unknown:kems-011-wetzel-gail-2013
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
   experiment_id: 10.1051/0004-6361/201220803::1
   identity:
@@ -492,9 +495,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for
+      our best fit to our experimental results on solid SiO obtained at 300 K.
     model: model_derived
   admission:
     status: superseded
@@ -578,9 +583,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for
+      our best fit to our experimental results on solid SiO obtained at 300 K.
     model: model_derived
   admission:
     status: pending
@@ -657,9 +664,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and
+      annealing experiments of Wetzel et al. (2012a).
     model: model_derived
   admission:
     status: superseded
@@ -743,9 +752,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and
+      annealing experiments of Wetzel et al. (2012a).
     model: model_derived
   admission:
     status: pending
@@ -822,9 +833,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric
+      function.
     model: model_derived
   admission:
     status: superseded
@@ -964,9 +977,11 @@ observations:
           row: '4'
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric
+      function.
     model: model_derived
   admission:
     status: pending
@@ -1043,9 +1058,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Some data used for calculating the opacity of the dust species considered in the model calculations and the
+      corresponding key elements.
     model: model_derived
   admission:
     status: superseded
@@ -1129,9 +1146,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Some data used for calculating the opacity of the dust species considered in the model calculations and the
+      corresponding key elements.
     model: model_derived
   admission:
     status: pending
@@ -1208,9 +1227,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Data used for calculation of silicon monoxide growth.
     model: model_derived
   admission:
     status: superseded
@@ -1294,9 +1314,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Data used for calculation of silicon monoxide growth.
     model: model_derived
   admission:
     status: pending
@@ -1373,9 +1394,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Basic parameters of the dust-shell models
     model: model_derived
   admission:
     status: superseded
@@ -1459,9 +1481,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Basic parameters of the dust-shell models
     model: model_derived
   admission:
     status: pending

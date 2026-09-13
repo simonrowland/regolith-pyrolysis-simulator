@@ -153,9 +153,12 @@ observations:
       note: Calculated p(O2); no numeric uncertainty printed.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
     model: model_derived
   admission:
     status: pending
@@ -236,10 +239,9 @@ observations:
       note: Ranges and ~ values as printed; no further numeric uncertainty.
   evidence:
     class:
-      tag: unknown
-      reason: table destination measured_reduced; source does not supply lineage
+      tag: value
+      value: measured_reduced
     original_method_class: derived_from_measured_kems_hertz_knudsen
-    model: derived_from_measured_kems_hertz_knudsen
   admission:
     status: pending
     reason: source does not state admission_status

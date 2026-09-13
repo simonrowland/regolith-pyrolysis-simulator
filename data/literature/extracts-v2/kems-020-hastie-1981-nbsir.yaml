@@ -1712,9 +1712,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: an estimated Cp for liquid K2O of 25 cal/deg mol ... log Kp [K2O(l)] = -23751/T + 11.7723
     model: model_derived
   admission:
     status: pending
@@ -1901,9 +1902,10 @@ observations:
       quote: 65.9 ± 3; 22.3 ± 2.8
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: ΔHv(1267) = 65.9 ± 3 kcal/mol, and ΔSv(1267) = 22.3 ± 2.8 cal/deg mol
     model: model_derived
   admission:
     status: pending
@@ -2092,9 +2094,10 @@ observations:
       note: No uncertainty printed on JANAF entropy.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: ΔHv(1550) = 69.8 ± 3 (71.7 ± 0.6) kcal/mol, and ΔSv(1550) = 27.8 ± 3 (29.7) cal/deg mol
     model: model_derived
   admission:
     status: pending
@@ -2283,9 +2286,10 @@ observations:
       quote: 46.4 ± 0.7 (47.1 ± 3.5); 30.2 ± 0.6 (29.7 ± 1.0)
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: -ΔHd(1300) = 46.4 ± 0.7 (47.1 ± 3.5) kcal/mol, and -ΔSd(1300) = 30.2 ± 0.6 (29.7 ± 1.0) cal/deg mol
     model: model_derived
   admission:
     status: pending
@@ -2392,7 +2396,7 @@ observations:
     pdf_page_index: 17
     paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-  read_from: pdf:kems-020-hastie-1981-nbsir
+  read_from: unknown:kems-020-hastie-1981-nbsir
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -2471,9 +2475,11 @@ observations:
       note: Printed ± terms; no invented confidence level.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: log P_NaCl (atm) = 4.85 (± 0.3) - 8820 (± 200)/T; ΔHv(1300) = 40.4 ± 0.9 (42.7 ± 3.5) kcal/mol, and ΔSv(1300)
+      = 22.2 ± 1.4 (24.2 ± 0.5) cal/deg mol
     model: model_derived
   admission:
     status: pending
@@ -2816,9 +2822,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Phases uncertain ~ 17[K2O] | 1600-2000 | 6.350 | 20693
     model: model_derived
   admission:
     status: pending
@@ -2926,7 +2933,7 @@ observations:
     table: '2'
     note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-  read_from: pdf:kems-020-hastie-1981-nbsir
+  read_from: unknown:kems-020-hastie-1981-nbsir
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::2
   identity:
@@ -3013,9 +3020,11 @@ observations:
           present.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
     model: model_derived
   admission:
     status: pending
@@ -3097,8 +3106,8 @@ observations:
       note: model table; no experimental sigma
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3122,7 +3131,7 @@ observations:
     pdf_page_index: 49
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-  read_from: pdf:kems-020-hastie-1981-nbsir
+  read_from: unknown:kems-020-hastie-1981-nbsir
   point_conditions:
     temperature_K:
       state:
@@ -3200,9 +3209,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
     model: model_derived
   admission:
     status: pending
@@ -3283,8 +3294,8 @@ observations:
       note: model table; no experimental sigma
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -3383,9 +3394,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
     model: model_derived
   admission:
     status: pending

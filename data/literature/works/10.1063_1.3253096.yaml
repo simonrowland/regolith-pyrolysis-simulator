@@ -32,6 +32,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-003-pound-1972
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:pound-1972-cr-langmuir-knudsen
       role: pdf
       path: raw/pound-1972-cr-langmuir-knudsen/pound-1972-cr-langmuir-knudsen.pdf
@@ -50,6 +56,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:pound-1972-cr-langmuir-knudsen
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:pound-1972-mccabe-cr
       role: pdf
       path: raw/pound-1972-mccabe-cr/pound-1972-mccabe-cr.pdf
@@ -68,12 +80,18 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:pound-1972-mccabe-cr
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:REF-040
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give an asset
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1063/1.3253096
 experiments:
 - experiment_id: 10.1063/1.3253096::1

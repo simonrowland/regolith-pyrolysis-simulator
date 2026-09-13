@@ -30,12 +30,18 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-031-halwax-2024
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:halwax_sergeev_mueller_schenk_2024
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give an asset
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1007/s11663-024-02995-6
 experiments:
 - experiment_id: 10.1007/s11663-024-02995-6::7
@@ -88,6 +94,29 @@ experiments:
         page: 825
         paragraph: experimental
         note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00001'
+            locator:
+              page: 825
+              paragraph: experimental
+              note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 825
+              paragraph: experimental
+              note: quote=As soon as the pressure decreased below 10-5 mbar, heating could be started.
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -334,6 +363,29 @@ experiments:
         paragraph: pressure decreased below 10^-5 mbar
         line_range: '230'
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00001'
+            locator:
+              paragraph: pressure decreased below 10^-5 mbar
+              line_range: '230'
+              source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              paragraph: pressure decreased below 10^-5 mbar
+              line_range: '230'
+              source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

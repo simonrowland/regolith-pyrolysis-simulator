@@ -72,10 +72,9 @@ observations:
       note: authors average +/- 10 Kcal/mole for reaction (1)
   evidence:
     class:
-      tag: unknown
-      reason: table destination measured_reduced; source does not supply lineage
+      tag: value
+      value: measured_reduced
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
-    model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
     status: pending
     reason: source does not state admission_status
@@ -238,10 +237,9 @@ observations:
       as_printed: 134.4 +/- 6 Kcal/mole
   evidence:
     class:
-      tag: unknown
-      reason: table destination measured_reduced; source does not supply lineage
+      tag: value
+      value: measured_reduced
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
-    model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
     status: pending
     reason: source does not state admission_status
@@ -485,8 +483,8 @@ observations:
       note: correlation figure; not a tabulated P(Al) series; not digitised
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -588,9 +586,13 @@ observations:
         digitised
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Fig. 7. Pressures of Al (atm) over various metal-Al2O3 systems at 1920 K versus the free energy of formation
+      of metal oxides, assuming those to be formed by reduction of Al2O3 in the cells. The dotted line is a rough approximation.
+      The presumed oxides are WO3 for W, MoO2 for Mo, Ta2O5 for Ta and NbO for Nb, but such selections of composition of oxides
+      are speculative.
     model: model_derived
   admission:
     status: pending
@@ -928,10 +930,9 @@ observations:
       as_printed: -111.9 +/- 6 Kcal/mole
   evidence:
     class:
-      tag: unknown
-      reason: table destination measured_reduced; source does not supply lineage
+      tag: value
+      value: measured_reduced
     original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
-    model: derived_third_law_from_measured_kems_and_janaf_fef
   admission:
     status: pending
     reason: source does not state admission_status
@@ -1095,8 +1096,8 @@ observations:
       note: estimate from decomposition K, not a tabulated p(O2) series; O2+ scarcely observed
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -1187,9 +1188,11 @@ observations:
       note: estimate from decomposition K, not a tabulated p(O2) series; O2+ scarcely observed; no numerical uncertainty printed
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: O2 was scarcely observed due to presence of rather high background. From the estimated decomposition equilibrium
+      constant, the partial pressures of O2 were about one order smaller than those of O atom.
     model: model_derived
   admission:
     status: pending

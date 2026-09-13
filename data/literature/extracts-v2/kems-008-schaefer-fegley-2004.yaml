@@ -88,7 +88,7 @@ observations:
     table: '10'
     paragraph: Vaporization coefficients for oxides and silicates
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: unknown:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
@@ -174,7 +174,7 @@ observations:
     table: '10'
     line_range: 649-661
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: unknown:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
@@ -261,7 +261,7 @@ observations:
     table: '10'
     paragraph: Vaporization coefficients for oxides and silicates
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: unknown:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
@@ -348,7 +348,7 @@ observations:
     table: '10'
     paragraph: Vaporization coefficients for oxides and silicates
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: unknown:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio_alpha_s_survey
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
@@ -436,7 +436,7 @@ observations:
     table: '10'
     line_range: 649-661
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  read_from: pdf:kems-008-schaefer-fegley-2004
+  read_from: unknown:kems-008-schaefer-fegley-2004
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r01_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
@@ -2262,9 +2262,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq) | 0.27 | 12735 | Hastie and Bonnell (1985)'
     model: model_derived
   admission:
     status: pending
@@ -2343,9 +2346,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq) | 0.35 | 14685 | Hastie and Bonnell (1985)'
     model: model_derived
   admission:
     status: pending
@@ -2424,9 +2430,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq) | −0.96 | 17572 | Hastie and Bonnell (1985)'
     model: model_derived
   admission:
     status: pending
@@ -2505,9 +2514,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq) | 4.30 | 17037 | Hastie and Bonnell (1985)'
     model: model_derived
   admission:
     status: pending
@@ -2586,9 +2598,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      Na (g) = Na+ (g) + e− (g) | −15.33 | 36735 | Chase (1998)'
     model: model_derived
   admission:
     status: pending
@@ -2667,9 +2682,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Reaction | A | B | Ref.
+
+      K (g) = K+ (g) + e− (g) | 2.76 | 23760 | Chase (1998)'
     model: model_derived
   admission:
     status: pending
@@ -2748,9 +2766,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      Al | ∼ 9.0(−12) | 3.4(−12)'
     model: model_derived
   admission:
     status: pending
@@ -2829,9 +2850,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      Al2 O | ∼ 10.0(−15) | 2.3(−15)'
     model: model_derived
   admission:
     status: pending
@@ -2910,9 +2934,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      AlO | ∼ 9.0(−11) | 2.7(−11)'
     model: model_derived
   admission:
     status: pending
@@ -2991,9 +3018,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      Ca | ∼ 1.5(−9) | 1.1(−9)'
     model: model_derived
   admission:
     status: pending
@@ -3072,9 +3102,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      CaO | ∼ 2.5(−11) | 1.6(−11)'
     model: model_derived
   admission:
     status: pending
@@ -3153,9 +3186,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      Mg | ∼ 2.0(−7)a | 1.4(−7)'
     model: model_derived
   admission:
     status: pending
@@ -3234,9 +3270,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      MgO | ∼ 8.0(−10) | 3.6(−10)'
     model: model_derived
   admission:
     status: pending
@@ -3315,9 +3354,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      O | ∼ 3.0(−7) | 3.4(−7)'
     model: model_derived
   admission:
     status: pending
@@ -3396,9 +3438,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      O2 | ∼ 3.0(−7) | 2.6(−7)'
     model: model_derived
   admission:
     status: pending
@@ -3477,9 +3522,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      SiO | ∼ 9.0(−7) | 7.1(−7)'
     model: model_derived
   admission:
     status: pending
@@ -3558,9 +3606,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      SiO2 | ∼ 7.0(−9) | 4.6(−9)'
     model: model_derived
   admission:
     status: pending
@@ -3639,9 +3690,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      Total | ∼ 1.7(−6) | 1.5(−6)'
     model: model_derived
   admission:
     status: pending
@@ -3720,9 +3774,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      Alkalis | 4.716 | −16037 | 1.87(−4) | – | –'
     model: model_derived
   admission:
     status: pending
@@ -3801,9 +3858,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      CAIs | 3.890 | −15373 | 6.46(−5) | 1.98(−5) | 1.62(−4)'
     model: model_derived
   admission:
     status: pending
@@ -3882,9 +3942,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      Dunite | 4.618 | −15724 | 2.19(−4) | – | –'
     model: model_derived
   admission:
     status: pending
@@ -3963,9 +4026,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      Komatiites | 4.480 | −16404 | 6.89(−5) | 2.08(−5) | 9.73(−5)'
     model: model_derived
   admission:
     status: pending
@@ -4044,9 +4110,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      MORBs | – | – | 8.23(−5)e | 7.79(−5) | 1.01(−4)'
     model: model_derived
   admission:
     status: pending
@@ -4125,9 +4194,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      OIBs | – | – | 1.26(−4)e | 3.59(−5) | 4.43(−4)'
     model: model_derived
   admission:
     status: pending
@@ -4206,9 +4278,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+      Tholeiites | 4.719 | −16761 | 7.72(−5)d | 5.52(−5) | 7.72(−5)'
     model: model_derived
   admission:
     status: pending
@@ -4287,9 +4362,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Al | < 0.008 | 8.77(−9) | 2.68(−9) | 5.79(−9) | 3.98(−10) | 1.31(−8)'
     model: model_derived
   admission:
     status: pending
@@ -4451,9 +4529,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Ca | < 0.001 | 8.25(−9) | 4.15(−9) | 1.03(−8) | 7.91(−10) | 1.60(−7)'
     model: model_derived
   admission:
     status: pending
@@ -4615,9 +4696,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Fe | < 0.038 | 4.10(−3) | 1.26(−3) | 4.53(−3) | 1.26(−3) | 2.64(−4)'
     model: model_derived
   admission:
     status: pending
@@ -4779,9 +4863,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      K | 0.10b | 2.11(−4)c | 1.88(−4) | 1.87(−4) | 2.92(−3) | 1.19(−4)'
     model: model_derived
   admission:
     status: pending
@@ -4943,9 +5030,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Na | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000'
     model: model_derived
   admission:
     status: pending
@@ -5107,9 +5197,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Si | < 0.014 | 2.35(−3) | 3.49(−4) | 1.27(−3) | 8.31(−5) | 3.79(−4)'
     model: model_derived
   admission:
     status: pending
@@ -5271,9 +5364,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+      Ti | < 0.014 | 1.68(−6) | 6.67(−7) | 2.08(−7) | 3.31(−8) | 6.79(−7)'
     model: model_derived
   admission:
     status: pending
@@ -5435,9 +5531,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      e− | 6.51(14) | 1.10(16) | 2.42(17)'
     model: model_derived
   admission:
     status: pending
@@ -5516,9 +5615,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      Fe | 1.64(13) | 4.03(14) | 1.29(16)'
     model: model_derived
   admission:
     status: pending
@@ -5597,9 +5699,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      FeO | 1.30(13) | 2.56(14) | 6.45(15)'
     model: model_derived
   admission:
     status: pending
@@ -5678,9 +5783,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      K | 1.01(13) | 9.84(13) | 1.22(15)'
     model: model_derived
   admission:
     status: pending
@@ -5759,9 +5867,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      K+ | 1.21(11) | 1.50(12) | 2.37(13)'
     model: model_derived
   admission:
     status: pending
@@ -5840,9 +5951,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      Mg | 1.70(11) | 6.69(12) | 3.49(14)'
     model: model_derived
   admission:
     status: pending
@@ -5921,9 +6035,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      Na | 1.00(17)a | 7.94(17) | 7.67(18)'
     model: model_derived
   admission:
     status: pending
@@ -6002,9 +6119,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      NaO | 1.26(13) | 2.43(14) | 6.20(15)'
     model: model_derived
   admission:
     status: pending
@@ -6083,9 +6203,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      Na+ | 3.02(12) | 5.20(13) | 1.15(15)'
     model: model_derived
   admission:
     status: pending
@@ -6164,9 +6287,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      O | 5.65(14) | 8.84(15) | 1.76(17)'
     model: model_derived
   admission:
     status: pending
@@ -6245,9 +6371,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      O2 | 2.10(18) | 1.66(17) | 1.58(18)'
     model: model_derived
   admission:
     status: pending
@@ -6326,9 +6455,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      SiO | 3.01(12) | 1.60(14) | 1.19(16)'
     model: model_derived
   admission:
     status: pending
@@ -6407,9 +6539,12 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Species | 1550 K | 1700 K | 1900 K
+
+      SiO2 | 4.08(11) | 1.65(13) | 9.26(14)'
     model: model_derived
   admission:
     status: pending

@@ -68,8 +68,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived_assumption
     model: model_derived_assumption
   admission:
@@ -160,9 +160,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: If αi/αj is assumed to be unity in eqn. (16), the ratio is 0.36 (at 1,600°C)
     model: model_derived
   admission:
     status: pending
@@ -252,7 +253,7 @@ observations:
     line_range: 883-927
     note: CaO and Al2O3 become enriched in residues as more volatile components are lost
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy
   experiment_id: 10.2343/geochemj.17.111::10
   identity:
@@ -319,8 +320,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -411,9 +412,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a trend to increase
+      with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively.
     model: model_derived
   admission:
     status: pending
@@ -490,8 +493,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -572,8 +575,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -662,9 +665,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a trend to increase
+      with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively.
     model: model_derived
   admission:
     status: pending
@@ -741,8 +746,8 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -831,9 +836,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a trend to increase
+      with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively.
     model: model_derived
   admission:
     status: pending
@@ -923,7 +930,7 @@ observations:
     line_range: '11'
     note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_fe_fcmas_free_evap_geometry
   experiment_id: 10.2343/geochemj.17.111::1
   identity:
@@ -1002,7 +1009,7 @@ observations:
     section: EXPERIMENTS
     line_range: 33-90
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_fe_geometry_class_b1
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1080,7 +1087,7 @@ observations:
   locator:
     paragraph: molten spherule free evaporation graphite crucible
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_mg_fcmas_free_evap_geometry
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1158,7 +1165,7 @@ observations:
     section: EXPERIMENTS
     line_range: 33-90
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_mg_geometry_class_b1
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1236,7 +1243,7 @@ observations:
   locator:
     paragraph: molten spherule free evaporation graphite crucible
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_fcmas_free_evap_geometry
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1314,7 +1321,7 @@ observations:
     section: EXPERIMENTS
     line_range: 33-90
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_geometry_class_b1
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1392,7 +1399,7 @@ observations:
   locator:
     paragraph: molten spherule free evaporation graphite crucible
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_stage_iv_cao_relative_volatility
   experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   identity:
@@ -1472,7 +1479,7 @@ observations:
     line_range: 927-937
     note: Stage-IV CaO volatility reported as about one third of SiO2; thermodynamic estimate 0.36
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-  read_from: pdf:kems-015-hashimoto-1983
+  read_from: unknown:kems-015-hashimoto-1983
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table1_starting_composition
   experiment_id: 10.2343/geochemj.17.111::1
   identity:
@@ -34158,8 +34165,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_rate does not use wall
   value:
-    kind: point
-    point: '0.8799276315789473684210526314'
+    kind: unavailable
+    unavailable_reason: series point 0 has no liftable numeric value
   uncertainty:
     kind: none
   evidence:
@@ -34188,12 +34195,6 @@ observations:
         pdf_page_index: 12
         table: '5'
         note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-  derivation:
-    relation: Torr_to_Pa
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::point:1
   experiment_id: 10.2343/geochemj.17.111::5
   identity:
@@ -34254,8 +34255,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_rate does not use wall
   value:
-    kind: point
-    point: '3.466381578947368421052631578'
+    kind: unavailable
+    unavailable_reason: series point 1 has no liftable numeric value
   uncertainty:
     kind: none
   evidence:
@@ -34284,12 +34285,6 @@ observations:
         pdf_page_index: 12
         table: '5'
         note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-  derivation:
-    relation: Torr_to_Pa
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::point:2
   experiment_id: 10.2343/geochemj.17.111::5
   identity:
@@ -34350,8 +34345,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_rate does not use wall
   value:
-    kind: point
-    point: '10.26582236842105263157894737'
+    kind: unavailable
+    unavailable_reason: series point 2 has no liftable numeric value
   uncertainty:
     kind: none
   evidence:
@@ -34380,12 +34375,6 @@ observations:
         pdf_page_index: 12
         table: '5'
         note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-  derivation:
-    relation: Torr_to_Pa
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::point:3
   experiment_id: 10.2343/geochemj.17.111::5
   identity:
@@ -34446,8 +34435,8 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_rate does not use wall
   value:
-    kind: point
-    point: '21.33157894736842105263157894'
+    kind: unavailable
+    unavailable_reason: series point 3 has no liftable numeric value
   uncertainty:
     kind: none
   evidence:
@@ -34476,12 +34465,6 @@ observations:
         pdf_page_index: 12
         table: '5'
         note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
-  derivation:
-    relation: Torr_to_Pa
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_feo_vaporization_enthalpies
   experiment_id: 10.2343/geochemj.17.111::6
   identity:
@@ -34637,9 +34620,50 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'no,reactant,products,delta_H_kcal_mol,delta_H_over_z_kcal_mol
+
+      1,Fe,Fe,89.243,89.243
+
+      2,FeO,Fe + 1/2 O2,150.637,100.425
+
+      3,FeO,Fe + O,211.657,105.829
+
+      4,FeO,FeO,109.476,109.476
+
+      5,Fe2O3,2Fe + 3/2 O2,352.832,100.809
+
+      6,Fe2O3,2Fe + 3O,535.892,107.178
+
+      7,Fe3O4,3Fe + 2 O2,506.610,101.322
+
+      8,Fe3O4,3Fe + 4O,750.690,107.241
+
+      9,Fe2O3,2FeO + 1/2 O2,270.510,108.204
+
+      10,Fe2O3,2FeO + O,331.530,110.510
+
+      11,Fe3O4,3FeO + 1/2 O2,383.127,109.465
+
+      12,Fe3O4,3FeO + O,444.147,111.037
+
+      13,SiO2,SiO + 1/2 O2,184.198,122.799
+
+      14,SiO2,SiO + O,245.218,122.609
+
+      15,SiO2,SiO2,137.071,137.071
+
+      16,SiO2,Si + O2,317.250,158.625
+
+      17,SiO2,Si + 2O,439.290,146.430
+
+      18,MgO,Mg + 1/2 O2,156.353,104.235
+
+      19,MgO,Mg + O,217.373,108.687
+
+      20,MgO,MgO,121.392,121.392'
     model: model_derived
   admission:
     status: pending
@@ -34805,9 +34829,50 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'no,reactant,products,delta_H_kcal_mol,delta_H_over_z_kcal_mol
+
+      1,Fe,Fe,89.243,89.243
+
+      2,FeO,Fe + 1/2 O2,150.637,100.425
+
+      3,FeO,Fe + O,211.657,105.829
+
+      4,FeO,FeO,109.476,109.476
+
+      5,Fe2O3,2Fe + 3/2 O2,352.832,100.809
+
+      6,Fe2O3,2Fe + 3O,535.892,107.178
+
+      7,Fe3O4,3Fe + 2 O2,506.610,101.322
+
+      8,Fe3O4,3Fe + 4O,750.690,107.241
+
+      9,Fe2O3,2FeO + 1/2 O2,270.510,108.204
+
+      10,Fe2O3,2FeO + O,331.530,110.510
+
+      11,Fe3O4,3FeO + 1/2 O2,383.127,109.465
+
+      12,Fe3O4,3FeO + O,444.147,111.037
+
+      13,SiO2,SiO + 1/2 O2,184.198,122.799
+
+      14,SiO2,SiO + O,245.218,122.609
+
+      15,SiO2,SiO2,137.071,137.071
+
+      16,SiO2,Si + O2,317.250,158.625
+
+      17,SiO2,Si + 2O,439.290,146.430
+
+      18,MgO,Mg + 1/2 O2,156.353,104.235
+
+      19,MgO,Mg + O,217.373,108.687
+
+      20,MgO,MgO,121.392,121.392'
     model: model_derived
   admission:
     status: pending
@@ -34973,9 +35038,50 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'no,reactant,products,delta_H_kcal_mol,delta_H_over_z_kcal_mol
+
+      1,Fe,Fe,89.243,89.243
+
+      2,FeO,Fe + 1/2 O2,150.637,100.425
+
+      3,FeO,Fe + O,211.657,105.829
+
+      4,FeO,FeO,109.476,109.476
+
+      5,Fe2O3,2Fe + 3/2 O2,352.832,100.809
+
+      6,Fe2O3,2Fe + 3O,535.892,107.178
+
+      7,Fe3O4,3Fe + 2 O2,506.610,101.322
+
+      8,Fe3O4,3Fe + 4O,750.690,107.241
+
+      9,Fe2O3,2FeO + 1/2 O2,270.510,108.204
+
+      10,Fe2O3,2FeO + O,331.530,110.510
+
+      11,Fe3O4,3FeO + 1/2 O2,383.127,109.465
+
+      12,Fe3O4,3FeO + O,444.147,111.037
+
+      13,SiO2,SiO + 1/2 O2,184.198,122.799
+
+      14,SiO2,SiO + O,245.218,122.609
+
+      15,SiO2,SiO2,137.071,137.071
+
+      16,SiO2,Si + O2,317.250,158.625
+
+      17,SiO2,Si + 2O,439.290,146.430
+
+      18,MgO,Mg + 1/2 O2,156.353,104.235
+
+      19,MgO,Mg + O,217.373,108.687
+
+      20,MgO,MgO,121.392,121.392'
     model: model_derived
   admission:
     status: pending

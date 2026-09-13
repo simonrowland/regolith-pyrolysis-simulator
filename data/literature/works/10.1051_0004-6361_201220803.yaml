@@ -30,6 +30,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-011-wetzel-gail-2013
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:wetzel-gail-2013-sio-arrhenius
       role: pdf
       path: raw/wetzel-gail-2013-sio-arrhenius/wetzel-gail-2013-sio-arrhenius.pdf
@@ -48,6 +54,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:wetzel-gail-2013-sio-arrhenius
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1051/0004-6361/201220803
 experiments:
 - experiment_id: 10.1051/0004-6361/201220803::1
@@ -181,6 +193,27 @@ experiments:
       locator:
         paragraph: UHV
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000001'
+            locator:
+              paragraph: UHV
+              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              paragraph: UHV
+              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -278,6 +311,29 @@ experiments:
         paragraph: background pressure measured during evaporation
         line_range: 51-53
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000001'
+            locator:
+              paragraph: background pressure measured during evaporation
+              line_range: 51-53
+              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              paragraph: background pressure measured during evaporation
+              line_range: 51-53
+              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

@@ -29,12 +29,18 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:janaf-4th
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:nist-janaf-4th
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give an asset
+        reason: INDEX does not give an unmatched-layer asset
 experiments:
 - experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::Al-001
   kind: literature

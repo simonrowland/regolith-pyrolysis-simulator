@@ -314,9 +314,12 @@ observations:
       note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The calculation of Po2 has been done using the equilibriums AlO=Al+O, O2=2O. The Po2 calculation for the
+      high temperature vaporization of Murchison and CAI inclusions of Efremovka shows that vaporization of latter takes place
+      at the conditions with higher Po2 (table).
     model: model_derived
   admission:
     status: pending

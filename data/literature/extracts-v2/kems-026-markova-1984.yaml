@@ -151,8 +151,8 @@ observations:
       note: Model percentage as printed; curve in Fig. 2 not digitised.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -314,8 +314,8 @@ observations:
       note: Model percentage as printed; curve in Fig. 2 not digitised.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:
@@ -396,9 +396,11 @@ observations:
       note: Authors print ~2% and ~1%; no numeric uncertainty.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the recent Moon is improbable.
+      Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%.
     model: model_derived
   admission:
     status: pending
@@ -479,9 +481,10 @@ observations:
         not digitised.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
     model: model_derived
   admission:
     status: pending
@@ -644,8 +647,8 @@ observations:
       note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%, K 3%, SiO 2%).
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
     model: model_derived
   admission:

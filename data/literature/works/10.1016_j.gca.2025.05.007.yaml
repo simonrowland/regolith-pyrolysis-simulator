@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-140-heck-2025
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2025.05.007
 experiments:
 - experiment_id: 10.1016/j.gca.2025.05.007::1
@@ -50,6 +56,27 @@ experiments:
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -397,6 +424,27 @@ experiments:
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -436,6 +484,27 @@ experiments:
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -559,6 +628,27 @@ experiments:
       locator:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

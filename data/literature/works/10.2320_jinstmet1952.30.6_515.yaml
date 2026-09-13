@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-001-homma-1966
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.2320/jinstmet1952.30.6_515
 experiments:
 - experiment_id: 10.2320/jinstmet1952.30.6_515::1
@@ -142,6 +148,29 @@ experiments:
         paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
         line_range: '29'
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.01'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+              line_range: '29'
+              source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:cardiff-2007-vacuum-pyrolysis-gsfc
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
 experiments:
 - experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::1
   kind: literature
@@ -205,6 +211,29 @@ experiments:
         pdf_page_index: 7
         figure: '8'
         paragraph: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00001'
+            locator:
+              pdf_page_index: 7
+              figure: '8'
+              paragraph: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 7
+              figure: '8'
+              paragraph: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

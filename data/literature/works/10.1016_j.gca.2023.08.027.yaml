@@ -30,6 +30,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-137-bischof-2023
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2023.08.027
 experiments:
 - experiment_id: 10.1016/j.gca.2023.08.027::4
@@ -136,6 +142,27 @@ experiments:
       locator:
         pdf_page_index: 5
         paragraph: The KC chamber (~10-6 mbar)
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -190,6 +217,27 @@ experiments:
       locator:
         pdf_page_index: 5
         paragraph: The KC chamber (~10-6 mbar)
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -244,6 +292,27 @@ experiments:
       locator:
         pdf_page_index: 5
         paragraph: The KC chamber (~10-6 mbar)
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -297,6 +366,27 @@ experiments:
       locator:
         pdf_page_index: 5
         paragraph: The KC chamber (~10-6 mbar)
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -350,6 +440,27 @@ experiments:
       locator:
         pdf_page_index: 5
         paragraph: The KC chamber (~10-6 mbar)
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 5
+              paragraph: The KC chamber (~10-6 mbar)
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

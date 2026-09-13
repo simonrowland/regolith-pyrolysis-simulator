@@ -31,6 +31,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:fedkin-grossman-ghiorso-2006
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:kems-005-fedkin-2006
       role: pdf
       path: raw/kems-005-fedkin-2006/kems-005-fedkin-2006.pdf
@@ -49,12 +55,18 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-005-fedkin-2006
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:REF-014
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
-        reason: INDEX does not give an asset
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2005.08.014
 experiments:
 - experiment_id: 10.1016/j.gca.2005.08.014::3

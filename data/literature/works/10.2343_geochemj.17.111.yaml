@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-015-hashimoto-1983
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.2343/geochemj.17.111
 experiments:
 - experiment_id: 10.2343/geochemj.17.111::1
@@ -51,6 +57,29 @@ experiments:
         paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
         line_range: 80-160
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
+              line_range: 80-160
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
+              line_range: 80-160
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -156,6 +185,29 @@ experiments:
         published_page: 118
         pdf_page_index: 8
         paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

@@ -236,8 +236,8 @@ observations:
         not a slope sigma. Appendix 1 % error is a separate per-point envelope.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: derived_least_squares
     model: derived_least_squares
   admission:
@@ -322,8 +322,8 @@ observations:
         0). Do not invent ± for other cells.'
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: derived_gibbs_duhem_integration
     model: derived_gibbs_duhem_integration
   admission:

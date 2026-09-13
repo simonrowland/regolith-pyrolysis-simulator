@@ -29,6 +29,12 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-044-robinot-2026
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.asr.2026.02.003
 experiments:
 - experiment_id: 10.1016/j.asr.2026.02.003::1
@@ -143,6 +149,31 @@ experiments:
         pdf_page_index: 8
         paragraph: maintaining an internal pressure of about 13 mbar
         section: '4.1'
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '13'
+            locator:
+              published_page: 7
+              pdf_page_index: 8
+              paragraph: maintaining an internal pressure of about 13 mbar
+              section: '4.1'
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 7
+              pdf_page_index: 8
+              paragraph: maintaining an internal pressure of about 13 mbar
+              section: '4.1'
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown

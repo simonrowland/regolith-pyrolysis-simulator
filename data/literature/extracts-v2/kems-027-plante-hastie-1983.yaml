@@ -337,9 +337,11 @@ observations:
       note: about; no numeric uncertainty printed
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: At 1200 K, the activity of CsBO2 in the melt is about 4 x 10^-6 based on the CsBO2 pressure over pure CsBO2
+      as given by Gurvich and Veits [1983].
     model: model_derived
   admission:
     status: pending
@@ -430,9 +432,10 @@ observations:
       note: Printed plus/minus terms; confidence level unstated.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: log P(atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04) x 10^4/T
     model: model_derived
   admission:
     status: pending
@@ -510,9 +513,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: a(CsBO2)calc = 4 x 10^-4
     model: model_derived
   admission:
     status: pending
@@ -954,8 +958,8 @@ observations:
       note: not applicable
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model
     model: model
   admission:
@@ -1058,7 +1062,7 @@ observations:
     paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
     line_range: 145-163
     source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
-  read_from: pdf:kems-027-plante-hastie-1983
+  read_from: unknown:kems-027-plante-hastie-1983
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
@@ -1218,9 +1222,11 @@ observations:
       note: about; some temperature dependence; no numeric uncertainty printed
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Comparing this curve with that for pure LiBO2(l), obtained from JANAF [1971], indicates that the activity
+      of LiBO2 in the SNW glass is about 0.1, with some temperature dependence.
     model: model_derived
   admission:
     status: pending
@@ -1302,9 +1308,10 @@ observations:
       note: Printed plus/minus terms; confidence level unstated.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02) x 10^4/T
     model: model_derived
   admission:
     status: pending
@@ -1477,9 +1484,11 @@ observations:
       note: approximately; slight temperature dependence; no numeric uncertainty printed
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: From the ratio of pressures from these curves, the activity of NaBO2 in the simulated nuclear glass is approximately
+      0.01 with a slight temperature dependence.
     model: model_derived
   admission:
     status: pending
@@ -1561,9 +1570,10 @@ observations:
       note: Printed plus/minus terms; confidence level unstated.
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02) x 10^4/T
     model: model_derived
   admission:
     status: pending
@@ -1812,9 +1822,10 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Calculated Equilibrium Composition (mole fraction) of Off-gas Mixture at 1 atm
     model: model_derived
   admission:
     status: pending
@@ -2148,8 +2159,8 @@ observations:
       note: compilation/model; no experimental sigma
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model
     model: model
   admission:
@@ -2238,9 +2249,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: Calculations assume an oxygen partial pressure of 0.02 atm. The nominal glass composition was used with activities
+      set equal to oxide component mole fractions.
     model: model_derived
   admission:
     status: pending

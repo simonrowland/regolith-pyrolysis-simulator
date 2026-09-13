@@ -92,7 +92,7 @@ observations:
     section: 4.1 Evaporation rates of silicon and magnesium
     line_range: '146'
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_al_quoted_non_loss_bound
   experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   identity:
@@ -264,7 +264,7 @@ observations:
     section: 4.1 Evaporation rates of silicon and magnesium
     line_range: '146'
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_ca_quoted_non_loss_bound
   experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   identity:
@@ -435,7 +435,7 @@ observations:
     line_range: 447-448
     note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_mg_quoted_fits
   experiment_id: 10.1016/j.gca.2007.09.005::3
   identity:
@@ -519,9 +519,12 @@ observations:
         figure: '2'
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0
+      = 25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
+      are 2σ
     model: model_derived
   admission:
     status: pending
@@ -618,7 +621,7 @@ observations:
     figure: '2'
     line_range: 183-191
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_numeric_areas_b1
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -705,7 +708,7 @@ observations:
     table: '1'
     paragraph: Init/Final area mm2 columns
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:0
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1060,6 +1063,31 @@ observations:
         table: '1'
         paragraph: R3-12
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:1
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1414,6 +1442,31 @@ observations:
         table: '1'
         paragraph: R3-10
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:10
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1768,6 +1821,31 @@ observations:
         table: '1'
         paragraph: R-6
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:11
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2122,6 +2200,31 @@ observations:
         table: '1'
         paragraph: R-3
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:12
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2476,6 +2579,31 @@ observations:
         table: '1'
         paragraph: R-2
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:13
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2830,6 +2958,31 @@ observations:
         table: '1'
         paragraph: R-18
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:14
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3184,6 +3337,31 @@ observations:
         table: '1'
         paragraph: R-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:15
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3538,6 +3716,31 @@ observations:
         table: '1'
         paragraph: R3-14
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:16
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3892,6 +4095,31 @@ observations:
         table: '1'
         paragraph: R2-1
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:17
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -4246,6 +4474,31 @@ observations:
         table: '1'
         paragraph: R-7
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:18
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -4600,6 +4853,31 @@ observations:
         table: '1'
         paragraph: R-13
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:19
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -4954,6 +5232,31 @@ observations:
         table: '1'
         paragraph: R-8
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:2
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -5308,6 +5611,31 @@ observations:
         table: '1'
         paragraph: R3-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:20
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -5662,6 +5990,31 @@ observations:
         table: '1'
         paragraph: R-9
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:21
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6016,6 +6369,31 @@ observations:
         table: '1'
         paragraph: R-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:22
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6370,6 +6748,31 @@ observations:
         table: '1'
         paragraph: R2-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:23
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6724,6 +7127,31 @@ observations:
         table: '1'
         paragraph: R2-5
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:24
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7078,6 +7506,31 @@ observations:
         table: '1'
         paragraph: R2-21
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:25
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7432,6 +7885,31 @@ observations:
         table: '1'
         paragraph: R2-20
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:26
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7786,6 +8264,31 @@ observations:
         table: '1'
         paragraph: R2-18
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:27
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8140,6 +8643,31 @@ observations:
         table: '1'
         paragraph: R2-19
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:28
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8494,6 +9022,31 @@ observations:
         table: '1'
         paragraph: R2-17
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:29
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8848,6 +9401,31 @@ observations:
         table: '1'
         paragraph: R2-7
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:3
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9202,6 +9780,31 @@ observations:
         table: '1'
         paragraph: R3-13
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:30
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9556,6 +10159,31 @@ observations:
         table: '1'
         paragraph: R2-3
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:31
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9910,6 +10538,31 @@ observations:
         table: '1'
         paragraph: R2-10
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:32
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10264,6 +10917,31 @@ observations:
         table: '1'
         paragraph: R2-16
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:33
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10618,6 +11296,31 @@ observations:
         table: '1'
         paragraph: R2-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:34
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10972,6 +11675,31 @@ observations:
         table: '1'
         paragraph: R2-12
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:35
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -11326,6 +12054,31 @@ observations:
         table: '1'
         paragraph: R2-2
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:36
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -11680,6 +12433,31 @@ observations:
         table: '1'
         paragraph: R2-13
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:37
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -12034,6 +12812,31 @@ observations:
         table: '1'
         paragraph: R2-15
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:38
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -12388,6 +13191,31 @@ observations:
         table: '1'
         paragraph: R2-14
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:39
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -12742,6 +13570,31 @@ observations:
         table: '1'
         paragraph: R2-9
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:4
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13096,6 +13949,31 @@ observations:
         table: '1'
         paragraph: R3-15
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:40
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13450,6 +14328,31 @@ observations:
         table: '1'
         paragraph: R2-8
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:41
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13804,6 +14707,31 @@ observations:
         table: '1'
         paragraph: R3-2
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:42
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14158,6 +15086,31 @@ observations:
         table: '1'
         paragraph: R3-1
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:43
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14512,6 +15465,31 @@ observations:
         table: '1'
         paragraph: R3-20
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:44
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14866,6 +15844,31 @@ observations:
         table: '1'
         paragraph: R3-21
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:45
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15220,6 +16223,31 @@ observations:
         table: '1'
         paragraph: R3-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:46
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15574,6 +16602,31 @@ observations:
         table: '1'
         paragraph: R3-7
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:47
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15928,6 +16981,31 @@ observations:
         table: '1'
         paragraph: R3-19
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:48
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16282,6 +17360,31 @@ observations:
         table: '1'
         paragraph: R3-18
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:49
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16636,6 +17739,31 @@ observations:
         table: '1'
         paragraph: R3-8
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:5
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16990,6 +18118,31 @@ observations:
         table: '1'
         paragraph: R3-9
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:50
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -17344,6 +18497,31 @@ observations:
         table: '1'
         paragraph: R3-5
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:6
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -17698,6 +18876,31 @@ observations:
         table: '1'
         paragraph: R-16
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:7
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -18052,6 +19255,31 @@ observations:
         table: '1'
         paragraph: R-14
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:8
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -18406,6 +19634,31 @@ observations:
         table: '1'
         paragraph: R-15
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:9
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -18760,6 +20013,31 @@ observations:
         table: '1'
         paragraph: R-17
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
   experiment_id: 10.1016/j.gca.2007.09.005::3
   identity:
@@ -18847,7 +20125,7 @@ observations:
     figure: '3'
     line_range: 447-448
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  read_from: pdf:kems-010-richter-2007
+  read_from: unknown:kems-010-richter-2007
 - observation_id: kems-010-richter-2007::richter_2007_sio_quoted_fits
   experiment_id: 10.1016/j.gca.2007.09.005::3
   identity:
@@ -18931,9 +20209,12 @@ observations:
         figure: '2'
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0
+      = 25.3, E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes
+      are 2σ
     model: model_derived
   admission:
     status: pending
@@ -19050,6 +20331,31 @@ observations:
         table: '1'
         paragraph: R3-10
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:1
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19155,6 +20461,31 @@ observations:
         table: '1'
         paragraph: R3-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:10
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19260,6 +20591,31 @@ observations:
         table: '1'
         paragraph: R2-1
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:11
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19365,6 +20721,31 @@ observations:
         table: '1'
         paragraph: R-7
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:12
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19470,6 +20851,31 @@ observations:
         table: '1'
         paragraph: R-8
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:13
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19575,6 +20981,31 @@ observations:
         table: '1'
         paragraph: R-9
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:14
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19680,6 +21111,31 @@ observations:
         table: '1'
         paragraph: R-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:15
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19785,6 +21241,31 @@ observations:
         table: '1'
         paragraph: R2-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:16
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19890,6 +21371,31 @@ observations:
         table: '1'
         paragraph: R2-5
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:17
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -19995,6 +21501,31 @@ observations:
         table: '1'
         paragraph: R2-3
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:18
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20100,6 +21631,31 @@ observations:
         table: '1'
         paragraph: R2-10
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:19
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20205,6 +21761,31 @@ observations:
         table: '1'
         paragraph: R2-16
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:2
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20310,6 +21891,31 @@ observations:
         table: '1'
         paragraph: R3-13
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:20
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20415,6 +22021,31 @@ observations:
         table: '1'
         paragraph: R2-11
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:21
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20520,6 +22151,31 @@ observations:
         table: '1'
         paragraph: R2-12
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:22
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20625,6 +22281,31 @@ observations:
         table: '1'
         paragraph: R2-2
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:23
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20730,6 +22411,31 @@ observations:
         table: '1'
         paragraph: R3-1
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:24
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20835,6 +22541,31 @@ observations:
         table: '1'
         paragraph: R3-20
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:25
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -20940,6 +22671,31 @@ observations:
         table: '1'
         paragraph: R3-21
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:26
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21045,6 +22801,31 @@ observations:
         table: '1'
         paragraph: R3-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:27
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21150,6 +22931,31 @@ observations:
         table: '1'
         paragraph: R3-7
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:28
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21255,6 +23061,31 @@ observations:
         table: '1'
         paragraph: R3-19
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:29
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21360,6 +23191,31 @@ observations:
         table: '1'
         paragraph: R3-18
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:3
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21465,6 +23321,31 @@ observations:
         table: '1'
         paragraph: R3-15
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:30
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21570,6 +23451,31 @@ observations:
         table: '1'
         paragraph: R3-8
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:31
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21675,6 +23581,31 @@ observations:
         table: '1'
         paragraph: R3-5
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:4
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21780,6 +23711,31 @@ observations:
         table: '1'
         paragraph: R3-9
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:5
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21885,6 +23841,31 @@ observations:
         table: '1'
         paragraph: R-3
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:6
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -21990,6 +23971,31 @@ observations:
         table: '1'
         paragraph: R-2
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:7
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -22095,6 +24101,31 @@ observations:
         table: '1'
         paragraph: R-18
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:8
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -22200,6 +24231,31 @@ observations:
         table: '1'
         paragraph: R-4
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series::point:9
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -22305,6 +24361,31 @@ observations:
         table: '1'
         paragraph: R3-14
         source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: K
 - observation_id: kems-010-richter-2007::richter_2007_table2_3537_1
   experiment_id: 10.1016/j.gca.2007.09.005::2
   identity:
@@ -22371,9 +24452,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: 3537-1 | B1 | 3.26 | 14.9
+      | 30.4'
     model: model_derived
   admission:
     status: pending
@@ -22452,9 +24535,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: E107 | B2 | 1.99 | 9.4 |
+      19.9'
     model: model_derived
   admission:
     status: pending
@@ -22533,9 +24618,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: F2 (TS65) | B2 | 6.12 | 26.0
+      | 49.2'
     model: model_derived
   admission:
     status: pending
@@ -22614,9 +24701,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: Golfball | B | 1.61 | 7.7
+      | 16.4'
     model: model_derived
   admission:
     status: pending
@@ -22695,9 +24784,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS33 | B1 | 4.01 | 18.0 |
+      35.9'
     model: model_derived
   admission:
     status: pending
@@ -22776,9 +24867,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: table destination model_derived; source does not supply lineage
+      tag: value
+      value: model_derived
     original_method_class: model_derived
+    attribution: 'Sample | Type | FMg (‰ amu−1) | % Mg evap. α = 0.97978 | % Mg evap. α = 0.991: TS34 | B1 | 5.63 | 24.2 |
+      46.4'
     model: model_derived
   admission:
     status: pending
