@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 152
-  extracts: 150
+  sources: 157
+  extracts: 155
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 2
-  extracts_without_pdf: 108
+  extracts_without_pdf: 113
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -62,8 +62,13 @@ gaps:
   - kems-057-kambayashi-1985
   - kems-058-ohara-1987
   - kems-103-fraser-1983
+  - kems-119-furukawa-1975
+  - kems-120-ueshima-1984
+  - kems-127-qi-1989
   - kems-133-costa-2017
   - kems-140-heck-2025
+  - kems-169-nakazawa-1976
+  - kems-188-nanjo-1976
   - kems-190-wu-1993
   - kems-198-ichise-ueshima-1989
   - kems-200-ueshima-1983
@@ -4565,6 +4570,180 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-119-furukawa-1975
+  aliases: []
+  citation: Furukawa, T. and Kato, E. (1975), "Thermodynamic Properties of the Fe-V, Fe-V-Cr Alloys at
+    1600 C by Mass-Spectrometry", Tetsu-to-Hagane 61(15):3050-3059, DOI 10.2355/tetsutohagane1955.61.15_3050
+  doi: 10.2355/tetsutohagane1955.61.15_3050
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.61.15_3050
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-119-furukawa-1975.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-119-furukawa-1975/kems-119-furukawa-1975.pdf
+      present: true
+      sha256: f2e3d5a84037dac5c18fffab90a809f99e7297854de0a4779036f8ca585202d3
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-119-furukawa-1975/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-119-furukawa-1975
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-119-furukawa-1975
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-119-furukawa-1975.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-119-furukawa-1975.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-120-ueshima-1984
+  aliases: []
+  citation: Ueshima, Y., Yamana, H., Sugiyama, T. and Ichise, E. (1984), "Knudsen Cell Mass Spectrometric
+    Study of the Thermodynamic Properties of Fe-W Alloys", Tetsu-to-Hagane 70(6):549-556, DOI 10.2355/tetsutohagane1955.70.6_549
+  doi: 10.2355/tetsutohagane1955.70.6_549
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.70.6_549
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-120-ueshima-1984.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-120-ueshima-1984/kems-120-ueshima-1984.pdf
+      present: true
+      sha256: 0f99f1d9b4c851d8d666ca8d1f02f80c9c8e8537a885f5cc9ab4fd22e6dad8ff
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-120-ueshima-1984/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-120-ueshima-1984
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-120-ueshima-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-120-ueshima-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-120-ueshima-1984.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-127-qi-1989
+  aliases: []
+  citation: Qi, G., Hino, M. and Azakami, T. (1989), "Thermodynamic Study of Liquid Ag-In and Ag-Ga Alloys
+    with a Knudsen Cell-Mass Spectrometer", Materials Transactions, JIM 30(8):575-582, DOI 10.2320/matertrans1989.30.575
+  doi: 10.2320/matertrans1989.30.575
+  report_number: null
+  identifier: 10.2320/matertrans1989.30.575
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-127-qi-1989.yaml
+    review_status: draft
+    rows: 11
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-127-qi-1989/kems-127-qi-1989.pdf
+      present: true
+      sha256: 8fecd04a3930330e59521ac232683f7d0bf348d6c1492d913a956ada6c754381
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-127-qi-1989/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-127-qi-1989
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-127-qi-1989
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-127-qi-1989.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-127-qi-1989.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
 - source_id: kems-132-nakajima-2016
   aliases: []
   citation: Nakajima, K. (2016), "Determination of Optimal Vapor Pressure Data by the Second and Third
@@ -4931,6 +5110,64 @@ sources:
       last_stage: null
       date: null
     commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-169-nakazawa-1976
+  aliases: []
+  citation: Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "Activity Measurement on Cd-Zn Alloy with
+    a Newly Constructed Knudsen Cell-Mass Filter System", J. Japan Inst. Metals 40(5):526-533, DOI 10.2320/jinstmet1952.40.5_526
+  doi: 10.2320/jinstmet1952.40.5_526
+  report_number: null
+  identifier: 10.2320/jinstmet1952.40.5_526
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-169-nakazawa-1976.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-169-nakazawa-1976/kems-169-nakazawa-1976.pdf
+      present: true
+      sha256: 95e0448a98a99f0975c0e20532ee5b9110918b083e40203ba904fd89f00cc1ad
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-169-nakazawa-1976/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-169-nakazawa-1976
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-169-nakazawa-1976
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-169-nakazawa-1976.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-169-nakazawa-1976.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
 - source_id: kems-184-behrens-1979
   aliases:
   - kems-042-plante-1979
@@ -4984,6 +5221,64 @@ sources:
       error: null
       last_stage: scored
       date: null
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-188-nanjo-1976
+  aliases: []
+  citation: Nanjo, M., Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "A Thermodynamic Study of the
+    Se-Te System by the Knudsencell-Massfilter Method", J. Japan Inst. Metals 40(9):958-964, DOI 10.2320/jinstmet1952.40.9_958
+  doi: 10.2320/jinstmet1952.40.9_958
+  report_number: null
+  identifier: 10.2320/jinstmet1952.40.9_958
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-188-nanjo-1976.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-188-nanjo-1976/kems-188-nanjo-1976.pdf
+      present: true
+      sha256: e55a47a81b56956a83d6195da41885059c691acd7aa2c26247e02bef4efa008b
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-188-nanjo-1976/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-188-nanjo-1976
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-188-nanjo-1976
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-188-nanjo-1976.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-188-nanjo-1976.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
     commit: 89d752b43956b94263c0f826582fa3d747e7e91b
 - source_id: kems-189-bischof-2021
   aliases: []

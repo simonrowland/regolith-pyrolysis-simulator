@@ -1,0 +1,318 @@
+schema_version: literature_extract.v1
+source_id: kems-188-nanjo-1976
+source:
+  citation: Nanjo, M., Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "A Thermodynamic Study of the
+    Se-Te System by the Knudsencell-Massfilter Method", J. Japan Inst. Metals 40(9):958-964, DOI 10.2320/jinstmet1952.40.9_958
+  doi: 10.2320/jinstmet1952.40.9_958
+  url: https://doi.org/10.2320/jinstmet1952.40.9_958
+  year: 1976
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-188-nanjo-1976/kems-188-nanjo-1976.pdf, sha256 e55a47a81b56956a83d6195da41885059c691acd7aa2c26247e02bef4efa008b).
+    No MinerU decode. Table 1 transcribed from a 400 dpi pdftoppm render of PDF pages 1-7 (published pp.
+    958-964). Preceding-paper bibliography on p. 958 and Komai paper from mid-p. 964 ignored. Second-law
+    Delta-H_vap present-work column labelled measured (Clausius-Clapeyron slopes). Literature column quoted_measurement.
+    Activities at 714 K are figure-only (Figs 7-8); printed regular-solution log gamma_Te coefficients
+    labelled model_derived. Japanese running prose unseen except numbers and English captions/abstract.
+    Chamber pressure unstated.
+  date: '2026-09-13'
+  worker: extract-alloys-b3
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Te.observations[nanjo_1976_table1_second_law_deltaHvap].values.rows[0].present_work_kcal_mol
+  value: 28.8
+  locator:
+    table: '1'
+    published_page: 960
+    pdf_page_index: 3
+    note: Table 1 Te(g) present work 28.8 (printed 28.8 with subscript-8)
+- species: Te
+  observable: activity_coefficient
+  observation_id: nanjo_1976_gamma_Te_regular_714k
+  field: log10_gamma_Te_coeff_XSe2_sq
+  value: 0.33
+  locator:
+    published_page: 961
+    pdf_page_index: 4
+    note: log gamma_Te = 0.33 X_Se2^2 from I+_128/I+_160 Belton-Fruehan at 714 K
+- path: species.Se.observations[nanjo_1976_kems_geometry_and_calibration].values.ionizing_electron_energy_eV
+  value: 55.0
+  locator:
+    published_page: 959
+    pdf_page_index: 2
+    note: electron accelerating potential 55 V
+species:
+  Se:
+    observations:
+    - observation_id: nanjo_1976_kems_geometry_and_calibration
+      type: gibbs_table
+      locator: &id001
+        published_page: 959
+        pdf_page_index: 2
+        figure: '1'
+        note: NAG-530 mass filter; quartz Knudsen cell; orifice 0.25 mm; 55 V
+      T_range_K:
+      - 500.0
+      - 800.0
+      phase: liquid_Se-Te
+      condensed_form: &id002
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Se-Te complete solution; 500-800 K; activities interpolated at 714 K
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: NEC-Varian NAG-530 quadrupole mass filter
+        ionizing_electron_energy_eV: 55.0
+        ionizing_energy_note: 55 V used; instrument minimum 50 V; at 95 V ion currents 60-80% of 55 V
+        sample_mass_g: 3-4
+        inner_cell_diameter_mm: 15.0
+        orifice_diameter_mm: 0.25
+        purity_percent_greater_than: 99.999
+        mass_range_amu_upper: 500
+        sample_loss_mg_max: 50
+        chamber_pressure: unstated
+        activity_T_K: 714.0
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: composition change during a run taken as negligible (loss <=50 mg)
+      equipment:
+        cell_material:
+          value: Quartz Knudsen cell with quartz protection tube and inner quartz cell (15 mm phi). Orifice
+            0.25 mm phi (Fig. 1 label V). Copper spiral wire at the ionization-chamber inlet as Se/Te
+            absorbent. NEC-Varian NAG-530 quadrupole mass filter (same apparatus as Nakazawa et al. 1976
+            Cd-Zn, ref 3). Thermocouple type unstated (Fig. 1 VI).
+          locator: *id001
+        chamber_pressure:
+          value: unstated
+          units: as published
+          locator:
+            published_page: 959
+            pdf_page_index: 2
+            note: system evacuated; no Torr/Pa number printed
+    - observation_id: nanjo_1976_table1_second_law_deltaHvap_Se
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 960
+        pdf_page_index: 3
+        note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
+      T_range_K:
+      - 500.0
+      - 800.0
+      phase: pure_Se_and_Se-Te_vapor
+      standard_state: second-law Delta-H_vap, kcal/mol species
+      regime: kems_effusion
+      units: kcal/mol species as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        method_class: measured
+        subscript_convention: present-work last digits printed as subscripts (28.8 = 28.8)
+        rows:
+        - species: Se(g)
+          present_work_kcal_mol: 19.8
+          literature: dash
+        - species: Se2(g)
+          present_work_kcal_mol: 25.3
+          literature_kcal_mol:
+          - 25.6
+          - 28.3
+          - 22.8
+          - 26.8
+          literature_refs:
+          - '8'
+          - '18'
+          - '14'
+          - '17'
+        - species: Se3(g)
+          present_work_kcal_mol: 17.6
+          literature: dash
+        - species: Se4(g)
+          present_work_kcal_mol: 13.3
+          literature: dash
+        - species: Se5(g)
+          present_work_kcal_mol: 13.8
+          literature: dash
+      uncertainty:
+        note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
+  Te:
+    observations:
+    - observation_id: nanjo_1976_table1_second_law_deltaHvap
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 960
+        pdf_page_index: 3
+        note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
+      T_range_K:
+      - 726.0
+      - 850.0
+      phase: pure_Te_and_Se-Te_vapor
+      standard_state: second-law Delta-H_vap, kcal/mol species
+      regime: kems_effusion
+      units: kcal/mol species as printed
+      values:
+        quantity: second_law_enthalpy_of_vaporization
+        method_class: measured
+        T_window_as_printed: Te melting point 726 K to 850 K for the Te rows
+        rows:
+        - species: Te(g)
+          present_work_kcal_mol: 28.8
+          literature_kcal_mol:
+          - 46.9
+          literature_refs:
+          - '8'
+        - species: Te2(g)
+          present_work_kcal_mol: 28.6
+          literature_kcal_mol:
+          - 40.2
+          - 27.3
+          - 28.3
+          - 28.4
+          literature_refs:
+          - '8'
+          - '14'
+          - '15'
+          - '16'
+        - species: Te3(g)
+          present_work_kcal_mol: 13.8
+          literature: none_printed_authors_say_new
+        Te3_isotopic_envelope_amu: 372-388
+      uncertainty:
+        note: no +/- on present-work column; conclusions round Te to 29, 29, 14
+    - observation_id: nanjo_1976_table1_literature_deltaHvap
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 960
+        pdf_page_index: 3
+        note: Table 1 literature column
+      T_range_K:
+      - 726.0
+      - 850.0
+      phase: literature_comparison
+      standard_state: second-law or selected Delta-H_vap, kcal/mol species
+      regime: quoted_compilation
+      units: kcal/mol species as printed
+      values:
+        quantity: enthalpy_of_vaporization
+        method_class: quoted_measurement
+        Hultgren_Te_g: 46.9
+        Hultgren_Te2_g: 40.2
+        Brooks_Te2_g: 27.3
+        Gattow_Te2_g: 28.3
+        Machol_Te2_g: 28.4
+      uncertainty:
+        note: quoted; authors agree with Brooks/Gattow/Machol not Hultgren on Te2
+    - observation_id: nanjo_1976_gamma_Te_regular_714k
+      type: activity_coefficient
+      locator:
+        published_page: 961
+        pdf_page_index: 4
+        figure: '7'
+        note: log gamma_Te = 0.33 X_Se2^2 from I+_128/I+_160; also 0.32 and 0.27 from other ion pairs
+      T_range_K:
+      - 714.0
+      - 714.0
+      phase: liquid_Se-Te
+      condensed_form: *id002
+      standard_state: Raoultian; activity = 1 for the pure-element melt
+      regime: kems_effusion
+      units: log10 gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: Belton-Fruehan integrals on interpolated ion-current ratios at 714 K
+        T_K: 714.0
+        log10_gamma_Te_coeff_XSe2_sq: 0.33
+        ion_pair: I+_128 Te / I+_160 Se2
+        alternate_log10_gamma_Te_XSe_sq_I128_I80: 0.32
+        alternate_log10_gamma_Te_XSe_sq_I208_I160: 0.27
+        a_Se_from_a_Se2: a_Se = sqrt(a_Se2)
+        deviation: positive vs Raoult; largest in dilute solutions
+      uncertainty:
+        note: no +/- on the 0.33/0.32/0.27 slopes; activities themselves figure-only
+    - observation_id: nanjo_1976_fig7_activities_714k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 962
+        pdf_page_index: 5
+        note: Belton-Fruehan plots and a_Se, a_Te at 714 K
+      T_range_K:
+      - 714.0
+      - 714.0
+      phase: liquid_Se-Te
+      standard_state: Raoultian a_Se and a_Te as plotted
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_K: 714.0
+        overlays_not_this_work:
+        - Yannopoulos_Themelis_961_1046K
+        - Konopelko_923K
+      uncertainty:
+        note: figure-only; no activity table
+deepening:
+  dispatch_id: extract-alloys-b3
+  date: '2026-09-13'
+  quote_convention: Printed text transcribed with ASCII flattening. Present-work subscripted last digits
+    written as decimals (28.8 for 28.8).
+  table_inventory:
+  - table: '1'
+    published_page: 960
+    pdf_page_index: 3
+    completeness: full
+    note: Second-law Delta-H_vap of Se and Te species; present work vs literature
+  class_ledger:
+    measured:
+    - nanjo_1976_kems_geometry_and_calibration
+    - nanjo_1976_table1_second_law_deltaHvap_Se
+    - nanjo_1976_table1_second_law_deltaHvap
+    quoted_measurement:
+    - nanjo_1976_table1_literature_deltaHvap
+    model_derived:
+    - nanjo_1976_gamma_Te_regular_714k
+    figure_only:
+    - nanjo_1976_fig7_activities_714k_figure_only
+  refused:
+  - what: numeric a_Se, a_Te off Figs 7-8
+    why: figure_only; printed regular-solution coefficients recorded
+  - what: chamber pressure in Pa/Torr
+    why: unstated
+  - what: ionization cross sections / species abundance ratios
+    why: authors state cross sections unknown so Kp not evaluated
+  - what: Komai exo-electron paper from mid-p. 964
+    why: next paper, not Nanjo
+  primary_sources_cited:
+  - ref: 3
+    as_printed: 'Nakazawa, Yazawa, Taniuchi: J. Japan Inst. Metals, 40 (1976), 526'
+  - ref: 5
+    as_printed: 'J. C. Yannopoulos and N. J. Themelis: Can. J. Chem. Eng., 42 (1964), 219'
+  - ref: 8
+    as_printed: 'R. Hultgren, R. L. Orr, P. D. Anderson and K. K. Kelley: Supplement to Selected Values
+      of Thermodynamic Properties of Metals and Alloys, Wiley, New York, (1963)'
+  - ref: 14
+    as_printed: 'L. S. Brooks: J. Amer. Chem. Soc., 74 (1952), 227'
+  - ref: 15
+    as_printed: 'W. Gattow and A. Schneider: Angew. Chem., 71 (1959), 189'
+  - ref: 16
+    as_printed: 'R. E. Machol and E. F. Westrum, Jr.: J. Amer. Chem. Soc., 80 (1958), 2950'
+  - ref: 17
+    as_printed: 'K. C. Mills: Thermodynamic Data for Inorganic Sulphides, Selenides and Tellurides, Butterworths,
+      London, (1974), 569'
+  - ref: 26
+    as_printed: 'G. R. Belton and R. J. Fruehan: J. Phys. Chem., 71 (1967), 1403'

@@ -1,0 +1,530 @@
+schema_version: literature_extract.v1
+source_id: kems-127-qi-1989
+source:
+  citation: Qi, G., Hino, M. and Azakami, T. (1989), "Thermodynamic Study of Liquid Ag-In and Ag-Ga Alloys
+    with a Knudsen Cell-Mass Spectrometer", Materials Transactions, JIM 30(8):575-582, DOI 10.2320/matertrans1989.30.575
+  doi: 10.2320/matertrans1989.30.575
+  url: https://doi.org/10.2320/matertrans1989.30.575
+  year: 1989
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-127-qi-1989/kems-127-qi-1989.pdf, sha256 8fecd04a3930330e59521ac232683f7d0bf348d6c1492d913a956ada6c754381).
+    No MinerU decode; pdftotext-layout is empty (image PDF). Tables 1-4 transcribed from a 400 dpi pdftoppm
+    render of PDF pages 1-8 (published pp. 575-582). Ion-ratio A,B tables labelled measured. Second-law
+    Delta-H_298 using Hultgren heat contents, Gibbs-Duhem gamma fits, and gamma0(T) equations labelled
+    model_derived. Figs 3-14 figure-only. English throughout.
+  date: '2026-09-13'
+  worker: extract-alloys-b3
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.In.observations[qi_1989_table3_ag_in_ion_ratio_fits].values.rows[0].A
+  value: -0.542
+  locator:
+    table: '3'
+    published_page: 578
+    pdf_page_index: 4
+    note: Table 3 first row X_In=0.102, A=-0.542
+- path: species.Ga.observations[qi_1989_table4_ag_ga_ion_ratio_fits].values.rows[0].B
+  value: -0.0766
+  locator:
+    table: '4'
+    published_page: 578
+    pdf_page_index: 4
+    note: Table 4 first row X_Ga=0.123, B=-0.0766
+- species: In
+  observable: activity_coefficient
+  observation_id: qi_1989_gamma0_T_equations
+  field: log10_gamma0_In_in_Ag_intercept
+  value: 0.514
+  locator:
+    published_page: 575
+    pdf_page_index: 1
+    note: 'Abstract: (log gamma0_In)_in Ag = 0.514 - 1790 T^-1'
+- path: species.Ag.observations[qi_1989_table2_second_law_deltaH298].values.Ag_kJ_mol
+  value: 276
+  locator:
+    table: '2'
+    published_page: 577
+    pdf_page_index: 3
+    note: Table 2 present study Ag Delta-H_298 = 276 +/- 3 kJ/mol
+species:
+  Ag:
+    observations:
+    - observation_id: qi_1989_kems_geometry_and_calibration
+      type: gibbs_table
+      locator: &id001
+        published_page: 576
+        pdf_page_index: 2
+        figure: '1'
+        note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-In_and_Ag-Ga
+      condensed_form: &id002
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Ag-In or Ag-Ga melted in situ in the alumina Knudsen cell
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi RM-6K single-focus mass spectrometer
+        sample_mass_g: 1.5
+        sample_mass_as_printed: about 1.5 g
+        weight_loss_percent: 0.5-1
+        homogenization_T_K: 1273.0
+        homogenization_time_h: 1.0
+        temperature_control_K: 1.0
+        temperature_control_as_printed: within +/-1 K
+        ionizing_electron_energy_eV: unstated
+        chamber_voltage: unstated numeric; held constant because it affected the ion-intensity ratio
+        furnace_vacuum_Pa: 7.0e-05
+        minimum_detectable_vapor_pressure_Pa: 0.006
+        ion_ratio_reproducibility_percent: 1.0
+        orifice_diameter_mm_tested:
+        - 0.3
+        - 0.5
+        orifice_diameter_mm_used: 0.5
+        ions_used:
+          Ag_plus_mass: 107
+          In_plus_mass: 114
+          Ga_plus_mass: 69
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: T +/-1 K; ion-intensity ratio reproducible to 1% of its value
+      equipment: &id003
+        cell_material:
+          value: 'Alumina Knudsen cell (Hitachi RM-6K single-focus mass spectrometer). Fig. 2: inner diameter
+            8.5 mm, outer diameter 10.5 mm, inner height 9.7 mm, orifice-lid thickness 0.6 mm, orifice
+            0.5 mm. Cell holder: text says molybdenum; Fig. 2 caption says tantalum (both recorded). Ta
+            cell supporter; Mo radiation shields; BN insulator. Main heater W; sub-heater double-wound
+            0.3 mm W wire. Pt/Pt-Rh thermocouple at the bottom of the cell holder (%Rh unstated). Orifices
+            0.3 and 0.5 mm tested; 0.5 mm used.'
+          locator: *id001
+        chamber_pressure:
+          value: 7e-5 Pa as printed (furnace vacuum)
+          units: Pa as published
+          locator:
+            published_page: 577
+            pdf_page_index: 3
+            note: The vacuum in the furnace could be maintained at 7 x 10^-5 Pa
+    - observation_id: qi_1989_table1_ionization_potentials_this_work
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 577
+        pdf_page_index: 3
+        note: Table 1 ionization potentials present work
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: vapor_over_Ag-In_and_Ag-Ga
+      standard_state: appearance/ionization potential in V
+      regime: kems_effusion
+      units: V as published
+      values:
+        quantity: ionization_potential
+        method_class: measured
+        O2_plus_V: 11.5
+        H2O_plus_V: 13.0
+        N2_plus_V: 14.5
+        Ag_plus_V: 7.7
+        In_plus_V: 5.0
+        Ga_plus_V: 4.9
+      uncertainty:
+        note: no +/- on the present-work IP column
+    - observation_id: qi_1989_table1_ionization_potentials_crc
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 577
+        pdf_page_index: 3
+        note: Table 1 IP Ref. (10) CRC Handbook 64th ed.
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: literature_IP
+      standard_state: ionization potential in V, CRC
+      regime: quoted_compilation
+      units: V as published
+      values:
+        quantity: ionization_potential
+        method_class: quoted_measurement
+        cited: Weast, Astle, Beyer, Handbook of Chemistry and Physics, 64th Edition, CRC Press, 1983-1984
+          (ref 10)
+        O2_plus_V: 12.06
+        H2O_plus_V: 12.6
+        N2_plus_V: 15.576
+        Ag_plus_V: 7.576
+        In_plus_V: 5.786
+        Ga_plus_V: 5.999
+      uncertainty:
+        note: quoted CRC values
+    - observation_id: qi_1989_table2_second_law_deltaH298
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 577
+        pdf_page_index: 3
+        note: Table 2 second-law Delta-H_298 of pure Ag, In, Ga
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: pure_liquid_metals
+      standard_state: Delta-H_298 of vaporization, kJ/mol; second-law with Hultgren heat contents
+      regime: kems_third_law_thermochemistry
+      units: kJ/mol as published
+      values:
+        quantity: second_law_enthalpy_of_vaporization_298K
+        method_class: model_derived
+        model_or_data_source: second-law slope of log(I T) vs 1/T (Fig. 3 for Ag) plus Hultgren et al.
+          heat-content data (ref 5)
+        Ag_kJ_mol: 276
+        Ag_uncertainty_kJ_mol: 3
+        In_kJ_mol: 238
+        In_uncertainty_kJ_mol: 5
+        Ga_kJ_mol: 266
+        Ga_uncertainty_kJ_mol: 5
+        Hultgren_Ag_kJ_mol: 284.9
+        Hultgren_In_kJ_mol: 242.7
+        Hultgren_Ga_kJ_mol: 271.7
+      uncertainty:
+        as_printed: Ag 276+/-3; In 238+/-5; Ga 266+/-5 kJ/mol
+    - observation_id: qi_1989_gamma0_T_equations_Ag
+      type: activity_coefficient
+      locator:
+        published_page: 575
+        pdf_page_index: 1
+        equation: 12-13
+        note: 'Abstract and eqs (12)(13): log gamma0_Ag in In and in Ga'
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-In_and_Ag-Ga
+      condensed_form: *id002
+      standard_state: Raoultian gamma0_Ag at infinite dilution in In or Ga
+      regime: kems_effusion
+      units: log10 gamma as printed; T in K
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        model_or_data_source: Belton-Fruehan / Neckel-Wagner Gibbs-Duhem on measured I_i/I_Ag over the
+          whole composition range
+        log10_gamma0_Ag_in_In: ' -0.237 - 345/T '
+        log10_gamma0_Ag_in_In_intercept: -0.237
+        log10_gamma0_Ag_in_In_B_K: -345.0
+        log10_gamma0_Ag_in_Ga: ' -0.394 + 220/T '
+        log10_gamma0_Ag_in_Ga_intercept: -0.394
+        log10_gamma0_Ag_in_Ga_B_K: 220.0
+      uncertainty:
+        note: no +/- on the gamma0 coefficients
+    - observation_id: qi_1989_fig8_ag_in_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '8'
+        published_page: 580
+        pdf_page_index: 6
+        note: Ag-In activities at 1300 K vs literature
+      T_range_K:
+      - 1300.0
+      - 1300.0
+      phase: liquid_Ag-In
+      standard_state: Raoultian a_Ag and a_In as plotted
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_K: 1300.0
+        overlays_not_this_work:
+        - Alcock_et_al_1969_1300K_MS
+        - Kameda_et_al_1981_1250K_EMF
+        - Nozaki_et_al_1966_1100K_EMF
+      uncertainty:
+        note: figure-only; ion-ratio tables are Tables 3-4
+  In:
+    observations:
+    - observation_id: qi_1989_table3_ag_in_ion_ratio_fits
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 578
+        pdf_page_index: 4
+        note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-In
+      condensed_form: *id002
+      standard_state: ion current ratio I_In+/I_Ag+; last column header prints (log I_In/I_Ag)_1300K but
+        numbers match the Gibbs-Duhem abscissa log(I/I)-log(X/X)
+      regime: kems_effusion
+      units: mole fraction X_In; A, B as printed vs T^-1 x 10^4
+      values:
+        quantity: ion_current_ratio_linear_fit
+        method_class: measured
+        fit_as_printed: log(I_In/I_Ag) = A + B T^-1 10^4
+        last_column_header_as_printed: (log(I_In/I_Ag))_1300K
+        last_column_note: Printed header is (log I_In/I_Ag)_1300K; the numbers equal A+B*(1e4/1300)-log10(X_In/X_Ag)
+          within ~0.02 for most rows (X_In=0.302 residual larger). Digits recorded as printed, not recomputed.
+        composition_basis: mole_fraction X_In as printed
+        n_rows: 7
+        rows:
+        - X_In: 0.102
+          A: -0.542
+          B: 0.0296
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 0.611
+        - X_In: 0.189
+          A: -0.204
+          B: 0.0609
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 0.897
+        - X_In: 0.302
+          A: -0.0567
+          B: 0.1258
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 1.323
+        - X_In: 0.427
+          A: 0.316
+          B: 0.1447
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 1.577
+        - X_In: 0.588
+          A: 0.563
+          B: 0.1792
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 1.788
+        - X_In: 0.658
+          A: 0.936
+          B: 0.1547
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 1.841
+        - X_In: 0.86
+          A: 1.413
+          B: 0.18
+          log_IIn_over_IAg_minus_log_X_1300K_as_printed: 2.01
+      uncertainty:
+        note: least-squares A,B; ion-ratio reproducibility 1%
+      equipment: *id003
+    - observation_id: qi_1989_gamma0_T_equations
+      type: activity_coefficient
+      locator:
+        published_page: 575
+        pdf_page_index: 1
+        equation: '10'
+        note: 'Abstract and eq (10): (log gamma0_In)_in Ag = 0.514 - 1790 T^-1'
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-In
+      condensed_form: *id002
+      standard_state: Raoultian gamma0_In at infinite dilution in Ag
+      regime: kems_effusion
+      units: log10 gamma as printed; T in K
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        model_or_data_source: eq (9) Gibbs-Duhem integral over the whole concentration range
+        log10_gamma0_In_in_Ag: 0.514 - 1790/T
+        log10_gamma0_In_in_Ag_intercept: 0.514
+        log10_gamma0_In_in_Ag_B_K: -1790.0
+        quadratic_1300K_as_printed: log(I_In/I_Ag)-log(X_In/X_Ag) = 0.2356 + 3.944 X_In - 2.206 X_In^2
+      uncertainty:
+        note: no +/- on the gamma0 coefficients
+  Ga:
+    observations:
+    - observation_id: qi_1989_table4_ag_ga_ion_ratio_fits
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 578
+        pdf_page_index: 4
+        note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-Ga
+      condensed_form: *id002
+      standard_state: ion current ratio I_Ga+/I_Ag+
+      regime: kems_effusion
+      units: mole fraction X_Ga; A, B as printed vs T^-1 x 10^4
+      values:
+        quantity: ion_current_ratio_linear_fit
+        method_class: measured
+        fit_as_printed: log(I_Ga/I_Ag) = A + B T^-1 10^4
+        last_column_header_as_printed: (log(I_Ga/I_Ag))_1300K
+        composition_basis: mole_fraction X_Ga as printed
+        n_rows: 10
+        rows:
+        - X_Ga: 0.123
+          A: -0.56
+          B: -0.0766
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: -0.295
+        - X_Ga: 0.194
+          A: -0.449
+          B: -0.0408
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: -0.144
+        - X_Ga: 0.278
+          A: -0.203
+          B: -0.0195
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.0647
+        - X_Ga: 0.399
+          A: -0.193
+          B: 0.0397
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.29
+        - X_Ga: 0.502
+          A: -0.0356
+          B: 0.056
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.392
+        - X_Ga: 0.61
+          A: 0.0361
+          B: 0.0807
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.463
+        - X_Ga: 0.698
+          A: 0.267
+          B: 0.0792
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.512
+        - X_Ga: 0.786
+          A: 0.619
+          B: 0.0587
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.503
+        - X_Ga: 0.861
+          A: 1.005
+          B: 0.035
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.469
+        - X_Ga: 0.933
+          A: 1.514
+          B: 0.0144
+          log_IGa_over_IAg_minus_log_X_1300K_as_printed: 0.477
+      uncertainty:
+        note: least-squares A,B; ion-ratio reproducibility 1%
+      equipment: *id003
+    - observation_id: qi_1989_gamma0_Ga_in_Ag
+      type: activity_coefficient
+      locator:
+        published_page: 575
+        pdf_page_index: 1
+        equation: '11'
+        note: (log gamma0_Ga)_in Ag = -0.124 - 1450 T^-1
+      T_range_K:
+      - 1100.0
+      - 1400.0
+      phase: liquid_Ag-Ga
+      condensed_form: *id002
+      standard_state: Raoultian gamma0_Ga at infinite dilution in Ag
+      regime: kems_effusion
+      units: log10 gamma as printed; T in K
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        log10_gamma0_Ga_in_Ag: -0.124 - 1450/T
+        log10_gamma0_Ga_in_Ag_intercept: -0.124
+        log10_gamma0_Ga_in_Ag_B_K: -1450.0
+        quadratic_1300K_as_printed: log(I_Ga/I_Ag)-log(X_Ga/X_Ag) = -0.644 + 3.086 X_Ga - 2.045 X_Ga^2
+        Ga_activity_sign_change: small positive deviations when X_Ga > 0.65; negative at low X_Ga
+      uncertainty:
+        note: no +/- on the gamma0 coefficients
+    - observation_id: qi_1989_fig9_ag_ga_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '9'
+        published_page: 580
+        pdf_page_index: 6
+        note: Ag-Ga activities at 1300 K vs literature
+      T_range_K:
+      - 1300.0
+      - 1300.0
+      phase: liquid_Ag-Ga
+      standard_state: Raoultian a_Ag and a_Ga as plotted
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_K: 1300.0
+        overlays_not_this_work:
+        - Kameda_et_al_1050K_EMF
+        - Danilin_Yatsenko_980K_EMF
+      uncertainty:
+        note: figure-only
+deepening:
+  dispatch_id: extract-alloys-b3
+  date: '2026-09-13'
+  quote_convention: Printed English transcribed with ASCII flattening of subscripts.
+  table_inventory:
+  - table: '1'
+    published_page: 577
+    pdf_page_index: 3
+    completeness: full
+    note: Ionization potentials this work vs CRC
+  - table: '2'
+    published_page: 577
+    pdf_page_index: 3
+    completeness: full
+    note: Second-law Delta-H_298 Ag, In, Ga
+  - table: '3'
+    published_page: 578
+    pdf_page_index: 4
+    completeness: full
+    note: Seven Ag-In ion-ratio A,B rows
+  - table: '4'
+    published_page: 578
+    pdf_page_index: 4
+    completeness: full
+    note: Ten Ag-Ga ion-ratio A,B rows
+  class_ledger:
+    measured:
+    - qi_1989_kems_geometry_and_calibration
+    - qi_1989_table1_ionization_potentials_this_work
+    - qi_1989_table3_ag_in_ion_ratio_fits
+    - qi_1989_table4_ag_ga_ion_ratio_fits
+    quoted_measurement:
+    - qi_1989_table1_ionization_potentials_crc
+    model_derived:
+    - qi_1989_table2_second_law_deltaH298
+    - qi_1989_gamma0_T_equations_Ag
+    - qi_1989_gamma0_T_equations
+    - qi_1989_gamma0_Ga_in_Ag
+    figure_only:
+    - qi_1989_fig8_ag_in_activities_figure_only
+    - qi_1989_fig9_ag_ga_activities_figure_only
+  refused:
+  - what: numeric a_i off Figs 8-9 and Delta-H^mix off Figs 13-14
+    why: figure_only; Tables 3-4 and the printed gamma0(T) equations carry the tabulated values
+  - what: ionizing electron energy in eV
+    why: unstated; only IP table and 'chamber voltage held constant'
+  - what: orifice area / Clausing / melt free-surface area
+    why: only orifice diameter 0.5 mm and cell ID 8.5 mm printed
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'E. P. Mycielska, J. Terpilowski and K. Strozecka: Arch. Hutnictwa, 8 (1963), 85'
+  - ref: 2
+    as_printed: 'T. Nozaki, M. Shimoji and K. Niwa: Trans. JIM, 7 (1966), 52'
+  - ref: 3
+    as_printed: 'K. Kameda, Y. Yoshida and S. Sakairi: J. Japan Inst. Metals, 45 (1981), 614'
+  - ref: 4
+    as_printed: 'C. B. Alcock, R. Sridhar and R. C. Svedberg: Acta Met., 17 (1969), 839'
+  - ref: 5
+    as_printed: 'P. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleiser and K. K. Kelley: Selected Values
+      of the Thermodynamic Properties of Binary Alloys, AMS, 1973'
+  - ref: 6
+    as_printed: 'V. N. Danilin and S. P. Yatsenko: Izv. Akad. Nauk SSSR, Metally., 3 (1968), 224'
+  - ref: 7
+    as_printed: 'K. Kameda: Doctor thesis, Tohoku University, 1986'
+  - ref: 8
+    as_printed: 'G. R. Belton and R. J. Fruehan: J. Phys. Chem., 71 (1967), 1403'
+  - ref: 9
+    as_printed: 'A. Neckel and S. Wagner: Ber. Bunsenges. Phys. Chem., 73 (1969), 210'
+  - ref: 10
+    as_printed: 'R. C. Weast, M. J. Astle and W. H. Beyer: Handbook of Chemistry and Physics, 64th Edition,
+      CRC Press, 1983-1984'
+  - ref: 11
+    as_printed: 'K. Itagaki and A. Yazawa: J. Japan Inst. Metals, 32 (1968), 1294'

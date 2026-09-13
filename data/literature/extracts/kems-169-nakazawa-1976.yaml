@@ -1,0 +1,240 @@
+schema_version: literature_extract.v1
+source_id: kems-169-nakazawa-1976
+source:
+  citation: Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "Activity Measurement on Cd-Zn Alloy with
+    a Newly Constructed Knudsen Cell-Mass Filter System", J. Japan Inst. Metals 40(5):526-533, DOI 10.2320/jinstmet1952.40.5_526
+  doi: 10.2320/jinstmet1952.40.5_526
+  url: https://doi.org/10.2320/jinstmet1952.40.5_526
+  year: 1976
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-169-nakazawa-1976/kems-169-nakazawa-1976.pdf, sha256
+    95e0448a98a99f0975c0e20532ee5b9110918b083e40203ba904fd89f00cc1ad). No MinerU decode. No numbered data
+    table in this paper; gamma equations, apparatus numbers, and English abstract transcribed from a 400
+    dpi pdftoppm render of PDF pages 1-8 (published pp. 526-533). Preceding Cu-Ti paper on p. 526 and
+    following Asayama paper on p. 533 ignored. Ion-intensity and activity curves (Figs 6-10) figure-only.
+    Printed log gamma = (1.35/2) X^2 at 667 K labelled model_derived from the ion-current ratio method.
+    Japanese running prose unseen except language-independent numbers and English captions/abstract.
+  date: '2026-09-13'
+  worker: extract-alloys-b3
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Cd
+  observable: activity_coefficient
+  observation_id: nakazawa_1976_gamma_regular_667k
+  field: log10_gamma_coeff_alpha
+  value: 1.35
+  locator:
+    published_page: 526
+    pdf_page_index: 1
+    note: 'Abstract: log gamma_Cd(l) = (1.35/2) X_Zn^2 at 667 K'
+- path: species.Cd.observations[nakazawa_1976_kems_geometry_and_calibration].values.ionizing_electron_energy_eV
+  value: 70.0
+  locator:
+    published_page: 529
+    pdf_page_index: 4
+    figure: '5'
+    note: 'Fig. 5 and body: 70 eV, 0.1 mA'
+- path: species.Cd.observations[nakazawa_1976_kems_geometry_and_calibration].values.sample_mass_g_range[0]
+  value: 6.0
+  locator:
+    published_page: 528
+    pdf_page_index: 3
+    note: alloy mass 6-11 g
+species:
+  Cd:
+    observations:
+    - observation_id: nakazawa_1976_kems_geometry_and_calibration
+      type: gibbs_table
+      locator: &id001
+        published_page: 527
+        pdf_page_index: 2
+        figure: '1'
+        note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+      T_range_K:
+      - 450.0
+      - 700.0
+      phase: liquid_Cd-Zn
+      condensed_form: &id002
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Cd-Zn over the whole binary; 450-700 K ion intensities
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Nippon Electric Varian NAG-530 quadrupole mass filter
+        ionizing_electron_energy_eV: 70.0
+        ionizing_current_mA: 0.1
+        isotopes:
+        - 114Cd
+        - 64Zn
+        sample_mass_g_range:
+        - 6.0
+        - 11.0
+        purity_percent_greater_than: 99.999
+        orifice_diameter_mm_as_printed: 0.18
+        orifice_plate_thickness_mm: 0.05
+        fig5_orifice_mm: 0.19
+        surface_to_orifice_area_ratio_about: 10000
+        thermocouple: alumel-chromel
+        max_hold_T_K: 800.0
+        residual_pressure_Pa_as_printed: 10^-5 Pa range; Fig. 5 ~= 3e-5 Pa
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: orifice given as about 0.18 mm; Fig. 5 annotates 0.19
+      equipment:
+        cell_material:
+          value: 'Mo Knudsen cell (lid, body, orifice plate) with alumina inner crucible. Fig. 3: outer
+            27 mm phi, inner crucible 16 mm phi, inner height 22 mm, outer height 27 mm. Orifice about
+            0.18 mm phi in a 0.05 mm plate (Fig. 5 example annotated 0.19 O). Estimated melt-surface:orifice-area
+            ratio about 1e4:1. NEVA (Nippon Electric Varian) NAG-530 quadrupole mass filter. Alumel-chromel
+            thermocouple in the lid well. Ionization 70 eV, 0.1 mA for all samples.'
+          locator: *id001
+        chamber_pressure:
+          value: residual with cell hot about 1e-5 Pa; Fig. 5 example ~= 3e-5 Pa
+          units: Pa as published
+          locator:
+            published_page: 529
+            pdf_page_index: 4
+            figure: '5'
+            note: Fig. 5 residual gas pressure ~= 3 x 10^-5 Pa; text 10^-5 Pa range from ion-pump gauges
+    - observation_id: nakazawa_1976_gamma_regular_667k
+      type: activity_coefficient
+      locator:
+        published_page: 526
+        pdf_page_index: 1
+        note: English abstract; also Fig. 8 slope 1.35 at 667 K
+      T_range_K:
+      - 667.0
+      - 667.0
+      phase: liquid_Cd-Zn
+      condensed_form: *id002
+      standard_state: Raoultian gamma_Cd(l) and gamma_Zn(l); pure liquid metals
+      regime: kems_effusion
+      units: log10 gamma as printed; mole fraction X
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: Belton-Fruehan ion-current ratio method on I(114Cd+)/I(64Zn+); Fig. 8 integration
+          plot slope 1.35 at 667 K
+        T_K: 667.0
+        equation_Cd_as_printed: log gamma_Cd(l) = (1.35/2) X_Zn^2
+        equation_Zn_as_printed: log gamma_Zn(l) = (1.35/2) X_Cd^2
+        log10_gamma_coeff_alpha: 1.35
+        regular_solution_Omega_over_2_303RT: 0.675
+        composition_range: whole binary
+        slope_uncertainty_as_printed: +/-0.21 on the 1.35 slope (p. 531 discussion)
+        converted_to_800K: regular-solution scaling (667/800); compared with Hultgren (figure-only Fig.
+          10)
+      uncertainty:
+        note: authors estimate the 1.35 slope error about +/-0.21; 90% confidence bars on Fig. 9
+    - observation_id: nakazawa_1976_fig7_ion_intensity_figure_only
+      type: rate_series
+      locator:
+        figure: '7'
+        published_page: 530
+        pdf_page_index: 5
+        note: log I+ T vs 1/T for 114Cd+ and 64Zn+ at X_Zn=0.10, 0.27, 0.50, 0.70, 0.83
+      T_range_K:
+      - 450.0
+      - 700.0
+      phase: liquid_Cd-Zn
+      condensed_form: *id002
+      standard_state: ion intensity of 114Cd+ and 64Zn+
+      regime: kems_effusion
+      units: log10(I+ T) vs 1000/T as published
+      values:
+        quantity: ion_current
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        X_Zn:
+        - 0.1
+        - 0.27
+        - 0.5
+        - 0.7
+        - 0.83
+      uncertainty:
+        note: figure-only; no ion-intensity table
+    - observation_id: nakazawa_1976_fig9_activities_667k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '9'
+        published_page: 530
+        pdf_page_index: 5
+        note: a_Cd(l) and a_Zn(l) at 667 K
+      T_range_K:
+      - 667.0
+      - 667.0
+      phase: liquid_Cd-Zn
+      standard_state: Raoultian a_Cd(l), a_Zn(l)
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_K: 667.0
+      uncertainty:
+        note: figure-only; 90% confidence bars as printed
+  Zn:
+    observations:
+    - observation_id: nakazawa_1976_gamma_Zn_667k
+      type: activity_coefficient
+      locator:
+        published_page: 526
+        pdf_page_index: 1
+        note: log gamma_Zn(l)=(1.35/2) X_Cd^2 at 667 K
+      T_range_K:
+      - 667.0
+      - 667.0
+      phase: liquid_Cd-Zn
+      condensed_form: *id002
+      standard_state: Raoultian gamma_Zn(l)
+      regime: kems_effusion
+      units: log10 gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        equation_as_printed: log gamma_Zn(l) = (1.35/2) X_Cd^2
+        log10_gamma_coeff_alpha: 1.35
+        T_K: 667.0
+      uncertainty:
+        note: same 1.35 slope as Cd; see Cd observation
+deepening:
+  dispatch_id: extract-alloys-b3
+  date: '2026-09-13'
+  quote_convention: Printed text transcribed with ASCII flattening. Japanese running prose unseen except
+    numbers and English captions.
+  table_inventory: []
+  class_ledger:
+    measured:
+    - nakazawa_1976_kems_geometry_and_calibration
+    model_derived:
+    - nakazawa_1976_gamma_regular_667k
+    - nakazawa_1976_gamma_Zn_667k
+    figure_only:
+    - nakazawa_1976_fig7_ion_intensity_figure_only
+    - nakazawa_1976_fig9_activities_667k_figure_only
+  refused:
+  - what: numeric a_Cd, a_Zn off Figs 9-10 and I+ off Figs 6-8
+    why: no numbered table; figure-only; printed gamma equations recorded
+  - what: orifice area / Clausing factor
+    why: only diameter about 0.18 mm and 10^4:1 area ratio estimate printed
+  - what: Asayama Table 1 on PDF page 8
+    why: next paper, not Nakazawa
+  primary_sources_cited:
+  - ref: 1
+    as_printed: R. Hultgren et al. (Cd-Zn selected values; compared at 800 K on Fig. 10)
+  - ref: method
+    as_printed: G. R. Belton and R. J. Fruehan ion-current ratio method (cited in the Japanese body)

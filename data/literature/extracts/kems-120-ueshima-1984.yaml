@@ -1,0 +1,740 @@
+schema_version: literature_extract.v1
+source_id: kems-120-ueshima-1984
+source:
+  citation: Ueshima, Y., Yamana, H., Sugiyama, T. and Ichise, E. (1984), "Knudsen Cell Mass Spectrometric
+    Study of the Thermodynamic Properties of Fe-W Alloys", Tetsu-to-Hagane 70(6):549-556, DOI 10.2355/tetsutohagane1955.70.6_549
+  doi: 10.2355/tetsutohagane1955.70.6_549
+  url: https://doi.org/10.2355/tetsutohagane1955.70.6_549
+  year: 1984
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-120-ueshima-1984/kems-120-ueshima-1984.pdf, sha256
+    0f99f1d9b4c851d8d666ca8d1f02f80c9c8e8537a885f5cc9ab4fd22e6dad8ff). No MinerU decode. Tables 1-4 transcribed
+    from a 400 dpi pdftoppm render of PDF pages 1-8 (published pp. 549-556). pdftotext-layout is a noisy
+    OCR layer and was not used as data. Two-phase a_Fe averages labelled measured. ln-gamma fits, Gibbs-Duhem
+    a_W, and Tables 2-3 partial molar quantities labelled model_derived. Table 4 Fe-Mo is a height-correction
+    of the authors' prior KEMS (ref 6), labelled model_derived. Figs 1-11 figure-only. Japanese running
+    prose unseen except language-independent numbers and English captions/abstract. Chamber pressure numeric
+    value unstated.
+  date: '2026-09-13'
+  worker: extract-alloys-b3
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.W.observations[ueshima_1984_table2_partial_molar_1873k].values.rows[2].a_Fe
+  value: 0.87
+  locator:
+    table: '2'
+    published_page: 553
+    pdf_page_index: 5
+    note: Table 2 x_W=0.152, a_Fe(l)=0.870 +/- 0.007 at 1873 K
+- species: W
+  observable: activity_coefficient
+  observation_id: ueshima_1984_gamma0_W_1873k
+  field: gamma0_W_solid
+  value: 7.6
+  locator:
+    published_page: 549
+    pdf_page_index: 1
+    note: 'Synopsis: gamma0_W(s)=7.6(+/-1.1) at 1873 K'
+- path: species.Fe.observations[ueshima_1984_table3_partial_molar_1773k].values.rows[2].a_Fe
+  value: 0.876
+  locator:
+    table: '3'
+    published_page: 553
+    pdf_page_index: 5
+    note: Table 3 x_W=0.12, a_Fe(s)=0.876 +/- 0.006 at 1773 K
+- path: species.W.observations[ueshima_1984_table2_partial_molar_1873k].values.epsilon_W_W
+  value: -2.2
+  locator:
+    table: '2'
+    published_page: 553
+    pdf_page_index: 5
+    note: Table 2 footnote epsilon_W^W = -2.2(+/-0.8); eq (7) prints -2.21(+/-0.8)
+species:
+  Fe:
+    observations:
+    - observation_id: ueshima_1984_kems_geometry_and_calibration
+      type: gibbs_table
+      locator: &id001
+        published_page: 550
+        pdf_page_index: 2
+        section: '2.3'
+        note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
+      T_range_K:
+      - 1623.0
+      - 1943.0
+      phase: liquid_and_solid_Fe-W
+      condensed_form: &id002
+        state: liquid_or_solid_solution
+        metastable: false
+        basis: explicit_author
+        note: Fe-W liquid, alpha, epsilon, and (W) fields at 1773 and 1873 K
+      standard_state: method geometry; Fe foil internal standard
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi RM6K Knudsen-cell mass spectrometer
+        thermocouple: W/W-26Re
+        internal_standard: pure Fe foil 0.2 mm x 8.5 mm diameter covering >90% of sample surface
+        sample_volume_cm3: 0.25
+        alloy_prep_mass_g: 10-15
+        W_purity_wt_percent_greater_than: 99.98
+        W_source: Toshiba granules 2 mm
+        foil_T_range_K:
+        - 1623.0
+        - 1773.0
+        alloy_T_range_K:
+        - 1673.0
+        - 1943.0
+        T_step_K: 20-30
+        hold_for_stable_I_min: 10
+        cell_holder_DeltaT_C: 30
+        height_correction_eq2_as_printed: I_Fe^o = I_f,Fe^o * exp[-4.920e2/T + 0.255] for T<=1811 K; =
+          I_f,Fe^o * 0.983 for T>=1811 K
+        DeltaH_vap_Fe_kcal_g_atom: 86.02
+        DeltaH_vap_Fe_stdev_kcal_g_atom: 0.08
+        DeltaH_vap_Fe_n: 8
+        DeltaH_vap_Fe_T_range_K:
+        - 1811.0
+        - 1923.0
+        detected_vapor: Fe only (mass 26-240 search at 1833 K, Fe-20 at% W)
+        ionizing_electron_energy_eV: unstated
+        chamber_pressure: unstated
+        orifice_diameter_mm_as_printed_on_figs:
+        - 0.5
+        - 0.7
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: DeltaH_vap Fe 86.02 +/- 0.08 kcal/g-atom (8 runs). Temperature hold until I_Fe constant
+          10 min.
+      equipment: &id003
+        cell_material:
+          value: 'Alumina Knudsen cell (Hitachi RM6K mass spectrometer; cell geometry referred to Ichise
+            et al., Tetsu-to-Hagane 63 (1977) as ref 9). Internal standard: pure Fe foil 0.2 mm thick,
+            8.5 mm diameter, covering >90% of the sample surface. Sample volume in the cell fixed at 0.25
+            cm3. Thermocouple W/W-26Re (replaced 6/30 Pt-Rh). Cell-holder upper-minus-lower Delta-T held
+            at 30 C. Figs 3-4 mark 0.5 mm and 0.7 mm orifice points.'
+          locator: *id001
+        chamber_pressure:
+          value: unstated
+          units: as published
+          locator:
+            published_page: 550
+            pdf_page_index: 2
+            section: '2.4'
+            note: alloys melted 1 h under high vacuum (高真空下) before the run; no Torr/Pa number printed
+    - observation_id: ueshima_1984_table3_partial_molar_1773k
+      type: activity_coefficient
+      locator:
+        table: '3'
+        published_page: 553
+        pdf_page_index: 5
+        note: Table 3 partial molar quantities of Fe-W at 1773 K; Fe(s) standard
+      T_range_K:
+      - 1773.0
+      - 1773.0
+      phase: alpha_epsilon_and_W_solid_solution_Fe-W
+      condensed_form: *id002
+      standard_state: Fe(s)=Fe(in alloy); W(s)=W(in alloy) as printed
+      regime: kems_effusion
+      units: mole fraction x_W; a and gamma dimensionless; G^M cal/g-atom
+      values:
+        quantity: partial_molar_quantities
+        method_class: model_derived
+        model_or_data_source: a_Fe from measured I_Fe with foil internal standard and eq (2) height correction;
+          two-phase a_Fe are averages of measured values; a_W by Gibbs-Duhem
+        T_K: 1773.0
+        composition_basis: mole_fraction x_W as printed
+        rows:
+        - x_W: 0.0
+          phase: alpha
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          GM_Fe_cal_g_atom: 0
+          a_W: 0.0
+          gamma_W: 6.1
+          gamma_W_uncertainty: 1.2
+          GM_W_cal_g_atom: -inf
+        - x_W: 0.1
+          phase: alpha
+          a_Fe: 0.897
+          gamma_Fe: 0.997
+          GM_Fe_cal_g_atom: -394
+          a_W: 0.649
+          gamma_W: 6.49
+          GM_W_cal_g_atom: -1570
+        - x_W: 0.12
+          phase: alpha
+          a_Fe: 0.876
+          a_Fe_uncertainty: 0.006
+          gamma_Fe: 0.995
+          GM_Fe_cal_g_atom: -480
+          a_W: 0.787
+          a_W_uncertainty: 0.013
+          gamma_W: 6.56
+          GM_W_cal_g_atom: -870
+        - x_W: 0.385
+          phase: epsilon
+          a_Fe: 0.876
+          gamma_Fe: 1.424
+          GM_Fe_cal_g_atom: -480
+          a_W: 0.787
+          gamma_W: 2.04
+          GM_W_cal_g_atom: -870
+        - x_W: 0.4
+          phase: epsilon
+          a_Fe: 0.758
+          gamma_Fe: 1.263
+          GM_Fe_cal_g_atom: -1000
+          a_W: 0.984
+          gamma_W: 2.46
+          GM_W_cal_g_atom: -60
+        - x_W: 0.983
+          phase: (W)
+          a_Fe: 0.758
+          a_Fe_uncertainty: 0.004
+          gamma_Fe: 45
+          GM_Fe_cal_g_atom: -1000
+          a_W: 0.984
+          a_W_uncertainty: 0.007
+          gamma_W: 1.0
+          GM_W_cal_g_atom: -60
+        - x_W: 1.0
+          phase: (W)
+          a_Fe: 0.0
+          gamma_Fe: 50
+          GM_Fe_cal_g_atom: -inf
+          a_W: 1.0
+          gamma_W: 1.0
+          GM_W_cal_g_atom: 0
+      uncertainty:
+        note: +/- as printed on two-phase a_Fe and a_W; G^M in cal/g-atom
+      equipment: *id003
+    - observation_id: ueshima_1984_fig3_activities_1873k_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 551
+        pdf_page_index: 3
+        note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_and_solid_Fe-W
+      standard_state: a_Fe liquid Fe; a_W solid W
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        orifice_mm_labels:
+        - 0.5
+        - 0.7
+      uncertainty:
+        note: figure-only; tabulated values in Tables 1-2
+  W:
+    observations:
+    - observation_id: ueshima_1984_table1_activity_equations
+      type: activity_coefficient
+      locator:
+        table: '1'
+        published_page: 552
+        pdf_page_index: 4
+        note: Table 1 experimental values for activities or activity coefficients
+      T_range_K:
+      - 1773.0
+      - 1873.0
+      phase: Fe-W_all_fields
+      condensed_form: *id002
+      standard_state: Fe(s) at 1773 K; Fe(l) at 1873 K; W(s) both T as printed
+      regime: kems_effusion
+      units: ln gamma and a as printed; x_W mole fraction
+      values:
+        quantity: activity_or_activity_coefficient_equations
+        method_class: model_derived
+        model_or_data_source: ln gamma vs x^2 linear fits to measured a_Fe in single-phase fields; two-phase
+          a_Fe are measured averages; a_W by Gibbs-Duhem; (W) field regular-solution Omega
+        composition_basis: mole_fraction x_W as printed
+        at_1773_K:
+        - phase: alpha
+          x_W: 0-0.12
+          Fe: ln gamma_Fe(s) = -0.316 x_W^2
+          W: ln gamma_W(s) = -0.316 x_Fe^2 + 2.126
+          eq:
+          - I
+          - II
+        - phase: alpha+epsilon
+          x_W: 0.12-0.385
+          Fe: a_Fe(s)=0.876+/-0.006
+          W: a_W(s)=0.787+/-0.013
+          eq:
+          - III
+          - IV
+          a_Fe_method_class: measured
+        - phase: epsilon
+          x_W: 0.385-0.400
+          Fe: a_Fe(s)=7.867 x_Fe - 3.962
+          W: a_W(s)=13.13 x_W - 4.269
+          eq:
+          - V
+          - VI
+        - phase: epsilon+(W)
+          x_W: 0.400-0.983
+          Fe: a_Fe(s)=0.758+/-0.004
+          W: a_W(s)=0.984+/-0.007
+          eq:
+          - VII
+          - VIII
+          a_Fe_method_class: measured
+        - phase: (W)
+          x_W: 0.983-1
+          Fe: ln gamma_Fe(s)=3.906 x_W^2
+          W: ln gamma_W(s)=3.906 x_Fe^2
+          eq:
+          - IX
+          - X
+        at_1873_K:
+        - phase: L
+          x_W: 0-0.152
+          Fe: ln gamma_Fe(l)=1.106 x_W^2
+          W: ln gamma_W(s)=1.106 x_Fe^2 + 0.919
+          eq:
+          - XI
+          - XII
+        - phase: L+epsilon
+          x_W: 0.152-0.385
+          Fe: a_Fe(l)=0.870+/-0.007
+          W: a_W(s)=0.844+/-0.014
+          eq:
+          - XIII
+          - XIV
+          a_Fe_method_class: measured
+        - phase: epsilon
+          x_W: 0.385-0.400
+          Fe: a_Fe(l)=5.33 x_Fe - 2.408
+          W: a_W(s)=9.07 x_W - 2.648
+          eq:
+          - XV
+          - XVI
+        - phase: epsilon+(W)
+          x_W: 0.400-0.978
+          Fe: a_Fe(l)=0.790+/-0.008
+          W: a_W(s)=0.980+/-0.007
+          eq:
+          - XVII
+          - XVIII
+          a_Fe_method_class: measured
+        - phase: (W)
+          x_W: 0.978-1
+          Fe: ln gamma_Fe(l)=3.697 x_W^2 + 0.031
+          W: ln gamma_W(s)=3.697 x_Fe^2
+          eq:
+          - XIX
+          - XX
+      uncertainty:
+        note: two-phase a printed with +/-; single-phase equations have no coefficient +/-
+    - observation_id: ueshima_1984_table2_partial_molar_1873k
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 553
+        pdf_page_index: 5
+        note: Table 2 partial molar quantities of Fe-W at 1873 K; Fe(l) and W(s) standards
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_epsilon_and_W_solid_solution_Fe-W
+      condensed_form: *id002
+      standard_state: Fe(l)=Fe(in alloy); W(s)=W(in alloy) as printed
+      regime: kems_effusion
+      units: mole fraction x_W; a and gamma dimensionless; G^M cal/g-atom
+      values:
+        quantity: partial_molar_quantities
+        method_class: model_derived
+        model_or_data_source: measured a_Fe plus Gibbs-Duhem a_W; G^M = RT ln a
+        T_K: 1873.0
+        epsilon_W_W: -2.2
+        epsilon_W_W_uncertainty: 0.8
+        e_W_W: 0.001
+        e_W_W_uncertainty: 0.0007
+        epsilon_W_W_eq7_as_printed: -2.21
+        epsilon_note: Table 2 footnote -2.2(+/-0.8); eq (7) p. 553 prints -2.21(+/-0.8) at 1873 K; both
+          recorded
+        composition_basis: mole_fraction x_W as printed
+        rows:
+        - x_W: 0.0
+          phase: L
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          GM_Fe_cal_g_atom: 0
+          a_W: 0.0
+          gamma_W: 7.6
+          gamma_W_uncertainty: 1.1
+          GM_W_cal_g_atom: -inf
+        - x_W: 0.1
+          phase: L
+          a_Fe: 0.91
+          gamma_Fe: 1.011
+          GM_Fe_cal_g_atom: -351
+          a_W: 0.614
+          gamma_W: 6.14
+          GM_W_cal_g_atom: -1820
+        - x_W: 0.152
+          phase: L
+          a_Fe: 0.87
+          a_Fe_uncertainty: 0.007
+          gamma_Fe: 1.026
+          GM_Fe_cal_g_atom: -519
+          GM_Fe_plus: 31
+          GM_Fe_minus: -29
+          a_W: 0.844
+          a_W_uncertainty: 0.014
+          gamma_W: 5.55
+          GM_W_cal_g_atom: -630
+          GM_W_uncertainty: 60
+        - x_W: 0.385
+          phase: epsilon
+          a_Fe: 0.87
+          gamma_Fe: 1.415
+          GM_Fe_cal_g_atom: -519
+          a_W: 0.844
+          gamma_W: 2.19
+          GM_W_cal_g_atom: -630
+        - x_W: 0.4
+          phase: epsilon
+          a_Fe: 0.79
+          gamma_Fe: 1.317
+          GM_Fe_cal_g_atom: -878
+          a_W: 0.98
+          gamma_W: 2.45
+          GM_W_cal_g_atom: -75
+        - x_W: 0.987
+          phase: (W)
+          a_Fe: 0.79
+          a_Fe_uncertainty: 0.008
+          gamma_Fe: 36
+          GM_Fe_cal_g_atom: -878
+          GM_Fe_plus: 38
+          GM_Fe_minus: -37
+          a_W: 0.98
+          a_W_uncertainty: 0.007
+          gamma_W: 1.0
+          GM_W_cal_g_atom: -75
+          GM_W_plus: 26
+          GM_W_minus: -11
+        - x_W: 1.0
+          phase: (W)
+          a_Fe: 0.0
+          gamma_Fe: 42
+          GM_Fe_cal_g_atom: -inf
+          a_W: 1.0
+          gamma_W: 1.0
+          GM_W_cal_g_atom: 0
+      uncertainty:
+        note: +/- as printed; G^M asymmetric errors at x_W=0.152 and 0.987
+      equipment: *id003
+    - observation_id: ueshima_1984_gamma0_W_1873k
+      type: activity_coefficient
+      locator:
+        published_page: 549
+        pdf_page_index: 1
+        note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-W
+      standard_state: Raoultian gamma0_W relative to solid W; liquid Fe
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        model_or_data_source: ln gamma_W intercept of Table 1 eq (XII) / Table 2 x_W=0 row
+        gamma0_W_solid: 7.6
+        gamma0_W_uncertainty: 1.1
+        epsilon_W_W: -2.2
+        epsilon_W_W_uncertainty: 0.8
+        T_K: 1873.0
+      uncertainty:
+        as_printed: 7.6(+/-1.1); -2.2(+/-0.8)
+    - observation_id: ueshima_1984_quoted_nesmeyanov_a_Fe
+      type: activity_coefficient
+      locator:
+        published_page: 555
+        pdf_page_index: 7
+        section: '4.3'
+        note: Nesmeyanov Knudsen a_Fe=0.865 at 0.345 at% W, 1500 K in gamma-Fe-W
+      T_range_K:
+      - 1500.0
+      - 1500.0
+      phase: gamma_Fe-W
+      standard_state: as in Nesmeyanov; quoted
+      regime: quoted_compilation
+      units: dimensionless a_Fe; at% W
+      values:
+        quantity: activity
+        method_class: quoted_measurement
+        cited: A. N. Nesmeyanov and G. Trapp, Russ. Journal of Phys. Chem., 39 (1965) 2, p. 183 (ref 1)
+        a_Fe: 0.865
+        W_at_percent: 0.345
+        T_K: 1500.0
+        authors_comment: strong negative deviation from ideal; this work finds positive deviation in alpha
+          and liquid Fe
+      uncertainty:
+        note: quoted; no +/- printed here
+  Mo:
+    observations:
+    - observation_id: ueshima_1984_table4_fe_mo_revised
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 554
+        pdf_page_index: 6
+        note: Table 4 partial molar quantities of Fe-Mo at 1823 K; height-corrected prior KEMS
+      T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: liquid_sigma_and_Mo_solid_solution_Fe-Mo
+      condensed_form:
+        state: liquid_or_solid_solution
+        metastable: false
+        basis: explicit_author
+        note: Revised Fe-Mo activities after sample-surface-height correction of prior work (ref 6)
+      standard_state: Fe(l)=Fe(in alloy); Mo(s)=Mo(in alloy)
+      regime: kems_effusion
+      units: mole fraction x_Mo; a, gamma dimensionless; G^M and H^M cal/g-atom
+      values:
+        quantity: partial_molar_quantities
+        method_class: model_derived
+        model_or_data_source: Correction of Ichise/Ueshima prior Fe-Mo KEMS (ref 6) using the foil-height
+          calibration established in this Fe-W paper; not a new Fe-Mo campaign
+        T_K: 1823.0
+        gamma0_Mo_solid: 2.19
+        gamma0_Mo_plus: 0.17
+        gamma0_Mo_minus: -0.15
+        synopsis_gamma0_Mo: 2.2
+        synopsis_gamma0_Mo_uncertainty: 0.17
+        epsilon_Mo_Mo: -0.14
+        epsilon_Mo_Mo_uncertainty: 0.18
+        e_Mo_Mo: 0.00167
+        e_Mo_Mo_uncertainty: 0.00019
+        composition_basis: mole_fraction x_Mo as printed
+        rows:
+        - x_Mo: 0.0
+          phase: L
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          GM_Fe_cal_g_atom: 0
+          HM_Fe_cal_g_atom: 0
+          a_Mo: 0.0
+          gamma_Mo: 2.19
+          gamma_Mo_plus: 0.17
+          gamma_Mo_minus: -0.15
+          GM_Mo_cal_g_atom: -inf
+          HM_Mo_cal_g_atom: -3490
+        - x_Mo: 0.1
+          phase: L
+          a_Fe: 0.901
+          gamma_Fe: 1.001
+          GM_Fe_cal_g_atom: -378
+          HM_Fe_cal_g_atom: 0
+          a_Mo: 0.216
+          gamma_Mo: 2.16
+          GM_Mo_cal_g_atom: -5550
+          HM_Mo_cal_g_atom: -3540
+        - x_Mo: 0.2
+          phase: L
+          a_Fe: 0.802
+          a_Fe_uncertainty: 0.003
+          gamma_Fe: 1.003
+          GM_Fe_cal_g_atom: -799
+          GM_Fe_uncertainty: 15
+          HM_Fe_cal_g_atom: 10
+          a_Mo: 0.426
+          a_Mo_plus: 0.02
+          a_Mo_minus: -0.015
+          gamma_Mo: 2.13
+          GM_Mo_cal_g_atom: -3090
+          GM_Mo_plus: 170
+          GM_Mo_minus: -130
+          HM_Mo_cal_g_atom: -3580
+        - x_Mo: 0.3
+          phase: L
+          a_Fe: 0.704
+          gamma_Fe: 1.006
+          GM_Fe_cal_g_atom: -1271
+          HM_Fe_cal_g_atom: 20
+          a_Mo: 0.633
+          gamma_Mo: 2.11
+          GM_Mo_cal_g_atom: -1660
+          HM_Mo_cal_g_atom: -3620
+        - x_Mo: 0.361
+          phase: L
+          a_Fe: 0.645
+          a_Fe_uncertainty: 0.009
+          gamma_Fe: 1.009
+          GM_Fe_cal_g_atom: -1590
+          GM_Fe_uncertainty: 50
+          HM_Fe_cal_g_atom: 30
+          a_Mo: 0.757
+          a_Mo_plus: 0.019
+          a_Mo_minus: -0.013
+          gamma_Mo: 2.1
+          GM_Mo_cal_g_atom: -1010
+          GM_Mo_plus: 90
+          GM_Mo_minus: -60
+          HM_Mo_cal_g_atom: -3630
+        - x_Mo: 0.485
+          phase: sigma
+          a_Fe: 0.645
+          gamma_Fe: 1.252
+          gamma_Fe_mark: printed_tick_on_1.252
+          GM_Fe_cal_g_atom: -1590
+          HM_Fe_cal_g_atom: 3170
+          a_Mo: 0.757
+          gamma_Mo: 1.561
+          GM_Mo_cal_g_atom: -1010
+          HM_Mo_cal_g_atom: -9190
+        - x_Mo: 0.5
+          phase: sigma
+          a_Fe: 0.627
+          gamma_Fe: 1.254
+          GM_Fe_cal_g_atom: -1690
+          HM_Fe_cal_g_atom: 630
+          a_Mo: 0.78
+          gamma_Mo: 1.56
+          GM_Mo_cal_g_atom: -900
+          HM_Mo_cal_g_atom: -6860
+        - x_Mo: 0.56
+          phase: sigma
+          a_Fe: 0.551
+          gamma_Fe: 1.252
+          GM_Fe_cal_g_atom: -2160
+          HM_Fe_cal_g_atom: -9540
+          a_Mo: 0.874
+          gamma_Mo: 1.561
+          GM_Mo_cal_g_atom: -490
+          HM_Mo_cal_g_atom: 2470
+        - x_Mo: 0.815
+          phase: (Mo)
+          a_Fe: 0.551
+          a_Fe_uncertainty: 0.008
+          gamma_Fe: 2.98
+          GM_Fe_cal_g_atom: -2160
+          GM_Fe_uncertainty: 50
+          HM_Fe_cal_g_atom: 3950
+          a_Mo: 0.874
+          gamma_Mo: 1.072
+          GM_Mo_cal_g_atom: -490
+          HM_Mo_cal_g_atom: 250
+        - x_Mo: 0.9
+          phase: (Mo)
+          a_Fe: 0.402
+          gamma_Fe: 4.02
+          GM_Fe_cal_g_atom: -3300
+          HM_Fe_cal_g_atom: 5040
+          a_Mo: 0.919
+          gamma_Mo: 1.021
+          GM_Mo_cal_g_atom: -310
+          HM_Mo_cal_g_atom: 70
+        - x_Mo: 1.0
+          phase: (Mo)
+          a_Fe: 0.0
+          gamma_Fe: 5.9
+          GM_Fe_cal_g_atom: -inf
+          HM_Fe_cal_g_atom: 6450
+          a_Mo: 1.0
+          gamma_Mo: 1.0
+          GM_Mo_cal_g_atom: 0
+          HM_Mo_cal_g_atom: 0
+      uncertainty:
+        note: synopsis rounds gamma0_Mo(s)=2.2(+/-0.17); Table 4 prints 2.19(+0.17/-0.15). Both recorded.
+deepening:
+  dispatch_id: extract-alloys-b3
+  date: '2026-09-13'
+  quote_convention: Printed text transcribed with ASCII flattening of subscripts and plus/minus. ln written
+    ln (table header Zn-gamma is ln gamma).
+  table_inventory:
+  - table: '1'
+    published_page: 552
+    pdf_page_index: 4
+    completeness: full
+    note: Activity/gamma equations by phase at 1773 and 1873 K
+  - table: '2'
+    published_page: 553
+    pdf_page_index: 5
+    completeness: full
+    note: Partial molar quantities Fe-W at 1873 K
+  - table: '3'
+    published_page: 553
+    pdf_page_index: 5
+    completeness: full
+    note: Partial molar quantities Fe-W at 1773 K
+  - table: '4'
+    published_page: 554
+    pdf_page_index: 6
+    completeness: full
+    note: Revised Fe-Mo partial molar quantities at 1823 K
+  class_ledger:
+    measured:
+    - ueshima_1984_kems_geometry_and_calibration
+    quoted_measurement:
+    - ueshima_1984_quoted_nesmeyanov_a_Fe
+    model_derived:
+    - ueshima_1984_table1_activity_equations
+    - ueshima_1984_table2_partial_molar_1873k
+    - ueshima_1984_table3_partial_molar_1773k
+    - ueshima_1984_gamma0_W_1873k
+    - ueshima_1984_table4_fe_mo_revised
+    figure_only:
+    - ueshima_1984_fig3_activities_1873k_figure_only
+  refused:
+  - what: numeric a_Fe, a_W off Figs 3-4 axes
+    why: figure_only; Tables 1-3 carry the tabulated values
+  - what: orifice area, Clausing factor, melt free-surface area
+    why: only 0.5/0.7 mm orifice labels on figures and 0.25 cm3 sample volume are printed
+  - what: chamber pressure in Torr/Pa
+    why: only 高真空下; recorded as unstated
+  - what: ionizing electron energy
+    why: unstated in this paper (referred to prior apparatus paper)
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'A. N. Nesmeyanov and G. Trapp: Russ. Journal of Phys. Chem., 39 (1965) 2, p. 183'
+  - ref: 2
+    as_printed: 'Iguchi, Tozaki, Saito, Fuwa: Tetsu-to-Hagane, 68 (1982), p. 633'
+  - ref: 3
+    as_printed: 'G. Kirchner, H. Harvig, and B. Uhrenius: Metall. Trans., 4 (1973), p. 1059'
+  - ref: 4
+    as_printed: 'L. Kaufman and H. Nesor: Metall. Trans., 5 (1974), p. 2123'
+  - ref: 5
+    as_printed: 'B. Uhrenius and L. Kaufman: CALPHAD, 6A (1975), p. 223'
+  - ref: 6
+    as_printed: 'Ichise, Maruo, Sano, Ueshima, Mori: Tetsu-to-Hagane, 66 (1980), p. 1075'
+  - ref: 7
+    as_printed: to be submitted
+  - ref: 8
+    as_printed: 'Ueshima, Ichise, Mori: Tetsu-to-Hagane, 68 (1982), p. 2569'
+  - ref: 9
+    as_printed: 'Ichise, Yamauchi, Mori: Tetsu-to-Hagane, 63 (1977), p. 417'
+  - ref: 10
+    as_printed: 'Ueshima, Miyaguchi, Ichise, Mori: Tetsu-to-Hagane, 68 (1982), S306'
+  - ref: 11
+    as_printed: Metals Handbook 8th ed. Vol. 8 (1973) [ASM]
+  - ref: 12
+    as_printed: 'R. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleiser, K. K. Kelley, and D. D. Wagman:
+      Selected Values of Thermodynamic Properties of the Elements (1973) [ASM]'
+  - ref: 13
+    as_printed: 'C. H. P. Lupis and J. F. Elliott: Acta Metall., 14 (1966), p. 1019'
+  - ref: 14
+    as_printed: 'L. Kaufman and H. Nesor: CALPHAD, 2 (1978), p. 55'
+  - ref: 15
+    as_printed: 'H. D. Nussler, T. Hoster, and O. Kubaschewski: Z. Metallkd., 71 (1980), p. 396'

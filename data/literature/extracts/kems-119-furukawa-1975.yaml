@@ -1,0 +1,1073 @@
+schema_version: literature_extract.v1
+source_id: kems-119-furukawa-1975
+source:
+  citation: Furukawa, T. and Kato, E. (1975), "Thermodynamic Properties of the Fe-V, Fe-V-Cr Alloys at
+    1600 C by Mass-Spectrometry", Tetsu-to-Hagane 61(15):3050-3059, DOI 10.2355/tetsutohagane1955.61.15_3050
+  doi: 10.2355/tetsutohagane1955.61.15_3050
+  url: https://doi.org/10.2355/tetsutohagane1955.61.15_3050
+  year: 1975
+extraction:
+  method: 'Official J-STAGE OA PDF (corpus raw/kems-119-furukawa-1975/kems-119-furukawa-1975.pdf, sha256
+    f2e3d5a84037dac5c18fffab90a809f99e7297854de0a4779036f8ca585202d3). No MinerU decode. Tables 1-3 transcribed
+    from a 400 dpi pdftoppm render of PDF pages 1-10 (published pp. 3050-3059). pdftotext-layout is a
+    noisy OCR layer and was not used as data. Ion-current ratio tables labelled measured. Activities,
+    gamma fits, and partial molar heats that pass through the modified Gibbs-Duhem / Belton-Fruehan integrals
+    labelled model_derived. Figs 3-12 and Photo 1 listed figure-only; no numbers off axes. Japanese body:
+    numbers and English captions/abstract transcribed from the render; untranslated running prose is unseen.'
+  date: '2026-09-13'
+  worker: extract-alloys-b3
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.V.observations[furukawa_1975_table2_fe_v_ion_current_ratios].values.rows[0].log_IV_over_IFe_1600C
+  value: -2.641
+  locator:
+    table: '2'
+    published_page: 3054
+    pdf_page_index: 5
+    note: Table 2 first row N_V=0.093, log(I_V+/I_Fe+) at 1600 C = -2.641
+- path: species.V.observations[furukawa_1975_table2_fe_v_ion_current_ratios].values.rows[0].N_V
+  value: 0.093
+  locator:
+    table: '2'
+    published_page: 3054
+    pdf_page_index: 5
+    note: Table 2 first row N_V = 0.093
+- path: species.Cr.observations[furukawa_1975_table3_fe_v_cr_ion_current_ratios].values.rows[0].log_ICr_over_IFe
+  value: 0.238
+  locator:
+    table: '3'
+    published_page: 3057
+    pdf_page_index: 8
+    note: Table 3 first row N_V=0.2 N_Fe=0.75 N_Cr=0.05, log(I_Cr+/I_Fe+)=0.238
+- species: V
+  observable: activity_coefficient
+  observation_id: furukawa_1975_gamma_v_fe_binary_fit
+  field: log10_gamma_V_coeff_NFe2
+  value: -1.02
+  locator:
+    published_page: 3050
+    pdf_page_index: 1
+    equation: synopsis
+    note: 'Synopsis: log gamma_V = -1.02 N_Fe^2 + 0.24 (0 <= N_V <= 0.20)'
+- path: species.Fe.observations[furukawa_1975_table1_starting_materials].values.rows[0].Al_wt_percent
+  value: 0.004
+  locator:
+    table: '1'
+    published_page: 3052
+    pdf_page_index: 3
+    note: Table 1 Iron Al = 0.004 %
+- path: species.Fe.observations[furukawa_1975_kems_geometry_and_calibration].values.chamber_pressure_Torr_as_printed
+  value: 3e-7 to 1.5e-6
+  locator:
+    published_page: 3053
+    pdf_page_index: 4
+    section: '3.2'
+    note: cell-side vacuum 3 x 10^-7 to 1.5 x 10^-6 Torr during ion-intensity measurement
+species:
+  Fe:
+    observations:
+    - observation_id: furukawa_1975_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        section: '3.1'
+        figure: '1'
+        note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_and_solid_Fe-V_and_Fe-V-Cr
+      condensed_form:
+        state: liquid_or_solid_or_two_phase
+        metastable: false
+        basis: explicit_author
+        note: Fe-V across the 1600 C liquid, solid, and solid+liquid fields (Fig. 3, Fig. 4)
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi RM-6K Knudsen-cell mass spectrometer
+        analyser: 90 deg magnetic-scan single-focusing; curvature radius 200 mm
+        heating: electron bombardment; upper and lower pair of 0.5 mm phi ring tungsten filaments
+        temperature_control: total emission current from upper and lower filaments held constant; upper/lower
+          current ratio trims the cell Delta-T
+        temperature_fluctuation_C: 0.5
+        temperature_fluctuation_as_printed: +/- 0.5 C during ion-ratio measurement
+        thermocouple: two pairs Pt-30%Rh / Pt-6%Rh on the susceptor top and bottom
+        thermocouple_note: Pt-Rh tips evaporate in vacuum near 1600 C within hours; tip recut each run
+        ionizing_electron_energy_eV_Fe_V: 16-20
+        ionizing_electron_energy_eV_Fe_V_Cr: 19.5
+        ion_accelerating_voltage_kV: 3.6 or 4.5
+        detected_ions_as_printed:
+        - 51V+
+        - 52Cr+
+        - 54Fe+
+        - 57Fe+
+        sample_mass_g: 1-3
+        sample_mass_note: solid and solid+liquid samples as chips; others as blocks
+        chamber_pressure_Torr_as_printed: 3e-7 to 1.5e-6
+        cell_upper_hotter_than_lower_C: 10-14
+        cell_upper_hotter_note: orifice kept 10-14 C hotter than the bottom to avoid sample deposition
+          on the orifice
+        Al_addition_at_percent_of_V: 1.0
+        Al_addition_purpose: deoxidation and to suppress oxygen pickup from cell-material dissociation;
+          liquid-state measurements only
+        orifice_diameter_mm_as_printed:
+        - 0.5
+        - 0.3
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        composition_after_run: chemical analysis; matched the master-alloy charge
+      uncertainty:
+        note: Temperature hold +/-0.5 C. Surface-depletion calculation at N_V=0.796 gives Fe 1% depletion
+          time >1e8 s; authors treat depletion as negligible. 51V+ at N_V=0.093 was ~20% of empty-cell
+          background after the run and was corrected; at N_V=0.201 the correction was <5%.
+      equipment:
+        cell_material:
+          value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm,
+            outer diameter 11 mm, height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice
+            diameter 0.5 mm or 0.3 mm. Lid/body contact faces precision-ground. Cell in a tantalum susceptor
+            with isothermal plates (Fig. 2). Homemade cell-support and filament-support on a Hitachi RM-6K
+            Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser radius 200
+            mm).
+          locator:
+            published_page: 3051
+            pdf_page_index: 2
+            section: '3.1'
+            figure: '1'
+            note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+        chamber_pressure:
+          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
+          units: Torr as published
+          locator:
+            published_page: 3053
+            pdf_page_index: 4
+            section: '3.2'
+            note: sample mass, chamber pressure, ionizing voltage, ion species
+    - observation_id: furukawa_1975_table1_starting_materials
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 3052
+        pdf_page_index: 3
+        note: Table 1 chemical composition of Fe, V, Cr starting metals
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: starting_metals
+      standard_state: starting-metal assay as printed (wt% except Cr ppm notes)
+      regime: kems_effusion
+      units: wt% as published unless noted ppm
+      values:
+        quantity: starting_metal_assay
+        method_class: measured
+        composition_basis: wt_percent as printed under Table 1; Cr impurities in ppm
+        rows:
+        - material: Iron
+          Al_wt_percent: 0.004
+          C_wt_percent: 0.005
+          Cu_wt_percent: dash_not_printed
+          Fe_wt_percent: dash_not_printed
+          S_wt_percent: 0.004
+          Si_wt_percent: 0.007
+          H_wt_percent: dash_not_printed
+          O_wt_percent: 0.0026
+          N_wt_percent: dash_not_printed
+          purity_as_printed: Fe>99.97
+        - material: Vanadium
+          Al_wt_percent: dash_not_printed
+          C_wt_percent: 0.05
+          Cu_wt_percent: dash_not_printed
+          Fe_wt_percent: 0.05
+          S_wt_percent: dash_not_printed
+          Si_wt_percent: 0.07
+          H_wt_percent: 0.005
+          O_wt_percent: 0.06
+          N_wt_percent: 0.04
+          purity_as_printed: V>99.7
+        - material: Chromium
+          Pb_ppm_less_than: 5
+          Mg_ppm_less_than: 1
+          purity_as_printed: Cr>99.999%
+        Cr_hydrogen_reduction: as-received Cr ~0.4% O formed an Al2O3 film in the cell; reduced in purified
+          H2 at 1200 C for 85 h to ~0.04% O before use
+      uncertainty:
+        note: assay table; no +/- printed
+      equipment:
+        cell_material:
+          value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm,
+            outer diameter 11 mm, height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice
+            diameter 0.5 mm or 0.3 mm. Lid/body contact faces precision-ground. Cell in a tantalum susceptor
+            with isothermal plates (Fig. 2). Homemade cell-support and filament-support on a Hitachi RM-6K
+            Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser radius 200
+            mm).
+          locator:
+            published_page: 3051
+            pdf_page_index: 2
+            section: '3.1'
+            figure: '1'
+            note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+        chamber_pressure:
+          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
+          units: Torr as published
+          locator:
+            published_page: 3053
+            pdf_page_index: 4
+            section: '3.2'
+            note: sample mass, chamber pressure, ionizing voltage, ion species
+    - observation_id: furukawa_1975_gamma_fe_binary_fit
+      type: activity_coefficient
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        equation: '10'
+        note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian pure liquid Fe (liquid reference as printed on Fig. 6)
+      regime: kems_effusion
+      units: log10 gamma as printed; mole fraction N
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: modified Gibbs-Duhem / Belton-Fruehan eq. (1) on measured I_V+/I_Fe+
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        T_K_conversion: 1600 C + 273
+        equation_as_printed: log gamma_Fe = -0.11 N_V^2 - 0.31 (0 <= N_Fe <= 0.20)
+        log10_gamma_Fe_coeff_NV2: -0.11
+        log10_gamma_Fe_intercept: -0.31
+        N_Fe_range:
+        - 0.0
+        - 0.2
+        synopsis_N_Fe_range_as_printed:
+        - 0.0
+        - 0.02
+        synopsis_range_note: Synopsis p. 3050 prints 0 <= N_Fe <= 0.02; eqs. (10) and the conclusions
+          print 0 <= N_Fe <= 0.20. Both recorded as printed; not reconciled.
+      uncertainty:
+        note: fit to the Fig. 5(b) integral of Table 2 ion ratios; no +/- on the coefficients
+    - observation_id: furukawa_1975_gamma0_fe_1600c
+      type: activity_coefficient
+      locator:
+        published_page: 3056
+        pdf_page_index: 7
+        note: infinite-dilution gamma_Fe = 0.38_9 at 1600 C; conclusions round to 0.39
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian pure liquid Fe; infinite dilution in V
+      regime: kems_effusion
+      units: dimensionless gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        model_or_data_source: Gibbs-Duhem integral of measured ion-current ratios
+        gamma0_Fe_as_printed_p3056: 0.389
+        gamma0_Fe_print_note: printed 0.38_9 with a subscript-9 trailing digit
+        gamma0_Fe_conclusions_p3059: 0.39
+        standard_state_conclusions: liquid reference
+      uncertainty:
+        note: no +/- printed on gamma0_Fe
+    - observation_id: furukawa_1975_HM_fe_infinite_dilution
+      type: gibbs_table
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        figure: '9'
+        note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: partial molar enthalpy of mixing of Fe; liquid reference
+      regime: kems_effusion
+      units: kcal mol^-1 as printed
+      values:
+        quantity: partial_molar_enthalpy_of_mixing
+        method_class: model_derived
+        model_or_data_source: eq. (2) on d log(I_V+/I_Fe+)/d(1/T) from Table 2 / Fig. 4
+        HM_Fe_kcal_mol_infinite_dilution: -4.5
+        HM_error_infinite_dilution_kcal_mol: 2.0
+        HM_max_kcal_mol: -1.9
+        HM_max_uncertainty_kcal_mol: 0.4
+        HM_max_at_N_V: 0.44
+      uncertainty:
+        as_printed: HM error about 2 kcal mol^-1 at infinite dilution; HM max -1.9 +/- 0.4 kcal mol^-1
+          (N_V=0.44)
+    - observation_id: furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 3054
+        pdf_page_index: 5
+        note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_and_solid_Fe-V
+      condensed_form:
+        state: liquid_or_solid_or_two_phase
+        metastable: false
+        basis: explicit_author
+        note: Fe-V across the 1600 C liquid, solid, and solid+liquid fields (Fig. 3, Fig. 4)
+      standard_state: ion current ratio I_V+/I_Fe+ as plotted
+      regime: kems_effusion
+      units: log10(I_V+/I_Fe+) vs 1e4/T K^-1 as published
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_compositions_N_V:
+        - 0.796
+        - 0.697
+        - 0.632
+        - 0.45
+        - 0.33
+        - 0.245
+        - 0.201
+        - 0.143
+        - 0.093
+        orifice_mm:
+        - 0.3
+        - 0.5
+        authors_text: N_V=0.796 measurements with 0.3 mm and 0.5 mm orifices agree; authors take this
+          as evidence against surface-diffusion error. Open/filled symbols are heating vs cooling sequences.
+      uncertainty:
+        note: figure-only; tabulated 1600 C intercepts and slopes are in Table 2
+    - observation_id: furukawa_1975_fig6_fe_v_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 3055
+        pdf_page_index: 6
+        note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_and_solid_Fe-V
+      condensed_form:
+        state: liquid_or_solid_or_two_phase
+        metastable: false
+        basis: explicit_author
+        note: Fe-V across the 1600 C liquid, solid, and solid+liquid fields (Fig. 3, Fig. 4)
+      standard_state: Raoultian a_Fe (liquid reference) and a_V (liquid/solid references as labelled)
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_two_phase_N_Fe: 0.385
+        labeled_two_phase_N_V: 0.163
+        negative_deviation_from_ideal: true
+      uncertainty:
+        note: figure-only activity curves; gamma fits are the printed equations (9)(10)
+  V:
+    observations:
+    - observation_id: furukawa_1975_table2_fe_v_ion_current_ratios
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 3054
+        pdf_page_index: 5
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_and_solid_Fe-V
+      condensed_form:
+        state: liquid_or_solid_or_two_phase
+        metastable: false
+        basis: explicit_author
+        note: Fe-V across the 1600 C liquid, solid, and solid+liquid fields (Fig. 3, Fig. 4)
+      standard_state: ion current ratio I_V+/I_Fe+; 1600 C isotherm plus d log(ratio)/d(1/T)
+      regime: kems_effusion
+      units: mole fraction N_V; log10(I_V+/I_Fe+) dimensionless; slope in K as printed
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        T_K_conversion: 1600 C + 273
+        composition_basis: mole_fraction N_V as printed
+        ion_ratio: I(51V+)/I(Fe+)
+        n_rows: 9
+        rows:
+        - N_V: 0.093
+          d_log_IV_over_IFe_d_invT: -10690
+          log_IV_over_IFe_1600C: -2.641
+          N_Fe: 0.907
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.143
+          d_log_IV_over_IFe_d_invT: -6460
+          log_IV_over_IFe_1600C: -2.34
+          N_Fe: 0.857
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.201
+          d_log_IV_over_IFe_d_invT: -6850
+          log_IV_over_IFe_1600C: -2.018
+          N_Fe: 0.799
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.245
+          d_log_IV_over_IFe_d_invT: -5970
+          log_IV_over_IFe_1600C: -1.847
+          N_Fe: 0.755
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.33
+          d_log_IV_over_IFe_d_invT: -6520
+          log_IV_over_IFe_1600C: -1.518
+          N_Fe: 0.67
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.45
+          d_log_IV_over_IFe_d_invT: -5370
+          log_IV_over_IFe_1600C: -1.128
+          N_Fe: 0.55
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.632
+          d_log_IV_over_IFe_d_invT: -4540
+          log_IV_over_IFe_1600C: -0.561
+          N_Fe: 0.368
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.796
+          d_log_IV_over_IFe_d_invT: -4300
+          log_IV_over_IFe_1600C: -0.105
+          N_Fe: 0.204
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+        - N_V: 0.9
+          d_log_IV_over_IFe_d_invT: -4680
+          log_IV_over_IFe_1600C: 0.27
+          N_Fe: 0.1
+          composition_basis: mole_fraction as printed (N_V); N_Fe = 1 - N_V for the binary
+      uncertainty:
+        note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio.
+          0.3 vs 0.5 mm orifice agreed at N_V=0.796.
+      equipment:
+        cell_material:
+          value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm,
+            outer diameter 11 mm, height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice
+            diameter 0.5 mm or 0.3 mm. Lid/body contact faces precision-ground. Cell in a tantalum susceptor
+            with isothermal plates (Fig. 2). Homemade cell-support and filament-support on a Hitachi RM-6K
+            Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser radius 200
+            mm).
+          locator:
+            published_page: 3051
+            pdf_page_index: 2
+            section: '3.1'
+            figure: '1'
+            note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+        chamber_pressure:
+          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
+          units: Torr as published
+          locator:
+            published_page: 3053
+            pdf_page_index: 4
+            section: '3.2'
+            note: sample mass, chamber pressure, ionizing voltage, ion species
+    - observation_id: furukawa_1975_gamma_v_fe_binary_fit
+      type: activity_coefficient
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        equation: '9'
+        note: eq. (9); same coefficients in the English synopsis p. 3050
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian pure V (liquid reference on Fig. 6; solid reference also plotted)
+      regime: kems_effusion
+      units: log10 gamma as printed; mole fraction N
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: modified Gibbs-Duhem / Belton-Fruehan eq. (1) on measured I_V+/I_Fe+
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        equation_as_printed: log gamma_V = -1.02 N_Fe^2 + 0.24 (0 <= N_V <= 0.20)
+        log10_gamma_V_coeff_NFe2: -1.02
+        log10_gamma_V_intercept: 0.24
+        N_V_range:
+        - 0.0
+        - 0.2
+      uncertainty:
+        note: no +/- on the fitted coefficients
+    - observation_id: furukawa_1975_gamma0_v_1600c
+      type: activity_coefficient
+      locator:
+        published_page: 3056
+        pdf_page_index: 7
+        note: gamma0_V = 0.16_3 (solid standard) at 1600 C; conclusions round to 0.16
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian; conclusions specify solid standard for gamma0_V
+      regime: kems_effusion
+      units: dimensionless gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient_infinite_dilution
+        method_class: model_derived
+        model_or_data_source: Gibbs-Duhem integral of measured ion-current ratios
+        gamma0_V_as_printed_p3056: 0.163
+        gamma0_V_print_note: printed 0.16_3 with a subscript-3 trailing digit
+        gamma0_V_conclusions_p3059: 0.16
+        standard_state_conclusions: solid reference
+      uncertainty:
+        note: Al at 1 at% of V is estimated to shift gamma_V by at most ~3% for N_V<0.2 (using epsilon_V^Al=12
+          from the literature); authors treat the Al effect as negligible.
+    - observation_id: furukawa_1975_HM_v_infinite_dilution
+      type: gibbs_table
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        note: H^M_V = -8.6 kcal mol^-1 at infinite dilution
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: partial molar enthalpy of mixing of V
+      regime: kems_effusion
+      units: kcal mol^-1 as printed
+      values:
+        quantity: partial_molar_enthalpy_of_mixing
+        method_class: model_derived
+        model_or_data_source: eq. (2) on Table 2 slopes
+        HM_V_kcal_mol_infinite_dilution: -8.6
+      uncertainty:
+        note: same ~2 kcal mol^-1 infinite-dilution envelope as H^M_Fe
+    - observation_id: furukawa_1975_liquidus_solidus_1600c
+      type: transition_point
+      locator:
+        figure: '3'
+        published_page: 3053
+        pdf_page_index: 4
+        note: 1600 C liquidus 66 at% V, solidus 69 at% V from ion-ratio breaks
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-V_solid_liquid_equilibrium
+      standard_state: at% V as printed
+      regime: kems_effusion
+      units: at% V; T in C as published
+      values:
+        quantity: liquidus_and_solidus_at_1600C
+        method_class: measured
+        T_C_as_printed: 1600
+        liquidus_at_percent_V: 66
+        solidus_at_percent_V: 69
+        V_melting_point_extrapolated_C: 1912
+        vs_previous_work_C: 20-30 C higher than Elliott et al. compilation (ref 17)
+        note: Early Al-free two-phase ion ratios were not trusted for activity, but the temperature of
+          the ion-ratio break was adopted for the phase boundary.
+      uncertainty:
+        note: phase-boundary T adopted; activity values from those four Al-free runs refused
+    - observation_id: furukawa_1975_quoted_chipman_dastur_gamma0_v
+      type: activity_coefficient
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        section: '2'
+        note: Chipman and Dastur H2-H2O equilibrium, V<1.5 wt%, 1600 C
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-O
+      standard_state: Henrian gamma0_V as reported by Chipman; V2O3 assumed
+      regime: quoted_compilation
+      units: dimensionless
+      values:
+        quantity: henrian_activity_coefficient_infinite_dilution
+        method_class: quoted_measurement
+        cited: Chipman and Dastur, Trans. Met. Soc. AIME, 191 (1951), p. 111 (ref 9)
+        gamma0_V: 0.12
+        gamma0_V_upper_bound_authors_error_discussion: 0.25
+        V_range_wt_percent_less_than: 1.5
+      uncertainty:
+        note: Chipman considered calculation-input errors and stated gamma0_V < 0.25
+    - observation_id: furukawa_1975_quoted_fruehan_gamma_v
+      type: activity_coefficient
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        section: '2'
+        note: Fruehan solid-electrolyte EMF, N_V<0.36, equilibrium oxide V2O3
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-O
+      standard_state: Raoultian / Henrian as in Fruehan; V2O3-saturated
+      regime: quoted_compilation
+      units: log10 gamma as printed
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_measurement
+        cited: R. J. Fruehan, Met. Trans., 1 (1970), p. 2083 (ref 10)
+        equation_as_printed: log gamma_V = -0.70 N_Fe^2 - 0.30 (N_V<0.4)
+        gamma0_V: 0.1
+        N_V_less_than: 0.36
+        V_wt_percent_greater_than: 0.3
+      uncertainty:
+        note: quoted; this work also replots Fruehan as VO-saturated (Fig. 7 dashed)
+    - observation_id: furukawa_1975_quoted_kay_kontopoulos_gamma0_v
+      type: activity_coefficient
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        section: '2'
+        note: Kay and Kontopoulos ZrO2(CaO) EMF, V<12 wt%, Henry's law
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-O
+      standard_state: Henrian gamma0_V; V2O3 assumed
+      regime: quoted_compilation
+      units: dimensionless
+      values:
+        quantity: henrian_activity_coefficient_infinite_dilution
+        method_class: quoted_measurement
+        cited: Kay and Kontopoulos, Sheffield symposium 1971, p. 178 (ref 11)
+        gamma0_V: 0.21
+        V_wt_percent_less_than: 12
+        Henrys_law: true
+        V_wt_percent_greater_than: 0.2
+      uncertainty:
+        note: quoted; no +/- transcribed
+    - observation_id: furukawa_1975_fig7_av_comparison_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 3056
+        pdf_page_index: 7
+        note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V
+      standard_state: Raoultian a_V as plotted
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        overlays_not_this_work:
+        - Fruehan_1970
+        - Kay_Kontopoulos_1971
+        - Fruehan_recalculated_VO
+      uncertainty:
+        note: figure-only; this-work points are the Fig. 6 a_V curve
+  Cr:
+    observations:
+    - observation_id: furukawa_1975_table3_fe_v_cr_ion_current_ratios
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 3057
+        pdf_page_index: 8
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-Cr
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: ion current ratios I_Cr+/I_Fe+ and I_Cr+/I_V+ at 1600 C
+      regime: kems_effusion
+      units: mole fraction as printed; log10 ion-current ratios dimensionless
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        T_K_conversion: 1600 C + 273
+        composition_basis: mole_fraction N_V, N_Fe, N_Cr as printed
+        columns_as_printed:
+        - N_V
+        - N_Fe
+        - N_Cr
+        - log(I_Cr+/I_Fe+)
+        - log(I_Cr+/I_V+)
+        n_rows: 8
+        mole_fraction_sum_note: N_V=0.2 block sums to 1.00. N_V=0.3 block prints the same N_Fe column
+          (0.75, 0.70, 0.65, 0.60) so N_V+N_Fe+N_Cr=1.10 as printed; recorded verbatim, not corrected
+          to 0.65/0.60/0.55/0.50.
+        rows:
+        - N_V: 0.2
+          N_Fe: 0.75
+          N_Cr: 0.05
+          log_ICr_over_IFe: 0.238
+          log_ICr_over_IV: 1.779
+          mole_fraction_sum: 1.0
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.2
+          N_Fe: 0.7
+          N_Cr: 0.1
+          log_ICr_over_IFe: 0.581
+          log_ICr_over_IV: 2.024
+          mole_fraction_sum: 1.0
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.2
+          N_Fe: 0.65
+          N_Cr: 0.15
+          log_ICr_over_IFe: 0.788
+          log_ICr_over_IV: 2.178
+          mole_fraction_sum: 1.0
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.2
+          N_Fe: 0.6
+          N_Cr: 0.2
+          log_ICr_over_IFe: 0.964
+          log_ICr_over_IV: 2.269
+          mole_fraction_sum: 1.0
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.3
+          N_Fe: 0.75
+          N_Cr: 0.05
+          log_ICr_over_IFe: 0.356
+          log_ICr_over_IV: 1.455
+          mole_fraction_sum: 1.1
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.3
+          N_Fe: 0.7
+          N_Cr: 0.1
+          log_ICr_over_IFe: 0.699
+          log_ICr_over_IV: 1.781
+          mole_fraction_sum: 1.1
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.3
+          N_Fe: 0.65
+          N_Cr: 0.15
+          log_ICr_over_IFe: 0.927
+          log_ICr_over_IV: 1.933
+          mole_fraction_sum: 1.1
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+        - N_V: 0.3
+          N_Fe: 0.6
+          N_Cr: 0.2
+          log_ICr_over_IFe: 1.108
+          log_ICr_over_IV: 2.023
+          mole_fraction_sum: 1.1
+          composition_basis: mole_fraction as printed (N_V, N_Fe, N_Cr)
+      uncertainty:
+        note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held
+          at 0.2 or 0.3.
+      equipment:
+        cell_material:
+          value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm,
+            outer diameter 11 mm, height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice
+            diameter 0.5 mm or 0.3 mm. Lid/body contact faces precision-ground. Cell in a tantalum susceptor
+            with isothermal plates (Fig. 2). Homemade cell-support and filament-support on a Hitachi RM-6K
+            Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser radius 200
+            mm).
+          locator:
+            published_page: 3051
+            pdf_page_index: 2
+            section: '3.1'
+            figure: '1'
+            note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+        chamber_pressure:
+          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
+          units: Torr as published
+          locator:
+            published_page: 3053
+            pdf_page_index: 4
+            section: '3.2'
+            note: sample mass, chamber pressure, ionizing voltage, ion species
+    - observation_id: furukawa_1975_gamma_ternary_nv02_fits
+      type: activity_coefficient
+      locator:
+        published_page: 3058
+        pdf_page_index: 9
+        equation: 14-15
+        note: eqs. (14)(15) at N_V=0.2 after dropping the small N_Cr^2 term
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-Cr
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian pure liquid metals
+      regime: kems_effusion
+      units: log10 gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: ternary Belton-Fruehan integrals (11)(12) on Table 3 plus Fe-V binary gamma
+          at N_V=0.20
+        T_C_as_printed: 1600
+        N_V: 0.2
+        N_Cr_range:
+        - 0.0
+        - 0.2
+        binary_gamma_Fe_at_NV_0_20: 0.914
+        binary_gamma_V_at_NV_0_20: 0.38
+        full_with_NCr2_as_printed:
+          log10_gamma_V: log gamma_V = -0.42 + 0.70 N_Cr - 0.09 N_Cr^2
+          log10_gamma_Fe: log gamma_Fe = -0.04 - 0.18 N_Cr - 0.09 N_Cr^2
+        dropped_NCr2_as_printed:
+          log10_gamma_V: log gamma_V = -0.42 + 0.70 N_Cr
+          log10_gamma_Fe: log gamma_Fe = -0.04 - 0.18 N_Cr
+        NCr2_note: authors say the N_Cr^2 contribution to log gamma is small and drop it
+      uncertainty:
+        note: no +/- on the ternary coefficients
+    - observation_id: furukawa_1975_gamma_ternary_nv03_fits
+      type: activity_coefficient
+      locator:
+        published_page: 3058
+        pdf_page_index: 9
+        equation: 16-17
+        note: eqs. (16)(17) at N_V=0.3
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-Cr
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian pure liquid metals
+      regime: kems_effusion
+      units: log10 gamma as printed
+      values:
+        quantity: raoultian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: same ternary integrals as N_V=0.2
+        T_C_as_printed: 1600
+        N_V: 0.3
+        N_Cr_range:
+        - 0.0
+        - 0.2
+        equation_gamma_V_as_printed: log gamma_V = -0.28 + 0.48 N_Cr
+        equation_gamma_Fe_as_printed: log gamma_Fe = -0.08 - 0.20 N_Cr
+      uncertainty:
+        note: no +/- on the ternary coefficients
+    - observation_id: furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
+      type: rate_series
+      locator:
+        figure: '10'
+        published_page: 3057
+        pdf_page_index: 8
+        note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-Cr
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: ion current ratios as plotted
+      regime: kems_effusion
+      units: log10 ion-current ratio vs 1e4/T K^-1 as published
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        N_V:
+        - 0.2
+        - 0.3
+        N_Cr_labels:
+        - 0.05
+        - 0.1
+        - 0.15
+        - 0.2
+      uncertainty:
+        note: figure-only; 1600 C intercepts are Table 3
+    - observation_id: furukawa_1975_fig12_ternary_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '12'
+        published_page: 3058
+        pdf_page_index: 9
+        note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-V-Cr
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-V or Fe-V-Cr at 1600 C; Al added at 1 at% of V for liquid-only runs
+      standard_state: Raoultian a_Fe and a_V as plotted
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        N_Cr_labels:
+        - 0.0
+        - 0.1
+        - 0.2
+        authors_text: Cr addition raises both a_Fe and a_V. Fe-V is negatively deviating; Fe-Cr nearly
+          Raoultian; V-Cr slightly negative vs Raoult as expected.
+      uncertainty:
+        note: figure-only; printed equations (14)-(17) are the tabulated fits
+deepening:
+  dispatch_id: extract-alloys-b3
+  date: '2026-09-13'
+  quote_convention: Printed text transcribed with ASCII flattening of subscripts, superscripts, and plus/minus.
+    Japanese running prose treated as unseen except for language-independent numbers and English captions.
+  table_inventory:
+  - table: '1'
+    published_page: 3052
+    pdf_page_index: 3
+    completeness: full
+    note: Starting-metal assays for Fe, V, Cr
+  - table: '2'
+    published_page: 3054
+    pdf_page_index: 5
+    completeness: full
+    note: Nine Fe-V ion-ratio slopes and 1600 C intercepts
+  - table: '3'
+    published_page: 3057
+    pdf_page_index: 8
+    completeness: full
+    note: Eight Fe-V-Cr ion-ratio rows at 1600 C; N_V=0.3 N_Fe column as printed
+  class_ledger:
+    measured:
+    - furukawa_1975_kems_geometry_and_calibration
+    - furukawa_1975_table1_starting_materials
+    - furukawa_1975_table2_fe_v_ion_current_ratios
+    - furukawa_1975_liquidus_solidus_1600c
+    - furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    quoted_measurement:
+    - furukawa_1975_quoted_chipman_dastur_gamma0_v
+    - furukawa_1975_quoted_fruehan_gamma_v
+    - furukawa_1975_quoted_kay_kontopoulos_gamma0_v
+    model_derived:
+    - furukawa_1975_gamma_fe_binary_fit
+    - furukawa_1975_gamma0_fe_1600c
+    - furukawa_1975_HM_fe_infinite_dilution
+    - furukawa_1975_gamma_v_fe_binary_fit
+    - furukawa_1975_gamma0_v_1600c
+    - furukawa_1975_HM_v_infinite_dilution
+    - furukawa_1975_gamma_ternary_nv02_fits
+    - furukawa_1975_gamma_ternary_nv03_fits
+    figure_only:
+    - furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
+    - furukawa_1975_fig6_fe_v_activities_figure_only
+    - furukawa_1975_fig7_av_comparison_figure_only
+    - furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
+    - furukawa_1975_fig12_ternary_activities_figure_only
+  refused:
+  - what: numeric a_Fe, a_V off Figs 6, 7, 12 axes
+    why: figure_only; Table 2/3 and the printed gamma equations already carry the tabulated values
+  - what: orifice area, Clausing factor, melt free-surface area
+    why: only orifice diameter 0.3/0.5 mm and cell ID 9 mm are printed; area not invented
+  - what: Al-free two-phase ion-ratio values from the four early runs
+    why: authors state those ion ratios are not reliable for activity; only the break temperature was
+      adopted
+  - what: N_Fe for the N_V=0.3 block of Table 3 corrected to sum to 1
+    why: printed N_Fe copied as 0.75-0.60; not silently renormalised
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'M. G. Inghram and J. Drowart: High Temperature Technology, McGraw-Hill, New York (1960),
+      p. 219'
+  - ref: 2
+    as_printed: 'G. R. Belton and R. J. Fruehan: J. Phys. Chem., 71 (1967), p. 1403'
+  - ref: 3
+    as_printed: 'G. R. Belton and R. J. Fruehan: Met. Trans., 1 (1970), p. 781'
+  - ref: 4
+    as_printed: 'G. R. Belton and R. J. Fruehan: Trans. Met. Soc. AIME, 245 (1969), p. 113'
+  - ref: 5
+    as_printed: 'S. Wagner and G. R. St. Pierre: Met. Trans., 3 (1972), p. 2873'
+  - ref: 6
+    as_printed: 'S. Wagner and G. R. St. Pierre: Met. Trans., 5 (1974), p. 887'
+  - ref: 7
+    as_printed: 'R. Speiser, A. J. Jacobs and J. W. Spretnak: Trans. Met. Soc. AIME, 215 (1959), p. 185'
+  - ref: 8
+    as_printed: 'R. Speiser and G. R. St. Pierre: J. Electrochem. Soc., 106 (1959), p. 629'
+  - ref: 9
+    as_printed: 'J. Chipman and M. Dastur: Trans. Met. Soc. AIME, 191 (1951), p. 111'
+  - ref: 10
+    as_printed: 'R. J. Fruehan: Met. Trans., 1 (1970), p. 2083'
+  - ref: 11
+    as_printed: 'D. A. R. Kay and A. Kontopoulos: International Symposium on Metallurgical Chemistry ''Application
+      in Ferrous Metallurgy'' Sheffield, England, July 19-21, (1971), p. 178'
+  - ref: 12
+    as_printed: 'A. P. Lyubimov and A. A. Granovskaya: Chem. Abstr., 53 (1959), p. 1060'
+  - ref: 13
+    as_printed: 'Wada, Kawai, Saito: J. Japan Inst. Metals, 24 (1961), p. 684'
+  - ref: 14
+    as_printed: 'R. B. Reese, R. A. Rapp and G. R. St. Pierre: Trans. Met. Soc. AIME, 242 (1968), p. 1719'
+  - ref: 15
+    as_printed: 'A. T. Aldred and K. M. Myles: Trans. Met. Soc. AIME, 230 (1964), p. 736'
+  - ref: 16
+    as_printed: 'Kato, Furukawa: Imono Kenkyu Hokoku (Waseda), No. 27 (1973), p. 97'
+  - ref: 17
+    as_printed: 'J. F. Elliott, M. Gleiser and V. Ramakrishna: Thermochemistry for Steelmaking, Addison-Wesley,
+      (1963), vol 2, p. 416'
+  - ref: 18
+    as_printed: 'N. A. Gokcen: J. Phys. Chem., 69 (1966), p. 3538'
+  - ref: 19
+    as_printed: 'D. L. Schroeder and J. F. Elliott: Trans. Met. Soc. AIME, 236 (1966), p. 1091'
+  - ref: 20
+    as_printed: 17), p. 694
+  - ref: 21
+    as_printed: 17), vol 1
+  - ref: 22
+    as_printed: 'J. Berkowitz, W. A. Chupka and M. G. Inghram: J. Chem. Phys., 27 (1957), p. 87'
+  - ref: 23
+    as_printed: 'C. Bodsworth and H. B. Bell: Physical Chemistry of Iron and Steel Manufacture, (1972),
+      p. 488, Longman'
+  - ref: 24
+    as_printed: 'Y. Kojima, M. Inouye and J. Ohi: Arch. Eisenhuttenwes., 42 (1971), p. 703'
+  - ref: 25
+    as_printed: 'Narita, Koyama, Kawaguchi: Tetsu-to-Hagane, 56 (1970), p. 366'
