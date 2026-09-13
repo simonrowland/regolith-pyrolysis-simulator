@@ -1,0 +1,853 @@
+schema_version: literature_extract.v1
+source_id: kems-198-ichise-ueshima-1989
+source:
+  citation: Ichise, E., Ueshima, Y. & Yamana, H. (1989), "Ion Intensity Thermal Analysis of Ag-Mn Alloy",
+    Mass Spectroscopy 37(5):295-307, DOI 10.5702/massspec.37.295
+  doi: 10.5702/massspec.37.295
+  url: https://doi.org/10.5702/massspec.37.295
+  year: 1989
+extraction:
+  method: Official J-STAGE OA PDF (https://www.jstage.jst.go.jp/article/massspec/37/5/37_5_295/_pdf).
+    Scanned pages, PDF page rotation 180 deg; pdftotext -layout is empty/noisy and was not used as data.
+    Tables I-V and apparatus numbers transcribed from 400 dpi pdftoppm PNG renders of PDF pages 1-13 (published
+    pp. 295-307). English body. Figs 1-7 listed figure-only; chart grids were not digitised. Authors'
+    KEMS ion-intensity thermal-analysis temperatures and q values kept distinct from Hansen/Elliott/Metals
+    Handbook/Hultgren quoted invariant temperatures and from Table IV sensitivities computed from heats
+    of vaporization.
+  date: '2026-09-13'
+  worker: extract-alloys-b4
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/EXTRACT-057.md
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Mn.observations[ichise_1989_agmn_table2_invariant_temperatures].values.mean_K.reaction_A
+  value: 1261.0
+  locator:
+    table: II
+    published_page: 303
+    pdf_page_index: 9
+    note: Table II Mean column, Reaction A = 1261 K
+- species: Ag
+  observable: transition_point
+  observation_id: ichise_1989_ag_tm_tb_table1
+  field: mean_Tm_minus_Tb_K
+  value: 81.6
+  locator:
+    table: I
+    published_page: 299
+    pdf_page_index: 5
+    note: Table I Ag Tm=1234.9 K mean Tm-Tb = 81.6
+- species: Mn
+  observable: gibbs_table
+  observation_id: ichise_1989_kems_geometry_and_calibration
+  field: ionizing_voltage_V
+  value: 37.0
+  locator:
+    published_page: 297
+    pdf_page_index: 3
+    paragraph: The ionizing voltage of the ion source was set at 37 volt
+- path: species.Mn.observations[ichise_1989_agmn_table2_invariant_temperatures].values.heats[6].at_pct_Mn
+  value: 92.8
+  locator:
+    table: II
+    published_page: 303
+    pdf_page_index: 9
+    note: Table II AM(6) at%Mn = 92.8
+species:
+  Mn:
+    observations:
+    - observation_id: ichise_1989_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 297
+        pdf_page_index: 3
+        section: 2.1 Apparatus
+        figure: '1'
+        note: Combined ion source and Knudsen cell furnace; English experimental section
+      T_range_K:
+      - 1234.9
+      - 1667.0
+      phase: Ag-Mn_liquid_and_solid_alloys_in_alumina_Knudsen_cell
+      condensed_form:
+        state: alloy_in_Knudsen_cell
+        metastable: false
+        basis: explicit_author
+        note: Ag-Mn alloy samples AM(2)-AM(8); Mn ion intensity used because of the relatively high vapor
+          pressure of Mn
+      standard_state: ion intensity of Mn as a temperature index; not a Raoultian activity series
+      regime: kems_ion_intensity_thermal_analysis
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: magnetic-field-deflection mass spectrometer; Knudsen-cell furnace installed directly
+          below the ion source
+        heating: electron bombardment of the Ta cell holder
+        ionizing_voltage_V: 37.0
+        ionizing_voltage_note: set at 37 volt because I(Ag) and I(Mn) were stable with ionizing voltage
+          around this value (Fig. 2)
+        measured_ion: Mn
+        measured_ion_reason: relatively high vapor pressure of Mn
+        crucible_diameter_mm: 10.0
+        crucible_height_mm: 11.0
+        lid_thickness_mm: 1.0
+        orifice_diameter_mm: 0.5
+        cell_material_as_printed: sintered alumina
+        cell_holder: Ta
+        sample_mass_g_range:
+        - 0.5
+        - 1.5
+        Tb_thermocouple_location: outside bottom of the crucible
+        chamber_pressure_torr_as_printed: about 10^{-6} to 10^{-7} torr
+        chamber_pressure_torr_low: 1.0e-07
+        chamber_pressure_torr_high: 1.0e-06
+        beam_shutter: manipulated from outside the chamber over the hole between ion-source and cell chambers
+        dynamic_heating_rate_K_per_min:
+        - 5.0
+        - 15.0
+        isothermal_hold_min_at_least: 5.0
+        temperature_references:
+          Ag_Tm_K: 1234.9
+          Fe_A4_K: 1667.0
+        q_definition: q = r t^2 / n; r = dTb/dt (K/min); t = arrest duration (min); n = moles of sample
+          (Eq. 5)
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: Table I gives Tm-Tb standard deviations 1.9 K (Ag) and 1.6 K (Fe). Chamber pressure printed
+          as about 10^{-6} to 10^{-7} torr.
+      equipment:
+        cell_material:
+          value: sintered alumina Knudsen cell (crucible 10 mm diameter, 11 mm height, lid 1 mm thick,
+            orifice 0.5 mm diameter) in a Ta cell holder
+          locator:
+            published_page: 297
+            pdf_page_index: 3
+            section: 2.1 Apparatus
+            figure: '1'
+            note: Combined ion source and Knudsen cell furnace; English experimental section
+        chamber_pressure:
+          value: about 10^{-6} to 10^{-7} torr
+          units: torr as printed
+          locator:
+            published_page: 297
+            pdf_page_index: 3
+            paragraph: both chambers were differentially pumped to about 10^{-6} to 10^{-7} torr
+    - observation_id: ichise_1989_agmn_table2_invariant_temperatures
+      type: transition_point
+      locator:
+        table: II
+        published_page: 303
+        pdf_page_index: 9
+        note: Table II. Temperature of Detected Reactions (K)
+      T_range_K:
+      - 1241.0
+      - 1492.0
+      phase: Ag-Mn_binary_alloy_invariant_and_solidus_liquidus
+      condensed_form:
+        state: condensed_alloy
+        metastable: false
+        basis: explicit_author
+      standard_state: sample temperature inside the cell from Mn ion intensity vs Tb calibration; K as
+        printed
+      regime: kems_ion_intensity_thermal_analysis
+      units: K and at% Mn as printed
+      values:
+        quantity: invariant_reaction_and_solidus_liquidus_temperatures
+        method_class: measured
+        composition_basis: at% Mn as printed in Table II
+        legend:
+          dash: Not measured
+          equals: Not detected
+          asterisk: Detected but uncertain
+        mean_K:
+          reaction_A: 1261.0
+          reaction_B: 1358.0
+          reaction_C: 1415.0
+          reaction_D: 1491.0
+        author_identification:
+          reaction_A: peritectic L1 + beta-Mn = (Ag) at composition below 50 at% Mn; 1261 K
+          reaction_B: remelting gamma-Mn = L1 + beta-Mn on the Mn-rich side; 1358 K
+          reaction_C: delta-gamma transformation on the Mn-rich side; 1415 K
+          reaction_D: monotectic L2 = L1 + delta-Mn; 1492 K
+          locator:
+            published_page: 305
+            pdf_page_index: 11
+            section: '4.2'
+        heats:
+        - heat_no: AM(8)
+          at_pct_Mn: 26.0
+          solidus_K: 1241.0
+          liquidus_K: 1244.0
+          reaction_A_K: not_detected
+          reaction_B_K: not_measured
+          reaction_C_K: not_measured
+          reaction_D_K: not_measured
+        - heat_no: AM(7)
+          at_pct_Mn: 53.4
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1264.0
+          reaction_B_K: not_detected
+          reaction_C_K: not_measured
+          reaction_D_K: not_measured
+        - heat_no: AM(5)
+          at_pct_Mn: 59.2
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1261.0
+          - 1261.0
+          reaction_B_K:
+          - 1359.0
+          - 1356.0
+          reaction_C_K: not_measured
+          reaction_D_K: not_measured
+        - heat_no: AM(3)
+          at_pct_Mn: 61.9
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1259.0
+          - 1261.0
+          reaction_B_K_parenthetical:
+          - 1309.0
+          - 1311.0
+          reaction_B_note: printed in parentheses; legend does not define parentheses
+          reaction_C_K:
+          - 1415.0
+          reaction_D_K:
+          - 1491.0
+        - heat_no: AM(2)
+          at_pct_Mn: 66.2
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1262.0
+          reaction_B_K: detected_but_uncertain
+          reaction_C_K: detected_but_uncertain
+          reaction_D_K: detected_but_uncertain
+        - heat_no: AM(4)
+          at_pct_Mn: 76.7
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1258.0
+          - 1259.0
+          reaction_B_K:
+          - 1356.0
+          reaction_C_K:
+          - 1413.0
+          reaction_D_K: not_measured
+        - heat_no: AM(6)
+          at_pct_Mn: 92.8
+          solidus_K: not_detected
+          liquidus_K: not_detected
+          reaction_A_K:
+          - 1263.0
+          reaction_B_K:
+          - 1360.0
+          - 1358.0
+          reaction_C_K:
+          - 1416.0
+          reaction_D_K:
+          - 1492.0
+        composition_discrepancy_note: Table II prints AM(8) as 26.0 at% Mn with solidus 1241 K and liquidus
+          1244 K. The prose on published p. 304 says the solidus and liquidus of 15.6 at%-Mn alloy are
+          estimated to 1241 K and 1244 K. Both wordings are recorded as printed; neither was altered.
+      uncertainty:
+        note: Table II prints no numeric sigma on the Mean column. AM(2) B/C/D marked detected but uncertain.
+          AM(3) reaction B printed in parentheses without a defined legend.
+    - observation_id: ichise_1989_agmn_table3_relative_heat_q
+      type: rate_series
+      locator:
+        table: III
+        published_page: 303
+        pdf_page_index: 9
+        note: Table III. Amount of Heat Absorbed During Invariant Reactions According to Eq.(5)
+      T_range_K:
+      - 1261.0
+      - 1416.0
+      phase: Ag-Mn_binary_alloy_invariant_arrests
+      standard_state: q = r t^2 / n as defined in Eq.(5); printed as q x 10^{-2} in arbitrary units
+      regime: kems_ion_intensity_thermal_analysis
+      units: q x 10^{-2} as printed; r in K/min; t in min; n x 10^2 as printed
+      values:
+        quantity: relative_heat_absorbed_q
+        method_class: measured
+        equation_as_printed: q = r t^2 / n
+        q_times_1e-2_note: column header is q x 10^{-2}; stored as printed, not converted
+        heats:
+        - heat_no: AM(7)
+          at_pct_Mn: 53.4
+          n_times_1e2: 1.63
+          A:
+            dTb_dt_K_per_min:
+            - 3.1
+            t_min:
+            - 5.0
+            q_times_1e-2:
+            - 48.0
+          B: not_detected
+          C: not_measured
+        - heat_no: AM(5)
+          at_pct_Mn: 59.2
+          n_times_1e2: 1.7
+          A:
+            dTb_dt_K_per_min:
+            - 3.6
+            - 3.1
+            t_min:
+            - 5.6
+            - 5.3
+            q_times_1e-2:
+            - 66.0
+            - 51.0
+          B:
+            dTb_dt_K_per_min:
+            - 2.3
+            t_min:
+            - 0.6
+            q_times_1e-2:
+            - 0.5
+          C: not_measured
+        - heat_no: AM(3)
+          at_pct_Mn: 61.9
+          n_times_1e2: 1.25
+          A:
+            dTb_dt_K_per_min:
+            - 14.8
+            - 7.4
+            t_min:
+            - 1.6
+            - 2.8
+            q_times_1e-2:
+            - 30.3
+            - 46.4
+          B:
+            dTb_dt_K_per_min:
+            - 11.4
+            - 4.9
+            t_min:
+            - 0.5
+            - 0.8
+            q_times_1e-2:
+            - 2.3
+            - 2.5
+          C:
+            dTb_dt_K_per_min:
+            - 4.4
+            t_min:
+            - 1.1
+            q_times_1e-2:
+            - 7.0
+        - heat_no: AM(2)
+          at_pct_Mn: 66.2
+          n_times_1e2: 0.65
+          A:
+            dTb_dt_K_per_min:
+            - 5.3
+            t_min:
+            - 1.3
+            q_times_1e-2:
+            - 13.8
+          B:
+            dTb_dt_K_per_min:
+            - 3.5
+            t_min:
+            - 0.7
+            q_times_1e-2:
+            - 2.6
+          C:
+            dTb_dt_K_per_min:
+            - 3.8
+            t_min:
+            - 0.8
+            q_times_1e-2:
+            - 3.7
+        - heat_no: AM(6)
+          at_pct_Mn: 92.8
+          n_times_1e2: 2.21
+          A:
+            dTb_dt_K_per_min:
+            - 2.4
+            t_min:
+            - 3.1
+            q_times_1e-2:
+            - 10.4
+          B:
+            dTb_dt_K_per_min:
+            - 2.3
+            t_min:
+            - 2.0
+            q_times_1e-2:
+            - 4.2
+          C:
+            dTb_dt_K_per_min:
+            - 2.8
+            t_min:
+            - 3.2
+            q_times_1e-2:
+            - 13.0
+        AM8_and_AM4_absent: Table III has no AM(8) or AM(4) columns
+      uncertainty:
+        note: No numeric uncertainty printed on q. Duplicate columns for AM(5) A and AM(3) A/B are two
+          runs as printed.
+    - observation_id: ichise_1989_agmn_15p6at_solidus_liquidus_prose
+      type: transition_point
+      locator:
+        published_page: 304
+        pdf_page_index: 10
+        paragraph: The solidus and liquidus temperatures of 15.6at%-Mn alloy are respectively estimated
+          to 1241K and 1244K
+      T_range_K:
+      - 1241.0
+      - 1244.0
+      phase: Ag-rich_Ag-Mn_alloy
+      standard_state: estimated solidus/liquidus of the named alloy; K as printed
+      regime: kems_ion_intensity_thermal_analysis
+      units: K and at% Mn as printed
+      values:
+        quantity: solidus_and_liquidus
+        method_class: author_estimate
+        at_pct_Mn_as_printed: 15.6
+        solidus_K: 1241.0
+        liquidus_K: 1244.0
+        qualifier: estimated
+        table_II_AM8_at_pct_Mn: 26.0
+        note: Prose prints 15.6 at% Mn; Table II AM(8) prints 26.0 at% Mn for the same 1241/1244 K pair.
+          Recorded as two printed statements.
+      uncertainty:
+        note: Authors say estimated; no numeric sigma.
+    - observation_id: ichise_1989_fig2_ionization_efficiency_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 297
+        pdf_page_index: 3
+        note: Ionization efficiency curve of Ag and Mn. I_Ag and I_Mn in arbitrary unit
+      T_range_K:
+      - 1234.9
+      - 1667.0
+      phase: Ag_and_Mn_vapor_in_ion_source
+      regime: kems_ion_intensity_thermal_analysis
+      units: arbitrary ion intensity vs ionization potential E (V)
+      values:
+        quantity: ionization_efficiency_curve
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis_labels: I_Mn and I_Ag vs ionization potential E (V); plotted ~30-70 V; I around 40-60 arb
+        chosen_ionizing_voltage_V: 37.0
+      uncertainty:
+        note: figure-only; curve not digitised
+    - observation_id: ichise_1989_fig3_ion_intensity_heating_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 298
+        pdf_page_index: 4
+        note: Ion intensity curve on isothermal and dynamic measurements of reactions A, B and C on heating.
+          Sample AgMn(6)
+      T_range_K:
+      - 1261.0
+      - 1492.0
+      phase: AgMn(6)_92.8_at_pct_Mn
+      regime: kems_ion_intensity_thermal_analysis
+      units: I_Mn and Tb (Pt/Rh thermocouple emf) in arbitrary unit
+      values:
+        quantity: ion_intensity_vs_time_heating
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        sample: AgMn(6)
+        labels_as_printed:
+        - Reaction A
+        - Reaction B
+        - Reaction C
+        - Dynamic measurement on heating
+        - I_Mn on reaction A
+        - Tb 2.4(K/min)
+        - 2 min/div
+      uncertainty:
+        note: chart recorder; not digitised
+    - observation_id: ichise_1989_fig4_ion_intensity_cooling_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 300
+        pdf_page_index: 6
+        note: Ion intensity curve on cooling. Sample AgMn(6). Supercooling visible on I_Mn but not on
+          Tb
+      T_range_K:
+      - 1261.0
+      - 1492.0
+      phase: AgMn(6)_92.8_at_pct_Mn
+      regime: kems_ion_intensity_thermal_analysis
+      units: I_Mn and Tb in arbitrary unit
+      values:
+        quantity: ion_intensity_vs_time_cooling
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        sample: AgMn(6)
+        supercooling_note: alloy usually undergoes supercooling, which appears on the ion intensity curve
+          very clearly although the effect cannot be observed on the Tb curve
+      uncertainty:
+        note: chart recorder; not digitised
+    - observation_id: ichise_1989_fig5_monovariant_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        published_page: 301
+        pdf_page_index: 7
+        note: Ion intensity curve on monovariant reaction. Sample AgMn(8). I_Mn at liquidus and I_Mn at
+          solidus labelled
+      T_range_K:
+      - 1241.0
+      - 1244.0
+      phase: AgMn(8)_solid_liquid_two_phase
+      regime: kems_ion_intensity_thermal_analysis
+      units: I_Mn and Tb in arbitrary unit
+      values:
+        quantity: ion_intensity_monovariant_solidus_liquidus
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        sample: AgMn(8)
+        labels_as_printed:
+        - Ion intensity in two-phase region
+        - I_Mn at liquidus
+        - I_Mn at solidus
+        - Tb base line
+        - 2 min/div
+      uncertainty:
+        note: chart recorder; not digitised
+    - observation_id: ichise_1989_fig6_lnIT_vs_1T_figure_only
+      type: rate_series
+      locator:
+        figure: '6'
+        published_page: 302
+        pdf_page_index: 8
+        note: Relation between ln(I_Mn T) vs 1/T. Sample AgMn(6). X_Mn=0.928
+      T_range_K:
+      - 1263.0
+      - 1492.0
+      phase: AgMn(6)_XMn_0.928
+      regime: kems_ion_intensity_thermal_analysis
+      units: ln(I_Mn T) arbitrary unit vs 10^4/T (K^{-1})
+      values:
+        quantity: ln_IT_vs_reciprocal_T
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        sample: AgMn(6)
+        X_Mn: 0.928
+        labelled_breaks_K:
+          reaction_A: 1263.0
+          reaction_B: 1359.0
+          reaction_C: 1416.0
+          reaction_D: 1492.0
+        symbols: open circles on heating; filled circles on cooling
+        note: labelled break temperatures are figure annotations matching Table II AM(6); numbers were
+          not read off axes
+      uncertainty:
+        note: figure-only; Clausius-Clapeyron grid not digitised
+    - observation_id: ichise_1989_fig7_q_vs_xmn_figure_only
+      type: rate_series
+      locator:
+        figure: '7'
+        published_page: 304
+        pdf_page_index: 10
+        note: Relation between heat of reaction absorbed and composition. q in arbitrary unit
+      T_range_K:
+      - 1261.0
+      - 1416.0
+      phase: Ag-Mn_binary_alloy
+      regime: kems_ion_intensity_thermal_analysis
+      units: q x 10^2 arbitrary vs atomic fraction of Mn
+      values:
+        quantity: relative_heat_q_vs_composition
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        numeric_source: Table III; Fig. 7 is the plot of those q values and was not digitised
+        author_note: This value is expected to attain maximum value at the composition of the decomposing
+          phase. Reaction A takes place at a composition near 50 at% Mn
+      uncertainty:
+        note: figure-only; Table III holds the printed numbers
+    - observation_id: ichise_1989_table4_sensitivity_model
+      type: gibbs_table
+      locator:
+        table: IV
+        published_page: 305
+        pdf_page_index: 11
+        note: Table IV. Comparison of Sensitivity of Temperature Measurement (at 1800K)
+      T_range_K:
+      - 1800.0
+      - 1800.0
+      phase: pure_metal_vapor_and_thermocouple
+      standard_state: (dI/I)/(dT/T) from Eq.(4) using heat of vaporization; not a measured ion-intensity
+        series
+      regime: kems_ion_intensity_thermal_analysis
+      units: dimensionless relative sensitivity at 1800 K as printed
+      values:
+        quantity: relative_temperature_sensitivity
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        thermocouple_dE_E_over_dT_T:
+          W-Re(0/26): 1.4
+          Pt-Rh(6/30): 1.8
+          Pt-Rh(0/13): 1.4
+        ion_intensity_dI_I_over_dT_T:
+          Ag: 17.0
+          Mn: 15.0
+          Fe: 25.0
+        derivation_as_printed: Eq.(4) dI_i/I_i = (H_i^v / RT - 1) dT/T. Heat of vaporization of iron about
+          90 kcal; around 2000 K the relative change in ion intensity of iron is 25 times as large as
+          the relative change in temperature.
+      uncertainty:
+        note: no numeric sigma printed on Table IV
+    - observation_id: ichise_1989_table5_quoted_invariants
+      type: transition_point
+      locator:
+        table: V
+        published_page: 306
+        pdf_page_index: 12
+        note: Table V. Comparison with Previous Studies on Invariant Reactions
+      T_range_K:
+      - 1260.0
+      - 1492.0
+      phase: Ag-Mn_binary_invariants_literature_comparison
+      standard_state: K as printed in the comparison table; not this work except Present study column
+      regime: literature_comparison
+      units: K as printed
+      values:
+        quantity: quoted_and_present_invariant_temperatures
+        method_class: quoted_measurement
+        reaction_type_legend:
+          P: Peritectic
+          M: Monotectic
+          R: Remelting
+          E: Eutectoid
+        rows:
+        - reaction: P; L2 + delta = gamma
+          Hansen_1958_K: 1485.0
+        - reaction: M; L2 = L1 + delta
+          Elliott_1965_K: 1481.0
+          Metals_Handbook_1973_K: 1483.0
+          Selected_Values_1973_K: 1481.0
+          present_study_K: 1492.0
+          present_study_method_class: measured
+        - reaction: M; L2 = L1 + gamma
+          Hansen_1958_K: 1458.0
+        - reaction: delta = gamma
+          Elliott_1965_K: 1404.0
+          Selected_Values_1973_K: 1404.0
+          present_study_K: 1415.0
+          present_study_method_class: measured
+        - reaction: R; delta = L1 + gamma
+          Metals_Handbook_1973_K: 1405.0
+        - reaction: ?; L1 + gamma = (Ag) + beta
+          Metals_Handbook_1973_K: 1344.0
+        - reaction: R; gamma = L1 + beta
+          Elliott_1965_K: 1343.0
+          Selected_Values_1973_K: 1343.0
+          present_study_K: 1358.0
+          present_study_method_class: measured
+        - reaction: P; L1 + beta = (Ag)
+          Selected_Values_1973_K: 1260.0
+          present_study_K: 1261.0
+          present_study_method_class: measured
+        - reaction: P; L1 + gamma = (Ag)
+          Hansen_1958_K: 1260.0
+        - reaction: E; gamma = (Ag) + beta
+          Hansen_1958_K: ~1260
+          Hansen_1958_qualifier: approximately as printed ~1260
+      uncertainty:
+        note: quoted literature values have no sigma in Table V; present-study column is this work's Table
+          II means
+  Ag:
+    observations:
+    - observation_id: ichise_1989_ag_tm_tb_table1
+      type: transition_point
+      locator:
+        table: I
+        published_page: 299
+        pdf_page_index: 5
+        note: Table I. Values for Temperature Correction. Ag Tm=1234.9 K
+      T_range_K:
+      - 1234.9
+      - 1234.9
+      phase: pure_Ag_melting_point_temperature_correction
+      standard_state: Ag melting point 1234.9 K as the reference for Tm - Tb
+      regime: kems_ion_intensity_thermal_analysis
+      units: K as printed
+      values:
+        quantity: Tm_minus_Tb_temperature_correction
+        method_class: measured
+        reference: Ag Tm = 1234.9 K
+        Tm_minus_Tb_K:
+        - 77.9
+        - 79.0
+        - 80.4
+        - 81.0
+        - 81.6
+        - 82.4
+        - 82.8
+        - 83.0
+        - 83.5
+        - 84.0
+        mean_Tm_minus_Tb_K: 81.6
+        standard_deviation_K: 1.9
+      uncertainty:
+        standard_deviation_K: 1.9
+        note: Table I Standard deviation column 1.9 K
+  Fe:
+    observations:
+    - observation_id: ichise_1989_fe_a4_tb_table1
+      type: transition_point
+      locator:
+        table: I
+        published_page: 299
+        pdf_page_index: 5
+        note: Table I. Fe TA4=1667 K temperature correction
+      T_range_K:
+      - 1667.0
+      - 1667.0
+      phase: pure_Fe_A4_temperature_correction
+      standard_state: Fe A4 point 1667 K as the reference for TA4 - Tb
+      regime: kems_ion_intensity_thermal_analysis
+      units: K as printed
+      values:
+        quantity: TA4_minus_Tb_temperature_correction
+        method_class: measured
+        reference: Fe A4 = 1667 K
+        TA4_minus_Tb_K:
+        - 81.1
+        - 82.2
+        - 82.7
+        - 83.0
+        - 84.4
+        - 85.4
+        - 85.8
+        - 86.3
+        mean_TA4_minus_Tb_K: 84.0
+        standard_deviation_K: 1.6
+      uncertainty:
+        standard_deviation_K: 1.6
+        note: Table I Standard deviation column 1.6 K
+deepening:
+  dispatch_id: extract-alloys-b4
+  date: '2026-09-13'
+  primary_sources_cited:
+  - system: Fe-Mo ion-intensity thermal analysis (authors' prior method paper)
+    method: KEMS ion intensity thermal analysis
+    investigator: Y. Ueshima, E. Ichise and T. Mori
+    year: 1982
+    journal_reference_as_printed: Tetsu-to-Hagane, 68, 2569 (1982)
+    ref_number: 1
+  - system: Fe-W high-temperature phase diagram (this group's companion KEMS paper)
+    method: KEMS ion intensity thermal analysis
+    investigator: E. Ichise, Y. Ueshima and S. Miyagawa
+    year: 1986
+    journal_reference_as_printed: Tetsu-to-Hagane, 72, 791 (1986)
+    ref_number: 2
+  - system: high-temperature vapors / ion-intensity vs pressure relation
+    method: review chapter
+    investigator: R. T. Grimley
+    year: 1967
+    journal_reference_as_printed: The Characterization of High-Temperature Vapors, ed. J. L. Margrave,
+      John Wiley & Sons, London, 1967, p.195
+    ref_number: 3
+  - system: Ag-Mn constitution
+    method: compilation phase diagram
+    investigator: M. Hansen
+    year: 1958
+    journal_reference_as_printed: Constitution of Binary Alloys, 2nd ed., McGraw-Hill, New York, 1958
+    ref_number: 4
+  - system: Ag-Mn constitution
+    method: compilation phase diagram
+    investigator: R. P. Elliott
+    year: 1965
+    journal_reference_as_printed: Constitution of Binary Alloys, First Supplement, McGraw-Hill, New York,
+      1965
+    ref_number: 5
+  - system: Ag-Mn constitution
+    method: compilation phase diagram
+    investigator: Metals Handbook
+    year: 1973
+    journal_reference_as_printed: Metals Handbook vol.8, 8th ed.(1973), American Society for Metals
+    ref_number: 6
+  - system: Ag-Mn thermodynamic properties / phase diagram
+    method: evaluated compilation
+    investigator: R. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleiser and K. K. Kelley
+    year: 1973
+    journal_reference_as_printed: Selected Values of the Thermodynamic Properties of Binary Alloys, American
+      Society for Metals, 1973
+    ref_number: 7
+  - system: authors' prior apparatus description
+    method: symposium paper
+    investigator: T. Yamauchi, E. Ichise and T. Mori
+    year: 1975
+    journal_reference_as_printed: The Fifth Japan-USSR Joint Symposium on Physical Chemistry of Metallurgical
+      Processes, Iron and Steel Inst. of Japan, Tokyo, 1975, p.202
+    ref_number: 8
+  class_ledger:
+    measured:
+    - ichise_1989_kems_geometry_and_calibration
+    - ichise_1989_agmn_table2_invariant_temperatures
+    - ichise_1989_agmn_table3_relative_heat_q
+    - ichise_1989_ag_tm_tb_table1
+    - ichise_1989_fe_a4_tb_table1
+    author_estimate:
+    - ichise_1989_agmn_15p6at_solidus_liquidus_prose
+    figure_only:
+    - ichise_1989_fig2_ionization_efficiency_figure_only
+    - ichise_1989_fig3_ion_intensity_heating_figure_only
+    - ichise_1989_fig4_ion_intensity_cooling_figure_only
+    - ichise_1989_fig5_monovariant_figure_only
+    - ichise_1989_fig6_lnIT_vs_1T_figure_only
+    - ichise_1989_fig7_q_vs_xmn_figure_only
+    model_derived:
+    - ichise_1989_table4_sensitivity_model
+    quoted_measurement:
+    - ichise_1989_table5_quoted_invariants
+  table_inventory:
+  - table: I
+    published_page: 299
+    pdf_page_index: 5
+    completeness: full
+    note: Ag Tm-Tb ten values + mean 81.6 sd 1.9; Fe A4-Tb eight values + mean 84.0 sd 1.6
+  - table: II
+    published_page: 303
+    pdf_page_index: 9
+    completeness: full
+    note: Seven heats AM(8,7,5,3,2,4,6); solidus/liquidus and reactions A-D
+  - table: III
+    published_page: 303
+    pdf_page_index: 9
+    completeness: full
+    note: q for reactions A-C; AM(8) and AM(4) absent from this table
+  - table: IV
+    published_page: 305
+    pdf_page_index: 11
+    completeness: full
+    note: Sensitivity comparison at 1800 K; ion-intensity row is from Eq.(4), not a raw series
+  - table: V
+    published_page: 306
+    pdf_page_index: 12
+    completeness: full
+    note: Literature comparison; Present study column is this work
+  refused:
+  - what: numeric ion-intensity or partial-pressure series from Figs 2-6
+    why: figure-only; no tabulated I or P values. Chart grids were not digitised
+  - what: Raoultian activities or activity coefficients of Ag or Mn
+    why: this paper is ion-intensity thermal analysis of invariant arrests, not an activity measurement.
+      Authors explicitly say the method should be combined with KEMS activity measurements (p. 305)
+  - what: orifice area, Clausing factor, sample surface area
+    why: orifice diameter 0.5 mm is printed; area was not computed. Clausing factor and free surface unstated

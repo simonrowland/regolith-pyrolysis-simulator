@@ -1,0 +1,793 @@
+schema_version: literature_extract.v1
+source_id: kems-201-ichise-1986
+source:
+  citation: Ichise, E., Ueshima, Y. & Miyagawa, S. (1986), "Reexamination of the High Temperature Region
+    of Fe-W Binary Alloy Phase Diagram", Tetsu-to-Hagane 72(7):791-798, DOI 10.2355/tetsutohagane1955.72.7_791
+  doi: 10.2355/tetsutohagane1955.72.7_791
+  url: https://doi.org/10.2355/tetsutohagane1955.72.7_791
+  year: 1986
+extraction:
+  method: Official J-STAGE OA PDF (https://www.jstage.jst.go.jp/article/tetsutohagane1955/72/7/72_7_791/_pdf).
+    Japanese body with English synopsis, table captions and figure captions. pdftotext -layout used only
+    as a page map. Tables 1-3 and printed invariant temperatures transcribed from 400 dpi pdftoppm PNG
+    renders of PDF pages 1-8 (published pp. 791-798). Where decode and render disagree, the render wins.
+    Figs 1-5 and Photos 1-3 listed figure-only. Authors' KEMS ion-intensity thermal-analysis Table 2 kept
+    distinct from annealing/EPMA Table 3, from quoted prior activity curves, and from Metals Handbook
+    / Schneider comparison values.
+  date: '2026-09-13'
+  worker: extract-alloys-b4
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/EXTRACT-057.md
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.W.observations[ichise_1986_few_table2_kems_thermal_analysis].values.invariant_means_K.alpha_eq_L_plus_eps
+  value: 1820.0
+  locator:
+    published_page: 793
+    pdf_page_index: 3
+    note: Printed alpha = L + eps ; 1820 +/- 0.4 K
+- species: W
+  observable: transition_point
+  observation_id: ichise_1986_few_table2_kems_thermal_analysis
+  field: n_heats
+  value: 15
+  locator:
+    table: '2'
+    published_page: 794
+    pdf_page_index: 4
+    note: Table 2 has 15 heats (plus ditto transform-T rows)
+- path: species.W.observations[ichise_1986_few_table2_kems_thermal_analysis].values.heats[0].at_pct_W
+  value: 11.1
+  locator:
+    table: '2'
+    published_page: 794
+    pdf_page_index: 4
+    note: Table 2 first data row Heat 201, 11.1 at% W, transform T 1821 K
+species:
+  W:
+    observations:
+    - observation_id: ichise_1986_few_kems_geometry
+      type: gibbs_table
+      locator:
+        published_page: 791
+        pdf_page_index: 1
+        section: '2.1'
+        note: KEMS ion-intensity thermal analysis method; apparatus details omitted, referred to Ueshima
+          et al. 1982 (ref 1)
+      T_range_K:
+      - 1703.0
+      - 1942.0
+      phase: Fe-W_alloys_in_Knudsen_cell
+      condensed_form:
+        state: alloy_in_Knudsen_cell
+        metastable: false
+        basis: explicit_author
+      standard_state: I_Fe as temperature index via ln(I_i T) = -Delta H_i^v / RT + C
+      regime: kems_ion_intensity_thermal_analysis
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        measured_ion: Fe
+        ionizing_energy: unstated in this paper
+        cell_material: unstated in this paper; apparatus details omitted and referred to ref 1 (Ueshima,
+          Ichise, Mori, Tetsu-to-Hagane 68 (1982) 2569)
+        orifice: unstated in this paper
+        chamber_pressure: unstated
+        sample_mass_KEMS: unstated as mass; Table 2 Quantity column is moles (0.0196-0.0421 mol)
+        heating: cell heated/cooled while recording ion intensity; isothermal holds 20-30 K apart plus
+          constant heating-rate arrests
+        temperature_correction: Pd melting point 1827 +/- 0.4 K used as calibration; six runs; standard
+          deviation of the correction 0.8 K (published p. 796)
+        q_definition: q = (1/n)(dT_h/d tau) Delta tau^2 ; proportional to molar heat of the invariant
+          (Eq. 5)
+        W_analysis: atomic absorption; analysis wavelength 255.1 nm; C2H2 5.0 l/min, N2O 6.0 l/min; SD
+          0.06 at% W (published p. 796)
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+        - chamber_pressure
+      uncertainty:
+        Pd_correction_sd_K: 0.8
+        W_AAS_sd_at_pct: 0.06
+        note: KEMS cell geometry unstated in this paper
+      equipment:
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 792
+            pdf_page_index: 2
+            paragraph: apparatus and experimental-method details already reported in ref 1, omitted here
+        cell_material:
+          value: unstated in this paper (referred to Ueshima et al. 1982)
+          locator:
+            published_page: 792
+            pdf_page_index: 2
+            paragraph: 装置および実験方法の詳細はすでに報告した1)ので省略する
+    - observation_id: ichise_1986_few_table2_kems_thermal_analysis
+      type: transition_point
+      locator:
+        table: '2'
+        published_page: 794
+        pdf_page_index: 4
+        note: Table 2. Results of Knudsen cell ion intensity thermal analysis
+      T_range_K:
+      - 1703.0
+      - 1942.0
+      phase: Fe-W_binary_invariants_alpha_eps_liquid_Wss
+      condensed_form:
+        state: condensed_alloy
+        metastable: false
+        basis: explicit_author
+      standard_state: arrest temperature on I_Fe heating/cooling curves; K as printed
+      regime: kems_ion_intensity_thermal_analysis
+      units: K, at% W, mol, K/min, min, relative heat as printed
+      values:
+        quantity: invariant_arrest_temperatures_and_relative_heat
+        method_class: measured
+        composition_basis: at% W as printed
+        legend:
+          n.m.: not measured
+          n.d.: not detected
+          n.g.: no good
+          ditto_row: second transform-temperature measurement on the same heat
+        invariant_means_K:
+          alpha_eq_L_plus_eps: 1820.0
+          eps_eq_L_plus_W: 1921.0
+        invariant_mean_standard_deviation_K:
+          alpha_eq_L_plus_eps: 0.4
+          eps_eq_L_plus_W: 0.7
+        as_printed: alpha = L + eps ; 1820 +/- 0.4 K. eps = L + (W) ; 1921 +/- 0.7 K. Attached range is
+          the standard deviation of the mean.
+        alpha_detected_at_pct_W:
+        - 11.0
+        - 29.0
+        eps_detected_at_pct_W:
+        - 19.0
+        - 81.0
+        n_heats: 15
+        heats:
+        - heat_no: '201'
+          at_pct_W: 11.1
+          quantity_mol: 0.037
+          T_range_K:
+          - 1838.0
+          - 1917.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 2.7
+            arrest_time_min: 6.6
+            relative_heat_absorbed: 3179.0
+            transform_temp_K:
+            - 1821.0
+          eps_to_L_W: n.m.
+        - heat_no: '193'
+          at_pct_W: 11.6
+          quantity_mol: 0.0356
+          T_range_K:
+          - 1705.0
+          - 1917.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 2.2
+            arrest_time_min: 6.6
+            relative_heat_absorbed: 2299.0
+            transform_temp_K:
+            - 1820.0
+          eps_to_L_W: n.m.
+        - heat_no: '207'
+          at_pct_W: 14.1
+          quantity_mol: 0.0364
+          T_range_K:
+          - 1812.0
+          - 1914.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.0
+            arrest_time_min: 5.0
+            relative_heat_absorbed: 2060.0
+            transform_temp_K:
+            - 1821.0
+          eps_to_L_W: n.m.
+        - heat_no: '188'
+          at_pct_W: 14.6
+          quantity_mol: 0.035
+          T_range_K:
+          - 1703.0
+          - 1916.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 2.5
+            arrest_time_min: 6.1
+            relative_heat_absorbed: 2658.0
+            transform_temp_K:
+            - 1821.0
+          eps_to_L_W: n.m.
+        - heat_no: '132'
+          at_pct_W: 18.7
+          quantity_mol: 0.0354
+          T_range_K:
+          - 1759.0
+          - 1931.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.3
+            arrest_time_min: 4.2
+            relative_heat_absorbed: 1644.0
+            transform_temp_K:
+            - 1819.0
+          eps_to_L_W:
+            heating_rate_K_per_min: 7.6
+            arrest_time_min: 0.4
+            relative_heat_absorbed: 34.0
+            transform_temp_K:
+            - 1919.0
+        - heat_no: '208'
+          at_pct_W: 18.7
+          quantity_mol: 0.037
+          T_range_K:
+          - 1815.0
+          - 1902.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.4
+            arrest_time_min: 3.8
+            relative_heat_absorbed: 1327.0
+            transform_temp_K:
+            - 1819.0
+          eps_to_L_W: n.m.
+        - heat_no: '180'
+          at_pct_W: 24.6
+          quantity_mol: 0.0363
+          T_range_K:
+          - 1751.0
+          - 1926.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.4
+            arrest_time_min: 4.0
+            relative_heat_absorbed: 1499.0
+            transform_temp_K:
+            - 1819.0
+          eps_to_L_W:
+            heating_rate_K_per_min: 1.9
+            arrest_time_min: 2.5
+            relative_heat_absorbed: 327.0
+            transform_temp_K:
+            - 1924.0
+        - heat_no: '220'
+          at_pct_W: 27.7
+          quantity_mol: 0.0388
+          T_range_K:
+          - 1818.0
+          - 1928.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.1
+            arrest_time_min: 4.8
+            relative_heat_absorbed: 1841.0
+            transform_temp_K:
+            - 1820.0
+          eps_to_L_W:
+            heating_rate_K_per_min: 3.4
+            arrest_time_min: 4.2
+            relative_heat_absorbed: 1546.0
+            transform_temp_K:
+            - 1921.0
+        - heat_no: '174'
+          at_pct_W: 28.8
+          quantity_mol: 0.0372
+          T_range_K:
+          - 1751.0
+          - 1925.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 3.1
+            arrest_time_min: 3.7
+            relative_heat_absorbed: 1141.0
+            transform_temp_K:
+            - 1818.0
+          eps_to_L_W:
+            heating_rate_K_per_min: 2.6
+            arrest_time_min: 4.3
+            relative_heat_absorbed: 1292.0
+            transform_temp_K:
+            - 1922.0
+        - heat_no: '125'
+          at_pct_W: 30.2
+          quantity_mol: 0.0356
+          T_range_K:
+          - 1753.0
+          - 1937.0
+          alpha_to_L_eps:
+            heating_rate_K_per_min: 2.8
+            arrest_time_min: 3.5
+            relative_heat_absorbed: 963.0
+            transform_temp_K:
+            - 1819.0
+          eps_to_L_W: n.g.
+        - heat_no: '129'
+          at_pct_W: 46.8
+          quantity_mol: 0.0421
+          T_range_K:
+          - 1784.0
+          - 1941.0
+          alpha_to_L_eps: n.d.
+          eps_to_L_W:
+            heating_rate_K_per_min: 2.2
+            arrest_time_min: 6.4
+            relative_heat_absorbed: 2140.0
+            transform_temp_K: n.g.
+        - heat_no: '219'
+          at_pct_W: 60.4
+          quantity_mol: 0.0302
+          T_range_K:
+          - 1775.0
+          - 1930.0
+          alpha_to_L_eps: n.d.
+          eps_to_L_W:
+            heating_rate_K_per_min: 2.5
+            arrest_time_min: 4.0
+            relative_heat_absorbed: 1325.0
+            transform_temp_K:
+            - 1919.0
+            - 1921.0
+        - heat_no: '127'
+          at_pct_W: 63.0
+          quantity_mol: 0.0288
+          T_range_K:
+          - 1777.0
+          - 1942.0
+          alpha_to_L_eps: n.d.
+          eps_to_L_W:
+            heating_rate_K_per_min: 3.6
+            arrest_time_min: 3.6
+            relative_heat_absorbed: 1620.0
+            transform_temp_K: n.g.
+        - heat_no: '182'
+          at_pct_W: 80.6
+          quantity_mol: 0.0196
+          T_range_K:
+          - 1775.0
+          - 1933.0
+          alpha_to_L_eps: n.d.
+          eps_to_L_W:
+            heating_rate_K_per_min: 2.6
+            arrest_time_min: 2.6
+            relative_heat_absorbed: 897.0
+            transform_temp_K:
+            - 1918.0
+            - 1918.0
+        - heat_no: '213'
+          at_pct_W: 81.0
+          quantity_mol: 0.021
+          T_range_K:
+          - 1772.0
+          - 1925.0
+          alpha_to_L_eps: n.d.
+          eps_to_L_W:
+            heating_rate_K_per_min: 2.5
+            arrest_time_min: 2.1
+            relative_heat_absorbed: 525.0
+            transform_temp_K:
+            - 1922.0
+            - 1921.0
+      uncertainty:
+        alpha_mean_sd_K: 0.4
+        eps_mean_sd_K: 0.7
+        note: printed +/- is the standard deviation of the mean (published p. 793)
+    - observation_id: ichise_1986_few_q_composition_text
+      type: rate_series
+      locator:
+        published_page: 793
+        pdf_page_index: 3
+        figure: '3'
+        note: Fig. 3 is figure-only; the numeric q=0 and q-max compositions in the prose are recorded
+          here
+      T_range_K:
+      - 1818.0
+      - 1924.0
+      phase: Fe-W_invariants
+      regime: kems_ion_intensity_thermal_analysis
+      units: at% W as printed; q in arbitrary units on Fig. 3
+      values:
+        quantity: relative_heat_q_composition_limits
+        method_class: measured
+        eps_decomposition:
+          q_max_at_pct_W: 37.0
+          q_max_qualifier: about 37 at% W
+          q_zero_at_pct_W:
+          - 19.0
+          - 98.0
+          q_zero_qualifier: almost 19 and 98 at% W
+        alpha_decomposition:
+          q_zero_at_pct_W: 40.0
+          q_zero_qualifier: about 40 at% W
+          q_max_at_pct_W: 11.0
+          q_max_qualifier: near 11 at% W
+        fig3: figure-only plot of q vs X_W; numbers above are from the English/Japanese prose, not from
+          axis reading
+      uncertainty:
+        note: prose uses about/near/almost; no numeric sigma on the q=0 compositions
+    - observation_id: ichise_1986_few_activity_runs_no_arrest
+      type: activity_coefficient
+      locator:
+        published_page: 793
+        pdf_page_index: 3
+        paragraph: activity measurements on 2.8-8.8 at% W at 1700-1910 K
+      T_range_K:
+      - 1700.0
+      - 1910.0
+      phase: Fe-W_dilute_W_alloys
+      standard_state: KEMS activity measurement mentioned; no activity numbers printed in this paper
+      regime: kems_effusion
+      units: K and at% W as printed
+      values:
+        quantity: activity_measurement_qualitative_arrest_search
+        method_class: measured
+        semantics: bound_not_point_ordering
+        at_pct_W_range:
+        - 2.8
+        - 8.8
+        ion_intensity_arrest: not observed in 1700-1910 K
+        lnIT_vs_1T_bend_K:
+        - 1811.0
+        - 1820.0
+        lnIT_bend_assigned_to: alpha -> L
+        note: No tabulated a(Fe), a(W), or gamma values. Authors refer activity curves to a previous paper
+          (ref 6, Ueshima, Yamauchi, Ichise, Mori, Tetsu-to-Hagane 70 (1984) 549).
+      uncertainty:
+        note: no numeric activities printed
+    - observation_id: ichise_1986_few_Wss_lattice_composition
+      type: transition_point
+      locator:
+        published_page: 794
+        pdf_page_index: 4
+        paragraph: (W) lattice parameter of 1933 K heat-treated FW60A-80B gave 97.4 +/- 0.15 at% W
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: W_solid_solution_in_equilibrium_with_liquid
+      standard_state: at% W from lattice parameter of (W); not a KEMS activity
+      regime: annealing_lattice_parameter
+      units: at% W as printed
+      values:
+        quantity: W_solid_solution_composition
+        method_class: measured
+        at_pct_W: 97.4
+        T_K: 1933.0
+        samples:
+        - FW60A
+        - FW80A
+        - FW60B
+        - FW80B
+      uncertainty:
+        at_pct_W: 0.15
+        as_printed: 97.4 +/- 0.15 at% W
+    - observation_id: ichise_1986_fig2_ion_intensity_arrest_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 793
+        pdf_page_index: 3
+        note: Example of Knudsen cell ion intensity thermal analysis showing an invariant reaction alpha
+          = L + eps
+      T_range_K:
+      - 1820.0
+      - 1820.0
+      phase: Fe-W_alpha_decomposition
+      regime: kems_ion_intensity_thermal_analysis
+      units: I_Fe arbitrary vs time; 2 min/div; heating 3 C/min labelled
+      values:
+        quantity: ion_intensity_arrest_curve
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labels_as_printed:
+        - L+eps -> alpha
+        - alpha -> L+eps
+        - I_Fe
+        - 3 C/min
+        - 2 min/div
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: ichise_1986_fig3_q_vs_xw_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 794
+        pdf_page_index: 4
+        note: Composition dependence of relative heat value q absorbed during invariant reactions eps=L+(W)
+          and alpha=L+eps
+      T_range_K:
+      - 1818.0
+      - 1924.0
+      phase: Fe-W_invariants
+      regime: kems_ion_intensity_thermal_analysis
+      units: q (arb. unit) vs X_W
+      values:
+        quantity: relative_heat_q_vs_composition
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        numeric_source: prose compositions recorded under ichise_1986_few_q_composition_text; plot not
+          digitised
+      uncertainty:
+        note: figure-only
+    - observation_id: ichise_1986_fig5_phase_diagram_figure_only
+      type: transition_point
+      locator:
+        figure: '5'
+        published_page: 796
+        pdf_page_index: 6
+        note: Phase diagram of Fe-W alloy. Symbols distinguish microscopy vs KEMS thermal analysis vs
+          Metals Handbook vs Schneider et al.
+      T_range_K:
+      - 1700.0
+      - 2000.0
+      phase: Fe-W_binary
+      regime: compiled_from_this_work_and_literature
+      units: K vs X_W
+      values:
+        quantity: phase_diagram
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labelled_invariants_K:
+          alpha_eq_L_eps: 1820.0
+          eps_eq_L_W: 1921.0
+        note: labelled 1820 K and 1921 K match the Table 2 means; other curves not digitised
+      uncertainty:
+        note: figure-only
+  Fe:
+    observations:
+    - observation_id: ichise_1986_table1_pure_metal_compositions
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 793
+        pdf_page_index: 3
+        note: Table 1. Chemical composition of pure iron and tungsten powder
+      T_range_K:
+      - 1703.0
+      - 1942.0
+      phase: starting_pure_Fe_and_W
+      standard_state: wt% as printed (table does not restate the unit; starting-metal analyses)
+      regime: starting_materials
+      units: wt% as printed in Table 1
+      values:
+        quantity: starting_metal_chemical_composition
+        method_class: measured
+        pure_iron:
+          Fe: '>99.98'
+          C: 0.002
+          Si: <0.005
+          Mn: <0.001
+          P: 0.005
+          S: 0.005
+          Cu: 0.005
+          Ni: 0.004
+          Cr: 0.003
+          Co: 0.013
+          Ti: 0.003
+          V: <0.001
+          Al: 0.003
+          O: 0.042
+          N: 0.0017
+        tungsten_powder:
+          W: '>99.98'
+          O: 0.01
+          C: 0.0004
+          S: <0.0001
+          Fe: 0.002-3
+          Ni: 0.002-3
+          Mo: 0.003-7
+          Si: 0.001-2
+          Ca: 0.0005-20
+          K_Na_Mg_Cu_Mn_As_Sn_Cr_Al: <0.0005
+      uncertainty:
+        note: no sigma printed on Table 1 impurity analyses
+    - observation_id: ichise_1986_table3_annealing
+      type: transition_point
+      locator:
+        table: '3'
+        published_page: 795
+        pdf_page_index: 5
+        note: Table 3. Results of annealing experiments
+      T_range_K:
+      - 1713.0
+      - 1933.0
+      phase: Fe-W_heat_treated_and_diffusion_couples
+      standard_state: phases present at the annealing temperature; not a KEMS activity
+      regime: annealing_and_diffusion_couple
+      units: K, h, at% W as printed
+      values:
+        quantity: annealing_phase_identification
+        method_class: measured
+        not_kems: true
+        rows:
+        - heat_no: DC(1)
+          annealing_T_K: 1713.0
+          annealing_time_h: 12.0
+          phases: alpha, eps, (W)
+          at_pct_W_as_printed: blank in Table 3
+        - heat_no: DC(2)
+          annealing_T_K: 1838.0
+          annealing_time_h: 23.0
+          phases: L+eps, (W)
+          at_pct_W_as_printed: blank in Table 3
+        - heat_no: WH14
+          at_pct_W: 6.0
+          annealing_T_K: 1840.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH15
+          at_pct_W: 8.1
+          annealing_T_K: 1841.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH16
+          at_pct_W: 10.0
+          annealing_T_K: 1841.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH17
+          at_pct_W: 14.0
+          annealing_T_K: 1841.0
+          annealing_time_h: 2.0
+          phases: L+eps
+        - heat_no: WH13
+          at_pct_W: 20.0
+          annealing_T_K: 1845.0
+          annealing_time_h: 2.0
+          phases: L+eps
+        - heat_no: WH3
+          at_pct_W: 34.9
+          annealing_T_K: 1855.0
+          annealing_time_h: 2.0
+          phases: L+eps
+          xray: eps (no other peaks)
+        - heat_no: WH5
+          at_pct_W: 7.0
+          annealing_T_K: 1860.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH6
+          at_pct_W: 10.0
+          annealing_T_K: 1860.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH18
+          at_pct_W: 14.0
+          annealing_T_K: 1863.0
+          annealing_time_h: 2.0
+          phases: L
+        - heat_no: WH19
+          at_pct_W: 16.0
+          annealing_T_K: 1867.0
+          annealing_time_h: 2.0
+          phases: L+eps
+        - heat_no: WH2
+          at_pct_W: 19.9
+          annealing_T_K: 1860.0
+          annealing_time_h: 2.0
+          phases: L+eps
+          xray: eps, L (as alpha); liquid composition from lattice parameter
+        - heat_no: FW60A
+          at_pct_W: 60.0
+          annealing_T_K: 1933.0
+          annealing_time_h: 3.0
+          phases: L+(W)
+          xray: (W); composition from lattice parameter
+          prep: in situ from Fe chip and W powder
+        - heat_no: FW80A
+          at_pct_W: 80.0
+          annealing_T_K: 1933.0
+          annealing_time_h: 3.0
+          phases: L+(W)
+          xray: (W); composition from lattice parameter
+          prep: in situ from Fe chip and W powder
+        - heat_no: FW60B
+          at_pct_W: 60.0
+          annealing_T_K: 1933.0
+          annealing_time_h: 3.0
+          phases: L+(W)
+          xray: (W); composition from lattice parameter
+          prep: A series arc melted then re-annealed
+        - heat_no: FW80B
+          at_pct_W: 80.0
+          annealing_T_K: 1933.0
+          annealing_time_h: 3.0
+          phases: L+(W)
+          xray: (W); composition from lattice parameter
+          prep: A series arc melted then re-annealed
+        diffusion_couple_EPMA_compositions_as_printed:
+          note: 'Fig. 4 figure-only. Prose: three phases from W side toward Fe side roughly 100, 40-50,
+            10-20 at% W. At 1713 K: (W), eps, alpha. At 1838 K: (W), eps, liquid.'
+      uncertainty:
+        note: no numeric sigma on Table 3 phase IDs
+    - observation_id: ichise_1986_FeW_sigma_true_absence
+      type: transition_point
+      locator:
+        published_page: 796
+        pdf_page_index: 6
+        paragraph: FeW (sigma) phase claimed in a literature diagram was not detected in the experimental
+          temperature range
+      T_range_K:
+      - 1700.0
+      - 1940.0
+      phase: Fe-W
+      regime: kems_ion_intensity_thermal_analysis_and_annealing
+      units: K as printed
+      values:
+        quantity: FeW_sigma_phase
+        method_class: measured
+        semantics: bound_not_point_ordering
+        detected: false
+        T_range_K_as_printed:
+        - 1700.0
+        - 1940.0
+        note: coincides with the authors' previously reported Fe-W activity-curve behaviour (ref 6)
+      uncertainty:
+        note: true absence in this T range; not a numeric activity
+deepening:
+  dispatch_id: extract-alloys-b4
+  date: '2026-09-13'
+  primary_sources_cited:
+  - system: Fe-Mo KEMS thermal analysis (method paper)
+    method: KEMS ion intensity thermal analysis
+    investigator: Y. Ueshima, E. Ichise and T. Mori
+    year: 1982
+    journal_reference_as_printed: Tetsu-to-Hagane, 68, 2569 (1982)
+    ref_number: 1
+  - system: Fe-Mo phase diagram (companion metallography paper)
+    method: annealing / EPMA
+    investigator: Y. Ueshima, E. Ichise and T. Mori
+    year: 1983
+    journal_reference_as_printed: Tetsu-to-Hagane, 69, 556 (1983)
+    ref_number: 2
+  - system: Fe-W constitution
+    method: compilation
+    investigator: Metals Handbook
+    year: 1973
+    journal_reference_as_printed: Metals Handbook 8th ed. vol. 8 (1973) [ASM]
+    ref_number: 3
+  - system: Fe-W thermodynamic properties
+    method: evaluated compilation
+    investigator: R. Hultgren et al.
+    year: 1973
+    journal_reference_as_printed: Selected Values of the Thermodynamic Properties of Binary Alloys (1973)
+      [ASM]
+    ref_number: 4
+  - system: Fe-W constitution
+    method: compilation
+    investigator: O. Kubaschewski
+    year: 1982
+    journal_reference_as_printed: Iron-Binary Phase Diagrams (1982) [Springer-Verlag]
+    ref_number: 5
+  - system: Fe-W activities (authors' prior KEMS)
+    method: KEMS activity
+    investigator: Y. Ueshima, H. Yamauchi, E. Ichise and T. Mori
+    year: 1984
+    journal_reference_as_printed: Tetsu-to-Hagane, 70 (1984), p. 549
+    ref_number: 6
+  class_ledger:
+    measured:
+    - ichise_1986_few_kems_geometry
+    - ichise_1986_few_table2_kems_thermal_analysis
+    - ichise_1986_few_q_composition_text
+    - ichise_1986_few_activity_runs_no_arrest
+    - ichise_1986_few_Wss_lattice_composition
+    - ichise_1986_table1_pure_metal_compositions
+    - ichise_1986_table3_annealing
+    - ichise_1986_FeW_sigma_true_absence
+    figure_only:
+    - ichise_1986_fig2_ion_intensity_arrest_figure_only
+    - ichise_1986_fig3_q_vs_xw_figure_only
+    - ichise_1986_fig5_phase_diagram_figure_only
+  japanese_body: Japanese experimental and discussion sections were not fully translated. English synopsis,
+    table/figure captions, and all numeric tables were transcribed. Untranslated Japanese prose is recorded
+    as unseen, never guessed, except where the English caption or a numeric equation is printed on the
+    same page.
+  refused:
+  - what: numeric a(Fe), a(W), gamma from the 2.8-8.8 at% W activity runs
+    why: this paper prints no activity table; those values live in ref 6. Only the qualitative no-arrest
+      and 1811-1820 K ln(IT) bend are printed here
+  - what: KEMS cell material, orifice, ionizing energy, chamber pressure
+    why: explicitly omitted; referred to Ueshima 1982. Recorded as unstated
+  - what: Fig. 4 EPMA line-analysis compositions as numbers off the chart
+    why: figure-only; prose ranges 100 / 40-50 / 10-20 at% W recorded as printed

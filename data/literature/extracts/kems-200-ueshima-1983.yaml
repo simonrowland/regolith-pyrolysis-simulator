@@ -1,0 +1,968 @@
+schema_version: literature_extract.v1
+source_id: kems-200-ueshima-1983
+source:
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature
+    Range of 1360 to 1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556
+  doi: 10.2355/tetsutohagane1955.69.6_556
+  url: https://doi.org/10.2355/tetsutohagane1955.69.6_556
+  year: 1983
+extraction:
+  method: Official J-STAGE OA PDF (https://www.jstage.jst.go.jp/article/tetsutohagane1955/69/6/69_6_556/_pdf).
+    Japanese body with English synopsis and English table/figure captions. pdftotext -layout used only
+    as a page map. Tables 1-2 and printed invariant/quoted KEMS temperatures transcribed from 400 dpi
+    pdftoppm PNG renders of PDF pages 1-8 (published pp. 556-563). Where decode and render disagree, the
+    render wins. THIS PAPER'S OWN MEASUREMENTS ARE ANNEALING + OPTICAL/X-RAY/EPMA, NOT KEMS. KEMS activity
+    and KEMS thermal-analysis temperatures printed here are quoted from the authors' previous papers (refs
+    1 and 2) and are labelled quoted_measurement. Figs 1-3 and Photos 1-3 are figure-only.
+  date: '2026-09-13'
+  worker: extract-alloys-b4
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/EXTRACT-057.md
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Mo.observations[ueshima_1983_femo_invariant_this_work].values.T_C
+  value: 1610.0
+  locator:
+    published_page: 560
+    pdf_page_index: 5
+    equation: '3'
+    note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
+- species: Mo
+  observable: transition_point
+  observation_id: ueshima_1983_femo_table2_epma
+  field: n_phase_analyses
+  value: 12
+  locator:
+    table: '2'
+    published_page: 561
+    pdf_page_index: 6
+    note: Table 2 twelve analysed-phase rows (SH 1 through SH 52)
+- path: species.Mo.observations[ueshima_1983_quoted_kems_thermal_analysis].values.invariants[0].T_C
+  value: 1610.0
+  locator:
+    published_page: 560
+    pdf_page_index: 5
+    paragraph: 'quoted previous KEMS thermal analysis: sigma = L + (Mo) : 1610 +/- 1 C'
+species:
+  Mo:
+    observations:
+    - observation_id: ueshima_1983_femo_geometry
+      type: gibbs_table
+      locator:
+        published_page: 556
+        pdf_page_index: 1
+        section: '2'
+        note: Annealing apparatus; not a Knudsen cell. KEMS geometry is not in this paper
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_annealed_samples
+      standard_state: not KEMS; SiC furnace, alumina tube, Ar atmosphere
+      regime: annealing_quench_EPMA
+      units: as published
+      values:
+        quantity: method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        this_work_is_not_kems: true
+        furnace: vertical SiC electric furnace with gas-tight high-purity Al2O3 tube (OD 30 mm, ID 24
+          mm, length 720 mm)
+        atmosphere: Ar cleaned over silica gel, NaOH asbestos, active Al2O3, P2O5 and sponge Ti (800 C);
+          50-100 cc/min
+        crucible: Al2O3 SSA-S (OD 11 mm, ID 9 mm, height 12 mm) in a Ta container, hung on Mo wire 0.5
+          mm dia
+        sample_mass_g:
+        - 1.0
+        - 2.0
+        sample_mass_qualifier: about 1-2 g granular alloy from arc-melted Fe and Mo
+        thermocouple: Pt-Rh (6/30); control within +/- 10 C; IPTS-68 (Table 1 footnote a)
+        hot_zone: 35 mm at 1550 C (+/- 1 C)
+        temperature_calibration: Au point 1064 C and Pd point 1554 C
+        chamber_pressure: unstated (flowing Ar, not vacuum effusion)
+        kems_cell_material: unstated (no Knudsen cell in this paper)
+        pure_Fe_as_printed: Fe >99.94, C 0.002, Si <0.005, Mn <0.001, P 0.005, S 0.005, Cu 0.005, Ni 0.004,
+          Cr 0.003, Co 0.013, Ti 0.003, V <0.001, Al 0.003, O 0.0042, N 0.0017 wt%
+        pure_Mo_as_printed: Mo >99.97, Fe 0.001, basic residue 0.001 wt%
+      uncertainty:
+        note: annealing control within +/- 10 C; IPTS-68. Not a KEMS vacuum measurement
+      equipment:
+        cell_material:
+          value: Al2O3 SSA-S crucible in a Ta container (annealing, not a Knudsen cell)
+          locator:
+            published_page: 556
+            pdf_page_index: 1
+            paragraph: Al2O3 SSA-S crucible OD 11 mm, ID 9 mm, height 12 mm in a Ta container
+        chamber_pressure:
+          value: unstated (flowing purified Ar at 50-100 cc/min, not vacuum effusion)
+          locator:
+            published_page: 556
+            pdf_page_index: 1
+            paragraph: Ar flow 50-100 cc/min
+    - observation_id: ueshima_1983_femo_table1_phases
+      type: transition_point
+      locator:
+        table: '1'
+        published_page: 558
+        pdf_page_index: 3
+        note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - sample: SH 1
+          T_C: 1529.0
+          time_h: 10.0
+          at_pct_Mo: 38.2
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1802.15
+        - sample: SH 3
+          T_C: 1529.0
+          time_h: 0.5
+          at_pct_Mo: 39.2
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1802.15
+        - sample: SH 2
+          T_C: 1529.0
+          time_h: 10.0
+          at_pct_Mo: 47.5
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1802.15
+        - sample: SH 27
+          T_C: 1532.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1805.15
+        - sample: SH 28
+          T_C: 1532.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: sigma + (Mo)
+          T_K: 1805.15
+        - sample: SH 29
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 30.1
+          aimed: false
+          optical: L
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 30
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 34.0
+          aimed: false
+          optical: L
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 31
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 36.4
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 8
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 10
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: sigma + (Mo)
+          xray: sigma, (Mo)
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 11
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - sample: SH 5
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 39.2
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - sample: SH 6
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 43.4
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - sample: SH 7
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 50.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - sample: SH 12
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1858.15
+        - sample: SH 13
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 44.3
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1858.15
+        - sample: SH 14
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: sigma + (Mo)
+          xray: sigma, (Mo)
+          epma: ''
+          T_K: 1858.15
+        - sample: SH 15
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: sigma + (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1858.15
+        - sample: SH 16
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 38.6
+          aimed: false
+          optical: L + sigma
+          xray: sigma, eps
+          epma: ''
+          T_K: 1860.15
+        - sample: SH 17
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 44.1
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1860.15
+        - sample: SH 18
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 87.8
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1860.15
+        - sample: SH 19
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 38.6
+          aimed: false
+          optical: L + sigma
+          xray: sigma, eps
+          epma: ''
+          T_K: 1870.15
+        - sample: SH 20
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 44.1
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1870.15
+        - sample: SH 21
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 87.8
+          aimed: false
+          optical: (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1870.15
+        - sample: SH 48
+          T_C: 1597.0
+          time_h: 2.0
+          at_pct_Mo: 55.4
+          aimed: false
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1870.15
+        - sample: SH 49
+          T_C: 1597.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1870.15
+        - sample: SH 59
+          T_C: 1601.0
+          time_h: 1.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1874.15
+        - sample: SH 57
+          T_C: 1602.0
+          time_h: 2.0
+          at_pct_Mo: 49.2
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1875.15
+        - sample: SH 56
+          T_C: 1604.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1877.15
+        - sample: SH 51
+          T_C: 1604.0
+          time_h: 3.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1877.15
+        - sample: SH 55
+          T_C: 1608.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1881.15
+        - sample: SH 54
+          T_C: 1609.0
+          time_h: 2.5
+          at_pct_Mo: 50.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1882.15
+        - sample: SH 53
+          T_C: 1610.0
+          time_h: 4.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1883.15
+        - sample: SH 23
+          T_C: 1610.0
+          time_h: 2.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1883.15
+        - sample: SH 60
+          T_C: 1611.0
+          time_h: 2.0
+          at_pct_Mo: 49.2
+          aimed: false
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1884.15
+        - sample: SH 52
+          T_C: 1614.0
+          time_h: 4.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1887.15
+        - sample: SH 37
+          T_C: 1618.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1891.15
+        - sample: SH 38
+          T_C: 1618.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1891.15
+        - sample: SH 24
+          T_C: 1622.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L
+          xray: eps
+          epma: ''
+          T_K: 1895.15
+        - sample: SH 25
+          T_C: 1622.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: L + (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1895.15
+        - sample: SH 26
+          T_C: 1622.0
+          time_h: 0.5
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1895.15
+        - sample: As melt
+          T_C_as_printed: As melt
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: ''
+          xray: eps
+          epma: ''
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610
+          C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+    - observation_id: ueshima_1983_femo_table2_epma
+      type: transition_point
+      locator:
+        table: '2'
+        published_page: 561
+        pdf_page_index: 6
+        note: Table 2. Phase boundary determination by EPMA. Result of analysis as at% of Mo
+      T_range_K:
+      - 1802.15
+      - 1889.15
+      phase: Fe-Mo_two_phase_equilibria
+      standard_state: at% Mo of the analysed phase by EPMA; mean of Fe Ka and Mo La
+      regime: EPMA_phase_boundary
+      units: at% Mo and C as printed
+      values:
+        quantity: EPMA_phase_boundary_composition
+        method_class: measured
+        not_kems: true
+        n_phase_analyses: 12
+        points:
+        - sample: SH 1
+          T_C: 1529.0
+          sample_at_pct_Mo: 38.2
+          aimed: false
+          coexisting: L + sigma
+          analyzed: sigma
+          Fe_Ka:
+          - 47.1
+          - 47.5
+          - 49.2
+          Mo_La:
+          - 49.2
+          mean: 48.2
+          T_K: 1802.15
+        - sample: SH 28
+          T_C: 1532.0
+          sample_at_pct_Mo: 60.0
+          aimed: true
+          coexisting: sigma + (Mo)
+          analyzed: sigma
+          Fe_Ka:
+          - 56.0
+          Mo_La:
+          - 56.4
+          mean: 56.2
+          T_K: 1805.15
+        - sample: SH 8
+          T_C: 1552.0
+          sample_at_pct_Mo: 38.8
+          aimed: false
+          coexisting: L + sigma
+          analyzed: sigma
+          Fe_Ka:
+          - 49.5
+          - 50.3
+          Mo_La:
+          - 47.3
+          - 47.0
+          mean: 48.5
+          T_K: 1825.15
+        - sample: SH 10
+          T_C: 1552.0
+          sample_at_pct_Mo: 59.1
+          aimed: false
+          coexisting: sigma + (Mo)
+          analyzed: sigma
+          Fe_Ka:
+          - 57.2
+          Mo_La:
+          - 54.2
+          mean: 55.7
+          T_K: 1825.15
+        - sample: SH 10
+          T_C: 1552.0
+          sample_at_pct_Mo: 59.1
+          aimed: false
+          coexisting: sigma + (Mo)
+          analyzed: (Mo)
+          Fe_Ka:
+          - 81.4
+          Mo_La:
+          - 79.2
+          mean: 80.3
+          T_K: 1825.15
+        - sample: SH 13
+          T_C: 1585.0
+          sample_at_pct_Mo: 44.3
+          aimed: false
+          coexisting: L + sigma
+          analyzed: sigma
+          Fe_Ka:
+          - 51.2
+          Mo_La:
+          - 51.9
+          mean: 51.6
+          T_K: 1858.15
+        - sample: SH 14
+          T_C: 1585.0
+          sample_at_pct_Mo: 59.1
+          aimed: false
+          coexisting: sigma + (Mo)
+          analyzed: sigma
+          Fe_Ka:
+          - 54.1
+          - 56.4
+          - 56.0
+          Mo_La:
+          - 58.4
+          mean: 56.2
+          T_K: 1858.15
+        - sample: SH 14
+          T_C: 1585.0
+          sample_at_pct_Mo: 59.1
+          aimed: false
+          coexisting: sigma + (Mo)
+          analyzed: (Mo)
+          Fe_Ka:
+          - 78.5
+          - 78.7
+          Mo_La:
+          - 79.1
+          mean: 78.8
+          T_K: 1858.15
+        - sample: SH 55
+          T_C: 1608.0
+          sample_at_pct_Mo: 45.0
+          aimed: true
+          coexisting: L + sigma
+          analyzed: sigma
+          Fe_Ka:
+          - 55.1
+          - 55.8
+          Mo_La:
+          - 54.0
+          - 54.0
+          mean: 54.7
+          T_K: 1881.15
+        - sample: SH 53
+          T_C: 1610.0
+          sample_at_pct_Mo: 59.0
+          aimed: true
+          coexisting: L + (Mo)
+          analyzed: (Mo)
+          Fe_Ka:
+          - 77.0
+          - 77.6
+          - 76.6
+          Mo_La:
+          - 72.9
+          - 73.1
+          mean: 75.4
+          T_K: 1883.15
+        - sample: SH 60
+          T_C: 1611.0
+          sample_at_pct_Mo: 50.0
+          aimed: true
+          coexisting: L + (Mo)
+          analyzed: (Mo)
+          Fe_Ka:
+          - 72.7
+          - 74.2
+          - 74.0
+          Mo_La:
+          - 75.1
+          - 77.2
+          mean: 74.5
+          T_K: 1884.15
+        - sample: SH 52
+          T_C: 1616.0
+          sample_at_pct_Mo: 59.0
+          aimed: true
+          coexisting: L + (Mo)
+          analyzed: (Mo)
+          Fe_Ka:
+          - 76.5
+          - 76.5
+          Mo_La:
+          - 73.0
+          - 72.4
+          mean: 74.6
+          T_K: 1889.15
+        calibration_equations:
+          I_FeKa: -0.8367 x_Mo + 0.8151
+          I_MoLa: 0.9310 x_Mo + 0.0544
+          x_Mo_range:
+          - 0.4
+          - 0.9
+          locator:
+            published_page: 560
+            pdf_page_index: 5
+            equation: 1-2
+        liquidus_from_microstructure_not_EPMA:
+          1552_C_at_pct_Mo:
+          - 34.0
+          - 36.0
+          1622_C_at_pct_Mo: 39.0
+          1610_C_at_pct_Mo_estimated: 38.0
+          method_class: author_estimate
+          note: liquidus near 1610 C estimated as about 38 at% Mo because quenched liquid could not be
+            EPMA-averaged
+      uncertainty:
+        Mo_AAS_sd_at_pct: 0.7
+        Mo_AAS_mean_of_3_sd_at_pct: 0.4
+        note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured
+          calibration
+    - observation_id: ueshima_1983_femo_invariant_this_work
+      type: transition_point
+      locator:
+        published_page: 560
+        pdf_page_index: 5
+        equation: '3'
+        note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
+      T_range_K:
+      - 1883.15
+      - 1883.15
+      phase: Fe-Mo_sigma_decomposition
+      standard_state: at% Mo of each phase; T in C as printed
+      regime: annealing_quench_EPMA
+      units: C and at% Mo as printed
+      values:
+        quantity: invariant_reaction
+        method_class: measured
+        not_kems: true
+        reaction_as_printed: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo)
+        T_C: 1610.0
+        T_K: 1883.15
+        sigma_at_pct_Mo: 56.0
+        liquid_at_pct_Mo: 38.0
+        Mo_ss_at_pct_Mo: 75.0
+      uncertainty:
+        note: no numeric +/- on Eq.(3); Table 1 brackets the sigma-out temperature between 1609 and 1610
+          C
+    - observation_id: ueshima_1983_quoted_kems_thermal_analysis
+      type: transition_point
+      locator:
+        published_page: 560
+        pdf_page_index: 5
+        paragraph: quoted previous KEMS thermal-analysis invariant temperatures from ref 2
+      T_range_K:
+      - 1633.15
+      - 1883.15
+      phase: Fe-Mo_invariants
+      standard_state: quoted from Ueshima, Ichise, Mori, Tetsu-to-Hagane 68 (1982) 2569; not measured
+        in this paper
+      regime: kems_ion_intensity_thermal_analysis
+      units: C as printed
+      values:
+        quantity: quoted_kems_invariant_temperatures
+        method_class: quoted_measurement
+        cited: Ueshima, Ichise and Mori, Tetsu-to-Hagane 68 (1982) 2569 (ref 2)
+        invariants:
+        - reaction: sigma = L + (Mo)
+          T_C: 1610.0
+          T_C_sigma: 1.0
+          as_printed: 1610 +/- 1 C
+        - reaction: delta = L + sigma
+          T_C_range:
+          - 1503.0
+          - 1521.0
+          T_C_average: 1509.0
+          as_printed: 1503-1521 C (average 1509 C)
+        - reaction: alpha = L + delta
+          T_C: 1454.0
+          T_C_sigma: 2.0
+          as_printed: 1454 +/- 2 C
+        - reaction: x2
+          T_C: 1392.0
+          as_printed: 1392 C
+        - reaction: x1
+          T_C: 1360.0
+          as_printed: 1360 C
+      uncertainty:
+        note: quoted +/- from the previous KEMS thermal-analysis paper
+    - observation_id: ueshima_1983_quoted_kems_activities
+      type: activity_coefficient
+      locator:
+        published_page: 556
+        pdf_page_index: 1
+        paragraph: 'English synopsis: previous Knudsen cell mass spectrometric measurement of the activities
+          in the Fe-Mo binary alloys'
+      T_range_K:
+      - 1823.15
+      - 1823.15
+      phase: Fe-Mo_binary
+      standard_state: quoted prior KEMS activities; no activity numbers reprinted in this paper
+      regime: kems_effusion
+      units: none printed here
+      values:
+        quantity: quoted_kems_activities_pointer
+        method_class: quoted_measurement
+        semantics: bound_not_point_ordering
+        cited: Ichise, Maruo, Sasho, Ueshima and Mori, Tetsu-to-Hagane 66 (1980) 1075 (ref 1)
+        note: This paper reprints no a(Fe), a(Mo), or gamma table. It only states that the 1550 C phase-boundary
+          positions agree with the activity-curve behaviour already reported in ref 1.
+        numeric_activities_in_this_paper: false
+      uncertainty:
+        note: no numeric activities printed
+    - observation_id: ueshima_1983_pure_Fe_melting_check
+      type: transition_point
+      locator:
+        published_page: 561
+        pdf_page_index: 6
+        paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
+      T_range_K:
+      - 1811.15
+      - 1811.15
+      phase: pure_Fe
+      standard_state: melting onset of pure Fe used to check the annealing-temperature scale
+      regime: annealing_quench
+      units: C as printed
+      values:
+        quantity: pure_Fe_melting_onset
+        method_class: measured
+        T_C: 1538.0
+        T_K: 1811.15
+        Hultgren_recommended_T_C: 1538.0
+        Hultgren_uncertainty_C_as_printed: +1 to -3 C
+      uncertainty:
+        Hultgren_C:
+        - 1.0
+        - -3.0
+        note: authors say Hultgren 1538 C has about +1 to -3 C uncertainty and this experiment's thermometry
+          is of that order
+    - observation_id: ueshima_1983_fig1_epma_calibration_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 559
+        pdf_page_index: 4
+        note: EPMA calibration curve for Fe-Mo alloy. Measured vs calculated I vs x_Mo
+      T_range_K:
+      - 1803.15
+      - 1883.15
+      phase: Fe-Mo_standards
+      regime: EPMA_calibration
+      units: relative intensity vs x_Mo
+      values:
+        quantity: EPMA_calibration_curve
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        numeric_source: Eqs (1)-(2) on p. 560; plot not digitised
+        standards_at_pct_Mo:
+        - 47.5
+        - 76.5
+        - 87.8
+        standards_from_AAS: true
+        standard_samples:
+        - SH-2
+        - SH-23
+        - SH-18
+      uncertainty:
+        note: figure-only; 2-5 at% Mo offset vs theoretical correction
+    - observation_id: ueshima_1983_fig2_epma_results_figure_only
+      type: transition_point
+      locator:
+        figure: '2'
+        published_page: 560
+        pdf_page_index: 5
+        note: Results of EPMA analysis. Phase boundaries vs T
+      T_range_K:
+      - 1793.15
+      - 1903.15
+      phase: Fe-Mo
+      regime: EPMA_phase_boundary
+      units: C vs at% Mo
+      values:
+        quantity: EPMA_phase_boundaries_plot
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        numeric_source: Table 2; plot not digitised
+      uncertainty:
+        note: figure-only
+    - observation_id: ueshima_1983_fig3_phase_diagram_figure_only
+      type: transition_point
+      locator:
+        figure: '3'
+        published_page: 561
+        pdf_page_index: 6
+        note: Revised Fe-Mo binary alloy phase diagram. Thick line this work; thin Metals Handbook; dashed
+          needs revision; inverted triangles Sykes; chain Gibson liquidus; KEMS thermal-analysis invariants
+          as marks
+      T_range_K:
+      - 1373.15
+      - 1973.15
+      phase: Fe-Mo_binary
+      regime: compiled_from_this_work_and_quoted_kems
+      units: C vs at% Mo
+      values:
+        quantity: revised_phase_diagram
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labelled_invariant_C: 1610.0
+        note: 1610 C label matches Eq.(3) and quoted KEMS 1610 +/- 1 C; curves not digitised
+      uncertainty:
+        note: figure-only
+deepening:
+  dispatch_id: extract-alloys-b4
+  date: '2026-09-13'
+  this_work_is_not_kems: true
+  primary_sources_cited:
+  - system: Fe-Mo activities
+    method: KEMS
+    investigator: E. Ichise, T. Maruo, H. Sasho, Y. Ueshima and T. Mori
+    year: 1980
+    journal_reference_as_printed: Tetsu-to-Hagane, 66 (1980), p. 1075
+    ref_number: 1
+  - system: Fe-Mo KEMS thermal analysis / invariant temperatures
+    method: KEMS ion intensity thermal analysis
+    investigator: Y. Ueshima, E. Ichise and T. Mori
+    year: 1982
+    journal_reference_as_printed: Tetsu-to-Hagane, 68 (1982), p. 2569
+    ref_number: 2
+  - system: Fe-Mo constitution
+    method: compilation
+    investigator: Metals Handbook
+    year: 1973
+    journal_reference_as_printed: Metals Handbook 8th ed, Vol. 8 (1973) [ASM]
+    ref_number: 3
+  - system: Fe melting point
+    method: evaluated compilation
+    investigator: R. Hultgren, D. D. Desai, D. T. Hawkins, M. Gleiser and K. K. Kelley
+    year: 1973
+    journal_reference_as_printed: Selected Values of the Thermodynamic Properties of Binary Alloys (1973)
+      [ASM]
+    ref_number: 5
+  - system: sigma / liquidus
+    method: thermal analysis / metallography
+    investigator: W. S. Gibson, J. R. Lee and W. Hume-Rothery
+    year: 1961
+    journal_reference_as_printed: JISI, 198 (1961), p. 64
+    ref_number: 9
+  - system: sigma decomposition 1542 +/- 10 C
+    method: metallography
+    investigator: W. P. Sykes
+    year: 1926
+    journal_reference_as_printed: Trans. Am. Soc. Steel Treat. 10 (1926), p. 836
+    ref_number: 10
+  class_ledger:
+    measured:
+    - ueshima_1983_femo_geometry
+    - ueshima_1983_femo_table1_phases
+    - ueshima_1983_femo_table2_epma
+    - ueshima_1983_femo_invariant_this_work
+    - ueshima_1983_pure_Fe_melting_check
+    quoted_measurement:
+    - ueshima_1983_quoted_kems_thermal_analysis
+    - ueshima_1983_quoted_kems_activities
+    figure_only:
+    - ueshima_1983_fig1_epma_calibration_figure_only
+    - ueshima_1983_fig2_epma_results_figure_only
+    - ueshima_1983_fig3_phase_diagram_figure_only
+  japanese_body: Japanese experimental and discussion sections were not fully translated. English synopsis,
+    table/figure captions, equations (1)-(3), and all numeric tables were transcribed. Untranslated Japanese
+    prose is unseen, never guessed.
+  refused:
+  - what: numeric a(Fe), a(Mo), gamma from the authors' 1980 KEMS activity paper
+    why: this paper reprints no activity table; it only points at ref 1
+  - what: KEMS cell geometry, orifice, ionizing energy, chamber vacuum
+    why: this work is annealing/EPMA in flowing Ar, not effusion MS. Recorded as unstated for KEMS fields
+  - what: Fig. 3 phase-boundary coordinates off the printed diagram
+    why: figure-only; Table 2 holds the EPMA numbers

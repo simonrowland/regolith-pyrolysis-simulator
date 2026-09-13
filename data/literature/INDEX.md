@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 149
-- Extracts (`literature_extract.v1`): 147
+- Sources: 152
+- Extracts (`literature_extract.v1`): 150
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 2
-- Extracts with no PDF: 105
+- Extracts with no PDF: 108
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -108,6 +108,9 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-184-behrens-1979` | Behrens, Robert G., and Rinehart, Gary H. (1979). Vaporization Thermodynamics and Kinetics of Hexagonal Silicon Carbide. Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, volume 1, pp. 125–142. | NBS Special Publication 561 | `docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.pdf`, `02bcfb56` | `raw/kems-184-behrens-1979/kems-184-behrens-1979.pdf` (present, 02bcfb56); `text/kems-184-behrens-1979/` (3 files, exists); `tables/kems-184-behrens-1979/` (5 files, exists) | `data/literature/extracts/kems-184-behrens-1979.yaml` (33 rows, draft) | `ledger/kems-184-behrens-1979.yaml`: scored (—) |
 | `kems-189-bischof-2021` | Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2021), "Vaporisation of group 13 elements from basaltic melts by Knudsen Effusion Mass Spectrometry", Goldschmidt2021 abstracts (Virtual, 4-9 July 2021), DOI 10.7185/gold2021.7353 | 10.7185/gold2021.7353 | `docs/references/pdfs/99-kems-langmuir/kems-189-bischof-2021.pdf`, `3a20da01` | `raw/kems-189-bischof-2021/kems-189-bischof-2021.pdf` (present, 3a20da01); `text/kems-189-bischof-2021/` (10 files, exists); `tables/kems-189-bischof-2021/` (2 files, exists) | `data/literature/extracts/kems-189-bischof-2021.yaml` (16 rows, draft) | `ledger/kems-189-bischof-2021.yaml`: decoded (2026-09-06) |
 | `kems-190-wu-1993` | Wu, P., Eriksson, G., Pelton, A. D. & Blander, M. (1993), "Prediction of the Thermodynamic Properties and Phase Diagrams of Silicate Systems—Evaluation of the FeO-MgO-SiO2 System", ISIJ International 33(1):26–35 | 10.2355/isijinternational.33.26 | ABSENT, `` | `raw/kems-190-wu-1993/kems-190-wu-1993.pdf` (present, 7f0812ef); `text/kems-190-wu-1993/` (17 files, exists); `tables/kems-190-wu-1993/` (6 files, exists) | `data/literature/extracts/kems-190-wu-1993.yaml` (16 rows, draft, private_path) | `ledger/kems-190-wu-1993.yaml`: scored (2026-09-06) |
+| `kems-198-ichise-ueshima-1989` | Ichise, E., Ueshima, Y. & Yamana, H. (1989), "Ion Intensity Thermal Analysis of Ag-Mn Alloy", Mass Spectroscopy 37(5):295-307, DOI 10.5702/massspec.37.295 | 10.5702/massspec.37.295 | ABSENT, `` | `raw/kems-198-ichise-ueshima-1989/kems-198-ichise-ueshima-1989.pdf` (present, 805ec3c9); `text/kems-198-ichise-ueshima-1989/` (3 files, exists); `tables/kems-198-ichise-ueshima-1989/` (0 files, ABSENT) | `data/literature/extracts/kems-198-ichise-ueshima-1989.yaml` (14 rows, draft) | `ledger/kems-198-ichise-ueshima-1989.yaml`: decoded (2026-09-13) |
+| `kems-200-ueshima-1983` | Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature Range of 1360 to 1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556 | 10.2355/tetsutohagane1955.69.6_556 | ABSENT, `` | `raw/kems-200-ueshima-1983/kems-200-ueshima-1983.pdf` (present, 19b1bb01); `text/kems-200-ueshima-1983/` (3 files, exists); `tables/kems-200-ueshima-1983/` (0 files, ABSENT) | `data/literature/extracts/kems-200-ueshima-1983.yaml` (10 rows, draft) | `ledger/kems-200-ueshima-1983.yaml`: decoded (2026-09-13) |
+| `kems-201-ichise-1986` | Ichise, E., Ueshima, Y. & Miyagawa, S. (1986), "Reexamination of the High Temperature Region of Fe-W Binary Alloy Phase Diagram", Tetsu-to-Hagane 72(7):791-798, DOI 10.2355/tetsutohagane1955.72.7_791 | 10.2355/tetsutohagane1955.72.7_791 | ABSENT, `` | `raw/kems-201-ichise-1986/kems-201-ichise-1986.pdf` (present, 5fc1999b); `text/kems-201-ichise-1986/` (3 files, exists); `tables/kems-201-ichise-1986/` (0 files, ABSENT) | `data/literature/extracts/kems-201-ichise-1986.yaml` (11 rows, draft) | `ledger/kems-201-ichise-1986.yaml`: decoded (2026-09-13) |
 | `kems-ms2000-044` | Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp. |  | `docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf`, `3d78f4e6` | `raw/kems-ms2000-044/kems-ms2000-044.pdf` (present, 3d78f4e6); `text/kems-ms2000-044/` (24 files, exists); `tables/kems-ms2000-044/` (8 files, exists) | `data/literature/extracts/kems-ms2000-044.yaml` (100 rows, draft, private_path) | `ledger/kems-ms2000-044.yaml`: — (—) |
 | `lamoreaux-hildenbrand-1984` | Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I. Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173 | 10.1063/1.555706 | ABSENT, `` | `raw/lamoreaux-hildenbrand-1984/lamoreaux-hildenbrand-1984.pdf` (ABSENT, ); `text/lamoreaux-hildenbrand-1984/` (0 files, ABSENT); `tables/lamoreaux-hildenbrand-1984/` (0 files, ABSENT) | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` (20 rows, draft, private_path) | `ledger/lamoreaux-hildenbrand-1984.yaml`: extracted (2026-09-06) |
 | `lamoreaux-hildenbrand-hildenbrand-1987` | Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior of Oxides II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J. Phys. Chem. Ref. Data 16 (1987) 419–443 | 10.1063/1.555799 | ABSENT, `` | `raw/lamoreaux-hildenbrand-hildenbrand-1987/lamoreaux-hildenbrand-hildenbrand-1987.pdf` (ABSENT, ); `text/lamoreaux-hildenbrand-hildenbrand-1987/` (0 files, ABSENT); `tables/lamoreaux-hildenbrand-hildenbrand-1987/` (0 files, ABSENT) | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` (6 rows, draft) | `ledger/lamoreaux-hildenbrand-hildenbrand-1987.yaml`: extracted (2026-09-06) |
@@ -228,6 +231,9 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-133-costa-2017`
 - `kems-140-heck-2025`
 - `kems-190-wu-1993`
+- `kems-198-ichise-ueshima-1989`
+- `kems-200-ueshima-1983`
+- `kems-201-ichise-1986`
 - `lamoreaux-hildenbrand-1984`
 - `lamoreaux-hildenbrand-hildenbrand-1987`
 - `lh87-al-o-gas-species`
