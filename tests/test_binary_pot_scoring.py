@@ -51,7 +51,7 @@ def test_engine_arm_pots_unchanged() -> None:
     assert [pot.pot_id for pot in pots] == list(ENGINE_ARM_POT_IDS)
 
 
-def test_scoring_pots_are_content_derived_from_extracts() -> None:
+def test_scoring_pots_are_content_derived_from_extracts(tmp_path: Path) -> None:
     derived = build_scoring_pots_from_extracts(SCORING_EXTRACTS)
     loaded = load_scoring_pots(DEFAULT_POTS_PATH)
     assert [p.pot_id for p in loaded] == [p.pot_id for p in derived]
@@ -87,14 +87,11 @@ def test_scoring_pots_are_content_derived_from_extracts() -> None:
                 obs["values"]["rows"] = []
                 found = True
     assert found
-    tmp = extract_path.with_name("kems-057-kambayashi-1985.mutated-for-test.yaml")
-    try:
-        tmp.write_text(yaml.safe_dump(mutated), encoding="utf-8")
-        shrunk = build_scoring_pots_from_extracts((tmp, SCORING_EXTRACTS[1]))
-        assert len(shrunk) == len(derived) - 3
-        assert all("pbo_p2o5" not in p.pot_id for p in shrunk)
-    finally:
-        tmp.unlink(missing_ok=True)
+    tmp = tmp_path / "kems-057-kambayashi-1985.table3-empty-for-test.yaml"
+    tmp.write_text(yaml.safe_dump(mutated), encoding="utf-8")
+    shrunk = build_scoring_pots_from_extracts((tmp, SCORING_EXTRACTS[1]))
+    assert len(shrunk) == len(derived) - 3
+    assert all("pbo_p2o5" not in p.pot_id for p in shrunk)
 
 
 def test_table3_elemental_wt_pct_reproduces_printed_mole_fraction() -> None:
@@ -394,7 +391,7 @@ def _successful_p2o5_cell(pot) -> EquilibrateCell:
     )
 
 
-def _mutate_kambayashi_gamma(mutator) -> Path:
+def _mutate_kambayashi_gamma(mutator, tmp_path: Path, filename: str) -> Path:
     extract_path = SCORING_EXTRACTS[0]
     payload = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
     mutated = copy.deepcopy(payload)
@@ -405,12 +402,12 @@ def _mutate_kambayashi_gamma(mutator) -> Path:
                 mutator(obs, block)
                 found = True
     assert found
-    tmp = extract_path.with_name("kems-057-kambayashi-1985.admission-mutated-for-test.yaml")
+    tmp = tmp_path / filename
     tmp.write_text(yaml.safe_dump(mutated), encoding="utf-8")
     return tmp
 
 
-def test_rejected_measured_observation_is_not_scored() -> None:
+def test_rejected_measured_observation_is_not_scored(tmp_path: Path) -> None:
     """M12 confirm: canonical rejection is not bypassed by method_class=measured."""
 
     def mark_rejected(obs, _block) -> None:
@@ -419,36 +416,37 @@ def test_rejected_measured_observation_is_not_scored() -> None:
         values["admission_status"] = "rejected_model_output_not_measurement"
         obs["admission_status"] = "rejected_model_output_not_measurement"
 
-    tmp = _mutate_kambayashi_gamma(mark_rejected)
-    try:
-        pots = build_scoring_pots_from_extracts()
-        pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
-        comparators = [
-            c
-            for c in iter_activity_comparators(extract_paths=(tmp,))
-            if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
-            and abs(c.temperature_K - 1643.0) < 1.0
-        ]
-        assert comparators
-        assert all(c.method_class == "measured" for c in comparators)
-        assert all(
-            c.admission_reason == "model_output_not_measurement" for c in comparators
-        )
-        rows = score_scoring_arm(
-            pots=(pot,),
-            cells=(_successful_p2o5_cell(pot),),
-            comparators=comparators,
-            envelope=envelope,
-            rail_for=rail_for,
-        )
-        assert rows
-        assert all(not r["score_eligible"] for r in rows)
-        assert any("model_output_not_measurement" in (r.get("notices") or []) for r in rows)
-    finally:
-        tmp.unlink(missing_ok=True)
+    tmp = _mutate_kambayashi_gamma(
+        mark_rejected,
+        tmp_path,
+        "kems-057-kambayashi-1985.rejected-for-test.yaml",
+    )
+    pots = build_scoring_pots_from_extracts(SCORING_EXTRACTS)
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    comparators = [
+        c
+        for c in iter_activity_comparators(extract_paths=(tmp,))
+        if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+        and abs(c.temperature_K - 1643.0) < 1.0
+    ]
+    assert comparators
+    assert all(c.method_class == "measured" for c in comparators)
+    assert all(
+        c.admission_reason == "model_output_not_measurement" for c in comparators
+    )
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(_successful_p2o5_cell(pot),),
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert rows
+    assert all(not r["score_eligible"] for r in rows)
+    assert any("model_output_not_measurement" in (r.get("notices") or []) for r in rows)
 
 
-def test_superseded_parent_observation_is_not_scored() -> None:
+def test_superseded_parent_observation_is_not_scored(tmp_path: Path) -> None:
     """M12 confirm: a supersedes edge excludes the parent from scoring."""
 
     def add_replacement(obs, block) -> None:
@@ -465,27 +463,28 @@ def test_superseded_parent_observation_is_not_scored() -> None:
             }
         )
 
-    tmp = _mutate_kambayashi_gamma(add_replacement)
-    try:
-        pots = build_scoring_pots_from_extracts()
-        pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
-        parent = [
-            c
-            for c in iter_activity_comparators(extract_paths=(tmp,))
-            if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
-            and abs(c.temperature_K - 1643.0) < 1.0
-        ]
-        assert parent
-        assert all(c.admission_reason == "superseded" for c in parent)
-        rows = score_scoring_arm(
-            pots=(pot,),
-            cells=(_successful_p2o5_cell(pot),),
-            comparators=parent,
-            envelope=envelope,
-            rail_for=rail_for,
-        )
-        assert rows
-        assert all(not r["score_eligible"] for r in rows)
-        assert any("superseded" in (r.get("notices") or []) for r in rows)
-    finally:
-        tmp.unlink(missing_ok=True)
+    tmp = _mutate_kambayashi_gamma(
+        add_replacement,
+        tmp_path,
+        "kems-057-kambayashi-1985.superseded-for-test.yaml",
+    )
+    pots = build_scoring_pots_from_extracts(SCORING_EXTRACTS)
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    parent = [
+        c
+        for c in iter_activity_comparators(extract_paths=(tmp,))
+        if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+        and abs(c.temperature_K - 1643.0) < 1.0
+    ]
+    assert parent
+    assert all(c.admission_reason == "superseded" for c in parent)
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(_successful_p2o5_cell(pot),),
+        comparators=parent,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert rows
+    assert all(not r["score_eligible"] for r in rows)
+    assert any("superseded" in (r.get("notices") or []) for r in rows)
