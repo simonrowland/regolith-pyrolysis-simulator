@@ -28,15 +28,22 @@ from simulator.diagnostic_helpers.species_rail import (
     derive_species_rail,
 )
 from simulator.diagnostic_helpers.species_rail_differential import (
+    AL_MELTING_K,
     CHANNEL_CEA_VS_ELLINGHAM,
     CHANNEL_NASA_CEA,
     CHANNEL_VAPOUR_RAIL_PSAT,
+    FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT,
+    FINDING_CONDENSED_ROW_PAST_TRANSITION,
     JANAF_STANDARD_PRESSURE_PA,
     MG_NBP_K,
     NA_NBP_K,
     QUANTITY_LOG10_PSAT,
+    SI_MELTING_K,
     cea_by_formula,
     _evaluate_rail_pressure_Pa,
+    _pick_condensed_psat,
+    _sidecar_valid_range_K,
+    psat_finding_class,
     ENVELOPE_BANDS,
     PHASE_GAS,
     PHASE_LIQUID,
@@ -973,3 +980,207 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     assert "## Vapour-rail P_sat" in markdown
     assert "Na/Mg boiling-point sanity" in markdown
     assert "pure_component_antoine" in markdown or "sidecar P_sat" in markdown
+
+
+def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
+    """b-493: Al/Si rail P_sat is 1–2 dex above JANAF; cheap hypotheses die.
+
+    H1: adapter uses Al-005/Si-005 gas and Al-003/Si-003 liquid, not cr
+    past melting (Al 933.5 K, Si 1687 K) and not Al2/Si2/Si3.
+    H2: Al 1700/2200 K and Si 2200 K sit inside the Stull sidecar fit
+    (Al 1557–2329 K, Si 1997–2560 K), so the residual is not Antoine
+    extrapolation. H3: Alcock 1984 liquid Al agrees with JANAF; Si is
+    not in Alcock. Finding class is compilation_disagreement.
+    """
+
+    assert AL_MELTING_K == 933.5
+    assert SI_MELTING_K == 1687.0
+    al_fit = _sidecar_valid_range_K("Al")
+    si_fit = _sidecar_valid_range_K("Si")
+    assert al_fit == (1557.0, 2329.0)
+    assert si_fit == (1997.0, 2560.0)
+    assert al_fit[0] <= 1700.0 <= al_fit[1]
+    assert al_fit[0] <= 2200.0 <= al_fit[1]
+    assert si_fit[0] <= 2200.0 <= si_fit[1]
+    assert not (al_fit[0] <= 1200.0 <= al_fit[1])
+    assert not (si_fit[0] <= 1800.0 <= si_fit[1])
+    assert not (si_fit[0] <= 2600.0 <= si_fit[1])
+
+    al_cr_1200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Al-002",
+        formula="Al",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1200.0,
+        delta_fG_kJ_mol=2.951,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    al_l_1200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Al-003",
+        formula="Al",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=1200.0,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    al_g_1200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Al-005",
+        formula="Al",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=1200.0,
+        delta_fG_kJ_mol=173.917,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    picked_1200 = _pick_condensed_psat([al_cr_1200, al_l_1200])
+    assert picked_1200 is al_l_1200
+    assert picked_1200.record_id == "Al-003"
+    assert 1200.0 > AL_MELTING_K
+
+    # Premise: Al(l) ⇌ Al(g), a=1, JANAF P0=0.1 MPa.
+    # Algebra: log10(P_sat/P0)=−ΔvapG/(R T ln 10).
+    # ΔvapG = dfG(Al-005 g)−dfG(Al-003 l)=117.631−0=117.631 kJ/mol at 1700 K.
+    # R=8.314462618e-3 kJ/(mol·K); R T ln 10=0.008314462618×1700×2.302585
+    # =32.546 kJ/mol. log10(P/P0)_JANAF=−117.631/32.546=−3.6143.
+    # Sidecar log10(P/Pa)=10.73623−13204.109/(1700−24.306); P=718.53 Pa.
+    # log10(P/P0)_rail=log10(718.53/1e5)=−2.1436.
+    # residual=−2.1436−(−3.6143)=+1.4707 dex.
+    # Unit: dimensionless dex. Sanity: Alcock 1984 liquid Al four-term at
+    # 1700 K is 23.6 Pa, 0.01 dex from JANAF 24.3 Pa.
+    al_l_1700 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Al-003",
+        formula="Al",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=1700.0,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    al_g_1700 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Al-005",
+        formula="Al",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=1700.0,
+        delta_fG_kJ_mol=117.631,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    al_P = _evaluate_rail_pressure_Pa("Al", 1700.0)
+    assert isinstance(al_P, float)
+    al_score = score_psat_pair(al_g_1700, al_l_1700, al_P, "Al")
+    assert al_score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
+    assert al_score.status == "mismatch"
+    assert al_score.finding_class == "compilation_disagreement"
+    assert al_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
+    assert al_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
+    assert al_score.residual_log10K == pytest.approx(1.4707, abs=5e-4)
+    assert "Al-003" in (al_score.note or "")
+    assert "Stull 1947" in (al_score.note or "")
+    assert psat_finding_class(
+        status="mismatch",
+        formula="Al",
+        species_id="Al",
+        T_K=1200.0,
+        condensed=al_l_1200,
+        provenance_class="independent_tabulation",
+    ) == "compilation_disagreement"
+
+    # Premise: Si(l) ⇌ Si(g), a=1, JANAF P0=0.1 MPa.
+    # Algebra: same as Al. ΔvapG=dfG(Si-005 g)−dfG(Si-003 l)=144.382 kJ/mol
+    # at 2200 K. R T ln 10=0.008314462618×2200×2.302585=42.118 kJ/mol.
+    # log10(P/P0)_JANAF=−144.382/42.118=−3.4280.
+    # Sidecar log10(P/Pa)=14.56436−23308.848/(2200−123.133); P=2194.21 Pa.
+    # log10(P/P0)_rail=log10(2194.21/1e5)=−1.6587.
+    # residual=−1.6587−(−3.4280)=+1.7693 dex.
+    # Unit: dimensionless dex. Sanity: Si is absent from Alcock 1984
+    # metallic-element tables; Clausius–Clapeyron from Tb≈3500 K and
+    # ΔHvap≈383 kJ/mol gives ~42 Pa at 2200 K, with JANAF not Stull.
+    si_cr_2200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Si-002",
+        formula="Si",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=2200.0,
+        delta_fG_kJ_mol=15.151,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    si_l_2200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Si-003",
+        formula="Si",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=2200.0,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    si_g_2200 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Si-005",
+        formula="Si",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=2200.0,
+        delta_fG_kJ_mol=144.382,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="janaf p°=0.1 MPa",
+    )
+    picked_si = _pick_condensed_psat([si_cr_2200, si_l_2200])
+    assert picked_si is si_l_2200
+    assert 2200.0 > SI_MELTING_K
+    si_P = _evaluate_rail_pressure_Pa("Si", 2200.0)
+    assert isinstance(si_P, float)
+    si_score = score_psat_pair(si_g_2200, si_l_2200, si_P, "Si")
+    assert si_score.status == "mismatch"
+    assert si_score.finding_class == "compilation_disagreement"
+    assert si_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
+    assert si_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
+    assert si_score.residual_log10K == pytest.approx(1.7693, abs=5e-4)
+    assert "Si-003" in (si_score.note or "")
+
+    rail = derive_species_rail()
+    channel = score_psat_channel(
+        [al_g_1200, al_cr_1200, al_l_1200, si_g_2200, si_cr_2200, si_l_2200],
+        rail,
+    )
+    by_key = {
+        (p.score.species, p.score.temperature_K): p.score
+        for p in channel
+        if p.score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
+        and p.score.status != "typed-refusal"
+        and p.score.species in {"Al", "Si"}
+    }
+    assert by_key[("Al", 1200.0)].finding_class == "compilation_disagreement"
+    assert "condensed_record=Al-003" in (by_key[("Al", 1200.0)].note or "")
+    assert by_key[("Si", 2200.0)].finding_class == "compilation_disagreement"
+    assert "condensed_record=Si-003" in (by_key[("Si", 2200.0)].note or "")

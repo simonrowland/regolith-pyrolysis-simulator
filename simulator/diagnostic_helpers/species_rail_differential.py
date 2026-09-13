@@ -88,6 +88,14 @@ CHANNEL_ELLINGHAM = "ellingham"
 CHANNEL_CEA_VS_ELLINGHAM = "nasa_cea_vs_ellingham"
 CHANNEL_VAPOUR_RAIL_PSAT = "vapour_rail_psat"
 QUANTITY_LOG10_PSAT = "log10_Psat_over_P0"
+# P_sat-channel finding classes (b-493). Cheap hypotheses first:
+# condensed_row_past_transition, antoine_extrapolated_beyond_fit; else
+# compilation_disagreement. Al/Si mismatches are the last of those.
+FINDING_CONDENSED_ROW_PAST_TRANSITION = "condensed_row_past_transition"
+FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT = "antoine_extrapolated_beyond_fit"
+# JANAF melting points. Used only to name the H1 hypothesis, not to retune.
+AL_MELTING_K = 933.5
+SI_MELTING_K = 1687.0
 UNAVAILABLE_CHANNELS = ("vaporock", "thermoengine", "melts")
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 
@@ -1119,6 +1127,50 @@ def _pick_condensed_psat(
     return min(solids, key=lambda p: p.delta_fG_kJ_mol)
 
 
+def _sidecar_valid_range_K(species_id: str) -> tuple[float, float] | None:
+    row = _legacy_species_row(species_id)
+    pca = row.get("pure_component_antoine")
+    if not isinstance(pca, Mapping):
+        return None
+    vr = pca.get("valid_range_K")
+    if not isinstance(vr, Sequence) or isinstance(vr, (str, bytes)) or len(vr) != 2:
+        return None
+    low, high = float(vr[0]), float(vr[1])
+    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+        return None
+    return low, high
+
+
+def psat_finding_class(
+    *,
+    status: str,
+    formula: str,
+    species_id: str,
+    T_K: float,
+    condensed: KeyedTablePoint,
+    provenance_class: str,
+) -> str | None:
+    """P_sat-channel finding class after the b-493 cheap hypotheses.
+
+    Premise: ln(P_sat/P0) = −[dfG(g)−dfG(cr or l)]/(R T) at printed T.
+    Cheap H1 (condensed_row_past_transition): a cr row used above the
+    melting point (Al 933.5 K, Si 1687 K) would drift monotonically.
+    Adapter picks liquid when present (Al-003 / Si-003), so H1 dies.
+    Cheap H2 (antoine_extrapolated_beyond_fit): T outside the Stull
+    sidecar fit (Al 1557–2329 K, Si 1997–2560 K) can drift. Al 1700/2200
+    and Si 2200 sit inside the fit with residual still 1.16–1.77 dex, so
+    H2 is not the class. Cheap H3: Alcock 1984 liquid Al agrees with
+    JANAF to ~0.01 dex; Alcock does not tabulate Si. Rail Stull 1947 is
+    the departing side. Al/Si mismatches are compilation_disagreement
+    at every T, including the extrapolated ends. Other species keep the
+    generic independent-tabulation class.
+    """
+
+    if formula in {"Al", "Si"} and status == "mismatch":
+        return "compilation_disagreement"
+    return _finding_class(provenance_class, status)
+
+
 # ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
@@ -1557,6 +1609,14 @@ def score_psat_pair(
     residual_kJ = engine_dvap - table_dvap
     provenance = PROVENANCE_INDEPENDENT
     status = _status_for_residual(residual_kJ, provenance)
+    finding = psat_finding_class(
+        status=status,
+        formula=gas.formula,
+        species_id=species_id,
+        T_K=T,
+        condensed=condensed,
+        provenance_class=provenance,
+    )
     return GibbsPointScore(
         key=_point_key(
             gas.compilation_id,
@@ -1577,7 +1637,7 @@ def score_psat_pair(
         residual_log10K=residual_log10,
         band_kJ_mol=PIN_BAND_KJ_MOL,
         status=status,
-        finding_class=_finding_class(provenance, status),
+        finding_class=finding,
         engine_channel=CHANNEL_VAPOUR_RAIL_PSAT,
         cea_key=None,
         skip_reason=None,
@@ -1585,6 +1645,12 @@ def score_psat_pair(
             f"{gas.note}; ln(P_sat/P0)=-[dfG(g)-dfG({condensed.phase})]/(R T); "
             f"P0={P0:g} Pa; rail_id={species_id}; "
             f"condensed_record={condensed.record_id}; a_melt=1"
+            + (
+                "; mechanism=compilation_disagreement "
+                "(Stull 1947 sidecar vs JANAF ΔvapG)"
+                if gas.formula in {"Al", "Si"} and status == "mismatch"
+                else ""
+            )
         ),
     )
 
