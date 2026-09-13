@@ -939,6 +939,57 @@ def test_python_api_in_band_liquidus_omits_structured_commissioning(
     _assert_no_structured_commissioning(result)
 
 
+def test_python_api_native_finder_hot_result_is_assessed(monkeypatch) -> None:
+    """E01 / Codex R1: exposed findLiq=1600 C is assessed even if the scan stays in band."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    backend._pet_module.findLiq_MELTS = lambda **_kwargs: 1600.0
+
+    def fake_isolated(operation, *, args=(), kwargs=None):
+        kwargs = dict(kwargs or {})
+        calls.append({'operation': operation, 'kwargs': kwargs})
+        if operation in ('findLiq_MELTS', 'findLiq'):
+            return 1600.0
+        temperature_C = float(kwargs.get('T_C', 1300.0))
+        frac = max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
+        payload = {
+            'Conditions': {
+                'mass': 100.0,
+                'fO2_log': -9.0,
+                'P_bar': 1.0,
+            },
+            'liquid1': {'SiO2': 50.0},
+            'liquid1_prop': {'mass': 100.0 * frac if frac > 0.0 else 0.0},
+        }
+        if frac < 1.0:
+            payload['olivine1'] = {'SiO2': 40.0}
+            payload['olivine1_prop'] = {'mass': 100.0 * (1.0 - frac)}
+        if payload['liquid1_prop']['mass'] <= 0.0:
+            payload.pop('liquid1')
+            payload.pop('liquid1_prop')
+        return payload
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fake_isolated)
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1400.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+    assert calls, 'python_api liquidus must still call the PetThermoTools transport'
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1300.0)
+    _assert_structured_commissioning(result)
+    extent = (result.diagnostics or {}).get('commissioning_notice', {}).get(
+        'evaluated_temperature_C'
+    )
+    assert extent, 'native finder T must enter the assessed temperature extent'
+    assert min(extent) <= 1600.0 <= max(extent)
+
+
 def test_python_api_hot_in_band_composition_notices(monkeypatch) -> None:
     """D01 / grok P1-1: python_api equilibrate at 2200 C, in-band composition."""
     backend = AlphaMELTSBackend()

@@ -1687,6 +1687,29 @@ class _MELTSBackendSupport(MeltBackend):
                 f'findLiq={ptt_liquidus_C:.3f} C, '
                 f'bisection={result.liquidus_T_C:.3f} C'
             )
+        if ptt_liquidus_C is not None:
+            native_T_C = float(ptt_liquidus_C)
+            if not any(
+                math.isclose(
+                    native_T_C, temperature_C,
+                    rel_tol=0.0, abs_tol=1.0e-9,
+                )
+                for temperature_C in evaluated_T_C
+            ):
+                evaluated_T_C.append(native_T_C)
+            extra_warnings: List[str] = []
+            native_fields = self._apply_engine_commissioning(
+                comp_wt,
+                temperature_C=native_T_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                warnings=extra_warnings,
+            )
+            if native_fields is not None and sample_commissioning is None:
+                sample_commissioning = native_fields
+            for warning in extra_warnings:
+                if warning not in warnings_out:
+                    warnings_out.append(warning)
         diagnostics_out = dict(result.diagnostics or {})
         if sample_commissioning is not None:
             notice = dict(sample_commissioning['commissioning_notice'])
