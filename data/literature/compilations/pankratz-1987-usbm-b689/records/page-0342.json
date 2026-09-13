@@ -125,11 +125,12 @@
           "footnote_markers": []
         },
         "log_k": {
-          "raw": "416.861",
-          "value": 416.861,
-          "ocr_suspect": true,
-          "ocr_check": "not_image_verified",
-          "footnote_markers": []
+          "raw": "-16.861",
+          "value": -16.861,
+          "ocr_suspect": false,
+          "ocr_check": "image_verified",
+          "footnote_markers": [],
+          "raw_ocr_token": "416.861"
         }
       }
     },
@@ -1006,7 +1007,26 @@
       "printed_form_ocr": "Sb "
     }
   ],
-  "corrections": [],
+  "corrections": [
+    {
+      "record_id": "page-0342",
+      "printed_page": 342,
+      "pdf_page": 346,
+      "source_row_index": 2,
+      "column": "log_k",
+      "kind": "repair",
+      "ocr_token": "416.861",
+      "printed_token": "-16.861",
+      "image_quote": "Sb₄S₃(g), 298.15 K: ΔGf° 23.002 kcal/mol; Log Kf −16.861",
+      "render_dpi": 300,
+      "ocr_class": "I/l/i/3/4 stacking; dirty minus + 1 read as 4",
+      "image_evidence": {
+        "source_pdf_sha256": "0b4b37822a058193e2d912214d74e0a1884d604ee3dad798d90800cadff70771",
+        "pdf_page": 346,
+        "render_dpi": 300
+      }
+    }
+  ],
   "ambiguities": [
     {
       "kind": "post_table_note_ocr_unverified",

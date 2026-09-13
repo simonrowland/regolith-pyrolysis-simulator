@@ -79,6 +79,10 @@ def _assert_image_anchors(records):
     assert corrected["raw"] == "-.968"
     assert corrected["value"] == -0.968
     assert corrected["raw_ocr_token"] == "-968"
+    sb4s3 = by_id["page-0342"]["rows"][0]["cells"]["log_k"]
+    assert sb4s3["raw"] == "-16.861"
+    assert sb4s3["value"] == -16.861
+    assert sb4s3["raw_ocr_token"] == "416.861"
     for printed, formula, published, name, phase in [
         (37, "B2S", "B₂S(g)", "Diboron Sulfide (ideal gas)", "g"),
         (38, "B2S", "B₂S(g)", "Diboron Sulfide (ideal gas)", "g"),
@@ -115,6 +119,11 @@ def test_reverting_numeric_repair_is_detected():
     records = _records()
     record = next(r for r in records if r["record_id"] == "page-0030")
     record["rows"][14]["cells"]["log_k"].update(raw="-968", value=-968)
+    with pytest.raises(AssertionError):
+        _assert_image_anchors(records)
+    records = _records()
+    record = next(r for r in records if r["record_id"] == "page-0342")
+    record["rows"][0]["cells"]["log_k"].update(raw="416.861", value=416.861)
     with pytest.raises(AssertionError):
         _assert_image_anchors(records)
 
