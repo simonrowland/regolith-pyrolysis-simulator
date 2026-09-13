@@ -622,3 +622,35 @@ def test_liquidus_search_aggregates_commissioning_notice(monkeypatch) -> None:
     evaluated = notice['evaluated_temperature_C']
     assert evaluated[0] <= 1000.0
     assert evaluated[-1] >= 1600.0
+
+
+def test_commissioning_notice_is_call_local(monkeypatch) -> None:
+    """C07 / F7: a later early refusal must not inherit the prior notice."""
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._engine_version = 'test'
+    called: list = []
+    monkeypatch.setattr(backend, '_equilibrate_prepared', _spy_prepared(called))
+
+    first = backend.equilibrate(
+        temperature_C=2200.0,
+        composition_kg=_in_band_pot(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+    assert first.diagnostics.get('commissioning_notice')
+
+    second = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_mol_by_account={
+            'process.cleaned_melt': {'SiO2': 1.0, 'MgO': 1.0, 'Al2O3': 1.0},
+            'oxygen_mre_anode_stored': {'O2': 0.1},
+        },
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+    assert second.status == 'out_of_domain'
+    assert 'commissioning_notice' not in (second.diagnostics or {})
+    assert (second.diagnostics or {}).get('authority') is None

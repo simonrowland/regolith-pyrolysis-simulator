@@ -930,9 +930,6 @@ class _MELTSBackendSupport(MeltBackend):
         self._subprocess_vapor_pressure_provider = None
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
-        self._pending_commissioning_diagnostics: Optional[dict[str, object]] = (
-            None
-        )
 
     def initialize(self, config: dict) -> bool:
         """
@@ -1393,7 +1390,6 @@ class _MELTSBackendSupport(MeltBackend):
             if math.isfinite(float(mass_kg)) and float(mass_kg) > 0.0
         )
 
-        self._pending_commissioning_diagnostics = None
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         crash_diagnostics = self._out_of_domain_diagnostics(
             temperature_C=temperature_C,
@@ -1425,7 +1421,7 @@ class _MELTSBackendSupport(MeltBackend):
         if domain_rejection is not None:
             return domain_rejection
         commissioning_warnings: List[str] = []
-        commissioning_refusal = self._apply_engine_commissioning(
+        commissioning_fields = self._apply_engine_commissioning(
             raw_comp_wt,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -1433,8 +1429,6 @@ class _MELTSBackendSupport(MeltBackend):
             diagnostics=crash_diagnostics,
             warnings=commissioning_warnings,
         )
-        if commissioning_refusal is not None:
-            return commissioning_refusal
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         crash_diagnostics = self._out_of_domain_diagnostics(
             temperature_C=temperature_C,
@@ -1446,8 +1440,8 @@ class _MELTSBackendSupport(MeltBackend):
             composition_mol_by_account=composition_mol_by_account,
             reason=OutOfDomainReason.NOT_CONVERGED.value,
         )
-        if self._pending_commissioning_diagnostics:
-            crash_diagnostics.update(self._pending_commissioning_diagnostics)
+        if commissioning_fields:
+            crash_diagnostics.update(commissioning_fields)
         warnings = list(self._last_normalization_warnings)
         warnings.extend(commissioning_warnings)
 
@@ -1796,10 +1790,6 @@ class _MELTSBackendSupport(MeltBackend):
         phase_masses = dict(phase_masses_kg or {})
         result_status = str(status)
         result_diagnostics = dict(diagnostics or {})
-        pending = self._pending_commissioning_diagnostics
-        if pending:
-            for key, value in pending.items():
-                result_diagnostics.setdefault(key, value)
         reported_activities = dict(activity_coefficients or {})
         result_diagnostics.update(
             self._activity_diagnostic_payload(reported_activities)
@@ -2111,8 +2101,8 @@ class _MELTSBackendSupport(MeltBackend):
         fO2_log: Optional[float],
         diagnostics: Optional[Mapping[str, object]] = None,
         warnings: Optional[List[str]] = None,
-    ) -> Optional[EquilibriumResult]:
-        """Certified-band notice. Never silent; never a pre-run floor refusal.
+    ) -> Optional[dict[str, object]]:
+        """Certified-band notice. Call-local; never retained on the backend.
 
         Out of the project-owned certified SiO2/T band the engine still
         runs: a notice with authority=extrapolated and certified_band is
@@ -2120,29 +2110,28 @@ class _MELTSBackendSupport(MeltBackend):
         actual AlphaMELTS subprocess death below that floor is annotated
         on the typed engine_crash already produced by the base path.
         """
-        self._pending_commissioning_diagnostics = None
         assessment = assess_engine_commissioning(
             self.backend_name,
             sio2_wt_pct=self._canonical_sio2_wt_pct(comp_wt),
             temperature_K=float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         )
-        if assessment.notice is not None:
-            notice = dict(assessment.notice)
-            pending = {
-                'commissioning_notice': notice,
-                'authority': notice['authority'],
-                'certified_band': notice['certified_band'],
-            }
-            self._pending_commissioning_diagnostics = pending
-            if isinstance(diagnostics, dict):
-                for key, value in pending.items():
-                    diagnostics.setdefault(key, value)
-            if warnings is not None:
-                warnings.append(
-                    'CommissioningNotice: out of certified band; '
-                    f"authority={notice['authority']}; engine will run"
-                )
-        return None
+        if assessment.notice is None:
+            return None
+        notice = dict(assessment.notice)
+        pending: dict[str, object] = {
+            'commissioning_notice': notice,
+            'authority': notice['authority'],
+            'certified_band': notice['certified_band'],
+        }
+        if isinstance(diagnostics, dict):
+            for key, value in pending.items():
+                diagnostics.setdefault(key, value)
+        if warnings is not None:
+            warnings.append(
+                'CommissioningNotice: out of certified band; '
+                f"authority={notice['authority']}; engine will run"
+            )
+        return pending
 
     def _crash_floor_result(
         self,
@@ -2782,19 +2771,13 @@ class _MELTSBackendSupport(MeltBackend):
                 warnings=tuple(domain_rejection.warnings),
                 diagnostics=dict(domain_rejection.diagnostics),
             )
-        commissioning_refusal = self._apply_engine_commissioning(
+        self._apply_engine_commissioning(
             raw_comp_wt,
             temperature_C=min_T_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             diagnostics=diagnostics,
         )
-        if commissioning_refusal is not None:
-            return LiquidusSolidusResult(
-                status=commissioning_refusal.status,
-                warnings=tuple(commissioning_refusal.warnings),
-                diagnostics=dict(commissioning_refusal.diagnostics),
-            )
         try:
             return self._normalize_composition_to_melts_basis(raw_comp_wt)
         except ValueError as exc:
@@ -4762,14 +4745,12 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if domain_rejection is not None:
             return [domain_rejection]
-        commissioning_refusal = self._apply_engine_commissioning(
+        self._apply_engine_commissioning(
             raw_comp_wt,
             temperature_C=T_C,
             pressure_bar=P_start_bar,
             fO2_log=fO2_log,
         )
-        if commissioning_refusal is not None:
-            return [commissioning_refusal]
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         ptt = self._require_petthermotools_runtime()
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
