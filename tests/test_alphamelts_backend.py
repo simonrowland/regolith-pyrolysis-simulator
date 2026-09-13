@@ -2129,34 +2129,79 @@ def test_alphamelts_cleanup_reaps_launcher_after_retry_kill(monkeypatch):
 def test_alphamelts_subprocess_below_certified_t_notices_and_still_launches(
     monkeypatch,
 ):
-    """t-894: certified T band is notice+run, not a pre-equilibrate refusal."""
+    """t-894: certified T band is notice+run, not a pre-equilibrate refusal.
+
+    Spy the real launch boundary (``_run_alphamelts_subprocess``). Restoring
+    the old ``T < 800 C`` refusal inside ``_equilibrate_subprocess`` must
+    make this test fail.
+    """
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
-    called = []
+    launches = []
+    temperature_C = 75.0
 
-    def spy_prepared(**kwargs):
-        called.append(kwargs)
-        return EquilibriumResult(
-            temperature_C=kwargs['temperature_C'],
-            status='ok',
-            liquid_fraction=1.0,
-            phases_present=['liquid'],
-            diagnostics=dict(kwargs.get('crash_diagnostics') or {}),
-            warnings=list(kwargs.get('warnings') or []),
+    def fake_run(args, **kwargs):
+        argv = list(args[0] if args and isinstance(args[0], (list, tuple)) else args)
+        if argv and argv[-1] == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr=''
+            )
+        launches.append(argv)
+        cwd = Path(kwargs['cwd'])
+        (cwd / 'System_main_tbl.txt').write_text(
+            _system_main_fixture(temperature_C=temperature_C)
+        )
+        (cwd / 'Phase_main_tbl.txt').write_text(
+            f'index 1 Pressure 1.00 Temperature {temperature_C:.2f} '
+            'SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            '50 15 10 10 10 5\n'
+        )
+        (cwd / 'Solid_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {temperature_C:.2f} 0.0 ---\n'
+        )
+        (cwd / 'Bulk_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {temperature_C:.2f} 100.0 50 15 10 10 10 5\n'
+        )
+        (cwd / 'Liquid_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            f'1 1.00 {temperature_C:.2f} 100.0 50 15 10 10 10 5\n'
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout=(
+                '<> Stable liquid assemblage achieved.\n'
+                'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+                f'T {temperature_C:.6f} (C)\n'
+                'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
+                '100.0 g 50 15 10 10 10 5\n'
+                'Melt fraction = 1.0\n'
+            ),
+            stderr='',
         )
 
-    monkeypatch.setattr(backend, '_equilibrate_prepared', spy_prepared)
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: ({}, {}, {'vapor_pressure_zero_reason': 'test_stub'}),
+    )
 
     result = backend.equilibrate(
-        temperature_C=75.0,
+        temperature_C=temperature_C,
         composition_kg=_melts_domain_composition(),
         fO2_log=-9.0,
         pressure_bar=1.0,
         subprocess_run_mode='isothermal',
     )
 
-    assert called, 'certified-band T must still call the engine'
+    assert launches, 'certified-band T must still launch the subprocess'
     assert result.diagnostics['authority'] == 'extrapolated'
     assert result.diagnostics['commissioning_notice']['kind'] == (
         'engine_commissioning'

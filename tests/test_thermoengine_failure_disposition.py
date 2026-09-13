@@ -8,6 +8,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
     ThermoEngineOutOfDomainError,
+    ThermoEnginePayload,
     ThermoEngineRefusalCause,
     ThermoEngineTimeoutCause,
     ThermoEngineTimeoutError,
@@ -16,7 +17,6 @@ from engines.alphamelts.thermoengine import (
 from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
-from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
 
@@ -185,20 +185,30 @@ def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
     backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._engine_version = 'test'
+    backend._vaporock_available = False
     called: list[dict] = []
 
-    def spy(**kwargs):
-        called.append(kwargs)
-        return EquilibriumResult(
-            temperature_C=kwargs['temperature_C'],
-            status='ok',
-            liquid_fraction=1.0,
-            phases_present=['liquid'],
-            diagnostics=dict(kwargs.get('crash_diagnostics') or {}),
-            warnings=list(kwargs.get('warnings') or []),
-        )
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            called.append(kwargs)
+            return ThermoEnginePayload(
+                phases_present=('liquid',),
+                phase_masses_kg={'liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(kwargs['comp_wt']),
+                activity_coefficients={'SiO2': 0.4},
+                solved_fO2_log=kwargs['fO2_log'],
+            )
 
-    monkeypatch.setattr(backend, '_equilibrate_prepared', spy)
+        def close(self):
+            return None
+
+    backend._thermoengine_transport = FakeTransport()
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *args, **kwargs: {},
+    )
     result = backend.equilibrate(
         temperature_C=2200.0,
         composition_kg={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 35.0},

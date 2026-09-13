@@ -282,10 +282,7 @@ def test_missing_table_is_typed_error(tmp_path: Path) -> None:
 
 def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:
     backend = AlphaMELTSBackend()
-    backend._mode = 'subprocess'
-    backend._engine_version = 'test'
-    called: list = []
-    monkeypatch.setattr(backend, '_equilibrate_prepared', _spy_prepared(called))
+    calls = _install_alphamelts_transport_spy(monkeypatch, backend)
 
     result = backend.equilibrate(
         temperature_C=1400.0,
@@ -295,17 +292,14 @@ def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:
         subprocess_run_mode='isothermal',
     )
 
-    assert called, 'in-band pot must call the engine'
+    assert calls, 'in-band pot must call the engine'
     assert 'commissioning_notice' not in result.diagnostics
     assert result.diagnostics.get('authority') is None
 
 
 def test_out_of_band_pot_notices_and_still_calls_engine(monkeypatch) -> None:
     backend = AlphaMELTSBackend()
-    backend._mode = 'subprocess'
-    backend._engine_version = 'test'
-    called: list = []
-    monkeypatch.setattr(backend, '_equilibrate_prepared', _spy_prepared(called))
+    calls = _install_alphamelts_transport_spy(monkeypatch, backend)
 
     result = backend.equilibrate(
         temperature_C=1400.0,
@@ -315,7 +309,7 @@ def test_out_of_band_pot_notices_and_still_calls_engine(monkeypatch) -> None:
         subprocess_run_mode='isothermal',
     )
 
-    assert called, 'out-of-band pot must still call the engine'
+    assert calls, 'out-of-band pot must still call the engine'
     notice = result.diagnostics['commissioning_notice']
     assert notice['kind'] == 'engine_commissioning'
     assert result.diagnostics['authority'] == 'extrapolated'
@@ -331,10 +325,7 @@ def test_thermoengine_out_of_band_notices_and_still_calls_engine(
     monkeypatch,
 ) -> None:
     backend = ThermoEngineBackend()
-    backend._mode = 'thermoengine'
-    backend._engine_version = 'test'
-    called: list = []
-    monkeypatch.setattr(backend, '_equilibrate_prepared', _spy_prepared(called))
+    calls = _install_thermoengine_transport_spy(monkeypatch, backend)
 
     result = backend.equilibrate(
         temperature_C=2200.0,
@@ -343,7 +334,7 @@ def test_thermoengine_out_of_band_notices_and_still_calls_engine(
         pressure_bar=1.0,
     )
 
-    assert called, 'thermoengine must run outside the certified T band'
+    assert calls, 'thermoengine must run outside the certified T band'
     assert result.diagnostics['authority'] == 'extrapolated'
     assert result.diagnostics['certified_band']['temperature_K'] == [
         1073.15,
