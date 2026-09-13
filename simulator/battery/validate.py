@@ -739,10 +739,31 @@ def validate_observation(
     return issues
 
 
+def _lineage_tokens(
+    observation: Observation,
+    experiments: Mapping[str, Experiment],
+    works: Mapping[str, Work] | None,
+) -> set[str]:
+    tokens: set[str] = set()
+    if observation.source_id:
+        tokens.add(observation.source_id)
+    experiment = experiments.get(observation.experiment_id)
+    if experiment is None:
+        return tokens
+    if experiment.work_id:
+        tokens.add(experiment.work_id)
+        work = None if works is None else works.get(experiment.work_id)
+        if work is not None:
+            tokens.update(work.source_ids)
+            tokens.update(asset.asset_id for asset in work.source_files.files)
+    return tokens
+
+
 def validate_residual(
     residual: Residual,
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
+    works: Mapping[str, Work] | None = None,
     path: str = "residual",
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
@@ -925,6 +946,22 @@ def validate_residual(
                             "score_eligible requires engine_prediction candidate",
                         )
                     )
+                if (
+                    residual.source_relation is SourceRelation.INDEPENDENT
+                    and candidate.engine is not None
+                ):
+                    overlap = _lineage_tokens(reference, experiments, works) & set(
+                        candidate.engine.coefficient_sources
+                    )
+                    if overlap:
+                        issues.append(
+                            _issue(
+                                f"{path}.source_relation",
+                                RefusalReason.CONDITIONAL_FIELD,
+                                "independent score_eligible requires coefficient_sources "
+                                "disjoint from the reference work/source ids (same_input)",
+                            )
+                        )
             quantity = None
             if isinstance(reference.identity, Identity):
                 quantity = reference.identity.quantity
@@ -1041,6 +1078,8 @@ def validate_corpus(
         )
     for residual in res_items:
         issues.extend(
-            validate_residual(residual, obs_map, exp_map, f"residual[{residual.key}]")
+            validate_residual(
+                residual, obs_map, exp_map, work_map, f"residual[{residual.key}]"
+            )
         )
     return ValidationReport(tuple(issues))

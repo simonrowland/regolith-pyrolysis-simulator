@@ -654,8 +654,33 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
     assert swapped.ok
     assert own.source_relation is SourceRelation.SAME_INPUT
     assert independent.source_relation is SourceRelation.INDEPENDENT
-    # Role mutation is a provenance predicate, not a count. Swapping labels
-    # without swapping coefficient_sources would be a later scorer concern.
+    from dataclasses import replace
+
+    own_input_eng = replace(
+        eng,
+        observation_id="eng-m15-own-input",
+        engine=replace(eng.engine, coefficient_sources=("janaf-4th",)),
+    )
+    relabelled = F.residual(
+        "m15-relabelled",
+        rows[1].observation_id,
+        candidate=own_input_eng.observation_id,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=True,
+    )
+    role_swap = validate_corpus([w], [exp], rows + [own_input_eng], [relabelled])
+    assert not role_swap.ok
+    assert any("coefficient_sources" in i.detail for i in role_swap.issues)
+    labelled_same = F.residual(
+        "m15-same-input-ok",
+        rows[1].observation_id,
+        candidate=own_input_eng.observation_id,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.SAME_INPUT,
+        score_eligible=False,
+    )
+    assert validate_corpus([w], [exp], rows + [own_input_eng], [labelled_same]).ok
 
 
 def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
