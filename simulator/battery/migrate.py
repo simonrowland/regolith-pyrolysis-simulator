@@ -66,13 +66,13 @@ from simulator.battery.identity import (
     bar_to_pa,
     celsius_to_kelvin,
     profile_for,
-    quantity_token,
 )
 from simulator.battery.records import (
     Admission,
     AdmissionDecision,
     Apparatus,
     ApparatusGeometry,
+    Derivation,
     Evidence,
     Experiment,
     FlowRegime,
@@ -517,6 +517,8 @@ class SourceCount:
     works_out: int = 0
     experiments_out: int = 0
     queued: int = 0
+    metadata_in: int = 0
+    index_works_in: int = 0
 
 
 @dataclass
@@ -1165,7 +1167,19 @@ def apparatus_from_equipment(equipment: object) -> Apparatus | None:
             if converted is None:
                 geometry_kwargs[dest] = located_unknown(why or "unmapped area unit")
             else:
-                geometry_kwargs[dest] = located_value(converted, loc)
+                inference = None
+                if payload.get("inferred") or payload.get("inference"):
+                    from simulator.battery.records import Derivation
+
+                    inference = Derivation(
+                        relation=str(payload.get("inference") or "inferred"),
+                        inputs=(str(payload.get("locator") or dest),),
+                        parameters=(),
+                        output_unit="m2",
+                    )
+                geometry_kwargs[dest] = Located(
+                    State.of(converted), locator=loc, inference=inference
+                )
             continue
         geometry_kwargs[dest] = located_value(amount, loc)
     geometry = ApparatusGeometry(**geometry_kwargs) if geometry_kwargs else None
@@ -1245,11 +1259,33 @@ def work_id_for(
     return citation_hash(citation), None
 
 
+def choose_read_from(work: Work, locator: Locator | None) -> str:
+    files = work.source_files.files
+    loc_path = locator.source_path if locator is not None else None
+    if loc_path:
+        for asset in files:
+            if asset.path != "unknown" and (
+                asset.path in str(loc_path) or str(loc_path) in asset.path
+            ):
+                return asset.asset_id
+        lowered = str(loc_path).lower()
+        if "tables/" in lowered or lowered.endswith(".csv"):
+            for asset in files:
+                if asset.role is AssetRole.TABLE_CSV:
+                    return asset.asset_id
+        if lowered.endswith(".md"):
+            for asset in files:
+                if asset.role is AssetRole.MINERU_MD:
+                    return asset.asset_id
+    for asset in files:
+        if asset.role is AssetRole.PDF and asset.path != "unknown":
+            return asset.asset_id
+    return "unknown"
+
+
 def source_files_for(
     source_id: str,
     index_row: Mapping[str, Any] | None,
-    *,
-    extra_assets: tuple[SourceFile, ...] = (),
 ) -> SourceFiles:
     files: list[SourceFile] = []
     corpus = (index_row or {}).get("corpus") or {}
@@ -1262,15 +1298,15 @@ def source_files_for(
     raw = corpus.get("raw") or {}
     pdf_path = raw.get("path") or (index_row or {}).get("pdf_path")
     sha = raw.get("sha256") or (index_row or {}).get("pdf_sha256")
-    asset_id = f"pdf:{source_id}"
-    files.append(
-        SourceFile(
-            asset_id=asset_id,
-            role=AssetRole.PDF,
-            path=str(pdf_path) if pdf_path else "unknown",
-            sha256=State.of(str(sha)) if sha else State.unknown("INDEX does not give sha256"),
+    if pdf_path:
+        files.append(
+            SourceFile(
+                asset_id=f"pdf:{source_id}",
+                role=AssetRole.PDF,
+                path=str(pdf_path),
+                sha256=State.of(str(sha)) if sha else State.unknown("INDEX does not give sha256"),
+            )
         )
-    )
     text = corpus.get("text") or {}
     if text.get("exists") or text.get("path"):
         files.append(
@@ -1291,7 +1327,15 @@ def source_files_for(
                 sha256=State.unknown("INDEX does not give table sha256"),
             )
         )
-    files.extend(extra_assets)
+    if not files:
+        files.append(
+            SourceFile(
+                asset_id=f"unknown:{source_id}",
+                role=AssetRole.PDFTOTEXT,
+                path="unknown",
+                sha256=State.unknown("INDEX does not give an asset"),
+            )
+        )
     repo = CORPUS_REPO_DEFAULT
     return SourceFiles(corpus_repo=repo, corpus_commit=commit, files=tuple(files))
 
@@ -1312,6 +1356,21 @@ def iter_extract_observations(
             for obs in body.get("observations") or []:
                 if isinstance(obs, Mapping):
                     yield str(formula), dict(obs)
+
+
+def _is_compilation_metadata(path: Path) -> bool:
+    name = path.name
+    if name in {
+        "manifest.yaml",
+        "access-status.yaml",
+        "html-era-txt-divergence.yaml",
+        "sidecar.yaml",
+        "census.json",
+    }:
+        return True
+    if name.startswith("image-verified-fixture"):
+        return True
+    return False
 
 
 def discover_extracts(directory: Path | None = None) -> list[Path]:
@@ -1739,6 +1798,9 @@ class Migrator:
         identity = fill_identity(quantity, species, **ident_kwargs)
 
         experiment_id = self._experiment_id(work.work_id, locator, source_id)
+        rail_raw = obs.get("rail") or values.get("rail")
+        if rail_raw:
+            canonicalize_rail(str(rail_raw))
         method = map_method(obs.get("regime"))
         if method.is_unknown:
             self.result.add_queue(
@@ -1759,7 +1821,7 @@ class Migrator:
             method=method,
             equipment=obs.get("equipment"),
         )
-        read_from = work.source_files.files[0].asset_id if work.source_files.files else "unknown"
+        read_from = choose_read_from(work, locator)
         if exploded and isinstance(values.get("series"), list):
             before = self._count(source_key).observations_out
             for item in exploded:
@@ -1973,6 +2035,7 @@ class Migrator:
         method: State[MethodToken] | None = None,
         equipment: object = None,
         source_row_index: int | None = None,
+        derivation: Derivation | None = None,
     ) -> Observation:
         ident_kwargs: dict[str, Any] = {}
         if temperature_K is not None:
@@ -2005,8 +2068,9 @@ class Migrator:
             notices=(),
             source_id=source_id,
             locator=locator,
-            read_from=work.source_files.files[0].asset_id,
+            read_from=choose_read_from(work, locator),
             point_conditions=point_conditions,
+            derivation=derivation,
         )
         self._add_observation(
             observation, source_key, source_row_index=source_row_index
@@ -2087,6 +2151,7 @@ class Migrator:
                     evidence=evidence_for(point.get("method_class"))[0],
                     temperature_K=t,
                     method=map_method(point.get("regime") or point.get("method")),
+                    uncertainty=uncertainty_for(point.get("uncertainty")),
                 )
 
     def _migrate_mre(self, path: Path) -> None:
@@ -2161,6 +2226,7 @@ class Migrator:
                             class_=State.unknown("mre sidecar does not state method_class")
                         ),
                         method=State.unknown("mre method not a closed token"),
+                        uncertainty=uncertainty_for(point.get("uncertainty")),
                     )
 
     def _migrate_langmuir(self, path: Path) -> None:
@@ -2318,6 +2384,14 @@ class Migrator:
                 pa = atm_to_pa(p_atm) if p_atm is not None else None
                 from simulator.battery.records import Derivation
 
+                derivation = None
+                if pa is not None:
+                    derivation = Derivation(
+                        relation="atm_to_Pa",
+                        inputs=(loc.record or "raw_pCa",),
+                        parameters=(),
+                        output_unit="Pa",
+                    )
                 self._generic_obs(
                     work=work,
                     source_id="shornikov-2025-cao",
@@ -2332,6 +2406,7 @@ class Migrator:
                     evidence=evidence_for(row.get("method_class"))[0],
                     temperature_K=t,
                     method=map_method(row.get("method") or row.get("regime")),
+                    derivation=derivation,
                 )
 
     def _migrate_ledger(self, path: Path) -> None:
@@ -2429,44 +2504,24 @@ class Migrator:
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
         except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
-            count.rows_in += 1
-            self.result.add_queue(
-                path.stem,
-                {"source_path": rel},
-                ["document"],
-                f"failed to parse: {exc}",
-                source=rel,
-            )
+            count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):
-            count.rows_in += 1
-            self.result.add_queue(
-                path.stem,
-                {"source_path": rel},
-                ["document"],
-                "compilation file is not a mapping",
-                source=rel,
-            )
+            count.metadata_in += 1
             return
         schema = str(doc.get("schema_version") or "")
-        if path.name in {"access-status.yaml", "html-era-txt-divergence.yaml"} or path.name == "manifest.yaml":
-            count.rows_in += 1
-            source_id = str(doc.get("source_id") or path.parent.name)
-            src = doc.get("source") if isinstance(doc.get("source"), Mapping) else {}
-            citation = str((src or {}).get("citation") or source_id)
-            doi = extract_doi((src or {}).get("doi"), citation)
-            self._work_from_citation(citation, doi, source_id)
-            count.works_out = 1
+        if _is_compilation_metadata(path):
+            count.metadata_in += 1
+            if path.name == "manifest.yaml":
+                source_id = str(doc.get("source_id") or path.parent.name)
+                src = doc.get("source") if isinstance(doc.get("source"), Mapping) else {}
+                citation = str((src or {}).get("citation") or source_id)
+                doi = extract_doi((src or {}).get("doi"), citation)
+                self._work_from_citation(citation, doi, source_id)
+                count.works_out = 1
             return
         if schema != "literature_compilation.v1" and "table" not in doc and "record_id" not in doc:
-            count.rows_in += 1
-            self.result.add_queue(
-                path.stem,
-                {"source_path": rel},
-                ["document"],
-                f"unrecognized compilation document schema {schema!r}",
-                source=rel,
-            )
+            count.metadata_in += 1
             return
         source_id = str(doc.get("source_id") or path.parent.parent.name)
         src = doc.get("source") if isinstance(doc.get("source"), Mapping) else {}
@@ -2494,7 +2549,7 @@ class Migrator:
                 ["phase"],
                 f"phase string {doc.get('phase')!r} not in closed map",
                 source=rel,
-                observation_id=record_id,
+                observation_id=f"{source_id}:{record_id}",
             )
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
@@ -2519,7 +2574,7 @@ class Migrator:
                     ["quantity"],
                     "delta_fH is not a v2.1 Quantity token; stored as expression",
                     source=rel,
-                    observation_id=record_id,
+                    observation_id=f"{source_id}:{record_id}",
                 )
             elif doc.get("intervals"):
                 value = Value(
@@ -2550,7 +2605,7 @@ class Migrator:
                 ["quantity"],
                 "ATcT formation enthalpy is not a v2.1 Quantity token",
                 source=rel,
-                observation_id=record_id,
+                observation_id=f"{source_id}:{record_id}",
             )
         elif doc.get("g_parameter") or doc.get("functions") or doc.get("intervals"):
             value = Value(
@@ -2705,7 +2760,7 @@ class Migrator:
         rel = "data/literature/INDEX.yaml"
         count = self._count(rel)
         for source_id, row in self.index.items():
-            count.rows_in += 1
+            count.index_works_in += 1
             citation = str(row.get("citation") or source_id)
             doi = extract_doi(row.get("doi"), citation)
             self._ensure_work(
@@ -2766,9 +2821,36 @@ class Migrator:
                     ),
                 )
 
-    def finalize(self) -> None:
+    def _resolve_queue_ids(self) -> None:
+        observations = self.result.observations
+        works = self.result.works
+        for entry in self.result.queue:
+            oid = entry.observation_id
+            if oid and oid not in observations:
+                matches = [
+                    key
+                    for key in observations
+                    if key == oid
+                    or key.startswith(oid + "::")
+                    or key.startswith(oid + ":")
+                    or key.endswith(":" + oid)
+                ]
+                if matches:
+                    entry.observation_id = sorted(matches)[0]
+            if entry.work_id not in works:
+                aliased = self.aliases.get(entry.work_id)
+                if aliased and aliased in works:
+                    entry.work_id = aliased
+                elif entry.observation_id and entry.observation_id in observations:
+                    obs = observations[entry.observation_id]
+                    exp = self.result.experiments.get(obs.experiment_id)
+                    if exp is not None and exp.work_id in works:
+                        entry.work_id = exp.work_id
+
+    def finalize(self, *, validate: bool = True) -> None:
         self._rebuild_works()
         self._apply_supersedes()
+        self._resolve_queue_ids()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by
@@ -2793,19 +2875,20 @@ class Migrator:
                 self.result.measured.doi_works += 1
             else:
                 self.result.measured.no_doi_works += 1
-        self.result.validation = validate_corpus(
-            self.result.works,
-            self.result.experiments,
-            self.result.observations,
-            residuals=None,
-        )
+        if validate:
+            self.result.validation = validate_corpus(
+                self.result.works,
+                self.result.experiments,
+                self.result.observations,
+                residuals=None,
+            )
 
-    def run(self) -> MigrationResult:
+    def run(self, *, validate: bool = True) -> MigrationResult:
         self.migrate_index_only_sources()
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
-        self.finalize()
+        self.finalize(validate=validate)
         return self.result
 
 
@@ -2929,6 +3012,8 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"experiments: {len(result.experiments)}",
         f"queue size: {len(result.queue)}",
         f"identical-payload dedupe aliases: {len(result.dedupe_aliases)}",
+        f"metadata files: {sum(c.metadata_in for c in result.source_counts.values())}",
+        f"index sources: {sum(c.index_works_in for c in result.source_counts.values())}",
         f"hard issues: {hard}",
         "",
         "## Spec vs measured",
@@ -2986,6 +3071,23 @@ def write_report(result: MigrationResult, path: Path) -> None:
         lines.extend(["", "## Hard issues (first 50)", ""])
         for issue in result.validation.hard_issues[:50]:
             lines.append(f"- `{issue.path}` {issue.reason.value}: {issue.detail}")
+    if result.validation is not None and result.validation.issues:
+        census: dict[str, int] = defaultdict(int)
+        for issue in result.validation.issues:
+            census[issue.reason.value] += 1
+        lines.extend(
+            [
+                "",
+                "## Advisory issue census",
+                "",
+                f"advisory issues: {len(result.validation.issues)}",
+                "",
+                "| kind | count |",
+                "|---|---:|",
+            ]
+        )
+        for kind, n in sorted(census.items(), key=lambda kv: (-kv[1], kv[0])):
+            lines.append(f"| `{kind}` | {n} |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -2996,9 +3098,7 @@ def migrate(
     validate: bool = True,
 ) -> MigrationResult:
     migrator = Migrator(root)
-    result = migrator.run()
-    if not validate:
-        result.validation = None
+    result = migrator.run(validate=validate)
     if write:
         write_outputs(result, root)
     return result

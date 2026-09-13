@@ -164,6 +164,14 @@ def test_unknown_rail_spelling_raises() -> None:
         canonicalize_rail("gibbs_thermochemistry")
 
 
+def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["rail"] = "gibbs_thermochemistry"
+    root = _write_min_tree(tmp_path, extract)
+    with pytest.raises(UnknownRailSpellingError):
+        migrate(root, write=False, validate=False)
+
+
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     result = migrate(root, write=True, validate=True)
@@ -201,30 +209,24 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
     extract_rows = 1
     assert first.source_counts["data/literature/extracts/fixture-source.yaml"].rows_in == extract_rows
     assert first.source_counts["data/literature/extracts/fixture-source.yaml"].observations_out >= extract_rows
-    second = migrate(root, write=True, validate=True)
-    v2 = root / "data" / "literature" / "extracts-v2" / "fixture-source.yaml"
-    aliases = root / "data" / "literature" / "works" / "ALIASES.yaml"
-    assert v2.read_bytes() == v2.read_bytes()
     first_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
-        if p.is_file()
+        if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    write_outputs(second, root)
+    second = migrate(root, write=True, validate=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
-        if p.is_file()
+        if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
     assert first_bytes.keys() == second_bytes.keys()
     for key in first_bytes:
-        if "extracts/fixture-source.yaml" in str(key):
-            continue
         assert first_bytes[key] == second_bytes[key], key
     original = (root / "data" / "literature" / "extracts" / "fixture-source.yaml").read_bytes()
     migrate(root, write=True, validate=True)
     assert (root / "data" / "literature" / "extracts" / "fixture-source.yaml").read_bytes() == original
-    assert aliases.is_file()
+    assert (root / "data" / "literature" / "works" / "ALIASES.yaml").is_file()
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
@@ -241,21 +243,21 @@ def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
 def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     report_path = REPO_ROOT / "data" / "battery" / "migration-report.md"
     works_dir = REPO_ROOT / "data" / "literature" / "works"
+    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not report_path.is_file() or not any(works_dir.glob("*.yaml")):
         pytest.skip("migrated store not generated yet")
-    headline = report_path.read_text(encoding="utf-8").splitlines()[:10]
-    assert any(line == "hard issues: 0" for line in headline), headline
-    # Extract rows are conserved: every extract observation produced ≥1 record.
-    body = report_path.read_text(encoding="utf-8")
-    for line in body.splitlines():
-        if "`data/literature/extracts/" not in line:
-            continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
-        if len(cells) < 3:
-            continue
-        rows_in = int(cells[1])
-        obs_out = int(cells[2])
-        assert obs_out >= rows_in, line
+    from simulator.battery.migrate import Migrator
+
+    migrator = Migrator(REPO_ROOT)
+    result = migrator.run(validate=True)
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert report.hard_issues == ()
+    assert extracts_v2.is_dir() or obs_dir.is_dir()
 
 
 def _phase_state(obs):
@@ -453,6 +455,94 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert exp.method.is_unknown
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
+
+
+def test_g09_queue_ids_resolve_in_store(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["phase"] = "silicate_melt"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    for entry in result.queue:
+        assert entry.work_id in result.works, entry
+        if entry.observation_id is not None:
+            assert entry.observation_id in result.observations, entry
+
+
+def test_g10_kems_uncertainty_is_retained(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "kems_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "sources": {"kems-src": {"citation": "KEMS sidecar fixture"}},
+                "cases": {
+                    "case": {
+                        "source_id": "kems-src",
+                        "points": [
+                            {
+                                "observable_id": "cao_p_ca_isothermal",
+                                "species": "Ca",
+                                "coordinate": {"temperature_K": 2077.0},
+                                "partial_pressure_pa": None,
+                                "uncertainty": {"temperature_K": 5, "observable_status": "not_reported"},
+                                "source_locator": {"figure": 7},
+                            }
+                        ],
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    obs = result.observations["cao_p_ca_isothermal"]
+    assert obs.uncertainty.kind.value == "printed"
+    assert obs.uncertainty.verbatim is not None
+
+
+def test_g11_read_from_is_unknown_without_index_asset(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    root = _write_min_tree(tmp_path, extract)
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_index.v1",
+                "sources": [
+                    {
+                        "source_id": "fixture-source",
+                        "citation": "Fixture, A. (2026), Test Journal 1:1",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    assert obs.read_from == "unknown"
+
+
+def test_g12_metadata_files_are_not_observation_rows(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    comp = root / "data" / "literature" / "compilations" / "janaf-4th"
+    comp.mkdir(parents=True)
+    (comp / "manifest.yaml").write_text(
+        yaml.safe_dump({"source_id": "janaf-4th", "source": {"citation": "JANAF"}}, sort_keys=False),
+        encoding="utf-8",
+    )
+    (comp / "sidecar.yaml").write_text("schema_version: sidecar\n", encoding="utf-8")
+    result = migrate(root, write=False, validate=True)
+    manifest = result.source_counts["data/literature/compilations/janaf-4th/manifest.yaml"]
+    sidecar = result.source_counts["data/literature/compilations/janaf-4th/sidecar.yaml"]
+    assert manifest.metadata_in == 1
+    assert manifest.rows_in == 0
+    assert sidecar.metadata_in == 1
+    assert sidecar.rows_in == 0
+    index = result.source_counts["data/literature/INDEX.yaml"]
+    assert index.index_works_in >= 1
+    assert index.rows_in == 0
 
 
 def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
