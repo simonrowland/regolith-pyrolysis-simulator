@@ -639,14 +639,15 @@ def _source_authority(source: Any) -> str:
 
 
 def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
-    """True when provenance marks range extrapolation (any species).
+    """True when provenance marks a noncertifying qualification (any species).
 
     The head token alone is not sufficient: ``_source_authority`` keeps only
     the first colon-separated segment, so a label such as
     ``builtin_authoritative:standard_reaction_term:extrapolated_beyond_valid_range_K``
-    would otherwise pass ``APPROVED_LIVE_VAPOR_SOURCES``. The extrapolation
-    suffix must be load-bearing for SiO oxide vapors (and all other species) —
-    not Mg-only — or process-envelope extrapolation silently certifies ledger
+    (or ``...:out_of_gamma_domain``) would otherwise pass
+    ``APPROVED_LIVE_VAPOR_SOURCES``. Range-extrapolation, gamma-domain, and
+    floor-inversion suffixes must be load-bearing for every species — not
+    Mg-only — or process-envelope extrapolation silently certifies ledger
     yields. Species is retained for call-site symmetry; rejection is
     token-driven today.
     """
@@ -657,6 +658,7 @@ def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
             "pure_component_extrapolated",
             "extrapolated_beyond_valid_range_K",
             "melt_dissociation_pO2_floor_inverted_through_mass_action",
+            "out_of_gamma_domain",
         }
     )
 

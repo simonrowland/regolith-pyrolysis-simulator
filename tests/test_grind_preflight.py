@@ -420,6 +420,39 @@ def test_strict_vapor_source_report_rejects_pO2_floor_inversion_even_with_author
         assert_strict_vapor_source_report(report, context="stored-result")
 
 
+def test_strict_vapor_source_report_rejects_out_of_gamma_domain_even_with_authoritative_head() -> None:
+    """Hostile construction: head approved but gamma-OOR suffix must fail.
+
+    Isolated ``out_of_gamma_domain`` (no range-extrapolation token) is the
+    M08 confirm probe: the head is otherwise eligible, so a consumer that
+    strips to the head would certify a gamma-domain extrapolation.
+    """
+    source = "builtin_authoritative:standard_reaction_term:out_of_gamma_domain"
+    report = {
+        "species": {"Na": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(GrindSourceGateError, match="out_of_gamma_domain"):
+        assert_strict_vapor_source_report(report, context="stored-result")
+
+
+def test_strict_vapor_source_report_accepts_in_band_na_standard_term() -> None:
+    """In-band Na standard term remains certifying (M08 successful-value control)."""
+    source = "builtin_authoritative:standard_reaction_term"
+    report = {
+        "species": {"Na": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    summary = assert_strict_vapor_source_report(report, context="stored-result")
+    assert summary["total_species"] == 1
+    assert summary["summary"]["builtin_authoritative"] >= 1
+    assert summary["vapor_active"] is True
+
+
 def test_strict_vapor_source_report_rejects_extrapolated_sio_even_with_authoritative_head() -> None:
     """Hostile construction: head approved but extrapolation suffix must fail.
 
