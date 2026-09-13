@@ -1,0 +1,1239 @@
+schema_version: literature_extract.v1
+source_id: kems-045-sossi-2018-pnas-cr
+source:
+  citation: Sossi, P. A., Moynier, F. & van Zuilen, K. (2018), "Volatile loss following cooling and accretion
+    of the Moon revealed by chromium isotopes", Proc. Natl. Acad. Sci. U.S.A. 115(43):10920-10925, DOI
+    10.1073/pnas.1809060115
+  doi: 10.1073/pnas.1809060115
+  url: https://doi.org/10.1073/pnas.1809060115
+  year: 2018
+extraction:
+  method: Official Europe PMC OA PDF (corpus raw/kems-045-sossi-2018-pnas-cr/, sha256 6f4f7b74ab9a3e26f381b79fba929c7af24b02d0be5bf6c4e183c7e145b70ffb;
+    6 pages; published 10920-10925). Born-digital. pdftotext -layout used only as a map; Table 1 and printed
+    prose numbers transcribed from a 400 dpi pdftoppm render (PDF pages 1-6). Where the decode and the
+    render disagree the render wins (PCC-1 d53Cr row is split across lines in pdftotext). This paper is
+    MC-ICP-MS Cr-isotope geochemistry of terrestrial ultramafic rocks and lunar samples, not a Knudsen-cell
+    evaporation experiment. Authors' Table 1 and BHVO-2 standard kept as measured; BSE/Moon filtered means,
+    Eq. 3 fractionation, and 1600-1800 K / FMQ-to-FMQ+1 evaporation window labelled model_derived; Bonnand,
+    Schoenberg, Berry, Costa 2017 KEMS, and De Maria 1971 KEMS labelled quoted_measurement. Figs 1-3 listed
+    figure-only (no numbers off axes). SI Appendix Tables S9, S11, S12 and Figs S1-S3 are cited in the
+    main text but the SI PDF is not in the corpus and was not fetched.
+  date: '2026-09-12'
+  worker: extract-kems-045-sossi
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Cr
+  observable: gibbs_table
+  observation_id: sossi_2018_pnas_table1_delta53Cr_measured
+  field: n_samples
+  value: 32
+  locator:
+    table: '1'
+    published_page: 10921
+    pdf_page_index: 2
+    note: Table 1 has 20 Earth rows + 12 Moon rows = 32 samples
+- path: species.Cr.observations[sossi_2018_pnas_table1_delta53Cr_measured].values.points[0].delta_53Cr_permil
+  value: -0.065
+  locator:
+    table: '1'
+    published_page: 10921
+    pdf_page_index: 2
+    note: Table 1 first data row 49J Komatiite d53Cr = -0.065
+- path: species.Cr.observations[sossi_2018_pnas_table1_delta53Cr_measured].values.points[18].delta_53Cr_permil
+  value: -0.083
+  locator:
+    table: '1'
+    published_page: 10921
+    pdf_page_index: 2
+    note: Table 1 PCC-1 Harzburgite d53Cr = -0.083 (pdftotext split this row)
+- path: species.Cr.observations[sossi_2018_pnas_table1_delta53Cr_measured].values.points[29].delta_53Cr_permil
+  value: -0.307
+  locator:
+    table: '1'
+    published_page: 10921
+    pdf_page_index: 2
+    note: Table 1 10003 High Ti d53Cr = -0.307
+- species: Cr
+  observable: gibbs_table
+  observation_id: sossi_2018_pnas_delta53Cr_moon_earth_model
+  field: delta_53Cr_Moon_minus_Earth_permil
+  value: -0.1
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    note: Delta53CrMoon-Earth = -0.10 +/- 0.04 permil
+- species: Cr
+  observable: gibbs_table
+  observation_id: sossi_2018_pnas_bhvo2_measured
+  field: delta_53Cr_permil
+  value: -0.104
+  locator:
+    published_page: 10924
+    pdf_page_index: 5
+    note: BHVO-2 -0.104 +/- 0.03 permil; n = 4
+- species: CrO
+  observable: activity_coefficient
+  observation_id: sossi_2018_pnas_gamma_CrO_quoted_berry
+  field: gamma_CrO
+  value: 3
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    note: CrO activity coefficient in silicate melts of ~3 (ref. 34 Berry et al. 2006)
+- species: Cr
+  observable: gibbs_table
+  observation_id: sossi_2018_pnas_eq3_fractionation_model
+  field: prefactor_1e6_over_T2
+  value: -0.31
+  locator:
+    equation: '3'
+    published_page: 10923
+    pdf_page_index: 4
+    note: Eq. 3 Delta53Cr CrO(l)-CrO2(g) = -0.31 +/- 0.16 x 10^6/T^2 (permil)
+species:
+  Cr:
+    observations:
+    - observation_id: sossi_2018_pnas_table1_delta53Cr_measured
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 10921
+        pdf_page_index: 2
+        note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
+      phase: terrestrial_ultramafic_rocks_and_lunar_samples
+      standard_state: d53Cr permil vs NIST SRM 979; 2xSD of MC-ICP-MS replicates; Cr ppm and MgO wt% as
+        printed
+      regime: mc_icp_ms_double_spike_not_kems
+      units: d53Cr permil vs SRM 979; Cr ppm; MgO wt% as published
+      uncertainty:
+        note: Table 1 column 2xSD is the 2SD of n MC-ICP-MS replicates on that sample. n denotes the number
+          of replicates. No uncertainty is printed on Cr ppm or MgO wt%.
+      values:
+        quantity: delta_53Cr_and_bulk_Cr_MgO
+        method_class: measured
+        instrument: Thermo Scientific Neptune Plus MC-ICP-MS; 50Cr-54Cr double spike; NIST SRM 979 bracketing
+        schema_parking_note: SCHEMA has no isotope-ratio observation type; parked as gibbs_table with
+          method_class measured. Not a Knudsen partial-pressure table.
+        n_samples: 32
+        n_earth: 20
+        n_moon: 12
+        prose_rounding_note: Prose on p. 10921 rounds some Table 1 cells (49J -0.07 +/- 0.04 vs table
+          -0.065 +/- 0.041; 422/95 -0.17 +/- 0.06 vs -0.168 +/- 0.059; 10003 -0.31 +/- 0.01 vs -0.307
+          +/- 0.007; 70135 -0.20 +/- 0.01 vs -0.196 +/- 0.012; 72415 -0.30 +/- 0.01 vs -0.297 +/- 0.011;
+          76535 -0.25 +/- 0.01 vs -0.253 +/- 0.005; 15426 -0.19 +/- 0.01 vs -0.186 +/- 0.009). Table cells
+          are the recorded values.
+        points:
+        - sample: 49J
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.065
+          two_sd_permil: 0.041
+          n: 3
+          Cr_ppm: 3190
+          MgO_wt_percent: 32.16
+        - sample: B-R1
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.155
+          two_sd_permil: 0.035
+          n: 3
+          Cr_ppm: 2650
+          MgO_wt_percent: 27.72
+        - sample: 179/751
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.122
+          two_sd_permil: 0.066
+          n: 3
+          Cr_ppm: 3240
+          MgO_wt_percent: 23.54
+        - sample: 176/723
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.122
+          two_sd_permil: 0.048
+          n: 3
+          Cr_ppm: 2450
+          MgO_wt_percent: 31.13
+        - sample: SD5/354.5
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.121
+          two_sd_permil: 0.017
+          n: 2
+          Cr_ppm: 3050
+          MgO_wt_percent: 25.72
+        - sample: 331/783
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.082
+          two_sd_permil: 0.039
+          n: 3
+          Cr_ppm: 2894
+          MgO_wt_percent: 26.69
+        - sample: 331/777A
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.114
+          two_sd_permil: 0.012
+          n: 2
+          Cr_ppm: 2717
+          MgO_wt_percent: 26.26
+        - sample: 422/94
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.147
+          two_sd_permil: 0.035
+          n: 2
+          Cr_ppm: 3464
+          MgO_wt_percent: 22.41
+        - sample: 422/95
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.168
+          two_sd_permil: 0.059
+          n: 2
+          Cr_ppm: 3260
+          MgO_wt_percent: 23.45
+        - sample: 422/84
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.112
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 2902
+          MgO_wt_percent: 30.32
+        - sample: RL-12-1
+          body: Earth
+          rock_type: Kom. basalt
+          delta_53Cr_permil: -0.111
+          two_sd_permil: 0.01
+          n: 2
+          Cr_ppm: 1351
+          MgO_wt_percent: 13.68
+        - sample: 331/790
+          body: Earth
+          rock_type: Px. cumulate
+          delta_53Cr_permil: -0.132
+          two_sd_permil: 0.006
+          n: 2
+          Cr_ppm: 3371
+          MgO_wt_percent: 16.05
+        - sample: 422/96
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.097
+          two_sd_permil: 0.001
+          n: 2
+          Cr_ppm: 3060
+          MgO_wt_percent: 28.71
+        - sample: SD6/400
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.098
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 2428
+          MgO_wt_percent: 27.99
+        - sample: 422/96a
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.085
+          two_sd_permil: 0.001
+          n: 2
+          Cr_ppm: 3060
+          MgO_wt_percent: 28.71
+        - sample: 331/948
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.104
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 2915
+          MgO_wt_percent: 23.54
+        - sample: 331/779
+          body: Earth
+          rock_type: Komatiite
+          delta_53Cr_permil: -0.097
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 2706
+          MgO_wt_percent: 26.76
+        - sample: DTS-1
+          body: Earth
+          rock_type: Dunite
+          delta_53Cr_permil: -0.127
+          two_sd_permil: 0.007
+          n: 2
+          Cr_ppm: 3990
+          MgO_wt_percent: 49.59
+        - sample: PCC-1
+          body: Earth
+          rock_type: Harzburgite
+          delta_53Cr_permil: -0.083
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 2730
+          MgO_wt_percent: 43.43
+        - sample: DTS-1a
+          body: Earth
+          rock_type: Dunite
+          delta_53Cr_permil: -0.123
+          two_sd_permil: 0.003
+          n: 2
+          Cr_ppm: 3990
+          MgO_wt_percent: 49.59
+        - sample: '15445'
+          body: Moon
+          rock_type: Norite
+          delta_53Cr_permil: -0.082
+          two_sd_permil: 0.007
+          n: 2
+          Cr_ppm: 1635
+          MgO_wt_percent: 10.2
+        - sample: '15455'
+          body: Moon
+          rock_type: Norite
+          delta_53Cr_permil: -0.116
+          two_sd_permil: 0.009
+          n: 2
+          Cr_ppm: 810
+          MgO_wt_percent: 10.9
+        - sample: '76535'
+          body: Moon
+          rock_type: Troctolite
+          delta_53Cr_permil: -0.253
+          two_sd_permil: 0.005
+          n: 2
+          Cr_ppm: 753
+          MgO_wt_percent: 19.09
+        - sample: '78235'
+          body: Moon
+          rock_type: Norite
+          delta_53Cr_permil: -0.14
+          two_sd_permil: 0.003
+          n: 2
+          Cr_ppm: 1500
+          MgO_wt_percent: 11.76
+        - sample: '78328'
+          body: Moon
+          rock_type: Norite
+          delta_53Cr_permil: -0.138
+          two_sd_permil: 0.006
+          n: 2
+          Cr_ppm: 1500
+          MgO_wt_percent: 11.76
+        - sample: '72415'
+          body: Moon
+          rock_type: Dunite
+          delta_53Cr_permil: -0.297
+          two_sd_permil: 0.011
+          n: 2
+          Cr_ppm: 2414
+          MgO_wt_percent: 43.61
+        - sample: '15555'
+          body: Moon
+          rock_type: Low Ti
+          delta_53Cr_permil: -0.283
+          two_sd_permil: 0.004
+          n: 2
+          Cr_ppm: 4290
+          MgO_wt_percent: 11.1
+        - sample: '12002'
+          body: Moon
+          rock_type: Low Ti
+          delta_53Cr_permil: -0.234
+          two_sd_permil: 0.009
+          n: 2
+          Cr_ppm: 5949
+          MgO_wt_percent: 14.82
+        - sample: '15426'
+          body: Moon
+          rock_type: Green glass
+          delta_53Cr_permil: -0.186
+          two_sd_permil: 0.009
+          n: 2
+          Cr_ppm: 3557
+          MgO_wt_percent: 17.5
+        - sample: '10003'
+          body: Moon
+          rock_type: High Ti
+          delta_53Cr_permil: -0.307
+          two_sd_permil: 0.007
+          n: 2
+          Cr_ppm: 1583
+          MgO_wt_percent: 7.1
+        - sample: '70135'
+          body: Moon
+          rock_type: High Ti
+          delta_53Cr_permil: -0.196
+          two_sd_permil: 0.012
+          n: 2
+          Cr_ppm: 3921
+          MgO_wt_percent: 9.3
+        - sample: '10057'
+          body: Moon
+          rock_type: High Ti
+          delta_53Cr_permil: -0.243
+          two_sd_permil: 0.002
+          n: 2
+          Cr_ppm: 2303
+          MgO_wt_percent: 7.6
+    - observation_id: sossi_2018_pnas_terrestrial_20sample_average_measured
+      type: gibbs_table
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: Twenty terrestrial ultramafic samples have d53Cr between -0.17 +/- 0.06 permil (sample
+          422/95) and -0.07 +/- 0.04 permil (sample 49J), with an average of -0.11 +/- 0.05 permil (Table
+          1)
+      phase: terrestrial_ultramafic_rocks_this_study
+      standard_state: d53Cr permil vs NIST SRM 979; authors' average of their 20 terrestrial Table 1 rows
+      regime: mc_icp_ms_double_spike_not_kems
+      units: permil as published
+      uncertainty:
+        as_printed: -0.11 +/- 0.05 permil
+        two_sd_permil: 0.05
+        note: Authors' 2SD on the 20-sample terrestrial average. End-members in the same sentence are
+          prose-rounded Table 1 cells.
+      values:
+        quantity: delta_53Cr_average
+        method_class: measured
+        delta_53Cr_permil_average: -0.11
+        n: 20
+        range_as_printed: -0.17 +/- 0.06 permil (422/95) to -0.07 +/- 0.04 permil (49J)
+    - observation_id: sossi_2018_pnas_bhvo2_measured
+      type: gibbs_table
+      locator:
+        published_page: 10924
+        pdf_page_index: 5
+        paragraph: The resulting 2sp of +/-0.03 permil (k = 35) is identical to the 2SD of repeated analyses
+          of the US Geological Survey geological reference material BHVO-2 (-0.104 +/- 0.03 permil; n
+          = 4)
+      phase: USGS_BHVO2_reference_material
+      standard_state: d53Cr permil vs NIST SRM 979
+      regime: mc_icp_ms_double_spike_not_kems
+      units: permil as published
+      uncertainty:
+        as_printed: -0.104 +/- 0.03 permil; n = 4
+        two_sd_permil: 0.03
+        n: 4
+        pooled_2sp_permil: 0.03
+        pooled_2sp_k: 35
+        note: 2sp of the sample dataset +/-0.03 permil (k = 35) is identical to the 2SD of BHVO-2.
+      values:
+        quantity: delta_53Cr_reference_material
+        method_class: measured
+        delta_53Cr_permil: -0.104
+        material: BHVO-2
+        n: 4
+        authors_accuracy_note: The d53Cr value of the BHVO-2 is further in agreement with literature data
+          (61-63), assuring accuracy of the analyses.
+    - observation_id: sossi_2018_pnas_mcicpms_method
+      type: gibbs_table
+      locator:
+        published_page: 10924
+        pdf_page_index: 5
+        section: Materials and Methods
+        note: Double-spike MC-ICP-MS method; not Knudsen-cell geometry
+      phase: dissolved_rock_powder
+      standard_state: d53Cr permil vs NIST SRM 979 after 50Cr-54Cr double-spike reduction
+      regime: mc_icp_ms_double_spike_not_kems
+      units: as published
+      uncertainty:
+        note: Intermediate precision 2sp +/-0.03 permil (k = 35). Chromatographic Cr recovery 60-90%;
+          mass bias corrected by double spike.
+      values:
+        quantity: method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Thermo Scientific Neptune Plus MC-ICP-MS, Institut de Physique du Globe de Paris
+        introduction: Cyclonic-Scott Double Pass spray chamber
+        resolution: medium-resolution mode; analyses on peak shoulders
+        double_spike: 50Cr-54Cr
+        spike_enrichment_50Cr_percent: 96.5
+        spike_enrichment_54Cr_percent: 95.5
+        optimal_spike_50Cr_54Cr_ratio_as_printed: 0.58:0.42
+        spike_concentration_ug_per_mL_approx: 38
+        calibrated_spike_sample_mixing_range_as_printed: 0.13:0.87 to 0.39:0.61
+        optimal_mixing_ratio_ref58_as_printed: 0.28:0.72
+        sample_powder_mass_mg_approx: 30
+        chromite_dissolution: Parr Bombs at 190 C for 72 h; no residues observed
+        cr_recovery_percent_range:
+        - 60
+        - 90
+        bracketing: NIST SRM 979; standard-sample-sample-standard
+        replicates_per_sample_as_printed: two or three times each
+        cycles_per_analysis: 100
+        integration_time_s: 4.194
+        delta_definition: d53Cr (permil) = [(53Cr/52Cr)sample / (53Cr/52Cr)NIST SRM 979 - 1] x 1000
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+        missing_note: Not a Knudsen effusion experiment. No evaporation duration, melt T, or experimental
+          fO2 is printed for Table 1.
+    - observation_id: sossi_2018_pnas_bse_filtered_mean_model
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: The remaining 42 samples with mean d53Cr = -0.11 +/- 0.11 permil were then filtered
+          for statistical outliers at the 95% confidence level using Grubbs' test, leaving 36 samples
+          with d53Cr = -0.11 +/- 0.06 permil
+        note: SI Appendix Table S9 holds the filtered list and is unseen
+      phase: bulk_silicate_Earth_filtered_ultramafic_compilation
+      standard_state: d53Cr permil vs NIST SRM 979; this study plus literature (30, 42, 43) after lithology
+        and fertility filters
+      regime: compiled_mantle_estimate
+      units: permil as published
+      uncertainty:
+        as_printed_n42: -0.11 +/- 0.11 permil
+        as_printed_n36: -0.11 +/- 0.06 permil
+        two_se_permil_n36: 0.02
+        note: 2SE of +/-0.02 permil on the n=36 Grubbs-filtered set. SI Table S9 not in corpus.
+      values:
+        quantity: delta_53Cr_BSE_filtered_mean
+        method_class: model_derived
+        model_or_data_source: This study plus Schoenberg et al. 2008/2016 and Xia et al. 2017, filtered
+          for mantle-derived lithologies and fertile unmetasomatized peridotites (Cr 2520 +/- 630 ppm,
+          Mg# 0.885-0.910, >2 wt% Al2O3), then Grubbs 95% outliers removed.
+        n_before_grubbs: 42
+        delta_53Cr_permil_n42: -0.11
+        two_sd_permil_n42: 0.11
+        n_after_grubbs: 36
+        delta_53Cr_permil_n36: -0.11
+        two_sd_permil_n36: 0.06
+        two_se_permil_n36: 0.02
+        filter_Cr_ppm: 2520
+        filter_Cr_ppm_uncertainty: 630
+        si_table: S9
+        si_status: unseen_not_in_corpus
+    - observation_id: sossi_2018_pnas_moon_filtered_mean_model
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: This exercise left 17 measurements of 15 lunar samples from ref. 31 and this study,
+          with average d53Cr = -0.21 +/- 0.06 permil and 2SE of +/-0.03 permil (SI Appendix, Table S11;
+          no outliers were found)
+      phase: bulk_silicate_Moon_filtered_lunar_samples
+      standard_state: d53Cr permil vs NIST SRM 979; this study plus Bonnand et al. 2016 after olivine/chromite
+        accumulation filters
+      regime: compiled_mantle_estimate
+      units: permil as published
+      uncertainty:
+        as_printed: -0.21 +/- 0.06 permil
+        two_se_permil: 0.03
+        n_measurements: 17
+        n_samples: 15
+      values:
+        quantity: delta_53Cr_Moon_filtered_mean
+        method_class: model_derived
+        model_or_data_source: This study plus Bonnand et al. 2016 (ref. 31). Samples rejected for significant
+          (>0.1) olivine accumulation or fractionation (kept 0.4 < Mg# < 0.5) and for chromite accumulation/fractionation.
+        delta_53Cr_permil: -0.21
+        two_sd_permil: 0.06
+        two_se_permil: 0.03
+        n_measurements: 17
+        n_samples: 15
+        si_table: S11
+        si_status: unseen_not_in_corpus
+    - observation_id: sossi_2018_pnas_delta53Cr_moon_earth_model
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: the d53Cr of the Earth (-0.11 +/- 0.02 permil, 2SE, n = 36) and Moon (-0.21 +/- 0.03
+          permil, 2SE, n = 17) are clearly statistically resolvable at Delta53CrMoon-Earth = -0.10 +/-
+          0.04 permil
+      phase: BSE_vs_bulk_silicate_Moon
+      standard_state: Delta53Cr Moon minus Earth, permil vs NIST SRM 979
+      regime: compiled_mantle_estimate
+      units: permil as published
+      uncertainty:
+        as_printed: -0.10 +/- 0.04 permil
+        earth_2se_permil: 0.02
+        moon_2se_permil: 0.03
+        t_statistic: 13.36
+        t_critical: 2.0
+        note: Two-tailed Student's t test; t statistic 13.36 vs critical value 2.00.
+      values:
+        quantity: delta_53Cr_Moon_minus_Earth
+        method_class: model_derived
+        delta_53Cr_Moon_minus_Earth_permil: -0.1
+        earth_delta_53Cr_permil_2se: -0.11
+        earth_n: 36
+        moon_delta_53Cr_permil_2se: -0.21
+        moon_n: 17
+        abstract_as_printed: enrichment in the lighter isotopes of Cr in the Moon compared with Earth's
+          mantle by 100 +/- 40 ppm per atomic mass unit
+    - observation_id: sossi_2018_pnas_cr_abundance_moon_earth_model
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: An average of these estimates gives 2,125 +/- 110 ppm Cr in the Moon, which is therefore
+          depleted with respect to the Earth's mantle (2,520 +/- 250 ppm) by 16 +/- 10%
+      phase: bulk_silicate_Moon_vs_BSE
+      standard_state: bulk Cr ppm in silicate mantle
+      regime: compiled_mantle_estimate
+      units: ppm as published; percent depletion as published
+      uncertainty:
+        moon_Cr_ppm: 110
+        earth_Cr_ppm: 250
+        depletion_percent: 10
+        as_printed: 2,125 +/- 110 ppm Cr in the Moon; Earth's mantle 2,520 +/- 250 ppm; depleted by 16
+          +/- 10%
+      values:
+        quantity: bulk_Cr_abundance_and_depletion
+        method_class: model_derived
+        moon_Cr_ppm: 2125
+        earth_Cr_ppm: 2520
+        depletion_percent: 16
+        f_Cr_silicate_moon: 0.84
+        f_Cr_silicate_moon_uncertainty: 0.1
+        f_Cr_note: 'p. 10923: f silicate moon Cr is 0.84 +/- 0.10'
+        component_estimates:
+          seifert_ringwood_1988_FeCr_ppm: 2200
+          seifert_ringwood_1988_CrV_ppm: 2500
+          seifert_ringwood_1988_note: quoted_measurement from ref. 8; Cr/V estimate called a maximum
+          V_adjusted_ppm: 2180
+          green_glass_plus_partitioning_ppm: 2000
+          green_glass_Cr_ppm_approx: 3500
+          green_glass_source: Jones and Palme 2000 (ref. 9)
+    - observation_id: sossi_2018_pnas_schoenberg_bse_quoted
+      type: gibbs_table
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: identical to the average of samples used to define bulk silicate Earth (BSE), -0.13
+          +/- 0.10 permil (30)
+      phase: bulk_silicate_Earth_literature
+      standard_state: d53Cr permil vs NIST SRM 979
+      regime: quoted_literature_average
+      units: permil as published
+      uncertainty:
+        as_printed: -0.13 +/- 0.10 permil
+        two_sd_permil: 0.1
+      values:
+        quantity: delta_53Cr_BSE
+        method_class: quoted_measurement
+        delta_53Cr_permil: -0.13
+        cited_as: Schoenberg et al. 2016 Geochim. Cosmochim. Acta 183:14-30 (ref. 30)
+    - observation_id: sossi_2018_pnas_bonnand_2016_quoted
+      type: gibbs_table
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: A previous study found overlapping Cr isotope compositions in low- and high-Ti basalts,
+          with an average of -0.22 +/- 0.10 permil (31)
+      phase: lunar_mare_basalts_literature
+      standard_state: d53Cr permil vs NIST SRM 979
+      regime: quoted_literature_average
+      units: permil as published
+      uncertainty:
+        as_printed: -0.22 +/- 0.10 permil
+        two_sd_permil: 0.1
+      values:
+        quantity: delta_53Cr_mare_basalt_average
+        method_class: quoted_measurement
+        delta_53Cr_permil: -0.22
+        cited_as: Bonnand, Parkinson and Anand 2016 Geochim. Cosmochim. Acta 175:208-221 (ref. 31)
+    - observation_id: sossi_2018_pnas_cr2plus_fraction_quoted_berry
+      type: activity_coefficient
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        equation: '1'
+        paragraph: Under these conditions with logK(1) ~ 1.9 at 1,400 C, Cr2+/Sigma Cr is 0.32 and 0.91
+          for terrestrial and lunar magmatic liquids, respectively (34)
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1
+      standard_state: homogeneous equilibrium CrO1.5 = CrO + 1/4 O2; Cr2+/Sigma Cr in magmatic liquids
+      regime: quoted_redox_speciation
+      units: dimensionless Cr2+/Sigma Cr; logK as printed
+      uncertainty:
+        note: logK(1) printed as ~1.9. No numeric uncertainty on 0.32 or 0.91.
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_measurement
+        reaction_as_printed: CrO1.5 = CrO + 1/4 O2
+        logK_approx: 1.9
+        T_C_as_printed: 1400
+        T_K: 1673.15
+        T_conversion: T_K = 1400 + 273.15
+        terrestrial_Cr2plus_fraction: 0.32
+        lunar_Cr2plus_fraction: 0.91
+        terrestrial_fO2: near FMQ
+        lunar_fO2: ~1 log unit below IW
+        logK_cited_as: Herd 2008 (ref. 33)
+        fractions_cited_as: Berry, O'Neill, Scott, Foran and Shelley 2006 Am. Mineral. 91:1901-1908 (ref.
+          34)
+    - observation_id: sossi_2018_pnas_chromite_opx_fractionation_model
+      type: gibbs_table
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: The Cr isotopic fractionation between Cr3+-bearing chromite and a lunar silicate melt
+          (assuming it is equivalent to Cr2+-bearing forsterite) with Cr2+/Sigma Cr = 0.91 is +0.35 x
+          10^6/T^2 (39), or Delta53Crchromite-melt = +0.16 permil at 1,200 C
+      T_range_K:
+      - 1473.15
+      - 1473.15
+      phase: lunar_silicate_melt_chromite_and_orthopyroxene
+      standard_state: Delta53Cr mineral minus melt, permil
+      regime: model_derived_mineral_melt_isotope_fractionation
+      units: permil as published; 10^6/T^2 prefactor as published
+      uncertainty:
+        note: No numeric uncertainty printed on +0.16 permil or +0.10 permil. Prefactor +0.35 x 10^6/T^2
+          is from Moynier et al. 2011 (ref. 39).
+      values:
+        quantity: Delta53Cr_mineral_melt
+        method_class: model_derived
+        prefactor_1e6_over_T2_Cr3plus_minus_Cr2plus: 0.35
+        prefactor_cited_as: Moynier, Yin and Schauble 2011 Science 331:1417-1420 (ref. 39)
+        Delta53Cr_chromite_minus_melt_permil_1200C: 0.16
+        Delta53Cr_opx_minus_melt_permil_1200C: 0.1
+        T_C_as_printed: 1200
+        T_K: 1473.15
+        T_conversion: T_K = 1200 + 273.15
+        lunar_parent_liquidus_C_mare:
+        - 1200
+        - 1250
+        lunar_parent_liquidus_C_Mg_suite: 1300
+        Mg_suite_parent_MgO_wt_percent_approx: 13
+        identical_to_bonnand_empirical: true
+    - observation_id: sossi_2018_pnas_eq3_fractionation_model
+      type: gibbs_table
+      locator:
+        equation: '3'
+        published_page: 10923
+        pdf_page_index: 4
+        note: Delta53Cr CrO(l)-CrO2(g) = -0.31 +/- 0.16 x 10^6/T^2 (permil)
+      T_range_K:
+      - 1500.0
+      - 1800.0
+      phase: silicate_melt_CrO_l_in_equilibrium_with_CrO2_g
+      standard_state: 53Cr/52Cr isotope fractionation factor for CrO(l) + 1/2 O2 = CrO2(g)
+      regime: model_derived_bond_valence_reduced_partition_function
+      units: permil; prefactor times 10^6/T^2 as published
+      uncertainty:
+        prefactor_1e6_over_T2: 0.16
+        as_printed: -0.31 +/- 0.16 x 10^6/T^2 (permil)
+        force_constant_agreement_percent: 50
+        note: 'Authors: this approach yields force constants that agree with spectroscopic or experimental
+          determinations to within 50% (x 10^6/T^2). Full 10^3 ln beta table is SI Table S12, unseen.'
+      values:
+        quantity: isotope_fractionation_factor_CrO_l_minus_CrO2_g
+        method_class: model_derived
+        reaction_as_printed: CrO(l) + 1/2 O2 = CrO2(g)
+        reaction_number: 2
+        fractionation_equation_number: 3
+        prefactor_1e6_over_T2: -0.31
+        CrO_g_vibrational_frequency_cm_minus_1: 864
+        frequency_cited_as: Espelid, Borve and Jensen 1998 (ref. 50)
+        olivine_Cr2SiO4_10ln3_beta_prefactor_1e6_over_T2: 0.26
+        olivine_analog_cited_as: Moynier et al. 2011 (ref. 39) as analog for CrO(l)
+        si_table: S12
+        si_figure: S3
+        si_status: unseen_not_in_corpus
+    - observation_id: sossi_2018_pnas_vapor_delta_and_T_window_model
+      type: gibbs_table
+      locator:
+        published_page: 10923
+        pdf_page_index: 4
+        paragraph: yielding d53Crvapor = +0.41 +/- 0.33 permil or (+2.00/-0.45) permil, considering uncertainty
+          in the Cr depletion in the lunar mantle. Solving Eq. 3 for temperature and propagating uncertainties
+          yields ~700 (+1,100/-300) K. Importantly, both thermodynamic and isotopic constraints converge
+          at temperatures between 1,600 and 1,800 K and fO2 between FMQ and FMQ+1 (Fig. 2)
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      phase: BSE_like_silicate_melt_in_equilibrium_with_CrO2_bearing_vapor
+      standard_state: liquid-vapor equilibrium; total pressure that of gas above a BSE composition (Visscher
+        and Fegley 2013, ref. 13)
+      regime: model_derived_evaporation_window
+      units: K; permil; fO2 as FMQ buffer offsets
+      uncertainty:
+        delta_53Cr_vapor_permil: 0.33
+        delta_53Cr_vapor_asymmetric_as_printed: (+2.00/-0.45) permil
+        T_from_eq3_as_printed: ~700 (+1,100/-300) K
+        note: The ~700 K inversion of Eq. 3 alone is reported and then set aside; the adopted window is
+          the 1600-1800 K / FMQ-to-FMQ+1 overlap with the thermodynamic fCr constraint (Fig. 2).
+      values:
+        quantity: evaporation_T_fO2_window_and_vapor_delta53Cr
+        method_class: model_derived
+        delta_53Cr_system_permil: -0.11
+        delta_53Cr_silicate_moon_permil: -0.21
+        f_Cr_silicate_moon: 0.84
+        delta_53Cr_vapor_permil: 0.41
+        T_from_eq3_alone_K_approx: 700
+        T_window_K:
+        - 1600.0
+        - 1800.0
+        fO2_window:
+        - FMQ
+        - FMQ+1
+        fO2_how_set: Vapor in equilibrium with a BSE-like silicate melt (Visscher and Fegley 2013); Fig.
+          2 dashed lines are DeltaFMQ+1, DeltaFMQ, and DeltaFMQ-1. Not an experimental gas mix.
+        duration: not_printed_not_an_evaporation_run
+        significant_Cr_in_vapor_above_K: 1500.0
+        significant_Cr_criterion_as_printed: '>1%'
+    - observation_id: sossi_2018_pnas_costa2017_kems_T_quoted
+      type: psat_series
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: The relatively oxidizing vapor, near the FMQ buffer, evolved upon evaporation of silicate
+          material, be it at high temperature (1,827-1,970 K, olivine; ref. 47) or low temperature (1,396-1,499
+          K, lunar mare basalt 12002; ref. 48) is evidenced by experimental Knudsen effusion mass spectrometry
+          studies
+      T_range_K:
+      - 1827.0
+      - 1970.0
+      phase: forsterite_rich_olivine_kems
+      standard_state: quoted KEMS temperature window only; no P printed here
+      regime: quoted_kems_not_this_work
+      units: K as published
+      uncertainty:
+        note: Only the T window is printed in this paper. No partial pressures from Costa et al. 2017
+          are tabulated here.
+      values:
+        quantity: quoted_kems_temperature_window
+        method_class: quoted_measurement
+        admission_status: quoted_T_window_no_P_table
+        T_K:
+        - 1827.0
+        - 1970.0
+        material: olivine
+        fO2_as_printed: near the FMQ buffer
+        cited_as: Costa, Jacobson and Fegley 2017 Icarus 289:42-55 (ref. 47); kems-133-costa-2017 in this
+          store
+    - observation_id: sossi_2018_pnas_demaria1971_kems_T_quoted
+      type: psat_series
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: or low temperature (1,396-1,499 K, lunar mare basalt 12002; ref. 48)
+      T_range_K:
+      - 1396.0
+      - 1499.0
+      phase: lunar_mare_basalt_12002_kems
+      standard_state: quoted KEMS temperature window only; no P printed here
+      regime: quoted_kems_not_this_work
+      units: K as published
+      uncertainty:
+        note: Only the T window is printed in this paper. No partial pressures from De Maria et al. 1971
+          are tabulated here.
+      values:
+        quantity: quoted_kems_temperature_window
+        method_class: quoted_measurement
+        admission_status: quoted_T_window_no_P_table
+        T_K:
+        - 1396.0
+        - 1499.0
+        material: lunar mare basalt 12002
+        fO2_as_printed: near the FMQ buffer
+        cited_as: De Maria, Balducci, Guido and Piacente 1971 Proc. Second Lunar Science Conference 2:1367-1380
+          (ref. 48); kems-022-demaria-1971 in this store
+    - observation_id: sossi_2018_pnas_fig1_figure_only
+      type: gibbs_table
+      locator:
+        figure: '1'
+        published_page: 10922
+        pdf_page_index: 3
+        note: d53Cr vs Cr ppm (A) and vs MgO wt% (B); this-work points are Table 1; smaller circles are
+          Bonnand et al. 2016
+      phase: lunar_and_terrestrial_samples
+      standard_state: d53Cr permil vs SRM 979
+      regime: mc_icp_ms_double_spike_not_kems
+      units: permil; ppm; wt%
+      uncertainty:
+        note: Figure-only; this-work points are the Table 1 cells. Scatter not digitised from axes.
+      values:
+        quantity: delta_53Cr_vs_Cr_and_MgO
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        this_work_n:
+          Mg_Suite: 6
+          green_glass: 1
+          high_Ti_as_printed_in_caption: 13
+          low_Ti_as_printed_in_caption: 11
+          komatiites: 17
+          peridotites: 3
+        caption_n_note: Fig. 1 caption high-Ti n=13 and low-Ti n=11 include Bonnand et al. 2016 smaller
+          circles, not only this-work Table 1 (this work has 3 high-Ti and 2 low-Ti mare basalts).
+        overlays_not_this_work:
+        - Bonnand et al. 2016 low-Ti mare
+        - Bonnand et al. 2016 high-Ti mare
+    - observation_id: sossi_2018_pnas_fig2_figure_only
+      type: gibbs_table
+      locator:
+        figure: '2'
+        published_page: 10923
+        pdf_page_index: 4
+        note: fCr vs Delta53Cr Moon-Earth; model curves at 1500-1800 K and DeltaFMQ-1/0/+1
+      T_range_K:
+      - 1500.0
+      - 1800.0
+      phase: BSE_like_silicate_melt_liquid_vapor_equilibrium
+      standard_state: fCr remaining in bulk silicate Moon relative to BSE vs Delta53Cr Moon-Earth
+      regime: model_derived_evaporation_window
+      units: dimensionless fCr; permil
+      uncertainty:
+        note: Figure-only model curves. Permitted-zone bounds are the sample-data field; curves not digitised.
+      values:
+        quantity: fCr_vs_delta53Cr_liquid_vapor_model
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_T_K:
+        - 1500.0
+        - 1600.0
+        - 1700.0
+        - 1800.0
+        labeled_fO2:
+        - DeltaFMQ-1
+        - DeltaFMQ
+        - DeltaFMQ+1
+        fCr_from: Eq. 2; T, P, fO2; total P from gas above BSE composition (ref. 13)
+        delta53Cr_from: Eq. 4
+    - observation_id: sossi_2018_pnas_fig3_caption_model
+      type: gibbs_table
+      locator:
+        figure: '3'
+        published_page: 10924
+        pdf_page_index: 5
+        note: Fig. 3 schematic; printed numbers are from the caption, not axis digitisation
+      T_range_K:
+      - 1600.0
+      - 1800.0
+      phase: protolunar_disk_and_accreting_Moon
+      standard_state: author schematic of post-impact cooling and Hill-sphere escape
+      regime: model_derived_disk_cooling
+      units: K; km/s; years as published
+      uncertainty:
+        note: Schematic. Printed caption numbers recorded; drawing not digitised.
+      values:
+        quantity: post_impact_cooling_and_escape_caption
+        method_class: model_derived
+        admission_status: figure_only
+        t1_y_approx: 0
+        t1_T_K: '>4000'
+        t2_y_approx: 100
+        t2_T_K:
+        - 2000.0
+        - 4000.0
+        t3_y:
+        - 1000.0
+        - 10000.0
+        t3_T_K:
+        - 1600.0
+        - 1800.0
+        vesc_Earth_km_s: 11.2
+        vth_lt_km_s_at_4000K: 3.8
+        fraction_vth_below_3p8_km_s_at_4000K_percent: 99.99
+        molar_mass_kg_mol: 0.052
+        Hill_vesc_Moon_at_3RE_km_s: 1.56
+        fraction_exceeding_Hill_vesc_percent:
+        - 2
+        - 4
+        lambda_esc_approx:
+        - 4
+        - 5
+  CrO:
+    observations:
+    - observation_id: sossi_2018_pnas_gamma_CrO_quoted_berry
+      type: activity_coefficient
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: assuming a CrO activity coefficient in silicate melts of ~3 (34)
+      T_range_K:
+      - 1500.0
+      - 1800.0
+      phase: silicate_melt_BSE_like
+      standard_state: activity coefficient of CrO in silicate melts
+      regime: quoted_melt_activity
+      units: dimensionless as published
+      uncertainty:
+        note: Printed as ~3. No numeric uncertainty. Cited Berry et al. 2006 (ref. 34).
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_measurement
+        gamma_CrO: 3
+        as_printed: ~3
+        cited_as: Berry, O'Neill, Scott, Foran and Shelley 2006 Am. Mineral. 91:1901-1908 (ref. 34)
+        used_for: partial pressure of CrO2(g) in vapor in equilibrium with a BSE-like silicate melt (Fig.
+          2)
+    - observation_id: sossi_2018_pnas_lnbeta_CrO_g_model
+      type: gibbs_table
+      locator:
+        published_page: 10923
+        pdf_page_index: 4
+        paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively (SI Appendix,
+          Fig. S3 and Table S12)
+      phase: CrO_g
+      standard_state: reduced partition function ratio 53Cr/52Cr in diatomic CrO(g), harmonic approximation
+      regime: model_derived_bond_valence
+      units: 10^3 ln beta as 10^6/T^2 prefactor
+      uncertainty:
+        force_constant_agreement_percent: 50
+        note: Full table is SI Table S12, unseen. Frequency 864 cm^-1 from ref. 50.
+      values:
+        quantity: reduced_partition_function_ratio_prefactor
+        method_class: model_derived
+        gas_species: CrO(g)
+        prefactor_1e6_over_T2: 0.28
+        vibrational_frequency_cm_minus_1: 864
+        si_table: S12
+        si_figure: S3
+        si_status: unseen_not_in_corpus
+  CrO2:
+    observations:
+    - observation_id: sossi_2018_pnas_lnbeta_CrO2_g_model
+      type: gibbs_table
+      locator:
+        published_page: 10923
+        pdf_page_index: 4
+        paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
+      phase: CrO2_g
+      standard_state: reduced partition function ratio 53Cr/52Cr of CrO2(g) from bond-valence Born-Lande
+        potentials
+      regime: model_derived_bond_valence
+      units: 10^3 ln beta as 10^6/T^2 prefactor
+      uncertainty:
+        force_constant_agreement_percent: 50
+        note: Full table is SI Table S12, unseen.
+      values:
+        quantity: reduced_partition_function_ratio_prefactor
+        method_class: model_derived
+        gas_species: CrO2(g)
+        prefactor_1e6_over_T2: 0.57
+        si_table: S12
+        si_figure: S3
+        si_status: unseen_not_in_corpus
+    - observation_id: sossi_2018_pnas_CrO2_stability_quoted_janaf
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: Gas-phase equilibria among the four Cr oxide species (ref. 27 and SI Appendix, Fig.
+          S2) show that CrO2(g) is stable for all fO2 > IW
+      phase: CrO2_g
+      standard_state: gas-phase Cr oxide equilibria; fO2 relative to iron-wustite
+      regime: quoted_janaf_gas_equilibria
+      units: fO2 relative to IW as published
+      uncertainty:
+        note: Stability statement only. SI Fig. S2 (the equilibrium figure) is unseen. No numeric P(CrO2)
+          table in the main text.
+      values:
+        quantity: CrO2_g_stability_vs_IW
+        method_class: quoted_measurement
+        stable_for_fO2: '> IW'
+        cited_as: Chase 1998 NIST-JANAF 4th ed. (ref. 27)
+        si_figure: S2
+        si_status: unseen_not_in_corpus
+  CrO3:
+    observations:
+    - observation_id: sossi_2018_pnas_lnbeta_CrO3_g_model
+      type: gibbs_table
+      locator:
+        published_page: 10923
+        pdf_page_index: 4
+        paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
+      phase: CrO3_g
+      standard_state: reduced partition function ratio 53Cr/52Cr of CrO3(g) from bond-valence Born-Lande
+        potentials
+      regime: model_derived_bond_valence
+      units: 10^3 ln beta as 10^6/T^2 prefactor
+      uncertainty:
+        force_constant_agreement_percent: 50
+        note: Full table is SI Table S12, unseen.
+      values:
+        quantity: reduced_partition_function_ratio_prefactor
+        method_class: model_derived
+        gas_species: CrO3(g)
+        prefactor_1e6_over_T2: 0.89
+        si_table: S12
+        si_figure: S3
+        si_status: unseen_not_in_corpus
+  O2:
+    observations:
+    - observation_id: sossi_2018_pnas_visscher_fegley_fO2_quoted
+      type: gibbs_table
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: Vaporization of silicate material of a bulk lunar composition gives rise to fO2 of
+          IW+2.5 at 1,800 K (13)
+      T_range_K:
+      - 1800.0
+      - 1800.0
+      phase: impact_generated_silicate_melt_vapor
+      standard_state: fO2 relative to iron-wustite for vapor in equilibrium with bulk lunar composition
+      regime: quoted_thermodynamic_calculation
+      units: log units relative to IW; K as published
+      uncertainty:
+        note: No numeric uncertainty printed on IW+2.5.
+      values:
+        quantity: fO2_of_lunar_silicate_vapor
+        method_class: quoted_measurement
+        fO2_as_printed: IW+2.5
+        T_K: 1800.0
+        cited_as: Visscher and Fegley 2013 Astrophys. J. 767:L12 (ref. 13)
+        authors_gloss: The relatively oxidizing vapor, near the FMQ buffer
+deepening:
+  dispatch_id: extract-kems-045-sossi
+  date: '2026-09-12'
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, permil, and plus/minus signs.
+  identity_note: Corpus source_id kems-045-sossi-2018-pnas-cr is Sossi, Moynier and van Zuilen 2018 PNAS
+    DOI 10.1073/pnas.1809060115 (Cr isotopes of lunar/terrestrial rocks). It is not Sossi, Klemme, O'Neill,
+    Berndt and Moynier 2019 GCA 260:204-231 (open-furnace MVE evaporation; that paper is kems-012-sossi-2019).
+    Bytes previously stored under this source_id were Gal et al. 2018 and were relocated in the corpus
+    ledger.
+  table_inventory:
+  - table: '1'
+    published_page: 10921
+    pdf_page_index: 2
+    completeness: full
+    note: 20 Earth + 12 Moon rows. All seven printed columns transcribed from the 400 dpi render.
+  - table: S9
+    location: SI Appendix
+    completeness: unseen_not_in_corpus
+    note: Grubbs-filtered BSE sample list (n=36). Cited p. 10922. SI PDF absent from corpus; not fetched.
+  - table: S11
+    location: SI Appendix
+    completeness: unseen_not_in_corpus
+    note: Filtered lunar sample list (17 measurements of 15 samples). Cited p. 10922. SI PDF absent; not
+      fetched.
+  - table: S12
+    location: SI Appendix
+    completeness: unseen_not_in_corpus
+    note: 10^3 ln beta 53/52 Cr for CrO(g), CrO2(g), CrO3(g). Main text prints only the three prefactors
+      0.28, 0.57, 0.89 x 10^6/T^2. SI PDF absent; not fetched.
+  figure_inventory:
+  - figure: '1'
+    published_page: 10922
+    pdf_page_index: 3
+    status: figure_only
+    note: d53Cr vs Cr and vs MgO. This-work points = Table 1; smaller circles = Bonnand et al. 2016. Not
+      digitised.
+  - figure: '2'
+    published_page: 10923
+    pdf_page_index: 4
+    status: figure_only
+    note: Model fCr vs Delta53Cr curves at 1500-1800 K and DeltaFMQ-1/0/+1. Not digitised.
+  - figure: '3'
+    published_page: 10924
+    pdf_page_index: 5
+    status: figure_only
+    note: Schematic post-impact cooling. Caption numbers recorded; drawing not digitised.
+  - figure: S1
+    location: SI Appendix
+    status: unseen_not_in_corpus
+    note: Orthopyroxene-plagioclase crystallization path. Cited p. 10922.
+  - figure: S2
+    location: SI Appendix
+    status: unseen_not_in_corpus
+    note: Gas-phase equilibria among four Cr oxide species. Cited p. 10922.
+  - figure: S3
+    location: SI Appendix
+    status: unseen_not_in_corpus
+    note: 10^3 ln beta vs T. Cited p. 10923.
+  class_ledger:
+    measured:
+    - sossi_2018_pnas_table1_delta53Cr_measured
+    - sossi_2018_pnas_terrestrial_20sample_average_measured
+    - sossi_2018_pnas_bhvo2_measured
+    - sossi_2018_pnas_mcicpms_method
+    - sossi_2018_pnas_fig1_figure_only
+    model:
+    - sossi_2018_pnas_bse_filtered_mean_model
+    - sossi_2018_pnas_moon_filtered_mean_model
+    - sossi_2018_pnas_delta53Cr_moon_earth_model
+    - sossi_2018_pnas_cr_abundance_moon_earth_model
+    - sossi_2018_pnas_chromite_opx_fractionation_model
+    - sossi_2018_pnas_eq3_fractionation_model
+    - sossi_2018_pnas_vapor_delta_and_T_window_model
+    - sossi_2018_pnas_fig2_figure_only
+    - sossi_2018_pnas_fig3_caption_model
+    - sossi_2018_pnas_lnbeta_CrO_g_model
+    - sossi_2018_pnas_lnbeta_CrO2_g_model
+    - sossi_2018_pnas_lnbeta_CrO3_g_model
+    quoted:
+    - sossi_2018_pnas_schoenberg_bse_quoted
+    - sossi_2018_pnas_bonnand_2016_quoted
+    - sossi_2018_pnas_cr2plus_fraction_quoted_berry
+    - sossi_2018_pnas_costa2017_kems_T_quoted
+    - sossi_2018_pnas_demaria1971_kems_T_quoted
+    - sossi_2018_pnas_gamma_CrO_quoted_berry
+    - sossi_2018_pnas_CrO2_stability_quoted_janaf
+    - sossi_2018_pnas_visscher_fegley_fO2_quoted
+    figure_only:
+    - sossi_2018_pnas_fig1_figure_only
+    - sossi_2018_pnas_fig2_figure_only
+    - sossi_2018_pnas_fig3_caption_model
+  primary_sources_cited:
+  - ref: 8
+    citation: Seifert S, Ringwood AE (1988) The lunar geochemistry of chromium and vanadium. Earth Moon
+      Planets 40:45-70.
+    used_for: lunar mantle Cr 2200 ppm (Fe/Cr) and 2500 ppm (Cr/V)
+  - ref: 9
+    citation: Jones JH, Palme H (2000) Geochemical constraints on the origin of the Earth and Moon. In
+      Canup RM, Righter K (eds) The Origin of the Earth and Moon, Univ. of Arizona Press, pp. 197-216.
+    used_for: ~3500 ppm Cr in lunar green glass beads; 2000 ppm lunar-mantle estimate
+  - ref: 13
+    citation: Visscher C, Fegley B, Jr (2013) Chemistry of impact-generated silicate melt-vapor debris
+      disks. Astrophys J 767:L12.
+    used_for: fO2 IW+2.5 at 1800 K; total pressure of gas above a BSE composition
+  - ref: 27
+    citation: Chase MW (1998) NIST-JANAF thermochemical tables, 4th ed. J. Phys. Chem. Ref. Data Monograph
+      9.
+    used_for: gas-phase equilibria among Cr, CrO, CrO2, CrO3
+  - ref: 30
+    citation: Schoenberg R, et al. (2016) The stable Cr isotopic compositions of chondrites and silicate
+      planetary reservoirs. Geochim Cosmochim Acta 183:14-30.
+    used_for: BSE d53Cr -0.13 +/- 0.10 permil
+  - ref: 31
+    citation: Bonnand P, Parkinson IJ, Anand M (2016) Mass dependent fractionation of stable chromium
+      isotopes in mare basalts. Geochim Cosmochim Acta 175:208-221.
+    used_for: mare basalt average -0.22 +/- 0.10 permil; overlay on Fig. 1
+  - ref: 33
+    citation: Herd CDK (2008) Basalts as probes of planetary interior redox state. Rev Mineral Geochem
+      68:527-553.
+    used_for: logK(1) ~1.9 at 1400 C
+  - ref: 34
+    citation: Berry AJ, O'Neill HSC, Scott DR, Foran GJ, Shelley JMG (2006) The effect of composition
+      on Cr2+/Cr3+ in silicate melts. Am Mineral 91:1901-1908.
+    used_for: Cr2+/Sigma Cr = 0.32 (terrestrial) and 0.91 (lunar); gamma_CrO ~3
+  - ref: 39
+    citation: Moynier F, Yin Q-Z, Schauble E (2011) Isotopic evidence of Cr partitioning into Earth's
+      core. Science 331:1417-1420.
+    used_for: +0.35 x 10^6/T^2 Cr3+-Cr2+; olivine Cr2SiO4 0.26 x 10^6/T^2 analog for CrO(l)
+  - ref: 47
+    citation: Costa GCC, Jacobson NS, Fegley B (2017) Vaporization and thermodynamics of forsterite-rich
+      olivine. Icarus 289:42-55.
+    used_for: quoted KEMS T window 1827-1970 K, olivine, oxidizing vapor near FMQ
+  - ref: 48
+    citation: De Maria G, Balducci G, Guido M, Piacente V (1971) Mass spectrometric investigation of the
+      vaporization process of Apollo 12 lunar samples. Proc. Second Lunar Science Conference 2:1367-1380.
+    used_for: quoted KEMS T window 1396-1499 K, lunar mare basalt 12002
+  - ref: 50
+    citation: Espelid O, Borve KJ, Jensen VR (1998) Structure and thermodynamics of gaseous oxides, hydroxides,
+      and mixed oxohydroxides of chromium. J Phys Chem A 102:10414-10423.
+    used_for: Cr-O vibrational frequency of CrO(g) 864 cm^-1
+  battery_limitation: Not KEMS. Authors' measured quantity is d53Cr (MC-ICP-MS double spike) of natural
+    rocks, plus Cr ppm and MgO wt% in Table 1. No evaporation duration, no experimental melt T, and no
+    experimental fO2 for those analyses. The 1600-1800 K / FMQ-to-FMQ+1 window is a model inversion of
+    isotope mass balance plus Visscher-Fegley vapor chemistry. Direct KEMS T windows (Costa 2017; De Maria
+    1971) are quoted, not re-measured. SI Tables S9/S11/S12 and Figs S1-S3 are unseen.
+  si_status: absent_from_corpus_not_fetched

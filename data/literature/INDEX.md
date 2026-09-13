@@ -16,10 +16,10 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 ## Counts
 
 - Sources: 149
-- Extracts (`literature_extract.v1`): 146
+- Extracts (`literature_extract.v1`): 147
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
-- PDFs with no extract: 3
+- PDFs with no extract: 2
 - Extracts with no PDF: 105
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
@@ -87,7 +87,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-041-sossi-fegley-2018` | Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and melt activity coefficients (Table 1 pure oxides; Table 2 complex silicate melts) | 10.2138/rmg.2018.84.11 | `docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.pdf`, `d46a4c09` | `raw/kems-041-sossi-fegley-2018/kems-041-sossi-fegley-2018.pdf` (present, d46a4c09); `text/kems-041-sossi-fegley-2018/` (110 files, exists); `tables/kems-041-sossi-fegley-2018/` (10 files, exists) | `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` (155 rows, draft, private_path) | `ledger/kems-041-sossi-fegley-2018.yaml`: — (—) |
 | `kems-042-plante-1979` | Plante, E. R. (1979), "Vapor pressure measurements of potassium over K2O-SiO2 solutions by a Knudsen effusion, mass spectrometric method", in Hastie, J. W. (ed.), Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, Vol. 1, pp. 265-281, National Bureau of Standards, Washington, DC. | 10.6028/NBS.SP.561v1 | `docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.pdf`, `a46c2132` | `raw/kems-042-plante-1979/kems-042-plante-1979.pdf` (present, a46c2132); `text/kems-042-plante-1979/` (4 files, exists); `tables/kems-042-plante-1979/` (6 files, exists) | `data/literature/extracts/kems-042-plante-1979.yaml` (383 rows, draft) | `ledger/kems-042-plante-1979.yaml`: — (—) |
 | `kems-044-robinot-2026` | Robinot, J., Rodat, S., Abanades, S., Bêche, E., Paillet, A. & Cowley, A. (2026), "Quantification of oxygen production from solar pyrolysis of lunar regolith", Adv. Space Res., DOI 10.1016/j.asr.2026.02.003, HAL hal-05512237 | 10.1016/j.asr.2026.02.003 | ABSENT, `` | `raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf` (present, 199c350a); `text/kems-044-robinot-2026/` (32 files, exists); `tables/kems-044-robinot-2026/` (0 files, ABSENT) | `data/literature/extracts/kems-044-robinot-2026.yaml` (19 rows, draft) | `ledger/kems-044-robinot-2026.yaml`: decoded (2026-09-06) |
-| `kems-045-sossi-2018-pnas-cr` |  |  | `docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf`, `47384f82` | `raw/kems-045-sossi-2018-pnas-cr/kems-045-sossi-2018-pnas-cr.pdf` (present, 47384f82); `text/kems-045-sossi-2018-pnas-cr/` (49 files, exists); `tables/kems-045-sossi-2018-pnas-cr/` (0 files, ABSENT) | — | `ledger/kems-045-sossi-2018-pnas-cr.yaml`: decoded (2026-09-06) |
+| `kems-045-sossi-2018-pnas-cr` | Sossi, P. A., Moynier, F. & van Zuilen, K. (2018), "Volatile loss following cooling and accretion of the Moon revealed by chromium isotopes", Proc. Natl. Acad. Sci. U.S.A. 115(43):10920-10925, DOI 10.1073/pnas.1809060115 | 10.1073/pnas.1809060115 | `docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf`, `47384f82` | `raw/kems-045-sossi-2018-pnas-cr/kems-045-sossi-2018-pnas-cr.pdf` (present, 6f4f7b74); `text/kems-045-sossi-2018-pnas-cr/` (3 files, exists); `tables/kems-045-sossi-2018-pnas-cr/` (0 files, ABSENT) | `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` (25 rows, draft) | `ledger/kems-045-sossi-2018-pnas-cr.yaml`: decoded (2026-09-13) |
 | `kems-047-turkdogan-1984-isij` | Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking Processes", Transactions ISIJ 24:591–611 (review). Received 14 November 1983. USS Technical Center, Monroeville, PA 15146. |  | ABSENT, `` | `raw/kems-047-turkdogan-1984-isij/kems-047-turkdogan-1984-isij.pdf` (present, 206060bc); `text/kems-047-turkdogan-1984-isij/` (89 files, exists); `tables/kems-047-turkdogan-1984-isij/` (0 files, ABSENT) | `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` (6 rows, draft) | `ledger/kems-047-turkdogan-1984-isij.yaml`: decoded (2026-09-06) |
 | `kems-048-turkdogan-2001-sio2-gamma` | Turkdogan, E. T. (2001), "Assessment of SiO2 Activity Coefficients in Molten Slags Relative to the CaO-SiO2 System", ISIJ International 41(8):930-932, DOI 10.2355/isijinternational.41.930 | 10.2355/isijinternational.41.930 | ABSENT, `` | `raw/kems-048-turkdogan-2001-sio2-gamma/kems-048-turkdogan-2001-sio2-gamma.pdf` (present, acd3112c); `text/kems-048-turkdogan-2001-sio2-gamma/` (27 files, exists); `tables/kems-048-turkdogan-2001-sio2-gamma/` (0 files, ABSENT) | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` (12 rows, draft) | `ledger/kems-048-turkdogan-2001-sio2-gamma.yaml`: decoded (2026-09-06) |
 | `kems-049-kato-1993-ms-review` | Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry", J. Mass Spectrom. Soc. Jpn. 41(6):297-316 (REVIEW) |  | ABSENT, `` | `raw/kems-049-kato-1993-ms-review/kems-049-kato-1993-ms-review.pdf` (present, b0bc110b); `text/kems-049-kato-1993-ms-review/` (38 files, exists); `tables/kems-049-kato-1993-ms-review/` (0 files, ABSENT) | `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` (26 rows, draft) | `ledger/kems-049-kato-1993-ms-review.yaml`: decoded (2026-09-06) |
@@ -180,7 +180,6 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ### PDFs with no extract
 
-- `kems-045-sossi-2018-pnas-cr`
 - `kems-137-bischof-2023-mmc1`
 - `wu-1993-feo-mgo-sio2`
 
