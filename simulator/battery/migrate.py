@@ -634,7 +634,9 @@ def convert_pressure_to_pa(
     amount = _as_dec_or_none(value)
     if amount is None:
         return None, "pressure value is not numeric"
-    unit = (units or "Pa").strip()
+    if units is None or not str(units).strip():
+        return None, "missing pressure unit"
+    unit = str(units).strip()
     lowered = unit.lower().replace(" ", "")
     if lowered in {"pa", "pascal", "pascals"}:
         return amount, "identity:Pa"
@@ -659,12 +661,51 @@ def convert_temperature_to_k(
     amount = _as_dec_or_none(value)
     if amount is None:
         return None, "temperature value is not numeric"
-    unit = (units or "K").strip().lower()
+    if units is None or not str(units).strip():
+        return None, "missing temperature unit"
+    unit = str(units).strip().lower()
     if unit in {"k", "kelvin"}:
         return amount, "identity:K"
     if unit in {"c", "celsius", "degc", "°c"}:
         return celsius_to_kelvin(amount), "celsius_to_kelvin"
     return None, f"unmapped temperature unit {units!r}"
+
+
+def convert_area_to_m2(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "area value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing area unit"
+    lowered = str(units).strip().lower().replace(" ", "")
+    if lowered in {"m2", "m^2", "m²"}:
+        return amount, "identity:m2"
+    if lowered in {"cm2", "cm^2", "cm²"}:
+        # Premise: 1 m² = 10⁴ cm² exactly (SI).
+        return amount / Decimal("10000"), "cm2_to_m2"
+    if lowered in {"mm2", "mm^2", "mm²"}:
+        return amount / Decimal("1000000"), "mm2_to_m2"
+    return None, f"unmapped area unit {units!r}"
+
+
+def convert_mass_to_kg(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "mass value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing mass unit"
+    lowered = str(units).strip().lower().replace(" ", "")
+    if lowered in {"kg"}:
+        return amount, "identity:kg"
+    if lowered in {"g", "gram", "grams"}:
+        return amount / Decimal("1000"), "g_to_kg"
+    if lowered in {"mg"}:
+        return amount / Decimal("1000000"), "mg_to_kg"
+    return None, f"unmapped mass unit {units!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -1088,13 +1129,13 @@ def apparatus_from_equipment(equipment: object) -> Apparatus | None:
         if amount is None:
             continue
         loc = locator_from_mapping(payload.get("locator"))
-        units = str(payload.get("units") or "")
-        if src == "orifice_area" and units.lower() in {"cm2", "cm^2"}:
-            # Premise: 1 m² = 10⁴ cm² exactly (SI).
-            # Algebra: A_m2 = A_cm2 / 10000.
-            amount = amount / Decimal("10000")
-        elif src == "sample_surface_area" and units.lower() in {"cm2", "cm^2"}:
-            amount = amount / Decimal("10000")
+        if src in {"orifice_area", "sample_surface_area"}:
+            converted, why = convert_area_to_m2(amount, payload.get("units"))
+            if converted is None:
+                geometry_kwargs[dest] = located_unknown(why or "unmapped area unit")
+            else:
+                geometry_kwargs[dest] = located_value(converted, loc)
+            continue
         geometry_kwargs[dest] = located_value(amount, loc)
     geometry = ApparatusGeometry(**geometry_kwargs) if geometry_kwargs else None
     if cell is None and geometry is None:
@@ -1383,16 +1424,29 @@ class Migrator:
         cond = conditions or {
             "temperature_K": located_unknown("source does not state a point temperature")
         }
+        pressure_env = pressure_from_equipment(equipment)
+        apparatus = apparatus_from_equipment(equipment)
+        if (
+            isinstance(equipment, Mapping)
+            and isinstance(equipment.get("chamber_pressure"), Mapping)
+            and pressure_env.total_pressure_Pa.state.is_unknown
+        ):
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["total_pressure_Pa"],
+                pressure_env.total_pressure_Pa.state.reason or "missing pressure unit",
+            )
         experiment = Experiment(
             experiment_id=experiment_id,
             kind=ExperimentKind.LITERATURE,
             method=method,
             sample=Sample(),
             conditions=cond,
-            pressure_environment=pressure_from_equipment(equipment),
+            pressure_environment=pressure_env,
             work_id=work_id,
             locator=locator or Locator(record=experiment_id),
-            apparatus=apparatus_from_equipment(equipment),
+            apparatus=apparatus,
         )
         self.result.experiments[experiment_id] = experiment
         self.result.experiments_by_work[work_id].append(experiment_id)

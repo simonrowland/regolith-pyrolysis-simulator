@@ -25,8 +25,13 @@ from simulator.battery.migrate import (
     canonicalize_doi,
     canonicalize_rail,
     citation_hash,
+    convert_area_to_m2,
+    convert_mass_to_kg,
+    convert_pressure_to_pa,
+    convert_temperature_to_k,
     map_phase,
     migrate,
+    pressure_from_equipment,
     work_id_for,
     write_outputs,
 )
@@ -446,6 +451,26 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert exp.method.is_unknown
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
+
+
+def test_g03_blank_pressure_unit_is_unknown() -> None:
+    pa, why = convert_pressure_to_pa(1, "")
+    assert pa is None
+    assert why is not None and "unit" in why.lower()
+    env = pressure_from_equipment(
+        {"chamber_pressure": {"value": 1, "units": "", "locator": {"table": "1"}}}
+    )
+    assert env.total_pressure_Pa.state.is_unknown
+    pa_ok, trail = convert_pressure_to_pa(1, "Pa")
+    assert pa_ok == 1
+    assert trail == "identity:Pa"
+    t, why_t = convert_temperature_to_k(1200, "")
+    assert t is None
+    assert why_t is not None and "unit" in why_t.lower()
+    area, why_a = convert_area_to_m2(1, "")
+    assert area is None and why_a is not None
+    mass, why_m = convert_mass_to_kg(1, "")
+    assert mass is None and why_m is not None
 
 
 def test_g01_map_phase_refuses_heuristics() -> None:
