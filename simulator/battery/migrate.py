@@ -2047,23 +2047,30 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
             for asset in files:
                 if asset.role is AssetRole.TABLE_CSV:
                     return asset.asset_id
-            return "unknown"
+            return _unknown_asset_id(files)
         if layer == "ocr":
             for asset in files:
                 if asset.role is AssetRole.MINERU_MD and asset.path != "unknown":
                     return asset.asset_id
             # Stated OCR/md layer with no matching INDEX asset: never PDF.
-            return "unknown"
+            return _unknown_asset_id(files)
         if layer == "pdf":
             for asset in files:
                 if asset.role is AssetRole.PDF and asset.path != "unknown":
                     return asset.asset_id
-            return "unknown"
+            return _unknown_asset_id(files)
     for asset in files:
         if asset.role is AssetRole.PDF and asset.path != "unknown":
             return asset.asset_id
     if files:
         return files[0].asset_id
+    return "unknown"
+
+
+def _unknown_asset_id(files: tuple[SourceFile, ...] | list[SourceFile]) -> str:
+    for asset in files:
+        if asset.asset_id.startswith("unknown:"):
+            return asset.asset_id
     return "unknown"
 
 
@@ -2128,13 +2135,13 @@ def source_files_for(
                 sha256=State.unknown("INDEX does not give OCR sha256"),
             )
         )
-    if not files:
+    if not any(f.asset_id == f"unknown:{source_id}" for f in files):
         files.append(
             SourceFile(
                 asset_id=f"unknown:{source_id}",
                 role=AssetRole.PDFTOTEXT,
                 path="unknown",
-                sha256=State.unknown("INDEX does not give an asset"),
+                sha256=State.unknown("INDEX does not give an unmatched-layer asset"),
             )
         )
     repo = CORPUS_REPO_DEFAULT

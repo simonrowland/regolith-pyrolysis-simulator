@@ -651,6 +651,10 @@ def test_h04_ocr_locator_does_not_fall_through_to_pdf(tmp_path: Path) -> None:
     assert "unknown" in str(obs.read_from)
     assert any("ocr" in (e.why or "").lower() or "source_path" in (e.why or "")
                for e in result.queue)
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert report.hard_issues == ()
 
 
 def test_g11_read_from_is_unknown_without_index_asset(tmp_path: Path) -> None:
