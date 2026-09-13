@@ -148,9 +148,10 @@ def test_table_loads_and_pins_published_defaults() -> None:
     assert DEFAULT_SIO2_MIN_WT_PCT == 30.0
     assert DEFAULT_SIO2_MAX_WT_PCT == 80.0
     assert _SIO2_CRASH_FLOOR_WT_PCT == 34.0
+    assert ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C == 800.0
     assert (
-        ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C + CELSIUS_TO_KELVIN_OFFSET
-        == pytest.approx(1073.15)
+        alphamelts.temperature_K.certified.minimum
+        == ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C + CELSIUS_TO_KELVIN_OFFSET
     )
     assert MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']['T_calib_max_K'] == (
         engine_commissioning('alphamelts').temperature_K.certified.maximum

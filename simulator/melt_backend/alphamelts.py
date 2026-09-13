@@ -94,17 +94,14 @@ logger = logging.getLogger(__name__)
 # Liquidus seed is a search start, not a domain gate.
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 # t-894: public alias of data/engine_commissioning.yaml
-# alphamelts.temperature_K.certified[0] − 273.15. Was hardcoded 800.0 C
-# (1073.15 K) and used as a pre-equilibrate refusal in
-# _equilibrate_subprocess. Certified-band T is now notice+run; this name
-# stays so importers (binary_pot_battery.melts_certified_band) keep the
-# published number. Do not restore a hard refusal on this constant.
-ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = (
-    float(
-        engine_commissioning('alphamelts').temperature_K.certified.minimum
-    )
-    - CELSIUS_TO_KELVIN_OFFSET
-)
+# alphamelts.temperature_K.certified minimum 1073.15 K.
+# Derivation: T_C = T_K − 273.15, so 1073.15 − 273.15 = 800 exactly.
+# IEEE-754 subtraction of those two floats is 800.0000000000001; store
+# the Celsius pin as the exact literal. Was used as a pre-equilibrate
+# refusal in _equilibrate_subprocess. Certified-band T is now notice+run;
+# this name stays so importers keep the published number. Do not restore
+# a hard refusal on this constant.
+ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800.0
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
