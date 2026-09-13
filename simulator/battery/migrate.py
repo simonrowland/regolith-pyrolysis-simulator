@@ -1610,6 +1610,7 @@ class Migrator:
         )
         read_from = work.source_files.files[0].asset_id if work.source_files.files else "unknown"
         if exploded and isinstance(values.get("series"), list):
+            before = self._count(source_key).observations_out
             for item in exploded:
                 self._emit_exploded_point(
                     parent_id=obs_id,
@@ -1626,7 +1627,16 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                 )
-            return
+            if self._count(source_key).observations_out > before:
+                return
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["value"],
+                "printed series had no numeric coordinate/value pairs; parent retained",
+                source=source_key,
+                observation_id=obs_id,
+            )
 
         observation = Observation(
             observation_id=obs_id,
