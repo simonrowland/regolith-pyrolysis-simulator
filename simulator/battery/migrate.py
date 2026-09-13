@@ -3748,7 +3748,7 @@ class Migrator:
                     if exp is not None and exp.work_id in works:
                         entry.work_id = exp.work_id
 
-    def finalize(self, *, validate: bool = True) -> None:
+    def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
         self._resolve_queue_ids()
@@ -3776,20 +3776,19 @@ class Migrator:
                 self.result.measured.doi_works += 1
             else:
                 self.result.measured.no_doi_works += 1
-        if validate:
-            self.result.validation = validate_corpus(
-                self.result.works,
-                self.result.experiments,
-                self.result.observations,
-                residuals=None,
-            )
+        self.result.validation = validate_corpus(
+            self.result.works,
+            self.result.experiments,
+            self.result.observations,
+            residuals=None,
+        )
 
-    def run(self, *, validate: bool = True) -> MigrationResult:
+    def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
-        self.finalize(validate=validate)
+        self.finalize()
         return self.result
 
 
@@ -4004,10 +4003,9 @@ def migrate(
     root: Path | None = None,
     *,
     write: bool = True,
-    validate: bool = True,
 ) -> MigrationResult:
     migrator = Migrator(root)
-    result = migrator.run(validate=validate)
+    result = migrator.run()
     if write:
         write_outputs(result, root)
     return result

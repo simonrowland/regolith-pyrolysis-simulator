@@ -24,6 +24,7 @@ from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
     DuplicateObservationIdError,
+    Migrator,
     UnknownRailSpellingError,
     canonicalize_doi,
     canonicalize_rail,
@@ -166,6 +167,14 @@ def test_unknown_rail_spelling_raises() -> None:
         canonicalize_rail("gibbs_thermochemistry")
 
 
+def test_h10_migrate_has_no_validation_bypass() -> None:
+    import inspect
+
+    assert "validate" not in inspect.signature(migrate).parameters
+    assert "validate" not in inspect.signature(Migrator.run).parameters
+    assert "validate" not in inspect.signature(Migrator.finalize).parameters
+
+
 def test_h06_ledger_unknown_rail_spelling_raises(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
@@ -189,7 +198,7 @@ def test_h06_ledger_unknown_rail_spelling_raises(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     with pytest.raises(UnknownRailSpellingError):
-        migrate(root, write=False, validate=True)
+        migrate(root, write=False)
 
 
 def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None:
@@ -197,12 +206,12 @@ def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None
     extract["species"]["Na"]["observations"][0]["rail"] = "gibbs_thermochemistry"
     root = _write_min_tree(tmp_path, extract)
     with pytest.raises(UnknownRailSpellingError):
-        migrate(root, write=False, validate=False)
+        migrate(root, write=False)
 
 
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    result = migrate(root, write=True, validate=True)
+    result = migrate(root, write=True)
     points = [
         o
         for o in result.observations.values()
@@ -221,7 +230,7 @@ def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> Non
     extract["species"]["Na"]["observations"][0]["values"].pop("admission_status")
     extract["species"]["Na"]["observations"][0]["values"].pop("method_class")
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.admission.status is AdmissionStatus.PENDING
     assert "does not state admission" in obs.admission.reason
@@ -233,7 +242,7 @@ def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> Non
 
 def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    migrate(root, write=True, validate=True)
+    migrate(root, write=True)
     works_dir = root / "data" / "literature" / "works"
     stale = works_dir / "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef.yaml"
     stale.write_text(
@@ -244,7 +253,7 @@ def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
     doc = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))
     doc["aliases"]["stale-source"] = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     aliases_path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
-    migrate(root, write=True, validate=True)
+    migrate(root, write=True)
     assert not stale.is_file()
     aliases = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))["aliases"]
     assert "stale-source" not in aliases
@@ -252,7 +261,7 @@ def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
 
 def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    first = migrate(root, write=True, validate=True)
+    first = migrate(root, write=True)
     extract_rows = 1
     assert first.source_counts["data/literature/extracts/fixture-source.yaml"].rows_in == extract_rows
     assert first.source_counts["data/literature/extracts/fixture-source.yaml"].observations_out >= extract_rows
@@ -261,7 +270,7 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
         for p in (root / "data").rglob("*")
         if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    second = migrate(root, write=True, validate=True)
+    second = migrate(root, write=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
@@ -271,14 +280,14 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
     for key in first_bytes:
         assert first_bytes[key] == second_bytes[key], key
     original = (root / "data" / "literature" / "extracts" / "fixture-source.yaml").read_bytes()
-    migrate(root, write=True, validate=True)
+    migrate(root, write=True)
     assert (root / "data" / "literature" / "extracts" / "fixture-source.yaml").read_bytes() == original
     assert (root / "data" / "literature" / "works" / "ALIASES.yaml").is_file()
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    result = migrate(root, write=True, validate=True)
+    result = migrate(root, write=True)
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
@@ -304,7 +313,7 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
 
 def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    migrate(root, write=True, validate=True)
+    migrate(root, write=True)
     works, experiments, observations = load_migrated_store(root)
     report = validate_corpus(works, experiments, observations, residuals=None)
     assert report.hard_issues == ()
@@ -322,7 +331,7 @@ def test_g01_blank_phase_is_unknown_not_gas(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["phase"] = ""
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     phase = _phase_state(obs)
     assert phase.is_unknown, phase
@@ -360,7 +369,7 @@ def test_g01_unmapped_and_sidecar_phases_are_unknown(tmp_path: Path) -> None:
         row.update(extra)
         rows.append(row)
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
 
     def by_prefix(suffix: str):
         matches = [o for o in result.observations.values() if suffix in o.observation_id]
@@ -413,7 +422,7 @@ def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     kems = result.observations["kems_no_phase"]
     assert kems.identity.species.phase.is_unknown
 
@@ -487,7 +496,7 @@ def test_g02_iron_olivine_kems_is_knudsen_not_langmuir(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = result.observations["iron_olivine_kems"]
     exp = result.experiments[obs.experiment_id]
     assert exp.method.is_value
@@ -524,7 +533,7 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = result.observations["kems_no_method"]
     exp = result.experiments[obs.experiment_id]
     assert exp.method.is_unknown
@@ -536,7 +545,7 @@ def test_g09_queue_ids_resolve_in_store(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["phase"] = "silicate_melt"
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     for entry in result.queue:
         assert entry.work_id in result.works, entry
         if entry.observation_id is not None:
@@ -570,7 +579,7 @@ def test_g10_kems_uncertainty_is_retained(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = result.observations["cao_p_ca_isothermal"]
     assert obs.uncertainty.kind.value == "printed"
     assert obs.uncertainty.verbatim is not None
@@ -583,7 +592,7 @@ def test_h04_ocr_locator_does_not_fall_through_to_pdf(tmp_path: Path) -> None:
         "table": "I",
     }
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert not str(obs.read_from).startswith("pdf:")
     assert "unknown" in str(obs.read_from)
@@ -609,7 +618,7 @@ def test_g11_read_from_is_unknown_without_index_asset(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert not str(obs.read_from).startswith("pdf:")
     assert "unknown" in str(obs.read_from)
@@ -624,7 +633,7 @@ def test_g12_metadata_files_are_not_observation_rows(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     (comp / "sidecar.yaml").write_text("schema_version: sidecar\n", encoding="utf-8")
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     manifest = result.source_counts["data/literature/compilations/janaf-4th/manifest.yaml"]
     sidecar = result.source_counts["data/literature/compilations/janaf-4th/sidecar.yaml"]
     assert manifest.metadata_in == 1
@@ -642,7 +651,7 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     extract["species"]["Na"]["observations"][0]["values"].pop("series", None)
     extract["species"]["Na"]["observations"][0]["values"]["quantity"] = "pure_Psat"
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.evidence.class_.is_value
     assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
@@ -679,7 +688,7 @@ def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> Non
         rows.append(row)
     extract["species"]["Na"]["observations"] = rows
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     for i, token in enumerate(tokens):
         dest = METHOD_CLASS_MAP[token]
         helper, _reason = evidence_for(token)
@@ -738,7 +747,7 @@ def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> No
         ),
         encoding="utf-8",
     )
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     charge = result.observations[
         "yu_2025_hollow_anode_measurements:one_hour:mre_applied_charge_C"
     ]
@@ -782,7 +791,7 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
         },
     ]
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     atm_points = [
         o
         for o in result.observations.values()
@@ -814,7 +823,7 @@ def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
         yaml.safe_dump({"schema_version": 1, "points": [point, dict(point)]}, sort_keys=False),
         encoding="utf-8",
     )
-    result = migrate(root, write=True, validate=True)
+    result = migrate(root, write=True)
     oid = point["key"]
     assert oid in result.observations
     assert len(result.observations) == 3  # fixture extract 2 points + 1 unique ledger
@@ -844,7 +853,7 @@ def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     with pytest.raises(DuplicateObservationIdError):
-        migrate(root, write=False, validate=True)
+        migrate(root, write=False)
 
 
 def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
@@ -889,7 +898,7 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
         },
     ]
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     old = result.observations["fixture-source::homma_1966_mn_olette_alpha_exp_table1"]
     new = result.observations["fixture-source::homma_1966_mn_olette_experimental_quoted_deep"]
     newer = result.observations["fixture-source::newer_list"]
@@ -972,7 +981,7 @@ def test_h01_bare_series_T_P_without_units_stay_unknown(tmp_path: Path) -> None:
     row["units"] = ""
     row["values"]["series"] = [{"T": 1200, "P": 1}]
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     temp = obs.identity.temperature_K
     assert temp is not None and temp.is_unknown, temp
@@ -991,7 +1000,7 @@ def test_h01_bare_series_T_P_without_units_stay_unknown(tmp_path: Path) -> None:
 
 def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     points = [
         o
         for o in result.observations.values()
@@ -1017,7 +1026,7 @@ def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Pat
         },
     }
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     exp = result.experiments[obs.experiment_id]
     area = exp.apparatus.geometry.exposed_area_m2 if exp.apparatus and exp.apparatus.geometry else None
@@ -1093,7 +1102,7 @@ def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> Non
         },
     ]
     root = _write_min_tree(tmp_path, extract)
-    result = migrate(root, write=False, validate=True)
+    result = migrate(root, write=False)
     expected = {
         "gao15_gamma_s1_1low_polytherm": "0.0632",
         "gao15_gamma_s2_1low_isotherm": "0.0353",

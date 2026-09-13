@@ -33,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         help="run the lift without writing outputs",
     )
     args = parser.parse_args(argv)
-    result = migrate(args.root, write=not args.dry_run, validate=True)
+    result = migrate(args.root, write=not args.dry_run)
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
     print(
         f"rows_in={sum(c.rows_in for c in result.source_counts.values())} "
