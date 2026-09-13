@@ -155,12 +155,11 @@ def _closed_mapping(
 
 
 def _finite_float(value: object, *, context: str) -> float:
-    try:
-        number = float(value)
-    except (TypeError, ValueError) as exc:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise EngineCommissioningError(
             f'{context} must be a finite float, got {value!r}'
-        ) from exc
+        )
+    number = float(value)
     if number != number or number in (float('inf'), float('-inf')):
         raise EngineCommissioningError(
             f'{context} must be a finite float, got {value!r}'
@@ -283,12 +282,11 @@ def _parse_table(payload: object, *, path: Path) -> CommissioningTable:
             'engine_commissioning missing engines mapping'
         )
     schema_version = body.get('schema_version', 1)
-    try:
-        schema_int = int(schema_version)
-    except (TypeError, ValueError) as exc:
+    if isinstance(schema_version, bool) or type(schema_version) is not int:
         raise EngineCommissioningError(
             f'schema_version must be an int, got {schema_version!r}'
-        ) from exc
+        )
+    schema_int = schema_version
     if schema_int != 1:
         raise EngineCommissioningError(
             f'unsupported engine_commissioning schema_version {schema_int}'

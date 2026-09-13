@@ -177,6 +177,24 @@ def test_authority_outside_bridge_is_rejected(tmp_path: Path) -> None:
         load_engine_commissioning(path)
 
 
+def test_boolean_bound_is_rejected(tmp_path: Path) -> None:
+    """C05 / F5: [True, 80] is not a numeric certified interval."""
+    payload = _valid_table_payload()
+    payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [True, 80]
+    path = _write_table(tmp_path / 'bool-bound.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='finite float'):
+        load_engine_commissioning(path)
+
+
+def test_non_integer_schema_version_is_rejected(tmp_path: Path) -> None:
+    """C05 / F5: schema_version 1.9 is not an int."""
+    payload = _valid_table_payload()
+    payload['schema_version'] = 1.9
+    path = _write_table(tmp_path / 'schema-1.9.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='schema_version'):
+        load_engine_commissioning(path)
+
+
 def test_inverted_band_is_rejected(tmp_path: Path) -> None:
     payload = _valid_table_payload()
     payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [80.0, 30.0]
