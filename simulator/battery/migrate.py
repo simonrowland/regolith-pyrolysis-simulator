@@ -2390,8 +2390,8 @@ class Migrator:
                 if pa is not None:
                     derivation = Derivation(
                         relation="atm_to_Pa",
-                        inputs=(loc.record or "raw_pCa",),
-                        parameters=(),
+                        inputs=(choose_read_from(work, loc),),
+                        parameters=(("pressure_atm", located_value(p_atm, loc)),),
                         output_unit="Pa",
                     )
                 self._generic_obs(
