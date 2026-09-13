@@ -13,17 +13,19 @@
 # Derivation of the published numbers this table replaces (do not retune):
 # - SiO2 certified [30, 80] wt% <- engines/alphamelts/domain.py
 #   DEFAULT_SIO2_MIN_WT_PCT = 30.0, DEFAULT_SIO2_MAX_WT_PCT = 80.0
-#   (DEFAULT_SILICATE_NETWORK_BAND_WT_PCT). Adapter
-#   AlphaMELTSBackend._domain_gate used the same window as a pre-equilibrate
-#   refusal.
+#   (DEFAULT_SILICATE_NETWORK_BAND_WT_PCT). That window is a
+#   commissioning band: out-of-band is notice+run
+#   (authority=extrapolated), not a pre-equilibrate refusal.
 # - SiO2 observed_crash_floor_wt_pct 34 <- engines/alphamelts/domain.py
 #   _SIO2_CRASH_FLOOR_WT_PCT = 34.0 (measured 2026-08-16 rump-hotwire:
-#   three of four basalts SIGABRT at 34.0 wt%).
+#   three of four basalts SIGABRT at 34.0 wt%). Evidence metadata only;
+#   it does not refuse before the engine runs.
 # - T certified [1073.15, 1700] K <- adapter
 #   ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800.0 (1073.15 K) in
-#   simulator/melt_backend/alphamelts.py and T_calib_max_K = 1700.0 in
+#   simulator/melt_backend/alphamelts.py and T_calib_max_K from the
+#   same certified maximum in
 #   simulator/melt_backend/melt_envelope.py
-#   MELT_ENVELOPE_CONSTANTS['MELTS-v1.0'].
+#   MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']. Certified T is notice+run.
 #
 # Closed keys. Extra engine blocks (vaporock / magemin / imcc_sf04) may be
 # added later with the same shape; they are omitted until commissioned.

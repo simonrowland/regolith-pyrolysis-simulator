@@ -101,6 +101,14 @@ def _spy_prepared(called: list):
     return spy
 
 
+def test_commissioning_yaml_comments_match_notice_and_run() -> None:
+    """C14 / G-P3-2: comments describe notice+run and floor-as-metadata."""
+    text = Path('data/engine_commissioning.yaml').read_text(encoding='utf-8')
+    assert 'notice + authority=extrapolated' in text
+    assert 'evidence metadata, not a pre-run refusal' in text
+    assert 'used the same window as a pre-equilibrate' not in text
+
+
 def test_melt_envelope_t_max_reads_commissioning_snapshot() -> None:
     """C12 / G-P1-4: envelope T max has one source — the commissioning table."""
     envelope_path = Path('simulator/melt_backend/melt_envelope.py')
