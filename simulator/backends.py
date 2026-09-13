@@ -1,4 +1,10 @@
-"""Shared melt-backend selection and simulator construction helpers."""
+"""Shared melt-backend selection and simulator construction helpers.
+
+IMCC-SF04 (``imcc-sf04``, ``imcc-sf04-ext``) is registered as a shadow /
+diagnostic backend, ineligible as the active recipe backend. Promotion
+into ``REAL_MELT_BACKEND_NAMES`` and active eligibility is a separate
+owner-gated change after the battery result (t-890).
+"""
 
 from __future__ import annotations
 
@@ -15,6 +21,9 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
     ANALYTICAL_BACKEND_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    IMCC_SF04_BACKEND_NAME,
+    IMCC_SF04_BACKEND_NAMES,
+    IMCC_SF04_EXT_BACKEND_NAME,
     canonical_backend_name,
 )
 from simulator.accounting.exceptions import AccountingError
@@ -36,7 +45,34 @@ from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
+INELIGIBLE_ACTIVE_BACKENDS = (
+    "vaporock",
+    "magemin",
+    IMCC_SF04_BACKEND_NAME,
+    IMCC_SF04_EXT_BACKEND_NAME,
+)
+_INELIGIBLE_ACTIVE_BACKEND_LABELS = {
+    "vaporock": "VapoRock",
+    "magemin": "MAGEMin",
+    IMCC_SF04_BACKEND_NAME: "IMCC-SF04",
+    IMCC_SF04_EXT_BACKEND_NAME: "IMCC-SF04-EXT",
+}
+
+
+def _ineligible_active_backend_message(name: str) -> str:
+    label = _INELIGIBLE_ACTIVE_BACKEND_LABELS.get(name, name)
+    if name in IMCC_SF04_BACKEND_NAMES:
+        return (
+            f"{label} is not eligible as the active melt backend "
+            "pending battery qualification; select alphamelts or auto."
+        )
+    return (
+        f"{label} is not eligible as the active melt backend "
+        "until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent "
+        "dispatcher; select alphamelts or auto."
+    )
+
+
 CACHED_REAL_BACKEND_NAME = "cached-real"
 REAL_MELT_BACKEND_NAMES = (
     "alphamelts",
@@ -1064,6 +1100,10 @@ def _make_backend_resolution_status(
     policy: BackendSelectionPolicy,
 ) -> BackendResolutionStatus:
     is_internal_analytical = isinstance(backend, InternalAnalyticalBackend)
+    requested_canonical = canonical_backend_name(
+        str(requested_backend or "").strip().lower()
+    )
+    ineligible_active = requested_canonical in INELIGIBLE_ACTIVE_BACKENDS
     active_backend = (
         ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
         if is_internal_analytical
@@ -1076,7 +1116,11 @@ def _make_backend_resolution_status(
         requested_backend=requested_backend,
         active_backend=active_backend,
         backend_status=backend_status,
-        authoritative=backend_status == BACKEND_STATUS_OK and not is_internal_analytical,
+        authoritative=(
+            backend_status == BACKEND_STATUS_OK
+            and not is_internal_analytical
+            and not ineligible_active
+        ),
         selection_policy=policy.value,
         message=_backend_status_message(backend, is_internal_analytical=is_internal_analytical),
     )
@@ -1184,12 +1228,7 @@ def _resolve_web_autodetect(
     backend_config: Mapping[str, Any] | None,
 ):
     if name in INELIGIBLE_ACTIVE_BACKENDS:
-        backend_label = "VapoRock" if name == "vaporock" else "MAGEMin"
-        raise unavailable_error_cls(
-            f"{backend_label} is not eligible as the active melt backend "
-            "until \\goal CHEMISTRY-KERNEL-CARVE-OUT wires a multi-intent "
-            "dispatcher; select alphamelts or auto."
-        )
+        raise unavailable_error_cls(_ineligible_active_backend_message(name))
 
     if name == CACHED_REAL_BACKEND_NAME:
         backend = _cached_real_backend(
@@ -1333,6 +1372,24 @@ def _resolve_runner_strict(
             thermoengine_backend_cls=thermoengine_backend_cls,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=backend_config,
+        )
+    if name in IMCC_SF04_BACKEND_NAMES:
+        from simulator.melt_backend.imcc_sf04.adapter import (
+            ImccSf04Backend,
+            ImccSf04ExtBackend,
+        )
+
+        backend_cls = (
+            ImccSf04ExtBackend
+            if name == IMCC_SF04_EXT_BACKEND_NAME
+            else ImccSf04Backend
+        )
+        backend = _try_backend(backend_cls, backend_config)
+        if backend is not None:
+            return backend
+        label = _INELIGIBLE_ACTIVE_BACKEND_LABELS.get(name, name)
+        raise unavailable_error_cls(
+            f"{label} unavailable; datapack missing or initialize() failed"
         )
     raise unavailable_error_cls(f"unknown backend {name!r}")
 
