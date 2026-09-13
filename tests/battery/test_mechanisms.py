@@ -57,6 +57,8 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    Reaction,
+    ReactionTerm,
     Residual,
     ResidualRefusal,
     SourceFile,
@@ -1799,11 +1801,16 @@ def test_r03_fo2_reconciliation_vs_experiment_point_conditions() -> None:
         matching,
         observation_id="r03-fo2-bad",
         identity=replace(ident, fO2_Pa=State.of(Decimal("1e-2"))),
-        point_conditions={"temperature_K": F.located(ident.temperature_K.value)},
     )
+    assert disagreed.point_conditions is not None
+    assert "fO2_Pa" in disagreed.point_conditions
+    assert "total_pressure_Pa" in disagreed.point_conditions
     report = validate_corpus([w], [exp], [disagreed])
     assert not report.ok
     assert any(i.reason is RefusalReason.INVALID_IDENTITY for i in report.issues)
+    fo2_issues = [i for i in report.issues if i.reason is RefusalReason.INVALID_IDENTITY]
+    assert any("fO2_Pa" in i.path for i in fo2_issues)
+    assert not any("total_pressure_Pa" in i.path for i in fo2_issues)
 
 
 def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
@@ -1842,6 +1849,302 @@ def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
         dropped_mass_fraction=Decimal("0.02"),
     )
     assert union_notices((projected_a,), (projected_b,)) == (projected_a, projected_b)
+
+
+def test_r09_union_fingerprint_isolates_each_constituent() -> None:
+    """Each fingerprint field is independently identity: original, band, source,
+    destination, dropped, and reason. Clean identical notices still collapse.
+    """
+
+    from dataclasses import replace
+
+    floor = F.floor_notice()
+    original_only = replace(floor, original=Decimal("1e-50"))
+    band_only = replace(floor, band="[1e-20, 1] bar")
+    assert union_notices((floor,), (original_only,)) == (floor, original_only)
+    assert union_notices((floor,), (band_only,)) == (floor, band_only)
+    fallback = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="fallback producer",
+        origin="adapter",
+        source="from-a",
+        destination="to-a",
+    )
+    source_only = replace(fallback, source="from-b")
+    destination_only = replace(fallback, destination="to-b")
+    reason_only = replace(fallback, reason="different producer")
+    assert union_notices((fallback,), (source_only,)) == (fallback, source_only)
+    assert union_notices((fallback,), (destination_only,)) == (fallback, destination_only)
+    assert union_notices((fallback,), (reason_only,)) == (fallback, reason_only)
+    assert union_notices((fallback,), (fallback,)) == (fallback,)
+    projected = Notice(
+        kind=NoticeKind.COMPOSITION_PROJECTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="dropped oxide",
+        origin="engine",
+        dropped=("P2O5",),
+        dropped_mass_fraction=Decimal("0.0152"),
+    )
+    dropped_only = replace(projected, dropped=("Fe2O3",))
+    assert union_notices((projected,), (dropped_only,)) == (projected, dropped_only)
+    assert union_notices((projected,), (projected,)) == (projected,)
+
+
+def test_r09_floor_notice_with_band_requires_original() -> None:
+    from dataclasses import replace
+
+    ident, w, exp, _ref = _r03_vapour_pair()
+    missing_original = replace(F.floor_notice(), original=None)
+    obs = F.observation(
+        "r09-floor-no-original",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(missing_original,),
+    )
+    report = validate_corpus([w], [exp], [obs])
+    assert not report.ok
+    assert any("original and band" in i.detail for i in report.issues)
+    complete = F.observation(
+        "r09-floor-original-ok",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(F.floor_notice(),),
+    )
+    assert validate_corpus([w], [exp], [complete]).ok
+
+
+def test_r09_printed_table_pairing_requires_reaction_and_formation_elements() -> None:
+    """Spec :239: table self-check matches reaction/per/p° plus formation elements."""
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r09-pair-ref",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r09-pair-cand", exp.experiment_id, ident_g, Decimal("0"))
+    o2 = Species("O2", Phase.G)
+    different_reaction = replace(
+        ident_k,
+        reaction=State.of(
+            Reaction((ReactionTerm(o2, Fraction(2)), ReactionTerm(o2, Fraction(-2))))
+        ),
+    )
+    rxn_log = F.observation(
+        "r09-pair-rxn-logK",
+        exp.experiment_id,
+        different_reaction,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    scored = F.residual(
+        "r09-pair-rxn",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, rxn_log, cand], [scored]).ok
+    different_elements = replace(
+        ident_k,
+        formation_elements=State.of((("O", Species("O", Phase.G)),)),
+    )
+    fe_log = F.observation(
+        "r09-pair-fe-logK",
+        exp.experiment_id,
+        different_elements,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    fe_scored = F.residual(
+        "r09-pair-fe",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, fe_log, cand], [fe_scored]).ok
+    matching_log = F.observation(
+        "r09-pair-match-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    matching = F.residual(
+        "r09-pair-match",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    matching_report = validate_corpus([w], [exp], [ref, matching_log, cand], [matching])
+    assert not matching_report.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in matching_report.issues)
+
+
+def test_r09_pressure_blocking_applies_to_partial_and_reference() -> None:
+    ident_partial = replace_pref_as_partial()
+    ident_pref = F.pref_identity()
+    w = F.work()
+    exp = F.tabulation_experiment(T_K=ident_partial.temperature_K.value)
+    for ident, tag, quantity in (
+        (ident_partial, "partial", Quantity.P_PARTIAL),
+        (ident_pref, "pref", Quantity.P_REFERENCE),
+    ):
+        notice = Notice(
+            kind=NoticeKind.FALLBACK,
+            affected_quantities=(quantity,),
+            reason="fallback producer",
+            origin="adapter",
+            source="melt",
+            destination="vacuum-floor",
+        )
+        ref = F.observation(
+            f"r09-{tag}-ref",
+            exp.experiment_id,
+            ident,
+            Decimal("0.1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        cand = F.engine_obs(
+            f"r09-{tag}-cand",
+            exp.experiment_id,
+            ident,
+            Decimal("1"),
+            notices=(notice,),
+        )
+        scored = F.residual(
+            f"r09-{tag}-scored",
+            ref.observation_id,
+            candidate=cand.observation_id,
+            status=ResidualStatus.MISMATCH,
+            rail=Rail.VAPOUR,
+            score_eligible=True,
+            notices=union_notices(cand.notices),
+        )
+        report = validate_corpus([w], [exp], [ref, cand], [scored])
+        assert not report.ok, tag
+        clean = F.engine_obs(f"r09-{tag}-clean", exp.experiment_id, ident, Decimal("0.1"))
+        control = F.residual(
+            f"r09-{tag}-clean",
+            ref.observation_id,
+            candidate=clean.observation_id,
+            status=ResidualStatus.MATCH,
+            rail=Rail.VAPOUR,
+            score_eligible=True,
+        )
+        assert validate_corpus([w], [exp], [ref, clean], [control]).ok, tag
+
+
+def replace_pref_as_partial():
+    from dataclasses import replace
+
+    pref = F.pref_identity()
+    pot = Composition(
+        "ordered_complete_mole_inventory",
+        (("SiO2", Decimal("0.5")), ("NaO0.5", Decimal("0.5"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    return replace(
+        pref,
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(pot),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+
+
+def test_r09_refused_branch_requires_refusal_payload() -> None:
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r09-refusal-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r09-refusal-cand", exp.experiment_id, ident, Decimal("0"))
+    missing = Residual(
+        key="r09-refusal-missing",
+        reference=ref.observation_id,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.THERMOCHEMISTRY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        candidate=cand.observation_id,
+        numeric=None,
+        refusal=None,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [missing])
+    assert not report.ok
+    assert any("refused requires refusal" in i.detail for i in report.issues)
+    control = F.residual(
+        "r09-refusal-ok",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_MISMATCH, {"fields": ["quantity"]}),
+        score_eligible=False,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [control]).ok
+
+
+def test_r09_engine_only_opposite_quantity_is_not_invalid_source() -> None:
+    """Printed-only pairing: an engine logK sibling must not become a table half."""
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r09-engine-ref",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r09-engine-cand", exp.experiment_id, ident_g, Decimal("0"))
+    engine_log = F.engine_obs(
+        "r09-engine-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+    )
+    scored = F.residual(
+        "r09-engine-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, engine_log, cand], [scored]).ok
+    printed_log = F.observation(
+        "r09-engine-printed-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    printed = validate_corpus([w], [exp], [ref, printed_log, cand], [scored])
+    assert not printed.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in printed.issues)
 
 
 def test_r06_engine_evaluation_commanded_value_needs_no_locator() -> None:
