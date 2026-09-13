@@ -427,7 +427,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     temperature_C,
                     payload.activity_coefficients,
                     comp_wt,
-                    pO2_bar=max(10.0 ** solved_fO2_log, 1e-30),
+                    pO2_bar=10.0 ** solved_fO2_log,
                     context='ThermoEngine VapoRock fallback unavailable',
                 )
                 vapor_pressures, vapor_pressure_source = (

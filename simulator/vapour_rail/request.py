@@ -1501,6 +1501,12 @@ def refusal_closure(
                     # Keep the melt source's band/reason attached to its public
                     # pressure answer, through the existing extensible carrier.
                     evaluation_extra["extrapolation_notice"] = dict(source_notice)
+                eval_notice = getattr(evaluation, "extrapolation_notice", None)
+                if (
+                    eval_notice is not None
+                    and "extrapolation_notice" not in evaluation_extra
+                ):
+                    evaluation_extra["extrapolation_notice"] = dict(eval_notice)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
 

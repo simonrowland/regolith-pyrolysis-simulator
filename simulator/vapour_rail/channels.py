@@ -906,6 +906,31 @@ def o2_potential_from_pO2_bar(
     # 1-bar ideal-gas standard state: (μ-μ0)/(R T) = ln(f / 1 bar).
     reduced = math.log(oxygen / 1.0)
     delta_mu = GAS_CONSTANT * temperature_K * reduced
+    receipt: dict[str, Any] = {
+        "kind": "legacy_pO2_bar",
+        "pO2_bar_input": float(pO2_bar),
+        "pO2_bar_clamped": oxygen,
+        "pO2_reference_bar": p_ref,
+        "standard_state_bar": 1.0,
+    }
+    if oxygen == MELT_DISSOCIATION_PO2_MIN_BAR and float(pO2_bar) < MELT_DISSOCIATION_PO2_MIN_BAR:
+        from engines.builtin.vapor_pressure import (
+            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
+            MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+        )
+
+        receipt["extrapolation_notice"] = {
+            "reason": MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
+            "authority_level": "extrapolated",
+            "certified_band": {
+                "pO2_bar": (
+                    MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+            },
+            "pO2_bar_used": oxygen,
+            "was_clamped": True,
+        }
     return GasChannelPotential(
         channel_id=CHANNEL_O2,
         gas_formula="O2",
@@ -918,15 +943,7 @@ def o2_potential_from_pO2_bar(
         authority=authority,
         state_fingerprint=state_fingerprint,
         source_kind=SOURCE_KIND_LEGACY_SCALAR_ADAPTER,
-        observation_or_setpoint_receipt=MappingProxyType(
-            {
-                "kind": "legacy_pO2_bar",
-                "pO2_bar_input": float(pO2_bar),
-                "pO2_bar_clamped": oxygen,
-                "pO2_reference_bar": p_ref,
-                "standard_state_bar": 1.0,
-            }
-        ),
+        observation_or_setpoint_receipt=MappingProxyType(receipt),
         attempts=("legacy_scalar_adapter",),
         legacy_pO2_bar=oxygen,
         legacy_pO2_reference_bar=p_ref,

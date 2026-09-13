@@ -4814,7 +4814,7 @@ class _MELTSBackendSupport(MeltBackend):
                 T_C,
                 dict(activities),
                 dict(melt_wt),
-                pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
+                pO2_bar=10.0 ** float(fO2_log),
                 context='VapoRock helper unavailable',
             )
             return self._finalize_antoine_projection(
@@ -4850,7 +4850,7 @@ class _MELTSBackendSupport(MeltBackend):
                 T_C,
                 dict(activities),
                 dict(melt_wt),
-                pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
+                pO2_bar=10.0 ** float(fO2_log),
                 context=f'VapoRock status {result.status!r}',
             )
             return self._finalize_antoine_projection(
@@ -4938,16 +4938,24 @@ class _MELTSBackendSupport(MeltBackend):
         base_source: str,
         pressures: Mapping[str, float],
     ) -> Dict[str, str]:
-        from engines.builtin.vapor_pressure import vapor_pressure_source_label
+        from engines.builtin.vapor_pressure import (
+            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
+            vapor_pressure_source_label,
+        )
 
         table = self._load_vapor_pressure_table()
-        return {
-            str(species): vapor_pressure_source_label(
+        notices = getattr(self, "_antoine_floor_inversion_notices", {}) or {}
+        token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        labels: Dict[str, str] = {}
+        for species in pressures:
+            label = vapor_pressure_source_label(
                 base_source,
                 table.get(str(species), {}),
             )
-            for species in pressures
-        }
+            if str(species) in notices and token not in str(label).split(":"):
+                label = f"{label}:{token}"
+            labels[str(species)] = label
+        return labels
 
     @staticmethod
     def _vapor_pressure_source_map(
@@ -5006,6 +5014,12 @@ class _MELTSBackendSupport(MeltBackend):
             pressures,
             source,
         )
+        notices = getattr(self, "_antoine_floor_inversion_notices", None) or {}
+        if notices:
+            payload["pO2_floor_inversion_notices_by_species"] = {
+                str(species): dict(notice)
+                for species, notice in notices.items()
+            }
         if isinstance(source, VaporPressureActivityRefusal):
             payload['vapor_pressure_backend_status'] = 'refused'
             payload['vapor_pressure_backend_status_reason'] = source.reason
@@ -5094,12 +5108,15 @@ class _MELTSBackendSupport(MeltBackend):
             return {}
         T_K = float(T_C) + 273.15
         pressures: Dict[str, float] = {}
+        self._antoine_floor_inversion_notices = {}
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_STANDARD_REACTION,
+            melt_dissociation_pO2_floor_inversion_notice,
             vapor_pressure_antoine_coefficients,
             warn_pseudo_vapor_pressure_fallback,
         )
+        from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 
         for species, spec in table.items():
             raw_activity = self._activity_for_vapor_species(species, activities)
@@ -5136,8 +5153,30 @@ class _MELTSBackendSupport(MeltBackend):
                         1e-30,
                         float(spec.get('pO2_reference_bar', 1.0) or 1.0),
                     )
-                    pO2_value = max(float(pO2_bar), 1e-30)
+                    pO2_raw = float(pO2_bar)
+                    pO2_value = max(pO2_raw, 1e-30)
                     p_i *= (pO2_value / pO2_reference_bar) ** pO2_exponent
+                    if p_i > 0.0 and math.isfinite(p_i):
+                        try:
+                            fO2_log = math.log10(pO2_value)
+                        except ValueError:
+                            fO2_log = None
+                        notice = melt_dissociation_pO2_floor_inversion_notice(
+                            species=str(species),
+                            pressure_Pa=p_i,
+                            pO2_bar_used=pO2_value,
+                            pO2_exponent=pO2_exponent,
+                            pressure_rail="liquid_oxide_standard_reaction",
+                            fO2_log=fO2_log,
+                            was_clamped=(
+                                math.isfinite(pO2_raw)
+                                and pO2_raw < MELT_DISSOCIATION_PO2_MIN_BAR
+                            ),
+                        )
+                        if notice is not None:
+                            self._antoine_floor_inversion_notices[
+                                str(species)
+                            ] = notice
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
                 if coefficient_block == COEFF_BLOCK_ANTOINE:

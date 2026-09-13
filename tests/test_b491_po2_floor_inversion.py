@@ -434,3 +434,123 @@ def test_lowest_catalog_body_floor_does_not_invert() -> None:
     assert diagnostic["vapor_pressures_Pa"]["Si"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert diagnostic["vapor_pressures_Pa"]["Mg"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert diagnostic["vapor_pressures_Pa"]["Na"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+
+
+def test_catalog_and_channel_floor_clamps_carry_floor_notice() -> None:
+    """M06: catalog evaluate and O2 clamp publish the existing floor notice."""
+
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from simulator.vapour_rail.channels import (
+        REACTION_PLANE_MELT_INTERFACE,
+        clamp_physical_pO2_bar,
+        o2_potential_from_pO2_bar,
+    )
+
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.evaluator_for("Si")
+    assert evaluator.pO2_exponent < 0.0
+    below = evaluator.evaluate(1700.0, source_activity=1e-30, pO2_bar=1e-40)
+    at_floor = evaluator.evaluate(1700.0, source_activity=1e-30, pO2_bar=1e-30)
+    control = evaluator.evaluate(1700.0, source_activity=1e-30, pO2_bar=1e-9)
+
+    assert below.pressure_pa == pytest.approx(at_floor.pressure_pa)
+    assert below.pressure_pa > 0.0
+    assert below.pressure_pa < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    assert below.status is None
+    assert below.extrapolation_notice is not None
+    assert below.extrapolation_notice["reason"] == (
+        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
+    assert below.extrapolation_notice["authority_level"] == "extrapolated"
+    assert below.extrapolation_notice["certified_band"]["pO2_bar"] == (
+        MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+    )
+    assert at_floor.extrapolation_notice is not None
+    assert control.pressure_pa > 0.0
+    assert control.pressure_pa / below.pressure_pa == pytest.approx(1e-21, rel=1e-9)
+    assert control.extrapolation_notice is None
+
+    assert clamp_physical_pO2_bar(1e-40) == MELT_DISSOCIATION_PO2_MIN_BAR
+    potential = o2_potential_from_pO2_bar(
+        pO2_bar=1e-40,
+        temperature_K=1700.0,
+        reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+    )
+    assert potential.legacy_pO2_bar == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert potential.verdict.value == "Point"
+    receipt = dict(potential.observation_or_setpoint_receipt)
+    assert receipt["pO2_bar_input"] == pytest.approx(1e-40)
+    assert receipt["pO2_bar_clamped"] == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert receipt["extrapolation_notice"]["reason"] == (
+        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
+    in_band = o2_potential_from_pO2_bar(
+        pO2_bar=1e-9,
+        temperature_K=1700.0,
+        reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+    )
+    assert "extrapolation_notice" not in dict(
+        in_band.observation_or_setpoint_receipt
+    )
+
+
+def test_positive_exponent_catalog_path_does_not_flag_floor_inversion() -> None:
+    """M06 control: positive-n carriers shrink at the floor — not inversion."""
+
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    evaluator = catalog.evaluator_for("AlO2")
+    assert evaluator.pO2_exponent > 0.0
+    floor = evaluator.evaluate(1700.0, source_activity=0.5, pO2_bar=1e-40)
+    control = evaluator.evaluate(1700.0, source_activity=0.5, pO2_bar=1e-9)
+    assert floor.pressure_pa > 0.0
+    assert control.pressure_pa > 0.0
+    assert floor.pressure_pa < control.pressure_pa
+    assert floor.extrapolation_notice is None
+    assert control.extrapolation_notice is None
+
+
+def test_adapter_antoine_projection_flags_floor_without_refusing() -> None:
+    """M06: AlphaMELTS/ThermoEngine inherited projection helpers carry notice."""
+
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend()
+    T_C = 1700.0 - 273.15
+    activities = {"Si": 1e-30}
+    below = backend._activities_times_antoine(
+        T_C, activities, {"SiO2": 100.0}, pO2_bar=1e-40
+    )
+    floor_notices = dict(backend._antoine_floor_inversion_notices)
+    _, floor_sources = backend._finalize_antoine_projection(
+        below, base_source="thermoengine"
+    )
+    at_floor = backend._activities_times_antoine(
+        T_C, activities, {"SiO2": 100.0}, pO2_bar=1e-30
+    )
+    control = backend._activities_times_antoine(
+        T_C, activities, {"SiO2": 100.0}, pO2_bar=1e-9
+    )
+    control_notices = dict(backend._antoine_floor_inversion_notices)
+    _, control_sources = backend._finalize_antoine_projection(
+        control, base_source="thermoengine"
+    )
+
+    assert below["Si"] == pytest.approx(at_floor["Si"])
+    assert below["Si"] > 0.0
+    assert below["Si"] < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    assert "Si" in floor_notices
+    assert floor_notices["Si"]["reason"] == (
+        MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    )
+    assert floor_notices["Si"]["certified_band"]["pO2_bar"] == (
+        MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+    )
+    assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in floor_sources["Si"]
+    assert control["Si"] > 0.0
+    assert control["Si"] / below["Si"] == pytest.approx(1e-21, rel=1e-6)
+    assert "Si" not in control_notices
+    assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON not in control_sources["Si"]

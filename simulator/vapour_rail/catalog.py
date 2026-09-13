@@ -1030,6 +1030,8 @@ class CompiledPressureEvaluator:
         # the legacy_scalar_adapter.
         o2_term = self.o2_channel_term
         needs_o2 = abs(self.pO2_exponent) > 0.0 or o2_term is not None
+        o2_potential = None
+        pO2_bar_raw = pO2_bar
         if needs_o2:
             plane = (
                 LEGACY_FO2_PLANE.get(self.oxygen_fugacity_channel or "")
@@ -1123,7 +1125,7 @@ class CompiledPressureEvaluator:
             raise CatalogCompileError(
                 f"{self.species_id}: evaluator produced invalid pressure"
             )
-        return PressureEvaluation(
+        evaluation = PressureEvaluation(
             pressure_pa=pressure_pa,
             pressure_observable=self.pressure_observable,
             validation_status=self.validation_status,
@@ -1149,6 +1151,25 @@ class CompiledPressureEvaluator:
                 )
             ),
         )
+        # Non-field attribute so t-622 dataclass canonicalization is unchanged.
+        object.__setattr__(
+            evaluation,
+            "extrapolation_notice",
+            _pO2_floor_inversion_notice(
+                species_id=self.species_id,
+                pressure_pa=pressure_pa,
+                pO2_exponent=self.pO2_exponent,
+                pO2_bar_used=_evaluation_pO2_bar_used(
+                    o2_potential=o2_potential,
+                    pO2_bar=pO2_bar_raw,
+                ),
+                was_clamped=_evaluation_pO2_was_clamped(
+                    o2_potential=o2_potential,
+                    pO2_bar=pO2_bar_raw,
+                ),
+            ),
+        )
+        return evaluation
 
     def evaluate_typed_shadow(
         self,
@@ -1246,6 +1267,8 @@ class CompiledPressureEvaluator:
         reference_ln = float(reference_log10) * math.log(10.0)
         activity_term_ln = self.activity_exponent * float(activity.ln_value)
         oxygen_term_ln = 0.0
+        oxygen_raw: float | None = None
+        oxygen: float | None = None
         if self.pO2_exponent:
             if pO2_bar is None:
                 return MappingProxyType(
@@ -1255,9 +1278,9 @@ class CompiledPressureEvaluator:
                         "detail": "typed pressure shadow requires explicit pO2",
                     }
                 )
-            oxygen = _finite_positive(pO2_bar, "pO2_bar")
+            oxygen_raw = _finite_positive(pO2_bar, "pO2_bar")
             oxygen = min(
-                max(oxygen, MELT_DISSOCIATION_PO2_MIN_BAR),
+                max(oxygen_raw, MELT_DISSOCIATION_PO2_MIN_BAR),
                 MELT_DISSOCIATION_PO2_MAX_BAR,
             )
             oxygen_term_ln = self.pO2_exponent * math.log(
@@ -1276,21 +1299,34 @@ class CompiledPressureEvaluator:
                 self.activity_exponent * float(band[1]),
             )
             pressure_band = (min(scaled), max(scaled))
-        return MappingProxyType(
-            {
-                "status": "shadow_only_no_behavior_authority",
-                "ln_pressure_Pa": ln_pressure,
-                "ln_pressure_band_offsets": pressure_band,
-                "reference_term_ln": reference_ln,
-                "activity_term_ln": activity_term_ln,
-                "oxygen_term_ln": oxygen_term_ln,
-                "out_of_range": out_of_range,
-                "activity_random_variable_key": activity.random_variable_key,
-                "activity_model_row_id": activity.model_row_id,
-                "activity_verdict": activity.verdict.value,
-                "flux_disposition": "instrumented_not_selected",
-            }
-        )
+        payload: dict[str, Any] = {
+            "status": "shadow_only_no_behavior_authority",
+            "ln_pressure_Pa": ln_pressure,
+            "ln_pressure_band_offsets": pressure_band,
+            "reference_term_ln": reference_ln,
+            "activity_term_ln": activity_term_ln,
+            "oxygen_term_ln": oxygen_term_ln,
+            "out_of_range": out_of_range,
+            "activity_random_variable_key": activity.random_variable_key,
+            "activity_model_row_id": activity.model_row_id,
+            "activity_verdict": activity.verdict.value,
+            "flux_disposition": "instrumented_not_selected",
+        }
+        if self.pO2_exponent and math.isfinite(ln_pressure):
+            pressure_pa = math.exp(float(ln_pressure))
+            notice = _pO2_floor_inversion_notice(
+                species_id=self.species_id,
+                pressure_pa=pressure_pa,
+                pO2_exponent=self.pO2_exponent,
+                pO2_bar_used=oxygen,
+                was_clamped=(
+                    oxygen_raw is not None
+                    and oxygen_raw < MELT_DISSOCIATION_PO2_MIN_BAR
+                ),
+            )
+            if notice is not None:
+                payload["extrapolation_notice"] = dict(notice)
+        return MappingProxyType(payload)
 
     def _out_of_domain_log10_continuation(self, temperature_K: float) -> float:
         """Continuous out-of-domain estimate (anti-cliff; not claim authority).
@@ -4089,6 +4125,96 @@ def _finite_real(value: Any, field_name: str) -> float:
     if not math.isfinite(result):
         raise CatalogCompileError(f"{field_name} must be finite")
     return result
+
+
+def _evaluation_pO2_bar_used(
+    *,
+    o2_potential: Any | None,
+    pO2_bar: float | None,
+) -> float | None:
+    if o2_potential is not None:
+        used = getattr(o2_potential, "legacy_pO2_bar", None)
+        if used is not None:
+            try:
+                value = float(used)
+            except (TypeError, ValueError):
+                value = None
+            else:
+                if math.isfinite(value) and value > 0.0:
+                    return value
+    if pO2_bar is None:
+        return None
+    try:
+        raw = float(pO2_bar)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(raw) or raw <= 0.0:
+        return None
+    return min(
+        max(raw, MELT_DISSOCIATION_PO2_MIN_BAR),
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+    )
+
+
+def _evaluation_pO2_was_clamped(
+    *,
+    o2_potential: Any | None,
+    pO2_bar: float | None,
+) -> bool:
+    raw: float | None = None
+    if o2_potential is not None:
+        receipt = getattr(
+            o2_potential, "observation_or_setpoint_receipt", None
+        ) or {}
+        if isinstance(receipt, Mapping) and receipt.get("pO2_bar_input") is not None:
+            try:
+                raw = float(receipt["pO2_bar_input"])
+            except (TypeError, ValueError):
+                raw = None
+    if raw is None and pO2_bar is not None:
+        try:
+            raw = float(pO2_bar)
+        except (TypeError, ValueError):
+            raw = None
+    return (
+        raw is not None
+        and math.isfinite(raw)
+        and raw > 0.0
+        and raw < MELT_DISSOCIATION_PO2_MIN_BAR
+    )
+
+
+def _pO2_floor_inversion_notice(
+    *,
+    species_id: str,
+    pressure_pa: float,
+    pO2_exponent: float,
+    pO2_bar_used: float | None,
+    was_clamped: bool,
+) -> Mapping[str, Any] | None:
+    """Reuse the builtin floor notice; lazy import avoids catalog cycle."""
+
+    if pO2_bar_used is None:
+        return None
+    from engines.builtin.vapor_pressure import (
+        melt_dissociation_pO2_floor_inversion_notice,
+    )
+
+    try:
+        fO2_log = math.log10(float(pO2_bar_used))
+    except (TypeError, ValueError):
+        fO2_log = None
+    if fO2_log is not None and not math.isfinite(fO2_log):
+        fO2_log = None
+    return melt_dissociation_pO2_floor_inversion_notice(
+        species=str(species_id),
+        pressure_Pa=float(pressure_pa),
+        pO2_bar_used=float(pO2_bar_used),
+        pO2_exponent=pO2_exponent,
+        pressure_rail=None,
+        fO2_log=fO2_log,
+        was_clamped=bool(was_clamped),
+    )
 
 
 def _finite_positive(value: Any, field_name: str) -> float:
