@@ -2500,6 +2500,51 @@ def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
     assert token is Quantity.DELTA_FG
 
 
+def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="K",
+        values={
+            "property_kind": "melting_point",
+            "value_K": 370.96,
+            "phase_from": "solid",
+            "phase_to": "liquid",
+            "pressure_basis": "near 1 atm",
+            "method_class": "compilation_calculated_table",
+        },
+        obs_type="transition_point",
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "Na_melting_point"
+    boil = yaml.safe_load(yaml.safe_dump(extract["species"]["Na"]["observations"][0]))
+    boil["observation_id"] = "Na_normal_boiling_point"
+    boil["values"] = {
+        "property_kind": "normal_boiling_point",
+        "value_K": 1156.0,
+        "pressure_basis_Pa": 101325,
+        "method_class": "compilation_calculated_table",
+    }
+    extract["species"]["Na"]["observations"].append(boil)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    melt = result.observations["fixture-source::Na_melting_point"]
+    assert quantity_token(melt.identity) is Quantity.TRANSITION_TEMPERATURE
+    assert melt.value.kind is ValueKind.POINT
+    assert melt.value.point == as_decimal("370.96")
+    assert melt.identity.subtype.is_value and melt.identity.subtype.value == "melting_point"
+    assert melt.identity.temperature_K is None or melt.identity.temperature_K.is_not_applicable
+    assert melt.identity.total_pressure_Pa.is_unknown
+    assert any(
+        e.observation_id == melt.observation_id and "total_pressure_Pa" in (e.axes or ())
+        for e in result.queue
+    )
+    nbp = result.observations["fixture-source::Na_normal_boiling_point"]
+    assert nbp.value.kind is ValueKind.POINT
+    assert nbp.value.point == as_decimal("1156.0")
+    assert nbp.identity.subtype.value == "normal_boiling_point"
+    assert nbp.identity.total_pressure_Pa.is_value
+    assert nbp.identity.total_pressure_Pa.value == as_decimal("101325")
+
+
 def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
     state, reason = compilation_quantity_from_record(
         {"record_kind": "atomic_weight", "rows": [{"atomic_weight": {"value": 227}}]}

@@ -2098,7 +2098,14 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.MASS_LOSS_FRACTION: ("mass_loss_fraction",),
     Quantity.YIELD_FRACTION: ("yield_fraction",),
     Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
-    Quantity.TRANSITION_TEMPERATURE: ("T_K", "temperature_K", "T_C", "T"),
+    Quantity.TRANSITION_TEMPERATURE: (
+        "value_K",
+        "T_m_K",
+        "T_K",
+        "temperature_K",
+        "T_C",
+        "T",
+    ),
 }
 
 _DECLARED_GENERIC_VALUE_KEYS = ("expected_value",)
@@ -2326,7 +2333,11 @@ def _selection_from_named_field(
         if key not in payload:
             continue
         if q_token is Quantity.TRANSITION_TEMPERATURE:
-            unit = "K" if key in {"T_K", "temperature_K"} else ("C" if key == "T_C" else units)
+            unit = (
+                "K"
+                if key in {"T_K", "temperature_K", "value_K", "T_m_K"}
+                else ("C" if key == "T_C" else units)
+            )
             amount, trail = convert_temperature_to_k(payload.get(key), unit)
             if amount is not None:
                 return _point_selection(
@@ -3481,8 +3492,41 @@ class Migrator:
             )
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
-        if q_token is Quantity.TRANSITION_TEMPERATURE and isinstance(values.get("quantity"), str):
-            ident_kwargs["subtype"] = State.of(str(values["quantity"]))
+        if q_token is Quantity.TRANSITION_TEMPERATURE:
+            kind = values.get("property_kind") or values.get("quantity")
+            if isinstance(kind, str) and kind:
+                ident_kwargs["subtype"] = State.of(kind)
+            p_amt = _as_dec_or_none(
+                values.get("pressure_basis_Pa") or values.get("target_pressure_Pa")
+            )
+            if p_amt is not None:
+                ident_kwargs["total_pressure_Pa"] = State.of(p_amt)
+            else:
+                textual = values.get("pressure_basis")
+                if textual not in (None, ""):
+                    ident_kwargs["total_pressure_Pa"] = State.unknown(
+                        f"source pressure_basis {textual!r} is not a numeric pressure"
+                    )
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        ["total_pressure_Pa"],
+                        f"source pressure_basis {textual!r} is not a numeric pressure",
+                        source=source_key,
+                        observation_id=obs_id,
+                    )
+                else:
+                    ident_kwargs["total_pressure_Pa"] = State.unknown(
+                        "source does not state a numeric total_pressure_Pa"
+                    )
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        ["total_pressure_Pa"],
+                        "source does not state a numeric total_pressure_Pa",
+                        source=source_key,
+                        observation_id=obs_id,
+                    )
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
             value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
