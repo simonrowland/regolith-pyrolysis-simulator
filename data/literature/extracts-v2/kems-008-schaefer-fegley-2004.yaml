@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Al2O3
       phase:
@@ -16,12 +16,55 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1800.0, 2310.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: interval
+    interval_low: '0.067'
+    interval_high: '1'
   uncertainty:
     kind: none
   evidence:
@@ -113,8 +156,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
@@ -137,8 +181,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: MgO
       phase:
@@ -147,12 +191,55 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1800.0, 2173.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: interval
+    interval_low: '0.09'
+    interval_high: '0.4'
   uncertainty:
     kind: none
   evidence:
@@ -182,8 +269,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::10
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: SiO2
       phase:
@@ -192,12 +279,55 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1823.0, 2373.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: interval
+    interval_low: '0.015'
+    interval_high: '0.11'
   uncertainty:
     kind: none
   evidence:
@@ -291,8 +421,9 @@ observations:
       note: compilation bounds; contradictory Al2O3 literature cited as example
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract

@@ -322,8 +322,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
   admission:
     status: pending
     reason: source does not state admission_status
@@ -357,8 +358,9 @@ observations:
       note: not applicable
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
   admission:
     status: pending
     reason: source does not state admission_status
@@ -481,7 +483,8 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: source does not state method_class
+      reason: unmapped regime 'langmuir_knudsen_comparison_review'
+    original_method_class: langmuir_knudsen_comparison_review
   admission:
     status: pending
     reason: source does not state admission_status
@@ -598,8 +601,9 @@ observations:
       note: not applicable
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
   admission:
     status: pending
     reason: source does not state admission_status
@@ -721,7 +725,8 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: source does not state method_class
+      reason: unmapped regime 'langmuir_knudsen_comparison_review'
+    original_method_class: langmuir_knudsen_comparison_review
   admission:
     status: pending
     reason: source does not state admission_status
@@ -805,7 +810,8 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: source does not state method_class
+      reason: unmapped regime 'langmuir_knudsen_comparison_review'
+    original_method_class: langmuir_knudsen_comparison_review
   admission:
     status: pending
     reason: source does not state admission_status

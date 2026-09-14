@@ -2713,8 +2713,8 @@ observations:
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull47_As2O3_highT
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_sat
     species:
       formula: As4O6
       phase:
@@ -2723,12 +2723,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [485.7, 730.4]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: source prints evaluator log10(P_bar) = A − B/(T_K + C); form is not a stored series or point
   uncertainty:
     kind: printed
     verbatim:
@@ -2758,8 +2800,8 @@ observations:
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull_Se_total_P
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_sat
     species:
       formula: Se_n_ladder
       phase:
@@ -2768,12 +2810,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [629.0, 953.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: source prints evaluator log10(P_bar) = A − B/(T_K + C); form is not a stored series or point
   uncertainty:
     kind: printed
     verbatim:

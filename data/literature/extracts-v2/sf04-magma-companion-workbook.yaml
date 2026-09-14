@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: Fe
       phase:
@@ -16,18 +16,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.001323692'
+    - - '1875'
+      - '0.01088142'
+    - - '1900'
+      - '0.01602551'
+    - - '2000'
+      - '0.0682499'
+    - - '2125'
+      - '0.3428764'
+    - - '2250'
+      - '1.431997'
+    - - '2375'
+      - '5.113043'
+    - - '2500'
+      - '15.93091'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -44,8 +104,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: K
       phase:
@@ -54,18 +114,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.05067528'
+    - - '1875'
+      - '0.2452494'
+    - - '1900'
+      - '0.3273535'
+    - - '2000'
+      - '0.9612152'
+    - - '2125'
+      - '3.164822'
+    - - '2250'
+      - '9.01215'
+    - - '2375'
+      - '22.70824'
+    - - '2500'
+      - '51.52974'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -82,8 +202,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: Mg
       phase:
@@ -92,18 +212,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.00001575052'
+    - - '1875'
+      - '0.0001755858'
+    - - '1900'
+      - '0.0002733803'
+    - - '2000'
+      - '0.001432297'
+    - - '2125'
+      - '0.009047511'
+    - - '2250'
+      - '0.04621354'
+    - - '2375'
+      - '0.1972089'
+    - - '2500'
+      - '0.7202059'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -120,8 +300,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -130,18 +310,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.8606028'
+    - - '1875'
+      - '4.04611'
+    - - '1900'
+      - '5.384318'
+    - - '2000'
+      - '15.73534'
+    - - '2125'
+      - '52.16904'
+    - - '2250'
+      - '150.9766'
+    - - '2375'
+      - '388.5705'
+    - - '2500'
+      - '902.4949'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -158,8 +398,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: O2
       phase:
@@ -168,18 +408,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.2229361'
+    - - '1875'
+      - '1.040384'
+    - - '1900'
+      - '1.382024'
+    - - '2000'
+      - '4.008'
+    - - '2125'
+      - '13.16272'
+    - - '2250'
+      - '37.86712'
+    - - '2375'
+      - '97.8073'
+    - - '2500'
+      - '232.2367'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -196,8 +496,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: O
       phase:
@@ -206,18 +506,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.01133381'
+    - - '1875'
+      - '0.07849888'
+    - - '1900'
+      - '0.1121325'
+    - - '2000'
+      - '0.4270354'
+    - - '2125'
+      - '1.902479'
+    - - '2250'
+      - '7.178274'
+    - - '2375'
+      - '23.59199'
+    - - '2500'
+      - '69.20946'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status
@@ -234,8 +594,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: unknown
-      reason: row type is a curation label, not a statement of the observable
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -244,18 +604,78 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: series
+    series:
+    - - '1750'
+      - '0.0001266025'
+    - - '1875'
+      - '0.002039921'
+    - - '1900'
+      - '0.003411743'
+    - - '2000'
+      - '0.02363555'
+    - - '2125'
+      - '0.2083974'
+    - - '2250'
+      - '1.460089'
+    - - '2375'
+      - '8.400103'
+    - - '2500'
+      - '40.66878'
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    original_method_class: magma_model_companion_workbook
+    model: magma_model_companion_workbook
   admission:
     status: pending
     reason: source does not state admission_status

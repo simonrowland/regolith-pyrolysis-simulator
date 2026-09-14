@@ -62,7 +62,8 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: source does not state method_class
+      reason: unmapped regime 'mixed_kms_tms'
+    original_method_class: mixed_kms_tms
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
@@ -457,7 +458,7 @@ observations:
       reason: source T_range_K [1100.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: series list had no numeric coordinate/value pairs
   uncertainty:
     kind: printed
     verbatim:
@@ -508,7 +509,7 @@ observations:
       reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: series list had no numeric coordinate/value pairs
   uncertainty:
     kind: printed
     verbatim:
@@ -557,7 +558,7 @@ observations:
       reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: series list had no numeric coordinate/value pairs
   uncertainty:
     kind: printed
     verbatim:
@@ -664,7 +665,8 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: source does not state method_class
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
   admission:
     status: pending
     reason: source does not state admission_status

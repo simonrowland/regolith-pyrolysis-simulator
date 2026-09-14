@@ -145,8 +145,30 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a p_partial field
+    kind: series
+    series:
+    - - '2293.15'
+      - '0.00019'
+    - - '2345.15'
+      - '0.00021'
+    - - '2403.15'
+      - '0.0002'
+    - - '2403.15'
+      - '0.0027'
+    - - '2403.15'
+      - '0.045'
+    - - '2453.15'
+      - '0.00063'
+    - - '2478.15'
+      - '0.00048'
+    - - '2478.15'
+      - '0.037'
+    - - '2540.15'
+      - '0.0073'
+    - - '2540.15'
+      - '0.0055'
+    - - '2621.15'
+      - '0.025'
   uncertainty:
     kind: printed
     verbatim:

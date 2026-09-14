@@ -144,8 +144,8 @@ observations:
       tag: unknown
       reason: source T_range_K [2500.0, 2500.0]; no midpoint invented
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
   uncertainty:
     kind: printed
     verbatim:

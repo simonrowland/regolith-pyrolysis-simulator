@@ -44,7 +44,7 @@ observations:
       formula: usgs-b1544-al2sio5-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string '1016.9 K. Sillimanite crystals 1016.9 to 1800 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -95,7 +95,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 20 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 20 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -111,6 +113,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[29, 30]; printed_pages=[23, 24]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-al2sio5-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-alooh-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -122,7 +125,8 @@ observations:
       formula: usgs-b1544-alooh-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''AlO(OH): Diaspore crystals 298.15 to 571.86 K. Boehmite 571.86 to 800 K.'' is not in the closed
+          automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -173,7 +177,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 8 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -189,6 +194,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[22]; printed_pages=[16]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-alooh-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-andalusite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -200,7 +206,7 @@ observations:
       formula: usgs-b1544-andalusite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1800 K. See Al 2 Si0 5 reference table.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -251,7 +257,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -267,6 +275,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[33, 34]; printed_pages=[27, 28]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-andalusite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-anorthite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -278,7 +287,7 @@ observations:
       formula: usgs-b1544-anorthite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to melting point 1830 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -329,7 +338,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -345,6 +356,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[63, 64]; printed_pages=[57, 58]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-anorthite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-boehmite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -356,7 +368,8 @@ observations:
       formula: usgs-b1544-boehmite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''AlO(OH): Crystals 298.15 to 800 K. See reference table for AlO(OH).'' is not in the closed
+          automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -407,7 +420,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 6 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -423,6 +437,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[24]; printed_pages=[18]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-boehmite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-ca-al-pyroxene
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -434,7 +449,7 @@ observations:
       formula: usgs-b1544-ca-al-pyroxene
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1800 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -485,7 +500,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -501,6 +518,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[61, 62]; printed_pages=[55, 56]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca-al-pyroxene.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-ca3sio5-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -512,7 +530,7 @@ observations:
       formula: usgs-b1544-ca3sio5-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'between 298 and 1800 K in this compound. GIBBS' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -563,7 +581,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -579,6 +599,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[37, 38]; printed_pages=[31, 32]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca3sio5-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-calcium-olivine
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -590,7 +611,8 @@ observations:
       formula: usgs-b1544-calcium-olivine
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1200 K. See Calcium olivine reference table.' is not in the closed automatic
+          map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -641,7 +663,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 10 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 10 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -657,6 +681,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[45, 46]; printed_pages=[39, 40]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-calcium-olivine-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -668,7 +693,7 @@ observations:
       formula: usgs-b1544-calcium-olivine-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'to 1710 K. Alpha crystals 1710 to 1800 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -719,7 +744,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 20 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 20 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -735,6 +762,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[43, 44]; printed_pages=[37, 38]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-casio3-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -746,7 +774,8 @@ observations:
       formula: usgs-b1544-casio3-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''CaSi0 3 : Wollastonite crystals 298.15 to 1398 K. Cyclowollastonite is the stable phase above
+          1398 K.'' is not in the closed automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -797,7 +826,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 18 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 18 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -813,6 +844,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[55, 56]; printed_pages=[49, 50]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-casio3-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-corundum
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -824,7 +856,7 @@ observations:
       formula: usgs-b1544-corundum
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string '(Corundum), crystals 298.15 to melting point 2345 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -875,7 +907,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -891,6 +924,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[21]; printed_pages=[15]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-corundum.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-cyclowollastonite-pseudowollastonite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -902,7 +936,8 @@ observations:
       formula: usgs-b1544-cyclowollastonite-pseudowollastonite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''CaSi0 3 : Crystals 298.15 to 1800 K. See CaSi0 3 reference table.'' is not in the closed automatic
+          map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -953,7 +988,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -969,6 +1006,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[59, 60]; printed_pages=[53, 54]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-cyclowollastonite-pseudowollastonite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -980,7 +1018,8 @@ observations:
       formula: usgs-b1544-diaspore
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''AlO(OH): Crystals 298.15 to 800 K. See reference table for AlO(OH).'' is not in the closed
+          automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1031,7 +1070,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 6 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1047,6 +1087,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[23]; printed_pages=[17]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-dickite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1058,7 +1099,8 @@ observations:
       formula: usgs-b1544-dickite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 900 K. -~~------------------------------------------------------------------------------'
+          is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1109,7 +1151,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 7 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 7 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1125,6 +1169,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[67, 68]; printed_pages=[61, 62]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-dickite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-gehlenite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1136,7 +1181,7 @@ observations:
       formula: usgs-b1544-gehlenite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to melting point 1863 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1187,7 +1232,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1203,6 +1250,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[49, 50]; printed_pages=[43, 44]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gehlenite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-gibbsite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1214,7 +1262,8 @@ observations:
       formula: usgs-b1544-gibbsite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''Al(OH) 3 : Crystals 298.15 to 800 K. Gibbsite decomposes above 480 K at 1 bar.'' is not in
+          the closed automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1265,7 +1314,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 6 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1281,6 +1331,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[25]; printed_pages=[19]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gibbsite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-grossulsr
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1292,7 +1343,7 @@ observations:
       formula: usgs-b1544-grossulsr
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1400 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1343,7 +1394,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 12 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 12 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1359,6 +1412,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[51, 52]; printed_pages=[45, 46]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-grossulsr.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-h2o-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1370,7 +1424,8 @@ observations:
       formula: usgs-b1544-h2o-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''H 2 0: Liquid 298.15 to 372.8 K. Ideal gas 372.8 to 1800 K.'' is not in the closed automatic
+          map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1421,7 +1476,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 18 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1437,6 +1493,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[27]; printed_pages=[21]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-h2o-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-halloysite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1448,7 +1505,7 @@ observations:
       formula: usgs-b1544-halloysite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 900 K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1499,7 +1556,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 7 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 7 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1515,6 +1574,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[69, 70]; printed_pages=[63, 64]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-halloysite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1526,7 +1586,8 @@ observations:
       formula: usgs-b1544-kaolinite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1000 K. -~~------------------------------------------------------------------------------'
+          is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1577,7 +1638,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 8 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 8 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1593,6 +1656,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[65, 66]; printed_pages=[59, 60]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kyanite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1604,7 +1668,7 @@ observations:
       formula: usgs-b1544-kyanite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1600 K. See Al 2 Si0 5 reference table.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1655,7 +1719,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 14 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 14 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1671,6 +1737,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[31, 32]; printed_pages=[25, 26]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kyanite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-larnite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1682,7 +1749,7 @@ observations:
       formula: usgs-b1544-larnite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'GIBBS' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1733,7 +1800,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 9 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 9 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1749,6 +1818,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[41, 42]; printed_pages=[35, 36]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-larnite-reference
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1760,7 +1830,7 @@ observations:
       formula: usgs-b1544-larnite-reference
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'to 1710 K. Alpha crystals 1710 to 1800 K. GIBBS' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1811,7 +1881,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 20 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 20 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1827,6 +1899,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[39, 40]; printed_pages=[33, 34]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite-reference.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-lime
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1838,7 +1911,7 @@ observations:
       formula: usgs-b1544-lime
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''CaO: Crystals 298.15 to 1800K.'' is not in the closed automatic map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1889,7 +1962,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1905,6 +1979,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[26]; printed_pages=[20]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-lime.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-margarite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -1967,7 +2042,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 10 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 10 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -1983,6 +2060,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[73, 74]; printed_pages=[67, 68]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-margarite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-prehnite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2045,7 +2123,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 10 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 10 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2061,6 +2141,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[75, 76]; printed_pages=[69, 70]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-prehnite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-pyrophyllite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2072,7 +2153,8 @@ observations:
       formula: usgs-b1544-pyrophyllite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string '-------------------------------------------------·-------------------------------' is not in
+          the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2123,7 +2205,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 10 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 10 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2139,6 +2223,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[71, 72]; printed_pages=[65, 66]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-pyrophyllite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2150,7 +2235,8 @@ observations:
       formula: usgs-b1544-quartz
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Alpha quartz 298.15 to 844 K. Beta quartz 844 to 1800 K. Beta quartz is metastable above 1140
+          K.' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2201,7 +2287,8 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 18 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2217,6 +2304,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[28]; printed_pages=[22]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-quartz.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-rankinite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2279,7 +2367,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 12 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 12 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2295,6 +2385,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[47, 48]; printed_pages=[41, 42]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-rankinite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-sillimanite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2306,7 +2397,7 @@ observations:
       formula: usgs-b1544-sillimanite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: phase string 'Crystals 298.15 to 1800 K. See Al sto reference table. 2 5' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2357,7 +2448,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 16 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 16 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2373,6 +2466,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[35, 36]; printed_pages=[29, 30]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-sillimanite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-table-1
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2406,6 +2500,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[15]; printed_pages=[9]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-table-1.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-wollastonite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2417,7 +2512,8 @@ observations:
       formula: usgs-b1544-wollastonite
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'phase string ''CaSi0 3 : Crystals 298.15 to 1500 K. See CaSi0 reference table. 3'' is not in the closed automatic
+          map'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2468,7 +2564,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 13 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 13 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2484,6 +2582,7 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[57, 58]; printed_pages=[51, 52]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-wollastonite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
 - observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-zoisite
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
@@ -2546,7 +2645,9 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: source prints 7 numeric formation Gibbs cells (column formation.from_the_elements.gibbs_energy, unit
+      as printed kJ/mol) and 7 numeric formation Gibbs cells (column formation.from_the_oxides.gibbs_energy, unit as printed
+      kJ/mol); not imported by the generic migrator; awaiting the per-source compilation generator
   uncertainty:
     kind: none
   evidence:
@@ -2562,4 +2663,5 @@ observations:
   source_id: hemingway-haas-robinson-1982-usgs-b1544
   locator:
     note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[53, 54]; printed_pages=[47, 48]
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-zoisite.json
   read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
