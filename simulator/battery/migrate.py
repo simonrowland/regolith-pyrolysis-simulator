@@ -1389,6 +1389,21 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+def _printed_field_text(raw: object) -> str | None:
+    if isinstance(raw, str):
+        text = raw.strip()
+        return text or None
+    if isinstance(raw, (list, tuple)):
+        parts = [_printed_field_text(item) for item in raw]
+        text = "; ".join(part for part in parts if part)
+        return text or None
+    if isinstance(raw, Mapping):
+        parts = [_printed_field_text(item) for item in raw.values()]
+        text = "; ".join(part for part in parts if part)
+        return text or None
+    return None
+
+
 def compilation_phase_text(doc: Mapping[str, Any]) -> object:
     """First nonempty printed phase field. Empty string is absence, not a token."""
 
@@ -1417,6 +1432,50 @@ def compilation_phase_text(doc: Mapping[str, Any]) -> object:
         if phases:
             return "multi-phase table: " + "; ".join(phases)
     return None
+
+
+_TRANSITION_PHASES = {
+    "melting_point": "solid -> liquid",
+    "normal_boiling_point": "liquid -> gas",
+    "triple_point_temperature": "solid / liquid / gas coexistence",
+    "solid_solid_transition": "solid -> solid",
+}
+
+
+def transition_phase_reason(
+    obs_type: str | None,
+    values: Mapping[str, Any],
+) -> str | None:
+    if obs_type != "transition_point":
+        return None
+    kind = values.get("property_kind")
+    if not isinstance(kind, str) or not kind:
+        return None
+    phase_from = _printed_field_text(values.get("phase_from"))
+    phase_to = _printed_field_text(values.get("phase_to"))
+    if phase_from and phase_to:
+        statement = (
+            f"source states transition property_kind {kind!r} and phases "
+            f"{phase_from!r} -> {phase_to!r} in values.phase_from/phase_to"
+        )
+    else:
+        pair = _TRANSITION_PHASES.get(kind)
+        if pair is None:
+            return None
+        statement = (
+            f"source states transition property_kind {kind!r} "
+            f"({pair}) in values.property_kind"
+        )
+    citation = values.get("citation")
+    if isinstance(citation, Mapping):
+        citation = citation.get("primary")
+    citation_text = _printed_field_text(citation)
+    if citation_text:
+        statement += f"; citation.primary prints {citation_text!r}"
+    return (
+        statement
+        + "; v2.1 species.phase has one phase axis and cannot hold a transition's phases"
+    )
 
 
 # A source field that uniquely names one closed quantity. Pressure columns are
@@ -1517,6 +1576,9 @@ def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
     if not form or not values.get("coefficients"):
         return False
     output = form.split("=", 1)[0].strip()
+    function = re.fullmatch(r"([A-Za-z_]\w*)\s*\((.*)\)", output)
+    if function and function.group(1).lower() not in {"ln", "log", "log10"}:
+        output = function.group(1)
     if "=" in form and not re.search(r"\bP(?:_|\b)|pressure", output, re.I):
         return False
     return bool(re.search(r"\bP_(?:bar|mmHg|Pa|atm|Torr)\b", output, re.I)) or (
@@ -2487,31 +2549,32 @@ def _formation_gibbs_cell_flags(cell: object) -> tuple[bool, bool, bool]:
 
 
 def _unit_as_printed(unit_map: object, column: str) -> str | None:
-    if not isinstance(unit_map, Mapping):
+    if isinstance(unit_map, Mapping):
+        if column.startswith("formation."):
+            raw = unit_map.get("formation_gibbs_energy")
+        else:
+            raw = (
+                unit_map.get(column)
+                or unit_map.get("formation_gibbs_energy")
+                or unit_map.get("delta_f_G")
+            )
+        return _printed_field_text(raw)
+    text = _printed_field_text(unit_map)
+    if text is None:
         return None
-    if column.startswith("formation."):
-        raw = unit_map.get("formation_gibbs_energy")
-    else:
-        raw = (
-            unit_map.get(column)
-            or unit_map.get("formation_gibbs_energy")
-            or unit_map.get("delta_f_G")
-        )
-    if raw in (None, ""):
-        return None
-    text = str(raw).strip()
-    return text or None
+    return (
+        f"{text!r} (printed units_as_published not mapped to column {column})"
+    )
 
 
 def _iter_formation_gibbs_cells(
     payload: Mapping[str, Any],
-    unit_map: Mapping[str, Any] | None = None,
+    unit_map: object = None,
 ) -> list[tuple[str, object, str | None]]:
     """Every formation-Gibbs spelling this source uses, with the printed unit."""
 
     if unit_map is None:
-        raw_units = payload.get("units_as_published")
-        unit_map = raw_units if isinstance(raw_units, Mapping) else {}
+        unit_map = payload.get("units_as_published")
     found: list[tuple[str, object, str | None]] = []
     if "delta_f_G" in payload:
         found.append(
@@ -3884,14 +3947,18 @@ class Migrator:
         assert locator is not None
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
-        phase, unmapped_phase = map_phase(phase_raw)
+        transition_reason = transition_phase_reason(obs_type, values)
+        if (phase_raw is None or phase_raw == "") and transition_reason:
+            phase, unmapped_phase = State.unknown(transition_reason), None
+        else:
+            phase, unmapped_phase = map_phase(phase_raw)
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["phase"],
-                "missing phase",
+                transition_reason or "missing phase",
                 source=source_key,
                 observation_id=obs_id,
             )

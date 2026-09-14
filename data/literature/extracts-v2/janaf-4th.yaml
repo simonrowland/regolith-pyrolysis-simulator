@@ -12,7 +12,9 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' and phases ''crystal'' -> ''liquid'' in values.phase_from/phase_to;
+          citation.primary prints ''Chase (1998) NIST-JANAF Cr-001: CRYSTAL LIQUID 2130.000 K''; v2.1 species.phase has one
+          phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -89,7 +91,9 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''normal_boiling_point'' (liquid -> gas) in values.property_kind;
+          citation.primary prints ''Chase (1998) NIST-JANAF Cr-001: LIQUID IDEAL GAS 2952.078 K''; v2.1 species.phase has
+          one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -166,7 +170,9 @@ observations:
       formula: Fe
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' and phases 'delta-Fe (bcc solid)' -> 'liquid' in values.phase_from/phase_to;
+          citation.primary prints 'Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed.; Fe condensed — liquid
+          heat-capacity domain starts at 1809 K'; v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -245,7 +251,9 @@ observations:
       formula: Fe
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Chase (1998) NIST-JANAF Fe; boiling point from adopted thermo + ΔsubH (see JANAF Fe text); liquid domain
+          ends 3133.345 K on WebBook Shomate'; v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -939,7 +947,9 @@ observations:
       formula: KCl
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'CRC / JANAF KCl(cr,l) conventional melt ~1045 K'; v2.1 species.phase has one phase axis and cannot hold
+          a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1016,7 +1026,9 @@ observations:
       formula: KCl
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Stull (1947) via NIST-WB KCl Antoine (CAS 7447-40-7); CRC bp 1420 C as in vapor_pressures.yaml'; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1094,7 +1106,9 @@ observations:
       formula: MgCl2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' (solid -> liquid) in values.property_kind; citation.primary
+          prints ''Chase (1998) NIST-JANAF MgCl2 table Cl-083: CRYSTAL LIQUID 950.000 K''; v2.1 species.phase has one phase
+          axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1171,7 +1185,9 @@ observations:
       formula: Mn
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' and phases ''delta'' -> ''liquid'' in values.phase_from/phase_to;
+          citation.primary prints ''Chase (1998) NIST-JANAF Mn-001: DELTA LIQUID 1519.000 K''; v2.1 species.phase has one
+          phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1248,7 +1264,9 @@ observations:
       formula: Mn
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''normal_boiling_point'' (liquid -> gas) in values.property_kind;
+          citation.primary prints ''Chase (1998) NIST-JANAF Mn-001: LIQUID IDEAL GAS 2334.526 K''; v2.1 species.phase has
+          one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1325,7 +1343,9 @@ observations:
       formula: NaCl
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Chase (1998) NIST-JANAF NaCl(cr,l) — melt commonly 1073.8 K in JANAF/CRC alkali-halide assessments'; v2.1
+          species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1404,7 +1424,10 @@ observations:
       formula: NaCl
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Stull, D.R. (1947) Vapor Pressure of Pure Substances — Organic Compounds, Ind. Eng. Chem. 39, 517–540 (NaCl
+          entry as compiled on NIST-WB Antoine page for CAS 7647-14-5)'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1483,7 +1506,9 @@ observations:
       formula: NaF
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' and phases ''crystal'' -> ''liquid'' in values.phase_from/phase_to;
+          citation.primary prints ''Chase (1998) NIST-JANAF NaF(cr,l) table F-033: CRYSTAL LIQUID at 1269.000 K (row immediately
+          before liquid domain)''; v2.1 species.phase has one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1561,7 +1586,9 @@ observations:
       formula: NaF
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'CRC normal boiling point 1704 C as retained in vapor_pressures.yaml NaF notes (interval-only identity row)';
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1639,7 +1666,9 @@ observations:
       formula: Na
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' and phases 'solid' -> 'liquid' in values.phase_from/phase_to;
+          citation.primary prints 'Marsh, K.N. (1987) Recommended Reference Materials for the Realization of Physicochemical
+          Properties, Blackwell Sci. Pub., Oxford'; v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1718,7 +1747,9 @@ observations:
       formula: Na
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' and phases 'liquid' -> 'gas' in values.phase_from/phase_to;
+          citation.primary prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1796,7 +1827,9 @@ observations:
       formula: Na
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Honig, R.E. & Kramer, D.A. (1969) Vapor pressure data for the solid and liquid elements,
+          RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1874,7 +1907,9 @@ observations:
       formula: Si
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' and phases ''crystal'' -> ''liquid'' in values.phase_from/phase_to;
+          citation.primary prints ''Chase (1998) NIST-JANAF Si(cr,l) table Si-001: CRYSTAL LIQUID transition at 1685.000 K'';
+          v2.1 species.phase has one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1952,7 +1987,9 @@ observations:
       formula: Si
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''normal_boiling_point'' and phases ''liquid'' -> ''ideal_gas'' in
+          values.phase_from/phase_to; citation.primary prints ''Chase (1998) NIST-JANAF Si-001: LIQUID IDEAL GAS 3504.616
+          K''; v2.1 species.phase has one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2029,7 +2066,9 @@ observations:
       formula: Ti
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''melting_point'' and phases ''beta'' -> ''liquid'' in values.phase_from/phase_to;
+          citation.primary prints ''Chase (1998) NIST-JANAF Ti-001: BETA LIQUID 1939.000 K''; v2.1 species.phase has one phase
+          axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2106,7 +2145,9 @@ observations:
       formula: Ti
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''normal_boiling_point'' (liquid -> gas) in values.property_kind;
+          citation.primary prints ''Chase (1998) NIST-JANAF Ti-001: LIQUID IDEAL GAS 3630.956 K''; v2.1 species.phase has
+          one phase axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2183,7 +2224,9 @@ observations:
       formula: Ti
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: 'source states transition property_kind ''solid_solid_transition'' (solid -> solid) in values.property_kind;
+          citation.primary prints ''Chase (1998) NIST-JANAF Ti-001: ALPHA BETA 1166.000 K''; v2.1 species.phase has one phase
+          axis and cannot hold a transition''s phases'
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved

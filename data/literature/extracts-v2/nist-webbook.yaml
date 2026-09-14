@@ -12,7 +12,9 @@ observations:
       formula: Al
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Anonymous (1988) catalog fixed-point value via TRC; NIST-WB Aluminum Tfus'; v2.1 species.phase has one phase
+          axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -90,7 +92,9 @@ observations:
       formula: Al
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -168,7 +172,9 @@ observations:
       formula: Al
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -246,7 +252,9 @@ observations:
       formula: Br2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Weber (1912) via NIST-WB Bromine Tfus=266.0 K'; v2.1 species.phase has one phase axis and cannot hold a
+          transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -323,7 +331,9 @@ observations:
       formula: CH4
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB Methane Tfus=85.7 K; TRC u=0.3 K class'; v2.1 species.phase has one phase axis
+          and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -400,7 +410,9 @@ observations:
       formula: CO2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Marsh (1987) recommended fixed point; NIST-WB CO2 Ttriple=216.58 K; TRC u=0.008 K'; v2.1
+          species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -478,7 +490,9 @@ observations:
       formula: CO
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Mullins, Kirk et al. (1963) via NIST-WB CO Tboil=81.63 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -555,7 +569,9 @@ observations:
       formula: CO
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Gill & Morrison (1966) via NIST-WB CO Ttriple=67.95 K'; v2.1 species.phase has one phase
+          axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -632,7 +648,9 @@ observations:
       formula: Ca
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) via NIST-WB Calcium'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -709,7 +727,9 @@ observations:
       formula: Ca
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -787,7 +807,9 @@ observations:
       formula: Ca
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -865,7 +887,9 @@ observations:
       formula: Cl2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Thiele & Schulte (1920) via NIST-WB Cl2 Tboil=239.5 K; TRC u=0.6 K'; v2.1 species.phase has one phase axis
+          and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -942,7 +966,9 @@ observations:
       formula: Cl2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Angus, Armstrong et al. (1984) IUPAC Cl2 tables via NIST-WB; u=0.05 K'; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1019,7 +1045,9 @@ observations:
       formula: H2O
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'ITS-90 ice point definition at 101325 Pa'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1096,7 +1124,9 @@ observations:
       formula: H2O
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'IAPWS-95 / ITS-90 liquid–vapor saturation at 101325 Pa (modern value slightly below 100 C)'; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1174,7 +1204,9 @@ observations:
       formula: H2O
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'ITS-90 definition of the triple point of water (fixed point)'; v2.1 species.phase has one
+          phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1252,7 +1284,9 @@ observations:
       formula: H2S
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Beckmann & Waentig (1910) via NIST-WB H2S Tfus=190.85 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1329,7 +1363,9 @@ observations:
       formula: H2S
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Goodwin (1983) via NIST-WB H2S Tboil=212.87 K'; v2.1 species.phase has one phase axis and cannot hold a
+          transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1406,7 +1442,9 @@ observations:
       formula: H2S
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Goodwin (1983) via NIST-WB H2S Ttriple=187.66 K'; v2.1 species.phase has one phase axis
+          and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1483,7 +1521,9 @@ observations:
       formula: HCHO
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Anonymous (1958) via NIST-WB Formaldehyde Tfus=181.0 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1560,7 +1600,9 @@ observations:
       formula: HCHO
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Spence & Wild (1935) via NIST-WB HCHO Tboil=253.85 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1637,7 +1679,9 @@ observations:
       formula: HCHO
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Spence & Wild (1935) via NIST-WB HCHO Ttriple=155.1 K'; v2.1 species.phase has one phase
+          axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1714,7 +1758,9 @@ observations:
       formula: HCl
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Beckmann & Waentig (1910) via NIST-WB HCl Tfus=161.15 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1791,7 +1837,9 @@ observations:
       formula: HF
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB HF Tfus=190.0 K'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1868,7 +1916,9 @@ observations:
       formula: HF
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB HF Tboil=292.7 K'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -1945,7 +1995,9 @@ observations:
       formula: K
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) via NIST-WB SRD 69 Potassium'; v2.1 species.phase has one phase axis and cannot hold
+          a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2022,7 +2074,9 @@ observations:
       formula: K
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2100,7 +2154,9 @@ observations:
       formula: K
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2178,7 +2234,9 @@ observations:
       formula: Mg
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) via NIST-WB SRD 69 Magnesium'; v2.1 species.phase has one phase axis and cannot hold
+          a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2255,7 +2313,9 @@ observations:
       formula: Mg
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2333,7 +2393,9 @@ observations:
       formula: Mg
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Honig & Kramer (1969) RCA Rev. 30, 285'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2411,7 +2473,9 @@ observations:
       formula: N2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB Nitrogen Tfus=63.3 K'; v2.1 species.phase has one phase axis and cannot hold a
+          transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2488,7 +2552,9 @@ observations:
       formula: N2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Jacobsen, Stewart et al. (1986) via NIST-WB N2 Tboil=77.34 K'; v2.1 species.phase has one phase axis and
+          cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2565,7 +2631,9 @@ observations:
       formula: N2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Jacobsen, Stewart et al. (1986) via NIST-WB N2 Ttriple=63.14 K'; v2.1 species.phase has
+          one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2642,7 +2710,9 @@ observations:
       formula: NH3
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Timmermans (1921) via NIST-WB Ammonia Tfus=194.95 K'; v2.1 species.phase has one phase axis and cannot hold
+          a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2845,7 +2915,9 @@ observations:
       formula: NO2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Giauque & Powell (1939) JACS 61, 1970 — melting of N2O4 (not pure undissociated NO2)'; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2922,7 +2994,9 @@ observations:
       formula: NO2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Thorpe (1880) via NIST-WB NO2 Tboil=295.08 K — treat with dissociation caveat'; v2.1 species.phase has one
+          phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3001,7 +3075,9 @@ observations:
       formula: O2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB Oxygen Tfus=54.8 K'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3078,7 +3154,9 @@ observations:
       formula: O2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'normal_boiling_point' (liquid -> gas) in values.property_kind; citation.primary
+          prints 'Streng (1971) via NIST-WB O2 Tboil=90.2 K'; v2.1 species.phase has one phase axis and cannot hold a transition's
+          phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3155,7 +3233,9 @@ observations:
       formula: O2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Henning & Otto (1936) via NIST-WB O2 Ttriple=54.33 K'; v2.1 species.phase has one phase
+          axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3232,7 +3312,9 @@ observations:
       formula: Pb
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Anonymous (1988) catalog via NIST-WB Lead Tfus=600.64 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3342,7 +3424,9 @@ observations:
       formula: SO2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; citation.primary
+          prints 'Hoffman & Vanderwerf (1946) via NIST-WB SO2 Tfus=200.75 K'; v2.1 species.phase has one phase axis and cannot
+          hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3419,7 +3503,9 @@ observations:
       formula: SO2
       phase:
         tag: unknown
-        reason: source does not state phase
+        reason: source states transition property_kind 'triple_point_temperature' (solid / liquid / gas coexistence) in values.property_kind;
+          citation.primary prints 'Giauque & Stephenson (1938) J. Am. Chem. Soc. 60, 1389 — via NIST-WB Ttriple=197.64 K';
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
