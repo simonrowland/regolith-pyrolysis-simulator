@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import re
 import time
-from bisect import bisect_right
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
@@ -47,13 +46,13 @@ from tools.harvest_janaf_compilation import parse_table
 
 SOURCE_ID = "nist-janaf-4th"
 TABLE_SOURCE_PREFIX = "data/literature/compilations/janaf/tables"
-INTRODUCTION_URL = "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-1Vol1-Intro.pdf"
 STANDARD_STATE = "p° = 0.1 MPa (as published by JANAF)"
 STANDARD_PRESSURE_PA = Decimal("100000")
+JANAF_R_J_PER_MOL_K = Decimal("8.31441")
 FORMATION_BASIS_REASON = (
     "JANAF formation from the elements in their reference states, as defined in "
-    f"the NIST-JANAF Fourth Edition introduction ({INTRODUCTION_URL}); schema v2.1 "
-    "has no closed token for this convention, and the table does not print a "
+    "JANAF Thermochemical Tables, 4th edition, introduction; schema v2.1 has no "
+    "closed token for this convention, and the table does not print a "
     "temperature-specific formation reaction"
 )
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
@@ -110,7 +109,21 @@ _PHASE_SIDE = {
     "IDEAL GAS": Phase.G,
     "REAL GAS": Phase.G,
 }
+_CRYSTAL_POLYMORPHS = {
+    "ALPHA": "alpha",
+    "BETA": "beta",
+    "GAMMA": "gamma",
+    "DELTA": "delta",
+    "I": "i",
+    "II": "ii",
+    "III": "iii",
+}
 _PHASE_CHANGE_RE = re.compile(r"^\s*(.+?)\s*<-->\s*(.+?)\s*$")
+_CONDITION_RE = re.compile(
+    r"^\s*(FUGACITY|PRESSURE)\s*=\s*"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?)\s+bar\s*$",
+    re.IGNORECASE,
+)
 _NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
 
 
@@ -135,6 +148,8 @@ class _Row:
     line_number: int | None = None
     label: str | None = None
     numeric_tail: Mapping[str, _Cell] | None = None
+    tail_text: str | None = None
+    is_short: bool = False
 
 
 @dataclass(frozen=True)
@@ -150,6 +165,8 @@ class _Boundary:
 class _Segment:
     index: int
     phase: State[Phase]
+    polymorph: State[str]
+    phase_basis: str
     lower_K: Decimal | None
     upper_K: Decimal | None
     boundary_labels: tuple[str, ...]
@@ -218,8 +235,6 @@ def _validate_table(table: Mapping[str, Any]) -> tuple[str, str, int, str]:
         charge = int(entry.get("charge", 0))
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{table_id}: invalid charge {entry.get('charge')!r}") from exc
-    if charge not in {-1, 0, 1}:
-        raise ValueError(f"{table_id}: unsupported charge {charge}; JANAF uses -1, 0, or 1")
     state = str(entry.get("state") or "")
     if state not in {*_SINGLE_PHASES, "fl", *_COMBINED_STATES}:
         raise ValueError(f"{table_id}: unsupported JANAF state {state!r}")
@@ -231,8 +246,18 @@ def _structured_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
     raw_rows = table.get("values")
     if not isinstance(raw_rows, list):
         raise ValueError(f"{table_id}: values must be a list")
+    ambiguity_lines = {
+        int(item["line_number"])
+        for item in table.get("parse_ambiguities") or ()
+        if isinstance(item, Mapping)
+        and isinstance(item.get("line_number"), int)
+        and item.get("raw_line")
+    }
     rows: list[_Row] = []
+    line_number = 3
     for index, raw in enumerate(raw_rows):
+        while line_number in ambiguity_lines:
+            line_number += 1
         if not isinstance(raw, Mapping):
             raise ValueError(f"{table_id}: values[{index}] is not a mapping")
         cells = {
@@ -247,9 +272,11 @@ def _structured_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
                 temperature=temperature.value,
                 temperature_token=temperature.token,
                 cells=cells,
-                order=index * 10,
+                order=line_number,
+                line_number=line_number,
             )
         )
+        line_number += 1
     return rows
 
 
@@ -278,7 +305,9 @@ def _short_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
         tail_tokens = fields[5].split()
         numeric_tail: dict[str, _Cell] | None = None
         label: str | None = fields[5].strip()
-        if len(tail_tokens) == 3:
+        if len(tail_tokens) == 3 and all(
+            _NUMBER_RE.fullmatch(token) for token in tail_tokens
+        ):
             try:
                 numeric_tail = {
                     column: _Cell(token, _published_decimal(token))
@@ -300,6 +329,8 @@ def _short_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
                 line_number=int(line_number) if isinstance(line_number, int) else None,
                 label=label,
                 numeric_tail=numeric_tail,
+                tail_text=fields[5],
+                is_short=True,
             )
         )
     return rows
@@ -315,7 +346,14 @@ def _phase_change(label: str | None) -> tuple[str, str] | None:
 
 
 def _side_phase(side: str) -> Phase | None:
-    return _PHASE_SIDE.get(" ".join(side.upper().split()))
+    canonical = " ".join(side.upper().split())
+    if canonical in _CRYSTAL_POLYMORPHS:
+        return Phase.CR
+    return _PHASE_SIDE.get(canonical)
+
+
+def _side_polymorph(side: str) -> str | None:
+    return _CRYSTAL_POLYMORPHS.get(" ".join(side.upper().split()))
 
 
 def _phase_state(phase: Phase | None, reason: str) -> State[Phase]:
@@ -328,12 +366,31 @@ def _segments(
     boundaries: Sequence[_Boundary],
 ) -> tuple[_Segment, ...]:
     if state in _SINGLE_PHASES:
-        return (_Segment(0, State.of(_SINGLE_PHASES[state]), None, None, ()),)
-    if state == "fl":
+        phase = _SINGLE_PHASES[state]
+        polymorph = (
+            State.unknown("JANAF index state 'cr' does not state a named polymorph")
+            if phase is Phase.CR
+            else State.not_applicable("not crystal")
+        )
         return (
             _Segment(
                 0,
-                State.unknown("JANAF state 'fl' is not a schema v2.1 Phase token"),
+                State.of(phase),
+                polymorph,
+                f"phase declared by JANAF index state {state!r}",
+                None,
+                None,
+                (),
+            ),
+        )
+    if state == "fl":
+        reason = "JANAF state 'fl' is not a schema v2.1 Phase token"
+        return (
+            _Segment(
+                0,
+                State.unknown(reason),
+                State.unknown("phase unknown; polymorph unresolved"),
+                reason,
                 None,
                 None,
                 (),
@@ -341,41 +398,108 @@ def _segments(
         )
     if not boundaries:
         phase = _FIXED_REFERENCE_PHASES.get(formula) if state == "ref" else None
-        reason = (
-            f"JANAF reference table for {formula} has no phase-change row and its "
-            "reference phase is not in the generator's closed fixed-reference map"
+        convention = (
+            "JANAF documented reference-phase convention for elemental reference "
+            "tables (Ar, C, Cl, F, H, He, N, Ne, O)"
         )
-        return (_Segment(0, _phase_state(phase, reason), None, None, ()),)
+        reason = (
+            convention
+            if phase is not None
+            else f"{convention} does not name a phase for {formula}"
+        )
+        polymorph = (
+            State.unknown("JANAF reference convention does not state a named polymorph")
+            if phase is Phase.CR
+            else State.not_applicable("not crystal")
+            if phase is not None
+            else State.unknown("phase unknown; polymorph unresolved")
+        )
+        return (
+            _Segment(
+                0,
+                _phase_state(phase, reason),
+                polymorph,
+                reason,
+                None,
+                None,
+                (),
+            ),
+        )
     result: list[_Segment] = []
     for index in range(len(boundaries) + 1):
         lower = boundaries[index - 1].temperature if index else None
         upper = boundaries[index].temperature if index < len(boundaries) else None
-        adjacent: list[tuple[str, str, Phase | None]] = []
+        adjacent: list[tuple[str, str, Phase | None, str | None]] = []
         if index:
             prior = boundaries[index - 1]
-            adjacent.append((prior.label, prior.right, _side_phase(prior.right)))
+            adjacent.append(
+                (
+                    prior.label,
+                    prior.right,
+                    _side_phase(prior.right),
+                    _side_polymorph(prior.right),
+                )
+            )
         if index < len(boundaries):
             following = boundaries[index]
-            adjacent.append((following.label, following.left, _side_phase(following.left)))
-        phases = {phase for _label, _side, phase in adjacent if phase is not None}
-        has_unknown = any(phase is None for _label, _side, phase in adjacent)
+            adjacent.append(
+                (
+                    following.label,
+                    following.left,
+                    _side_phase(following.left),
+                    _side_polymorph(following.left),
+                )
+            )
+        phases = {phase for _label, _side, phase, _polymorph in adjacent if phase is not None}
+        has_unknown = any(phase is None for _label, _side, phase, _polymorph in adjacent)
         if len(phases) > 1:
-            detail = "; ".join(f'{side!r} in "{label}"' for label, side, _ in adjacent)
+            detail = "; ".join(
+                f'{side!r} in "{label}"' for label, side, _phase, _polymorph in adjacent
+            )
             raise ValueError(f"conflicting JANAF segment phases: {detail}")
         if len(phases) == 1 and not has_unknown:
             phase_state = State.of(next(iter(phases)))
-        else:
-            quoted = "; ".join(f'"{label}"' for label, _side, _phase in adjacent)
-            phase_state = State.unknown(
-                f"phase not named by adjacent JANAF transition label(s): {quoted}"
+            phase_basis = "; ".join(
+                f'{side!r} in "{label}"' for label, side, _phase, _polymorph in adjacent
             )
+        else:
+            quoted = "; ".join(
+                f'"{label}"' for label, _side, _phase, _polymorph in adjacent
+            )
+            phase_basis = f"phase not named by adjacent JANAF transition label(s): {quoted}"
+            phase_state = State.unknown(phase_basis)
+        if phase_state.is_value and phase_state.value is Phase.CR:
+            polymorphs = {
+                polymorph
+                for _label, _side, _phase, polymorph in adjacent
+                if polymorph is not None
+            }
+            if len(polymorphs) > 1:
+                polymorph_state = State.unknown(
+                    "conflicting adjacent JANAF polymorph labels: "
+                    + ", ".join(sorted(polymorphs))
+                )
+            elif polymorphs:
+                polymorph_state = State.of(next(iter(polymorphs)))
+            else:
+                polymorph_state = State.unknown(
+                    "adjacent JANAF labels do not name a crystal polymorph"
+                )
+        elif phase_state.is_value:
+            polymorph_state = State.not_applicable("not crystal")
+        else:
+            polymorph_state = State.unknown("phase unknown; polymorph unresolved")
         result.append(
             _Segment(
                 index=index,
                 phase=phase_state,
+                polymorph=polymorph_state,
+                phase_basis=phase_basis,
                 lower_K=lower,
                 upper_K=upper,
-                boundary_labels=tuple(label for label, _side, _phase in adjacent),
+                boundary_labels=tuple(
+                    label for label, _side, _phase, _polymorph in adjacent
+                ),
             )
         )
     return tuple(result)
@@ -398,12 +522,14 @@ def _identity_failure(row: _Row, table_id: str) -> list[dict[str, str]]:
         calculated = s.value - Decimal("1000") * h.value / t
         # Each printed decimal represents an interval of half its last-place grain.
         # Adding the interval radii gives a conservative rounding-only tolerance;
-        # the T term bounds |1000*H/T - 1000*H/(T±eT)| by its worst denominator.
+        # both H and T contributions use the smallest permitted denominator.
         e_t = _decimal_grain(row.temperature_token) / 2
         tolerance = (
             _decimal_grain(phi.token) / 2
             + _decimal_grain(s.token) / 2
-            + Decimal("1000") * _decimal_grain(h.token) / (Decimal(2) * t)
+            + Decimal("1000")
+            * _decimal_grain(h.token)
+            / (Decimal(2) * (t - e_t))
             + Decimal("1000") * abs(h.value) * e_t / (t * (t - e_t))
         )
         residual = abs(phi.value - calculated)
@@ -425,9 +551,26 @@ def _identity_failure(row: _Row, table_id: str) -> list[dict[str, str]]:
         dg = row.numeric_tail.get("formation_gibbs_energy")
         logk = row.numeric_tail.get("log10_formation_equilibrium_constant")
     if dg and logk and dg.value is not None and logk.value is not None:
-        calculated = log10K_from_delta_fG_kJ_mol(dg.value, t)
+        # Premise: the JANAF 4th-edition introduction tabulates
+        # R = 8.31441 J/(mol K), so this source-level transcription check must
+        # use that printed constant rather than the helper's modern default.
+        # Algebra: log10(Kf) = -1000*delta_fG/(R*T*ln(10)). Unit check:
+        # (kJ/mol)*1000 J/kJ / ((J/(mol K))*K) is dimensionless. Worked row:
+        # B-132 at 298.15 K with delta_fG=-5582.653 kJ/mol gives about
+        # 978.04468, compatible with the printed 978.058 after input rounding.
+        calculated = log10K_from_delta_fG_kJ_mol(
+            dg.value,
+            t,
+            gas_constant_J_per_mol_K=JANAF_R_J_PER_MOL_K,
+        )
         e_t = _decimal_grain(row.temperature_token) / 2
-        denominator = abs(log10K_from_delta_fG_kJ_mol(Decimal("1"), t))
+        denominator = abs(
+            log10K_from_delta_fG_kJ_mol(
+                Decimal("1"),
+                t - e_t,
+                gas_constant_J_per_mol_K=JANAF_R_J_PER_MOL_K,
+            )
+        )
         temperature_term = abs(calculated) * e_t / (t - e_t)
         tolerance = (
             _decimal_grain(logk.token) / 2
@@ -463,6 +606,7 @@ def _observation(
     table_id: str,
     formula: str,
     phase: State[Phase],
+    polymorph: State[str] | None,
     quantity: Quantity,
     value: Value,
     source_path: str,
@@ -471,12 +615,18 @@ def _observation(
     null_count: int = 0,
     subtype: str | None = None,
     transition_label: str | None = None,
+    transition_pressure_Pa: Decimal | None = None,
+    transition_pressure_basis: str | None = None,
 ) -> Observation:
-    species = make_species(formula, phase)
+    species = make_species(formula, phase, polymorph)
     known: dict[str, Any] = {}
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         known["subtype"] = State.of(subtype or "phase-transition")
-        known["total_pressure_Pa"] = State.of(STANDARD_PRESSURE_PA)
+        known["total_pressure_Pa"] = State.of(
+            transition_pressure_Pa
+            if transition_pressure_Pa is not None
+            else STANDARD_PRESSURE_PA
+        )
     else:
         known["per"] = State.of(PerBasis.MOL_SPECIES)
         known["temperature_K"] = State.unknown(
@@ -494,7 +644,10 @@ def _observation(
         f"circularity_warning={CIRCULARITY_WARNING}"
     )
     if transition_label is not None:
-        relation = f'Direct JANAF labelled row "{transition_label}"; {role_note}'
+        relation = (
+            f'Direct JANAF labelled row "{transition_label}"; '
+            f"total_pressure_basis={transition_pressure_basis}; {role_note}"
+        )
     else:
         relation = (
             f"Direct JANAF tabulation; {null_count} printed cells blank or INFINITE; "
@@ -502,6 +655,8 @@ def _observation(
         )
         if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
             relation += f"; formation_basis={FORMATION_BASIS_REASON}"
+        if segment is not None:
+            relation += f"; phase_basis={segment.phase_basis}"
     locator = Locator(
         table=table_id,
         source_path=source_path,
@@ -564,24 +719,25 @@ def generate_table(
             boundary_rows.append(
                 _Boundary(row.temperature, row.label or "", parts[0], parts[1], row.order)
             )
-    boundary_rows.sort(key=lambda item: (item.temperature, item.row_order))
+    boundary_rows.sort(key=lambda item: item.row_order)
     segments = _segments(state, formula.rstrip("+-"), boundary_rows)
-    boundary_temperatures = [item.temperature for item in boundary_rows]
 
     def segment_index(row: _Row) -> int:
         if len(segments) == 1:
             return 0
-        # In combined/ref tables JANAF prints the boundary twice: the labelled
-        # boundary row belongs to the left/lower-T phase, while the following
-        # same-T continuation row belongs to the right/higher-T phase. A full
-        # row at the boundary follows that same right-side rule. Single-state
-        # tables retain every row in their one declared phase segment.
-        parts = _phase_change(row.label)
-        if parts is not None:
-            for index, boundary in enumerate(boundary_rows):
-                if boundary.row_order == row.order and boundary.label == row.label:
-                    return index
-        return bisect_right(boundary_temperatures, row.temperature)
+        # Physical row order, not a right-bisect, owns a same-T row's printed
+        # side. JANAF's regular full grid row is printed before an equal-T
+        # labelled boundary; short rows retain their harvested source lines, so
+        # only short rows following that boundary enter the upper segment.
+        return sum(
+            boundary.temperature < row.temperature
+            or (
+                boundary.temperature == row.temperature
+                and row.is_short
+                and boundary.row_order < row.order
+            )
+            for boundary in boundary_rows
+        )
 
     accounting: dict[str, dict[str, Any]] = {
         column: {
@@ -608,27 +764,34 @@ def generate_table(
                 accounting[column]["structured_numeric"] += 1
                 accounting[column]["numeric_source_cells"] += 1
     for row in short:
+        seg = segment_index(row)
         for column, cell in row.cells.items():
-            if column == "temperature" or cell.value is None:
+            if column == "temperature":
                 continue
-            accounting[column]["short_row_numeric"] += 1
-            accounting[column]["numeric_source_cells"] += 1
+            if cell.value is None:
+                accounting[column]["printed_null_cells"] += 1
+                nulls[(seg, column)] += 1
+            else:
+                accounting[column]["short_row_numeric"] += 1
+                accounting[column]["numeric_source_cells"] += 1
         if row.numeric_tail is not None:
             for column, cell in row.numeric_tail.items():
                 if cell.value is None:
                     accounting[column]["printed_null_cells"] += 1
+                    nulls[(seg, column)] += 1
                     continue
                 accounting[column]["short_row_numeric"] += 1
                 accounting[column]["numeric_source_cells"] += 1
-                accounting[column]["excluded_numeric"][
-                    "harvester short row merged three formation columns into one tab field"
-                ] += 1
 
     points: dict[tuple[int, str], list[tuple[Decimal, Decimal, int]]] = defaultdict(list)
     for row in all_rows:
         seg = segment_index(row)
         for column in _COLUMN_QUANTITIES:
-            cell = row.cells.get(column)
+            cell = (
+                row.numeric_tail.get(column)
+                if row.numeric_tail is not None and column in _FORMATION_TAIL_COLUMNS
+                else row.cells.get(column)
+            )
             if cell is not None and cell.value is not None:
                 points[(seg, column)].append((row.temperature, cell.value, row.order))
                 accounting[column]["stored_points"] += 1
@@ -661,6 +824,7 @@ def generate_table(
                 table_id=table_id,
                 formula=formula,
                 phase=segment.phase,
+                polymorph=segment.polymorph,
                 quantity=quantity,
                 value=value,
                 source_path=source_path,
@@ -675,6 +839,45 @@ def generate_table(
     non_transition_rows: list[dict[str, Any]] = []
     vocabulary_gaps: list[dict[str, Any]] = []
     ordered_short = sorted(short, key=lambda row: row.order)
+    adjacent_condition_rows: list[dict[str, Any]] = []
+    transition_pressures: dict[int, tuple[Decimal, str]] = {}
+    for row_index, row in enumerate(ordered_short):
+        condition = _CONDITION_RE.fullmatch(row.label or "")
+        if condition is None:
+            continue
+        neighbors = (
+            ordered_short[row_index - 1] if row_index else None,
+            ordered_short[row_index + 1]
+            if row_index + 1 < len(ordered_short)
+            else None,
+        )
+        transition = next(
+            (
+                candidate
+                for candidate in neighbors
+                if candidate is not None
+                and candidate.temperature == row.temperature
+                and _phase_change(candidate.label) is not None
+            ),
+            None,
+        )
+        if transition is None:
+            continue
+        adjacent_condition_rows.append(
+            {
+                "temperature_as_published": row.temperature_token,
+                "label": row.label,
+                "line_number": row.line_number,
+                "transition_label": transition.label,
+                "transition_line_number": transition.line_number,
+                "assigned_segment": f"segment-{segment_index(row)}",
+            }
+        )
+        if condition.group(1).upper() == "PRESSURE":
+            transition_pressures[transition.order] = (
+                Decimal(condition.group(2)) * STANDARD_PRESSURE_PA,
+                f'adjacent JANAF row "{row.label}"',
+            )
     for row_index, row in enumerate(ordered_short):
         if row.label is None:
             continue
@@ -685,17 +888,27 @@ def generate_table(
                     "temperature_as_published": row.temperature_token,
                     "label": row.label,
                     "line_number": row.line_number,
+                    "raw_text": row.tail_text,
                     "reason": "label does not name a phase change on both sides",
                 }
             )
             continue
         subtype = _subtype(*parts)
+        pressure, pressure_basis = transition_pressures.get(
+            row.order,
+            (
+                STANDARD_PRESSURE_PA,
+                f'table declared standard state "{STANDARD_STATE}"; no adjacent PRESSURE row',
+            ),
+        )
         transition_rows.append(
             {
                 "temperature_as_published": row.temperature_token,
                 "label": row.label,
                 "subtype": subtype,
                 "line_number": row.line_number,
+                "total_pressure_Pa": str(pressure),
+                "total_pressure_basis": pressure_basis,
             }
         )
         observations.append(
@@ -703,6 +916,7 @@ def generate_table(
                 table_id=table_id,
                 formula=formula,
                 phase=State.unknown(f'transition spans phases named by "{row.label}"'),
+                polymorph=None,
                 quantity=Quantity.TRANSITION_TEMPERATURE,
                 value=Value.point_of(row.temperature),
                 source_path=source_path,
@@ -710,6 +924,8 @@ def generate_table(
                 segment=None,
                 subtype=subtype,
                 transition_label=row.label,
+                transition_pressure_Pa=pressure,
+                transition_pressure_basis=pressure_basis,
             )
         )
         next_row = ordered_short[row_index + 1] if row_index + 1 < len(ordered_short) else None
@@ -783,15 +999,17 @@ def generate_table(
         "formula": formula,
         "state_as_published": state,
         "transition_row_assignment": (
-            "For combined and reference tables, the first printed row at a transition "
-            "temperature is assigned to the label's left/lower-temperature phase and "
-            "the repeated row is assigned to its right/higher-temperature phase. "
-            "Single-state tables remain one segment."
+            "For combined and reference tables, physical file order assigns every "
+            "same-temperature row: rows through the labelled transition stay on its "
+            "printed left side and following rows use its right side. Single-state "
+            "tables remain one segment."
         ),
         "phase_segments": [
             {
                 "segment": f"segment-{segment.index}",
                 "phase": to_plain(segment.phase),
+                "polymorph": to_plain(segment.polymorph),
+                "phase_basis": segment.phase_basis,
                 "lower_boundary_K": None if segment.lower_K is None else str(segment.lower_K),
                 "upper_boundary_K": None if segment.upper_K is None else str(segment.upper_K),
                 "boundary_labels": list(segment.boundary_labels),
@@ -801,15 +1019,21 @@ def generate_table(
         ],
         "cell_accounting": plain_accounting,
         "transcription_checks": dict(checks),
+        "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
         "transcription_identity_failures": failures,
         "transition_rows": transition_rows,
         "non_transition_rows": non_transition_rows,
+        "adjacent_condition_rows": adjacent_condition_rows,
         "vocabulary_gaps": vocabulary_gaps,
-        "malformed_numeric_tail_rows": [
+        "merged_formation_rows": [
             {
                 "temperature_as_published": row.temperature_token,
                 "line_number": row.line_number,
-                "reason": "three formation values share one tab field; excluded to preserve the parsed-table control",
+                "raw_text": row.tail_text,
+                "assigned_segment": f"segment-{segment_index(row)}",
+                "values_as_published": {
+                    column: cell.token for column, cell in row.numeric_tail.items()
+                },
             }
             for row in short
             if row.numeric_tail is not None
@@ -885,10 +1109,13 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     quantity_counts: Counter[str] = Counter()
     point_counts: Counter[str] = Counter()
     phase_segment_counts: Counter[str] = Counter()
+    polymorph_segment_counts: Counter[str] = Counter()
     phase_observation_counts: dict[str, Counter[str]] = defaultdict(Counter)
     cell_totals: dict[str, Counter[str]] = defaultdict(Counter)
     transcription_checks: Counter[str] = Counter()
     failure_counts: Counter[str] = Counter()
+    adjacent_condition_counts: Counter[str] = Counter()
+    merged_formation_row_count = 0
     table_count = 0
     started = time.monotonic()
     last_progress = started
@@ -911,6 +1138,13 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
             phase = segment["phase"]
             phase_key = phase.get("value") if phase.get("tag") == "value" else "unknown"
             phase_segment_counts[str(phase_key)] += 1
+            polymorph = segment["polymorph"]
+            polymorph_key = (
+                polymorph.get("value")
+                if polymorph.get("tag") == "value"
+                else polymorph.get("tag")
+            )
+            polymorph_segment_counts[str(polymorph_key)] += 1
             for quantity, count in segment["observation_counts"].items():
                 phase_observation_counts[str(phase_key)][quantity] += int(count)
         for column, row in generated.report["cell_accounting"].items():
@@ -926,6 +1160,10 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
                 cell_totals[column][key] += int(row[key])
         for failure in generated.report["transcription_identity_failures"]:
             failure_counts[str(failure["identity"])] += 1
+        adjacent_condition_counts.update(
+            str(row["label"]) for row in generated.report["adjacent_condition_rows"]
+        )
+        merged_formation_row_count += len(generated.report["merged_formation_rows"])
         transcription_checks.update(generated.report["transcription_checks"])
         now = time.monotonic()
         if table_count % 100 == 0 or now - last_progress >= 60:
@@ -960,6 +1198,7 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         "observation_counts_by_quantity": dict(sorted(quantity_counts.items())),
         "point_counts_by_quantity": dict(sorted(point_counts.items())),
         "phase_segment_counts": dict(sorted(phase_segment_counts.items())),
+        "polymorph_segment_counts": dict(sorted(polymorph_segment_counts.items())),
         "observation_counts_by_phase": {
             phase: dict(sorted(counts.items()))
             for phase, counts in sorted(phase_observation_counts.items())
@@ -970,6 +1209,9 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         },
         "transcription_check_counts": dict(sorted(transcription_checks.items())),
         "transcription_identity_failure_counts": dict(sorted(failure_counts.items())),
+        "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
+        "merged_formation_row_count": merged_formation_row_count,
+        "adjacent_condition_row_counts": dict(sorted(adjacent_condition_counts.items())),
         "sharding": "one observation shard and one report shard per JANAF index element",
     }
     dump_yaml(summary, out / "summary.yaml")

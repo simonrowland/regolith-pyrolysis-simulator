@@ -133,13 +133,19 @@ def celsius_to_kelvin(temperature_C: object) -> Decimal:
     return as_decimal(temperature_C) + CELSIUS_OFFSET_DEC
 
 
-def log10K_from_delta_fG_kJ_mol(delta_fG_kJ_mol: object, T_K: object) -> Decimal:
+def log10K_from_delta_fG_kJ_mol(
+    delta_fG_kJ_mol: object,
+    T_K: object,
+    *,
+    gas_constant_J_per_mol_K: object = R_J_PER_MOL_K,
+) -> Decimal:
     """log10 Kf = −ΔfG / (R T ln 10) with ΔfG in kJ/mol, T in K."""
 
     t = as_decimal(T_K)
     if t <= 0:
         raise ValueError("T_K must be positive")
-    return -as_decimal(delta_fG_kJ_mol) / (R_KJ_PER_MOL_K * t * LN10)
+    r_kJ_per_mol_K = as_decimal(gas_constant_J_per_mol_K) / Decimal("1000")
+    return -as_decimal(delta_fG_kJ_mol) / (r_kJ_per_mol_K * t * LN10)
 
 
 def standard_pressure_delta_g_kJ_per_mol(
