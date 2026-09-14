@@ -223,6 +223,10 @@ def parse_published_number(token: str) -> float | None:
     return None
 
 
+def _looks_like_concatenated_numbers(token: str) -> bool:
+    return token.count(".") >= 2 and re.fullmatch(r"[0-9Ee+.-]+", token) is not None
+
+
 def flatten_subscripts(value: str) -> str:
     value = re.sub(r"_\{([^}]*)\}", r"\1", value)
     return value.replace("{", "").replace("}", "").replace(" ", "")
@@ -314,17 +318,25 @@ def parse_janaf_txt(
         fields = [field.strip() for field in line.split("\t")]
         while len(fields) > len(header_fields) and fields[-1] == "":
             fields.pop()
-        if not fields or not NUMBER_RE.fullmatch(fields[0]):
+        if not fields:
             continue
-        if len(fields) != len(header_fields):
+        first_field_is_number = NUMBER_RE.fullmatch(fields[0]) is not None
+        if not first_field_is_number and not _looks_like_concatenated_numbers(
+            fields[0]
+        ):
+            continue
+        if len(fields) != len(header_fields) or not first_field_is_number:
+            reason = (
+                f"expected {len(VALUE_COLUMNS)} tab-separated values; "
+                f"found {len(fields)}"
+                if len(fields) != len(header_fields)
+                else "first field is not one published number"
+            )
             ambiguities.append(
                 {
                     "line_number": line_number,
                     "raw_line": line,
-                    "reason": (
-                        f"expected {len(VALUE_COLUMNS)} tab-separated values; "
-                        f"found {len(fields)}"
-                    ),
+                    "reason": reason,
                     "locator": {"table_id": table_id, "url": url},
                 }
             )

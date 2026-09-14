@@ -30,7 +30,7 @@ formula_normalised_rule: formula_normalised is formula_as_published with trailin
 summary:
   table_count: 1655
   thermodynamic_row_count: 76549
-  parse_ambiguity_count: 2225
+  parse_ambiguity_count: 2229
   formula_count: 985
 non_stoichiometric_formulas:
 - table_id: C-001
@@ -11144,7 +11144,7 @@ entries:
   url: https://janaf.nist.gov/tables/C-083.html
   download_url: https://janaf.nist.gov/tables/C-083.txt
   row_count: 20
-  ambiguity_count: 5
+  ambiguity_count: 7
   parse_ambiguities:
   - line_number: 5
     raw_line: "172.100\t93.722\t69.586\t138.127\t-11.796\tI <--> II"
@@ -11155,6 +11155,18 @@ entries:
   - line_number: 6
     raw_line: "172.100\t93.724\t69.588\t138.127\t-11.796\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: C-083
+      url: https://janaf.nist.gov/tables/C-083.html
+  - line_number: 8
+    raw_line: "288.5001548.088\t111.062\t118.520\t-2.152\tII <--> III"
+    reason: expected 8 tab-separated values; found 5
+    locator:
+      table_id: C-083
+      url: https://janaf.nist.gov/tables/C-083.html
+  - line_number: 9
+    raw_line: "288.5001548.129\t111.063\t118.520\t-2.151\tTRANSITION\t\t\t\t\t\t"
+    reason: first field is not one published number
     locator:
       table_id: C-083
       url: https://janaf.nist.gov/tables/C-083.html
@@ -11228,7 +11240,7 @@ entries:
   url: https://janaf.nist.gov/tables/C-085.html
   download_url: https://janaf.nist.gov/tables/C-085.txt
   row_count: 31
-  ambiguity_count: 5
+  ambiguity_count: 7
   parse_ambiguities:
   - line_number: 5
     raw_line: "172.100\t93.722\t69.586\t138.127\t-11.796\tI <--> II"
@@ -11239,6 +11251,18 @@ entries:
   - line_number: 6
     raw_line: "172.100\t93.724\t69.588\t138.127\t-11.796\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: C-085
+      url: https://janaf.nist.gov/tables/C-085.html
+  - line_number: 8
+    raw_line: "288.5001548.088\t111.062\t118.520\t-2.152\tII <--> III"
+    reason: expected 8 tab-separated values; found 5
+    locator:
+      table_id: C-085
+      url: https://janaf.nist.gov/tables/C-085.html
+  - line_number: 9
+    raw_line: "288.5001548.129\t111.063\t118.520\t-2.151\tTRANSITION\t\t\t\t\t\t"
+    reason: first field is not one published number
     locator:
       table_id: C-085
       url: https://janaf.nist.gov/tables/C-085.html

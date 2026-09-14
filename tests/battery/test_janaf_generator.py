@@ -26,6 +26,7 @@ from simulator.reference_data.janaf import (
     TABLES_DIR,
     iter_table_paths,
     load_table_document,
+    parse_janaf_txt,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,6 +60,11 @@ _FORMATION_COLUMNS = {
     Quantity.LOG10_KF: "log10_formation_equilibrium_constant",
 }
 _PHASE_CHANGE_RE = re.compile(r"^\s*(.+?)\s*<-->\s*(.+?)\s*$")
+_CONCATENATED_T_CP_RE = re.compile(
+    r"^([+-]?\d+\.\d{3})"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?)$"
+)
+_CRYSTAL_POLYMORPH_LABELS = {"ALPHA", "BETA", "GAMMA", "DELTA", "I", "II", "III"}
 
 
 def _generation(table_id: str) -> generator.TableGeneration:
@@ -105,13 +111,29 @@ def _source_formation_segments(
         if isinstance(item.get("line_number"), int) and item.get("raw_line")
     ]
     occupied_lines = {item["line_number"] for item in ambiguities}
-    boundaries = sorted(
-        (Decimal(item["raw_line"].split("\t")[0]), item["line_number"])
-        for item in ambiguities
-        if table["index_entry"]["state"] in _COMBINED_STATES
-        and len(item["raw_line"].split("\t")) == 6
-        and _PHASE_CHANGE_RE.fullmatch(item["raw_line"].split("\t")[5])
-    )
+    boundaries = []
+    for item in ambiguities:
+        fields = item["raw_line"].split("\t")
+        while fields and fields[-1] == "":
+            fields.pop()
+        temperature_token = fields[0] if fields else ""
+        if len(fields) == 5:
+            concatenated = _CONCATENATED_T_CP_RE.fullmatch(temperature_token)
+            if concatenated is not None:
+                temperature_token = concatenated.group(1)
+        transition = _PHASE_CHANGE_RE.fullmatch(fields[-1]) if fields else None
+        if transition is None:
+            continue
+        state = table["index_entry"]["state"]
+        named_crystal_transition = {
+            transition.group(1).strip().upper(),
+            transition.group(2).strip().upper(),
+        } <= _CRYSTAL_POLYMORPH_LABELS
+        if state in _COMBINED_STATES or (
+            state == "cr" and named_crystal_transition
+        ):
+            boundaries.append((Decimal(temperature_token), item["line_number"]))
+    boundaries.sort()
     segments: list[list[tuple[Decimal, Decimal, int]]] = [
         [] for _ in range(len(boundaries) + 1)
     ]
@@ -150,6 +172,8 @@ def _source_formation_segments(
             continue
         index = list(_FORMATION_COLUMNS).index(quantity)
         point = (Decimal(fields[0]), values[index])
+        if point[1] != 0:
+            continue
         segment = sum(
             boundary_temperature < point[0]
             or (
@@ -181,6 +205,38 @@ def _assert_cell_accounting(report: dict) -> None:
             row["stored_points"] + row["excluded_numeric_total"]
         ), column
         assert row["unexplained_numeric"] == 0, column
+
+
+def _logk_pair_violates_printed_rounding(
+    temperature_token: str, delta_fG_token: str, log10_Kf_token: str
+) -> bool:
+    temperature = Decimal(temperature_token)
+    delta_fG = Decimal(delta_fG_token)
+    log10_Kf = Decimal(log10_Kf_token)
+
+    def grain(token: str) -> Decimal:
+        value = Decimal(token)
+        return Decimal(1).scaleb(value.as_tuple().exponent)
+
+    calculated = log10K_from_delta_fG_kJ_mol(
+        delta_fG,
+        temperature,
+        gas_constant_J_per_mol_K=generator.JANAF_R_J_PER_MOL_K,
+    )
+    temperature_radius = grain(temperature_token) / 2
+    per_delta_fG = abs(
+        log10K_from_delta_fG_kJ_mol(
+            Decimal("1"),
+            temperature - temperature_radius,
+            gas_constant_J_per_mol_K=generator.JANAF_R_J_PER_MOL_K,
+        )
+    )
+    tolerance = (
+        grain(log10_Kf_token) / 2
+        + grain(delta_fG_token) / 2 * per_delta_fG
+        + abs(calculated) * temperature_radius / (temperature - temperature_radius)
+    )
+    return abs(log10_Kf - calculated) > tolerance
 
 
 def test_delta_fH_is_an_additive_formation_quantity() -> None:
@@ -377,6 +433,97 @@ def test_transition_observations_reports_and_vocabulary_gaps() -> None:
         )
 
 
+def test_concatenated_transition_temperature_and_cp_rows_are_recovered() -> None:
+    for table_id, expected_polymorphs in {
+        "C-083": ["i", "ii", "iii"],
+        "C-085": ["i", "ii", "iii", None],
+    }.items():
+        generated = _generation(table_id)
+        assert any(
+            row["temperature_as_published"] == "288.500"
+            and row["label"] == "II <--> III"
+            for row in generated.report["transition_rows"]
+        )
+        assert generated.report["refused_concatenated_rows"] == []
+        assert len(generated.report["recovered_concatenated_rows"]) == 2
+        actual_polymorphs = [
+            segment["polymorph"].get("value")
+            if segment["polymorph"]["tag"] == "value"
+            else None
+            for segment in generated.report["phase_segments"]
+        ]
+        assert actual_polymorphs == expected_polymorphs
+        cp_observations = _quantity_observations(generated, Quantity.CP)
+        assert (Decimal("288.500"), Decimal("1548.088")) in (
+            cp_observations[1].value.series or ()
+        )
+        assert (Decimal("288.500"), Decimal("1548.129")) in (
+            cp_observations[2].value.series or ()
+        )
+
+
+def test_concatenated_transition_pair_is_refused_when_temperatures_differ() -> None:
+    document = load_table_document(TABLES_DIR / "C-083.yaml")
+    companion = next(
+        row
+        for row in document["table"]["parse_ambiguities"]
+        if row.get("line_number") == 9
+    )
+    companion["raw_line"] = companion["raw_line"].replace(
+        "288.5001548.129", "289.5001548.129"
+    )
+    generated = generator.generate_table(document)
+    assert len(generated.report["refused_concatenated_rows"]) == 2
+    assert all(
+        row["reason"] == generator.CONCATENATED_ROW_REFUSAL_REASON
+        for row in generated.report["refused_concatenated_rows"]
+    )
+    assert not any(
+        row["temperature_as_published"] == "288.500"
+        and row["label"] == "II <--> III"
+        for row in generated.report["transition_rows"]
+    )
+
+
+def test_native_parser_preserves_concatenated_numeric_first_fields() -> None:
+    payload = (
+        "Sodium Cyanide (NaCN)\tC1N1Na1(cr)\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tdelta-f H\tdelta-f G\tlog Kf\n"
+        "0\t0.\t0.\tINFINITE\t-19.422\t-98.299\t-98.299\tINFINITE\n"
+        "288.5001548.088\t111.062\t118.520\t-2.152\tII <--> III\n"
+        "288.5001548.129\t111.063\t118.520\t-2.151\tTRANSITION\t\t\t\t\t\t\n"
+    )
+    parsed = parse_janaf_txt(
+        payload,
+        table_id="C-test",
+        url="https://example.invalid/C-test.html",
+        download_url="https://example.invalid/C-test.txt",
+    )
+    assert [row["line_number"] for row in parsed.parse_ambiguities] == [4, 5]
+
+
+def test_all_labelled_transition_temperatures_use_three_decimals() -> None:
+    transition_count = 0
+    for path in iter_table_paths():
+        table = load_table_document(path)["table"]
+        for ambiguity in table.get("parse_ambiguities", []):
+            fields = str(ambiguity.get("raw_line", "")).split("\t")
+            while fields and fields[-1] == "":
+                fields.pop()
+            if not fields or _PHASE_CHANGE_RE.fullmatch(fields[-1]) is None:
+                continue
+            transition_count += 1
+            temperature_field = fields[0]
+            match = _CONCATENATED_T_CP_RE.fullmatch(temperature_field)
+            temperature_token = match.group(1) if match else temperature_field
+            assert re.fullmatch(r"[+-]?\d+\.\d{3}", temperature_token), (
+                table["table_id"],
+                ambiguity["line_number"],
+                temperature_field,
+            )
+    assert transition_count == 979
+
+
 def test_printed_rounding_checks_flag_broken_rows_without_dropping_points() -> None:
     healthy_doc = load_table_document(TABLES_DIR / "Al-006.yaml")
     healthy = generator.generate_table(healthy_doc)
@@ -394,6 +541,24 @@ def test_printed_rounding_checks_flag_broken_rows_without_dropping_points() -> N
     assert kinds == {"negative_gibbs_enthalpy_function", "log10_Kf_from_delta_fG"}
     for quantity in Quantity.CP, Quantity.S, Quantity.H_MINUS_H298, Quantity.LOG10_KF:
         assert len(_series(broken, quantity)) == len(_series(healthy, quantity))
+
+
+def test_hf004_printed_enthalpy_erratum_is_refused() -> None:
+    generated = _generation("Hf-004")
+    enthalpy = _series(generated, Quantity.H_MINUS_H298)
+    assert (Decimal("2500"), Decimal("63.307")) in enthalpy
+    assert (Decimal("2500.000"), Decimal("66.307")) not in enthalpy
+    assert generated.report["stored_cell_errata"] == [
+        {
+            **generator.STORED_CELL_ERRATA[0],
+            "disposition": "refused",
+            "reason": generator.PRINTED_CELL_ERRATUM_REASON,
+        }
+    ]
+    accounting = generated.report["cell_accounting"]["enthalpy_increment"]
+    assert accounting["excluded_numeric"] == {
+        generator.PRINTED_CELL_ERRATUM_REASON: 1
+    }
 
 
 def test_janaf_identity_uses_the_source_gas_constant() -> None:
@@ -417,31 +582,54 @@ def test_janaf_identity_uses_the_source_gas_constant() -> None:
     )
 
 
-def test_readable_merged_formation_triples_are_stored_and_reported_once() -> None:
-    generated = _generation("Al-003")
+def test_al002_nonzero_merged_formation_cells_are_refused() -> None:
+    refused = _generation("Al-002")
     for quantity, value in {
-        Quantity.DELTA_FH: Decimal("0"),
-        Quantity.DELTA_FG: Decimal("0"),
-        Quantity.LOG10_KF: Decimal("0"),
+        Quantity.DELTA_FH: Decimal("10.585"),
+        Quantity.DELTA_FG: Decimal("0.760"),
+        Quantity.LOG10_KF: Decimal("0.040"),
     }.items():
-        assert (Decimal("1000"), value) in _series(generated, quantity)
-    assert [
+        assert (Decimal("1000"), value) not in _series(refused, quantity)
+    refused_row = next(
         row
-        for row in generated.report["merged_formation_rows"]
+        for row in refused.report["merged_formation_rows"]
+        if row["temperature_as_published"] == "1000"
+    )
+    assert refused_row["raw_text"] == "10.585 0.760  0.040"
+    assert refused_row["assigned_segment"] == "segment-0"
+    assert {
+        column: disposition["disposition"]
+        for column, disposition in refused_row["cell_dispositions"].items()
+    } == {
+        "formation_enthalpy": "refused",
+        "formation_gibbs_energy": "refused",
+        "log10_formation_equilibrium_constant": "refused",
+    }
+    assert all(
+        disposition["reason"] == generator.MERGED_FORMATION_REFUSAL_REASON
+        for disposition in refused_row["cell_dispositions"].values()
+    )
+
+
+def test_al003_merged_formation_zeros_are_stored_in_the_right_segment() -> None:
+    zeros = _generation("Al-003")
+    for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF):
+        assert (Decimal("1000"), Decimal("0")) in _series(zeros, quantity)
+    zero_row = next(
+        row
+        for row in zeros.report["merged_formation_rows"]
         if row["line_number"] == 20
-    ] == [
-        {
-            "temperature_as_published": "1000",
-            "line_number": 20,
-            "raw_text": "0. 0. 0.",
-            "assigned_segment": "segment-0",
-            "values_as_published": {
-                "formation_enthalpy": "0.",
-                "formation_gibbs_energy": "0.",
-                "log10_formation_equilibrium_constant": "0.",
-            },
-        }
-    ]
+    )
+    assert zero_row["raw_text"] == "0. 0. 0."
+    assert zero_row["assigned_segment"] == "segment-0"
+    assert {
+        column: disposition["disposition"]
+        for column, disposition in zero_row["cell_dispositions"].items()
+    } == {
+        "formation_enthalpy": "stored_zero",
+        "formation_gibbs_energy": "stored_zero",
+        "log10_formation_equilibrium_constant": "stored_zero",
+    }
 
     malformed_document = load_table_document(TABLES_DIR / "Al-003.yaml")
     malformed_row = next(
@@ -460,6 +648,28 @@ def test_readable_merged_formation_triples_are_stored_and_reported_once() -> Non
         row["raw_text"] == "0. unreadable 0."
         for row in malformed.report["non_transition_rows"]
     )
+
+
+def test_fe004_mixed_merged_formation_cells_are_classified_individually() -> None:
+    mixed = _generation("Fe-004")
+    assert (Decimal("1700"), Decimal("0.001")) not in _series(
+        mixed, Quantity.DELTA_FH
+    )
+    assert (Decimal("1700"), Decimal("0")) in _series(mixed, Quantity.DELTA_FG)
+    assert (Decimal("1700"), Decimal("0")) in _series(mixed, Quantity.LOG10_KF)
+    mixed_row = next(
+        row
+        for row in mixed.report["merged_formation_rows"]
+        if row["temperature_as_published"] == "1700"
+    )
+    assert {
+        column: disposition["disposition"]
+        for column, disposition in mixed_row["cell_dispositions"].items()
+    } == {
+        "formation_enthalpy": "refused",
+        "formation_gibbs_energy": "stored_zero",
+        "log10_formation_equilibrium_constant": "stored_zero",
+    }
 
 
 def test_raw_and_tables_paths_are_byte_identical_and_hash_guarded(
@@ -521,6 +731,23 @@ def test_cell_accounting_negative_witness_breaks_generator_accounting(
         _generation("Al-001")
 
 
+def test_raw_numeric_census_detects_a_deleted_tab() -> None:
+    payload = (RAW_FIXTURES / "Al-006.txt").read_bytes().replace(
+        b"298.15\t20.786", b"298.1520.786", 1
+    )
+    document = generator.parse_table(
+        payload,
+        {
+            "table_id": "Al-006",
+            "url": "https://janaf.nist.gov/tables/Al-006.html",
+            "download_url": "https://janaf.nist.gov/tables/Al-006.txt",
+        },
+        RAW_FIXTURES / "Al-006.txt",
+    )
+    with pytest.raises(AssertionError, match="unexplained raw numeric tokens"):
+        generator.generate_table(document)
+
+
 def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     current = yaml.load(CURRENT_STORE.read_text(encoding="utf-8"), Loader=loader)
@@ -537,10 +764,25 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     points = Counter()
     observations = Counter()
     phases = Counter()
+    polymorphs = Counter()
     cells: dict[str, Counter] = defaultdict(Counter)
+    raw_numeric_accounting = Counter()
+    transcription_checks = Counter()
     failures = Counter()
+    refused_merged_pair_checks = 0
+    stored_cell_errata = 0
+    recovered_concatenated_rows = 0
+    refused_concatenated_rows = 0
     merged_rows = 0
     merged_extras = Counter()
+    stored_pair_violations: list[tuple[str, str]] = []
+    refused_merged_pair_violations: list[tuple[str, str]] = []
+    reported_stored_pair_violations: list[tuple[str, str]] = []
+    reported_refused_pair_violations: list[tuple[str, str]] = []
+    stored_nonzero_merged_cells = 0
+    merged_disposition_mismatches = 0
+    segment_control_mismatches = 0
+    legacy_superset_mismatches = 0
     seen_control: set[tuple[str, Quantity]] = set()
     started = time.monotonic()
     paths = list(iter_table_paths())
@@ -549,6 +791,99 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         document = load_table_document(path)
         generated = generator.generate_table(document)
         table_id = generated.report["table_id"]
+        structured_points: dict[Quantity, Counter[tuple[Decimal, Decimal]]] = {
+            quantity: Counter() for quantity in _FORMATION_COLUMNS
+        }
+        for row in document["table"]["values"]:
+            temperature = Decimal(row["temperature"]["as_published"])
+            for quantity, column in _FORMATION_COLUMNS.items():
+                cell = row[column]
+                if cell["value"] is not None:
+                    structured_points[quantity][
+                        (temperature, Decimal(cell["as_published"]))
+                    ] += 1
+            delta_fG = row["formation_gibbs_energy"]
+            log10_Kf = row["log10_formation_equilibrium_constant"]
+            if (
+                temperature > 0
+                and delta_fG["value"] is not None
+                and log10_Kf["value"] is not None
+                and _logk_pair_violates_printed_rounding(
+                    row["temperature"]["as_published"],
+                    delta_fG["as_published"],
+                    log10_Kf["as_published"],
+                )
+            ):
+                stored_pair_violations.append(
+                    (table_id, row["temperature"]["as_published"])
+                )
+
+        emitted_merged: dict[Quantity, Counter[tuple[Decimal, Decimal]]] = {}
+        for quantity in _FORMATION_COLUMNS:
+            emitted = Counter(_series(generated, quantity))
+            emitted.subtract(structured_points[quantity])
+            emitted_merged[quantity] = +emitted
+        report_rows = {
+            row["line_number"]: row
+            for row in generated.report["merged_formation_rows"]
+        }
+        for ambiguity in document["table"].get("parse_ambiguities", []):
+            fields = str(ambiguity.get("raw_line", "")).split("\t")
+            if len(fields) != 6:
+                continue
+            tokens = fields[5].split()
+            if len(tokens) != 3:
+                continue
+            try:
+                values = [Decimal(token) for token in tokens]
+            except InvalidOperation:
+                continue
+            emitted_cells: list[bool] = []
+            for (quantity, _column), value in zip(
+                _FORMATION_COLUMNS.items(), values, strict=True
+            ):
+                point = (Decimal(fields[0]), value)
+                emitted = emitted_merged[quantity][point] > 0
+                emitted_cells.append(emitted)
+                if emitted:
+                    emitted_merged[quantity][point] -= 1
+                if value != 0 and emitted:
+                    stored_nonzero_merged_cells += 1
+            if (
+                Decimal(fields[0]) > 0
+                and _logk_pair_violates_printed_rounding(
+                    fields[0], tokens[1], tokens[2]
+                )
+            ):
+                target = (
+                    stored_pair_violations
+                    if emitted_cells[1] and emitted_cells[2]
+                    else refused_merged_pair_violations
+                )
+                target.append((table_id, fields[0]))
+            reported = report_rows[ambiguity["line_number"]]
+            for column, token in zip(_FORMATION_COLUMNS.values(), tokens, strict=True):
+                expected_disposition = (
+                    "stored_zero" if Decimal(token) == 0 else "refused"
+                )
+                actual_disposition = (
+                    reported.get("cell_dispositions", {})
+                    .get(column, {})
+                    .get("disposition")
+                )
+                if actual_disposition != expected_disposition:
+                    merged_disposition_mismatches += 1
+
+        reported_stored_pair_violations.extend(
+            (row["table_id"], row["temperature_as_published"])
+            for row in generated.report.get("stored_pair_identity_failures", [])
+        )
+        reported_refused_pair_violations.extend(
+            (row["table_id"], row["temperature_as_published"])
+            for row in generated.report.get(
+                "refused_merged_pair_identity_failures", []
+            )
+        )
         for quantity in (Quantity.DELTA_FG, Quantity.LOG10_KF):
             key = (table_id, quantity)
             source_segments, expected_merged = _source_formation_segments(
@@ -562,7 +897,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 generated.report["phase_segments"],
                 strict=True,
             ):
-                assert list(observation.value.series or ()) == source_series
+                if list(observation.value.series or ()) != source_series:
+                    segment_control_mismatches += 1
                 assert (
                     observation.identity.species.phase.tag.value
                     == segment["phase"]["tag"]
@@ -575,7 +911,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
             actual = Counter(_series(generated, quantity))
             legacy = Counter(expected[key])
             assert not legacy - actual
-            assert actual - legacy == expected_merged
+            if actual - legacy != expected_merged:
+                legacy_superset_mismatches += 1
             merged_extras[quantity.value] += sum(expected_merged.values())
             seen_control.add(key)
         merged_rows += len(generated.report["merged_formation_rows"])
@@ -588,6 +925,12 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         for segment in generated.report["phase_segments"]:
             phase = segment["phase"]
             phases[phase.get("value", "unknown") if phase["tag"] == "value" else "unknown"] += 1
+            polymorph = segment["polymorph"]
+            polymorphs[
+                polymorph.get("value", polymorph["tag"])
+                if polymorph["tag"] == "value"
+                else polymorph["tag"]
+            ] += 1
         _assert_cell_accounting(generated.report)
         for column, row in generated.report["cell_accounting"].items():
             for key in (
@@ -601,6 +944,18 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 cells[column][key] += row[key]
         for failure in generated.report["transcription_identity_failures"]:
             failures[failure["identity"]] += 1
+        transcription_checks.update(generated.report["transcription_checks"])
+        refused_merged_pair_checks += generated.report.get(
+            "refused_merged_pair_checks", 0
+        )
+        stored_cell_errata += len(generated.report.get("stored_cell_errata", []))
+        raw_numeric_accounting.update(generated.report["raw_numeric_accounting"])
+        recovered_concatenated_rows += len(
+            generated.report["recovered_concatenated_rows"]
+        )
+        refused_concatenated_rows += len(
+            generated.report["refused_concatenated_rows"]
+        )
         if index % 100 == 0:
             print(
                 f"JANAF test audit: {index}/1655 tables in "
@@ -608,36 +963,79 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 flush=True,
             )
 
+    assert stored_nonzero_merged_cells == 0, (
+        f"stored {stored_nonzero_merged_cells} sign-ambiguous merged cells"
+    )
+    assert stored_pair_violations == [("B-133", "300")], (
+        f"expected one stored-pair identity failure, got "
+        f"{len(stored_pair_violations)} "
+        f"({len(stored_pair_violations) - 1} excess)"
+    )
+    assert reported_stored_pair_violations == stored_pair_violations
+    assert len(refused_merged_pair_violations) == 437
+    assert reported_refused_pair_violations == refused_merged_pair_violations
+    assert merged_disposition_mismatches == 0
+    assert segment_control_mismatches == 0
+    assert legacy_superset_mismatches == 0
     assert seen_control == set(expected)
-    assert points[Quantity.DELTA_FH.value] == 75352
-    assert points[Quantity.DELTA_FG.value] == 75192
-    assert points[Quantity.LOG10_KF.value] == 74212
+    assert points[Quantity.CP.value] == 77542
+    assert points[Quantity.S.value] == 77540
+    assert points[Quantity.H_MINUS_H298.value] == 77539
+    assert points[Quantity.DELTA_FH.value] == 74914
+    assert points[Quantity.DELTA_FG.value] == 74755
+    assert points[Quantity.LOG10_KF.value] == 73775
+    assert points[Quantity.TRANSITION_TEMPERATURE.value] == 979
     assert merged_rows == 508
-    assert merged_extras == {"delta_fG": 508, "log10_Kf": 508}
+    assert merged_extras == {"delta_fG": 71, "log10_Kf": 71}
     assert {
         column: row["structured_numeric"] for column, row in cells.items()
     } == STRUCTURED_NUMERIC_COUNTS
     assert all(row["unexplained_numeric"] == 0 for row in cells.values())
-    assert cells["heat_capacity"]["stored_points"] == 77538
-    assert cells["entropy"]["stored_points"] == 77536
-    assert cells["enthalpy_increment"]["stored_points"] == 77536
-    assert cells["formation_enthalpy"]["stored_points"] == 75352
-    assert cells["formation_gibbs_energy"]["stored_points"] == 75192
-    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74212
-    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 0
-    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 0
-    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 0
+    assert cells["heat_capacity"]["stored_points"] == 77542
+    assert cells["entropy"]["stored_points"] == 77540
+    assert cells["enthalpy_increment"]["stored_points"] == 77539
+    assert cells["formation_enthalpy"]["stored_points"] == 74914
+    assert cells["formation_gibbs_energy"]["stored_points"] == 74755
+    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 73775
+    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 438
+    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 437
+    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 437
     assert observations == {
-        "cp": 2013,
-        "S": 2013,
-        "H_minus_H298": 2013,
-        "delta_fH": 2013,
-        "delta_fG": 2013,
-        "log10_Kf": 2013,
-        "transition_temperature": 977,
+        "cp": 2117,
+        "S": 2117,
+        "H_minus_H298": 2117,
+        "delta_fH": 2117,
+        "delta_fG": 2117,
+        "log10_Kf": 2117,
+        "transition_temperature": 979,
     }
-    assert phases == {"cr": 690, "l": 444, "g": 874, "unknown": 5}
+    assert phases == {"cr": 794, "l": 444, "g": 874, "unknown": 5}
+    assert polymorphs == {
+        "unknown": 457,
+        "not_applicable": 1318,
+        "alpha": 92,
+        "beta": 94,
+        "gamma": 21,
+        "delta": 9,
+        "i": 55,
+        "ii": 54,
+        "iii": 17,
+    }
+    assert transcription_checks == {
+        "negative_gibbs_enthalpy_function": 76293,
+        "log10_Kf_from_delta_fG": 73668,
+    }
+    assert refused_merged_pair_checks == 437
+    assert stored_cell_errata == 1
+    assert raw_numeric_accounting == {
+        "numeric_source_tokens": 533672,
+        "accounted_numeric_cells": 533672,
+        "refused_concatenated_numeric_tokens": 0,
+        "unexplained_numeric_tokens": 0,
+    }
+    assert recovered_concatenated_rows == 4
+    assert refused_concatenated_rows == 0
     assert failures == {
         "negative_gibbs_enthalpy_function": 18,
-        "log10_Kf_from_delta_fG": 438,
+        "log10_Kf_from_delta_fG": 1,
     }

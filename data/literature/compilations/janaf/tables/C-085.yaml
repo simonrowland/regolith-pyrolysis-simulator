@@ -2292,6 +2292,18 @@ table:
     locator:
       table_id: C-085
       url: https://janaf.nist.gov/tables/C-085.html
+  - line_number: 8
+    raw_line: "288.5001548.088\t111.062\t118.520\t-2.152\tII <--> III"
+    reason: expected 8 tab-separated values; found 5
+    locator:
+      table_id: C-085
+      url: https://janaf.nist.gov/tables/C-085.html
+  - line_number: 9
+    raw_line: "288.5001548.129\t111.063\t118.520\t-2.151\tTRANSITION\t\t\t\t\t\t"
+    reason: first field is not one published number
+    locator:
+      table_id: C-085
+      url: https://janaf.nist.gov/tables/C-085.html
   - line_number: 10
     raw_line: "298.15\t68.681\t118.467\t118.467\t0.\t90.709  80.413 14.088"
     reason: expected 8 tab-separated values; found 6

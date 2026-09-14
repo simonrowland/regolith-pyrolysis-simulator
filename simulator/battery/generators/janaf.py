@@ -55,6 +55,34 @@ FORMATION_BASIS_REASON = (
     "closed token for this convention, and the table does not print a "
     "temperature-specific formation reaction"
 )
+MERGED_FORMATION_REFUSAL_REASON = (
+    "NIST's rendering drops minus signs in space-joined formation fields; "
+    "a nonzero printed token is sign-ambiguous"
+)
+PRINTED_CELL_ERRATUM_REASON = (
+    "printed cell is out of line with both neighbouring rows and violates the "
+    "Gibbs-function identity"
+)
+STORED_CELL_ERRATA = (
+    {
+        "table_id": "Hf-004",
+        "temperature_as_published": "2500.000",
+        "line_number": 35,
+        "column": "enthalpy_increment",
+        "quoted_evidence": (
+            "2500.000\t37.656\t125.068\t99.746\t66.307\tBETA <--> LIQUID"
+        ),
+        "neighbouring_rows": (
+            "2500\t37.656\t125.068\t99.746\t63.307\t29.288\t0.\t0.",
+            "2600\t37.656\t126.545\t100.748\t67.072\t0. 0. 0.",
+        ),
+    },
+)
+CONCATENATED_ROW_REFUSAL_REASON = (
+    "concatenated temperature/Cp recovery requires a labelled transition "
+    "temperature with exactly three decimals and an immediately following "
+    "TRANSITION row with the same temperature"
+)
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
 
 _UNITS = {
@@ -125,6 +153,11 @@ _CONDITION_RE = re.compile(
     re.IGNORECASE,
 )
 _NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
+_CONCATENATED_TEMPERATURE_CP_RE = re.compile(
+    r"^([+-]?\d+\.\d{3})"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?)$"
+)
+_CONCATENATED_NUMERIC_FIELD_RE = re.compile(r"^[0-9Ee+.-]+$")
 
 
 @dataclass(frozen=True)
@@ -150,6 +183,8 @@ class _Row:
     numeric_tail: Mapping[str, _Cell] | None = None
     tail_text: str | None = None
     is_short: bool = False
+    raw_line: str | None = None
+    recovered_concatenated_temperature_cp: bool = False
 
 
 @dataclass(frozen=True)
@@ -280,16 +315,154 @@ def _structured_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
     return rows
 
 
-def _short_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
+def _trimmed_tab_fields(line: str) -> list[str]:
+    fields = line.split("\t")
+    while fields and fields[-1] == "":
+        fields.pop()
+    return fields
+
+
+def _raw_numeric_token_count(line: str) -> int:
+    count = 0
+    fields = _trimmed_tab_fields(line)
+    for field in fields:
+        tokens = field.split()
+        if tokens and all(_NUMBER_RE.fullmatch(token) for token in tokens):
+            count += len(tokens)
+        elif (
+            not any(character.isspace() for character in field)
+            and field.count(".") >= 2
+            and _CONCATENATED_NUMERIC_FIELD_RE.fullmatch(field)
+        ):
+            count += 2
+    first_field_has_temperature = bool(fields) and (
+        _NUMBER_RE.fullmatch(fields[0]) is not None
+        or (
+            fields[0].count(".") >= 2
+            and _CONCATENATED_NUMERIC_FIELD_RE.fullmatch(fields[0]) is not None
+        )
+    )
+    return count - int(first_field_has_temperature)
+
+
+def _short_rows(
+    table: Mapping[str, Any], table_id: str
+) -> tuple[list[_Row], list[dict[str, Any]]]:
     rows: list[_Row] = []
     ambiguities = table.get("parse_ambiguities") or []
     if not isinstance(ambiguities, list):
         raise ValueError(f"{table_id}: parse_ambiguities must be a list")
+    normalized_fields: dict[int, list[str]] = {}
+    recovered_indices: set[int] = set()
+    refused_indices: set[int] = set()
+    refused_rows: list[dict[str, Any]] = []
     for ambiguity_index, item in enumerate(ambiguities):
+        if ambiguity_index in refused_indices:
+            continue
+        if not isinstance(item, Mapping) or not item.get("raw_line"):
+            continue
+        fields = _trimmed_tab_fields(str(item["raw_line"]))
+        if (
+            len(fields) != 5
+            or fields[0].count(".") < 2
+            or _PHASE_CHANGE_RE.fullmatch(fields[-1].strip()) is None
+        ):
+            continue
+        transition_match = _CONCATENATED_TEMPERATURE_CP_RE.fullmatch(
+            fields[0].strip()
+        )
+        companion_index = ambiguity_index + 1
+        companion = (
+            ambiguities[companion_index]
+            if companion_index < len(ambiguities)
+            and isinstance(ambiguities[companion_index], Mapping)
+            else None
+        )
+        companion_fields = (
+            _trimmed_tab_fields(str(companion.get("raw_line") or ""))
+            if companion is not None
+            else []
+        )
+        companion_is_next_line = (
+            isinstance(item.get("line_number"), int)
+            and companion is not None
+            and companion.get("line_number") == item["line_number"] + 1
+        )
+        companion_is_transition = (
+            bool(companion_fields)
+            and companion_fields[-1].strip().upper() == "TRANSITION"
+        )
+        companion_match = (
+            _CONCATENATED_TEMPERATURE_CP_RE.fullmatch(
+                companion_fields[0].strip()
+            )
+            if len(companion_fields) == 5
+            else None
+        )
+        companion_temperature = (
+            companion_match.group(1)
+            if companion_match is not None
+            else companion_fields[0].strip()
+            if len(companion_fields) == 6
+            and _NUMBER_RE.fullmatch(companion_fields[0].strip())
+            else None
+        )
+        fields_are_numeric = all(_NUMBER_RE.fullmatch(field) for field in fields[1:4])
+        companion_fields_are_numeric = (
+            companion_match is not None
+            and all(
+                _NUMBER_RE.fullmatch(field) for field in companion_fields[1:4]
+            )
+        ) or (
+            len(companion_fields) == 6
+            and all(
+                _NUMBER_RE.fullmatch(field) for field in companion_fields[:5]
+            )
+        )
+        valid_pair = (
+            transition_match is not None
+            and companion_is_next_line
+            and companion_is_transition
+            and companion_temperature == transition_match.group(1)
+            and fields_are_numeric
+            and companion_fields_are_numeric
+        )
+        paired_indices = [ambiguity_index]
+        if companion_is_next_line and companion_is_transition:
+            paired_indices.append(companion_index)
+        if not valid_pair:
+            for refused_index in paired_indices:
+                refused_item = ambiguities[refused_index]
+                refused_indices.add(refused_index)
+                refused_rows.append(
+                    {
+                        "line_number": refused_item.get("line_number"),
+                        "raw_text": str(refused_item.get("raw_line") or ""),
+                        "reason": CONCATENATED_ROW_REFUSAL_REASON,
+                    }
+                )
+            continue
+        normalized_fields[ambiguity_index] = [
+            transition_match.group(1),
+            transition_match.group(2),
+            *fields[1:],
+        ]
+        recovered_indices.add(ambiguity_index)
+        if companion_match is not None:
+            normalized_fields[companion_index] = [
+                companion_match.group(1),
+                companion_match.group(2),
+                *companion_fields[1:],
+            ]
+            recovered_indices.add(companion_index)
+
+    for ambiguity_index, item in enumerate(ambiguities):
+        if ambiguity_index in refused_indices:
+            continue
         if not isinstance(item, Mapping) or not item.get("raw_line"):
             continue
         line = str(item["raw_line"])
-        fields = line.split("\t")
+        fields = normalized_fields.get(ambiguity_index, _trimmed_tab_fields(line))
         if len(fields) != 6:
             continue
         try:
@@ -331,9 +504,13 @@ def _short_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
                 numeric_tail=numeric_tail,
                 tail_text=fields[5],
                 is_short=True,
+                raw_line=line,
+                recovered_concatenated_temperature_cp=(
+                    ambiguity_index in recovered_indices
+                ),
             )
         )
-    return rows
+    return rows, refused_rows
 
 
 def _phase_change(label: str | None) -> tuple[str, str] | None:
@@ -365,7 +542,7 @@ def _segments(
     formula: str,
     boundaries: Sequence[_Boundary],
 ) -> tuple[_Segment, ...]:
-    if state in _SINGLE_PHASES:
+    if state in _SINGLE_PHASES and not (state == "cr" and boundaries):
         phase = _SINGLE_PHASES[state]
         polymorph = (
             State.unknown("JANAF index state 'cr' does not state a named polymorph")
@@ -508,6 +685,22 @@ def _segments(
 def _decimal_grain(token: str) -> Decimal:
     value = Decimal(token)
     return Decimal(1).scaleb(value.as_tuple().exponent)
+
+
+def _printed_cell_erratum(
+    table_id: str, row: _Row, column: str
+) -> Mapping[str, Any] | None:
+    return next(
+        (
+            erratum
+            for erratum in STORED_CELL_ERRATA
+            if erratum["table_id"] == table_id
+            and erratum["temperature_as_published"] == row.temperature_token
+            and erratum["line_number"] == row.line_number
+            and erratum["column"] == column
+        ),
+        None,
+    )
 
 
 def _identity_failure(row: _Row, table_id: str) -> list[dict[str, str]]:
@@ -710,12 +903,20 @@ def generate_table(
     if not download_url:
         raise ValueError(f"{table_id}: missing NIST download_url")
     structured = _structured_rows(table, table_id)
-    short = _short_rows(table, table_id)
+    short, refused_concatenated_rows = _short_rows(table, table_id)
     all_rows = structured + short
     boundary_rows: list[_Boundary] = []
     for row in short:
         parts = _phase_change(row.label)
-        if parts is not None and state in _COMBINED_STATES:
+        is_named_crystal_transition = (
+            parts is not None
+            and _side_polymorph(parts[0]) is not None
+            and _side_polymorph(parts[1]) is not None
+        )
+        if parts is not None and (
+            state in _COMBINED_STATES
+            or (state == "cr" and is_named_crystal_transition)
+        ):
             boundary_rows.append(
                 _Boundary(row.temperature, row.label or "", parts[0], parts[1], row.order)
             )
@@ -752,6 +953,7 @@ def generate_table(
         if column != "temperature"
     }
     nulls: dict[tuple[int, str], int] = Counter()
+    applied_cell_errata: list[dict[str, Any]] = []
     for row in structured:
         seg = segment_index(row)
         for column, cell in row.cells.items():
@@ -774,6 +976,18 @@ def generate_table(
             else:
                 accounting[column]["short_row_numeric"] += 1
                 accounting[column]["numeric_source_cells"] += 1
+                erratum = _printed_cell_erratum(table_id, row, column)
+                if erratum is not None:
+                    accounting[column]["excluded_numeric"][
+                        PRINTED_CELL_ERRATUM_REASON
+                    ] += 1
+                    applied_cell_errata.append(
+                        {
+                            **erratum,
+                            "disposition": "refused",
+                            "reason": PRINTED_CELL_ERRATUM_REASON,
+                        }
+                    )
         if row.numeric_tail is not None:
             for column, cell in row.numeric_tail.items():
                 if cell.value is None:
@@ -782,6 +996,37 @@ def generate_table(
                     continue
                 accounting[column]["short_row_numeric"] += 1
                 accounting[column]["numeric_source_cells"] += 1
+                if cell.value != 0:
+                    accounting[column]["excluded_numeric"][
+                        MERGED_FORMATION_REFUSAL_REASON
+                    ] += 1
+
+    ambiguity_raw_lines = [
+        str(item["raw_line"])
+        for item in table.get("parse_ambiguities") or ()
+        if isinstance(item, Mapping) and item.get("raw_line")
+    ]
+    raw_numeric_source_tokens = sum(
+        int(row["structured_numeric"]) for row in accounting.values()
+    ) + sum(_raw_numeric_token_count(line) for line in ambiguity_raw_lines)
+    accounted_numeric_cells = sum(
+        int(row["numeric_source_cells"]) for row in accounting.values()
+    )
+    refused_concatenated_numeric_tokens = sum(
+        _raw_numeric_token_count(str(row["raw_text"]))
+        for row in refused_concatenated_rows
+    )
+    unexplained_raw_numeric_tokens = (
+        raw_numeric_source_tokens
+        - accounted_numeric_cells
+        - refused_concatenated_numeric_tokens
+    )
+    if unexplained_raw_numeric_tokens:
+        raise AssertionError(
+            f"{table_id}: unexplained raw numeric tokens: "
+            f"source={raw_numeric_source_tokens} accounted={accounted_numeric_cells} "
+            f"refused={refused_concatenated_numeric_tokens}"
+        )
 
     points: dict[tuple[int, str], list[tuple[Decimal, Decimal, int]]] = defaultdict(list)
     for row in all_rows:
@@ -793,6 +1038,14 @@ def generate_table(
                 else row.cells.get(column)
             )
             if cell is not None and cell.value is not None:
+                if _printed_cell_erratum(table_id, row, column) is not None:
+                    continue
+                if (
+                    row.numeric_tail is not None
+                    and column in _FORMATION_TAIL_COLUMNS
+                    and cell.value != 0
+                ):
+                    continue
                 points[(seg, column)].append((row.temperature, cell.value, row.order))
                 accounting[column]["stored_points"] += 1
         phi = row.cells.get("negative_gibbs_enthalpy_function")
@@ -951,9 +1204,13 @@ def generate_table(
         vocabulary_gaps.append(gap)
 
     failures: list[dict[str, str]] = []
+    stored_pair_failures: list[dict[str, str]] = []
+    refused_merged_pair_failures: list[dict[str, Any]] = []
     checks = Counter()
+    refused_merged_pair_checks = 0
     for row in all_rows:
         t = row.temperature
+        pair_is_stored = False
         if t > 0:
             if all(
                 row.cells.get(column) is not None
@@ -976,8 +1233,28 @@ def generate_table(
                 else row.cells.get("log10_formation_equilibrium_constant")
             )
             if dg is not None and logk is not None and dg.value is not None and logk.value is not None:
-                checks["log10_Kf_from_delta_fG"] += 1
-        failures.extend(_identity_failure(row, table_id))
+                pair_is_stored = row.numeric_tail is None or (
+                    dg.value == 0 and logk.value == 0
+                )
+                if pair_is_stored:
+                    checks["log10_Kf_from_delta_fG"] += 1
+                else:
+                    refused_merged_pair_checks += 1
+        for failure in _identity_failure(row, table_id):
+            if failure["identity"] != "log10_Kf_from_delta_fG":
+                failures.append(failure)
+            elif pair_is_stored:
+                failures.append(failure)
+                stored_pair_failures.append(failure)
+            else:
+                refused_merged_pair_failures.append(
+                    {
+                        **failure,
+                        "line_number": row.line_number,
+                        "raw_text": row.tail_text,
+                        "assigned_segment": f"segment-{segment_index(row)}",
+                    }
+                )
 
     plain_accounting: dict[str, Any] = {}
     for column, row in accounting.items():
@@ -999,10 +1276,10 @@ def generate_table(
         "formula": formula,
         "state_as_published": state,
         "transition_row_assignment": (
-            "For combined and reference tables, physical file order assigns every "
-            "same-temperature row: rows through the labelled transition stay on its "
-            "printed left side and following rows use its right side. Single-state "
-            "tables remain one segment."
+            "For combined and reference tables, and named-polymorph boundaries in "
+            "crystal tables, physical file order assigns every same-temperature row: "
+            "rows through the labelled transition stay on its printed left side and "
+            "following rows use its right side."
         ),
         "phase_segments": [
             {
@@ -1018,13 +1295,38 @@ def generate_table(
             for segment in segments
         ],
         "cell_accounting": plain_accounting,
+        "raw_numeric_accounting": {
+            "numeric_source_tokens": raw_numeric_source_tokens,
+            "accounted_numeric_cells": accounted_numeric_cells,
+            "refused_concatenated_numeric_tokens": (
+                refused_concatenated_numeric_tokens
+            ),
+            "unexplained_numeric_tokens": 0,
+        },
         "transcription_checks": dict(checks),
         "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
         "transcription_identity_failures": failures,
+        "stored_pair_identity_failures": stored_pair_failures,
+        "refused_merged_pair_checks": refused_merged_pair_checks,
+        "refused_merged_pair_identity_failures": refused_merged_pair_failures,
         "transition_rows": transition_rows,
         "non_transition_rows": non_transition_rows,
         "adjacent_condition_rows": adjacent_condition_rows,
         "vocabulary_gaps": vocabulary_gaps,
+        "recovered_concatenated_rows": [
+            {
+                "line_number": row.line_number,
+                "raw_text": row.raw_line,
+                "temperature_as_published": row.temperature_token,
+                "heat_capacity_as_published": row.cells["heat_capacity"].token,
+                "label": row.label,
+                "assigned_segment": f"segment-{segment_index(row)}",
+            }
+            for row in short
+            if row.recovered_concatenated_temperature_cp
+        ],
+        "refused_concatenated_rows": refused_concatenated_rows,
+        "stored_cell_errata": applied_cell_errata,
         "merged_formation_rows": [
             {
                 "temperature_as_published": row.temperature_token,
@@ -1033,6 +1335,17 @@ def generate_table(
                 "assigned_segment": f"segment-{segment_index(row)}",
                 "values_as_published": {
                     column: cell.token for column, cell in row.numeric_tail.items()
+                },
+                "cell_dispositions": {
+                    column: (
+                        {"disposition": "stored_zero"}
+                        if cell.value == 0
+                        else {
+                            "disposition": "refused",
+                            "reason": MERGED_FORMATION_REFUSAL_REASON,
+                        }
+                    )
+                    for column, cell in row.numeric_tail.items()
                 },
             }
             for row in short
@@ -1114,6 +1427,12 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     cell_totals: dict[str, Counter[str]] = defaultdict(Counter)
     transcription_checks: Counter[str] = Counter()
     failure_counts: Counter[str] = Counter()
+    stored_pair_identity_failure_count = 0
+    refused_merged_pair_check_count = 0
+    refused_merged_pair_identity_failure_count = 0
+    raw_numeric_accounting: Counter[str] = Counter()
+    recovered_concatenated_row_count = 0
+    refused_concatenated_row_count = 0
     adjacent_condition_counts: Counter[str] = Counter()
     merged_formation_row_count = 0
     table_count = 0
@@ -1160,6 +1479,22 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
                 cell_totals[column][key] += int(row[key])
         for failure in generated.report["transcription_identity_failures"]:
             failure_counts[str(failure["identity"])] += 1
+        stored_pair_identity_failure_count += len(
+            generated.report["stored_pair_identity_failures"]
+        )
+        refused_merged_pair_check_count += int(
+            generated.report["refused_merged_pair_checks"]
+        )
+        refused_merged_pair_identity_failure_count += len(
+            generated.report["refused_merged_pair_identity_failures"]
+        )
+        raw_numeric_accounting.update(generated.report["raw_numeric_accounting"])
+        recovered_concatenated_row_count += len(
+            generated.report["recovered_concatenated_rows"]
+        )
+        refused_concatenated_row_count += len(
+            generated.report["refused_concatenated_rows"]
+        )
         adjacent_condition_counts.update(
             str(row["label"]) for row in generated.report["adjacent_condition_rows"]
         )
@@ -1210,6 +1545,14 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         "transcription_check_counts": dict(sorted(transcription_checks.items())),
         "transcription_identity_failure_counts": dict(sorted(failure_counts.items())),
         "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
+        "stored_pair_identity_failure_count": stored_pair_identity_failure_count,
+        "refused_merged_pair_check_count": refused_merged_pair_check_count,
+        "refused_merged_pair_identity_failure_count": (
+            refused_merged_pair_identity_failure_count
+        ),
+        "raw_numeric_accounting": dict(sorted(raw_numeric_accounting.items())),
+        "recovered_concatenated_row_count": recovered_concatenated_row_count,
+        "refused_concatenated_row_count": refused_concatenated_row_count,
         "merged_formation_row_count": merged_formation_row_count,
         "adjacent_condition_row_counts": dict(sorted(adjacent_condition_counts.items())),
         "sharding": "one observation shard and one report shard per JANAF index element",
