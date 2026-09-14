@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: Fe
       phase:
@@ -16,54 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -86,8 +44,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: K
       phase:
@@ -96,54 +54,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -166,8 +82,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: Mg
       phase:
@@ -176,54 +92,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -246,8 +120,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: Na
       phase:
@@ -256,54 +130,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -326,8 +158,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: O2
       phase:
@@ -336,54 +168,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -406,8 +196,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: O
       phase:
@@ -416,54 +206,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -486,8 +234,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
   identity:
     quantity:
-      tag: value
-      value: p_sat
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: SiO
       phase:
@@ -496,54 +244,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_sat does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile p_sat does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_sat does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile p_sat does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: not_applicable
-      reason: profile p_sat does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_sat does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_sat does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_sat does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_sat does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_sat field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

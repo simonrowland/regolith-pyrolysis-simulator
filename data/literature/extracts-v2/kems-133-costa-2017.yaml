@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2250.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier series does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -286,6 +289,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier fayalite does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -373,7 +379,7 @@ observations:
       reason: source T_range_K [1750.0, 2250.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -413,7 +419,7 @@ observations:
       reason: source T_range_K [1751.0, 2225.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -456,7 +462,7 @@ observations:
       reason: source T_range_K [1751.0, 2225.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -497,7 +503,7 @@ observations:
       reason: source T_range_K [1751.0, 2225.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -537,7 +543,7 @@ observations:
       reason: source T_range_K [1751.0, 2225.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -577,7 +583,7 @@ observations:
       reason: source T_range_K [1751.0, 2225.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -605,7 +611,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_molar_enthalpy_FeO'
     species:
-      formula: Fe
+      formula: FeO
       phase:
         tag: unknown
         reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
@@ -617,7 +623,7 @@ observations:
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -646,7 +652,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_molar_enthalpy_MgO'
     species:
-      formula: Mg
+      formula: MgO
       phase:
         tag: unknown
         reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
@@ -658,7 +664,7 @@ observations:
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -685,7 +691,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_molar_enthalpy_SiO2'
     species:
-      formula: SiO
+      formula: SiO2
       phase:
         tag: unknown
         reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
@@ -697,7 +703,7 @@ observations:
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -736,7 +742,7 @@ observations:
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -777,7 +783,7 @@ observations:
       reason: source T_range_K [1750.0, 2050.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

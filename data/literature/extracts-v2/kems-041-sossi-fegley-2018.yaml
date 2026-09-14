@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_Eu2O3_window
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source is an ordering or categorical statement, not an activity coefficient
     species:
       formula: Eu_metal_and_EuO
       phase:
@@ -16,51 +16,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1950, 2350]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -83,8 +41,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_Mk86_PO2_from_silicate_melt
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: PO2
       phase:
@@ -93,54 +51,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -161,8 +74,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_Mk86_PO_from_silicate_melt
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: PO
       phase:
@@ -171,54 +84,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -239,8 +107,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_T1_P4O10_KEMS_dominance
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source is an ordering or categorical statement, not an activity coefficient
     species:
       formula: P4O10
       phase:
@@ -249,51 +117,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -317,8 +140,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_T5_P4O6_Hchondrite_column
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: P4O6
       phase:
@@ -327,54 +150,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -395,8 +173,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::SF18_Yb2O3_window
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source is an ordering or categorical statement, not an activity coefficient
     species:
       formula: Yb_metal_and_YbO
       phase:
@@ -405,51 +183,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000, 2626]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -472,8 +208,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::melt_associative_P4O10
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: P4O10
       phase:
@@ -482,54 +218,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -549,8 +240,8 @@ observations:
   experiment_id: 10.2138/rmg.2018.84.11::kems-041-sossi-fegley-2018
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source units are dimensionless ordering, not a numeric activity coefficient
     species:
       formula: VO_VO2
       phase:
@@ -559,51 +250,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -3684,6 +3330,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3722,6 +3371,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3760,6 +3412,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3798,6 +3453,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3836,6 +3494,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3874,6 +3535,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3912,6 +3576,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3950,6 +3617,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -3988,6 +3658,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4026,6 +3699,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4064,6 +3740,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1423.0, 1523.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4102,6 +3781,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1923.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4140,6 +3822,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4178,6 +3863,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4216,6 +3904,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1823.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4254,6 +3945,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4292,6 +3986,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4330,6 +4027,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1623.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4368,6 +4068,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4406,6 +4109,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1823.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4444,6 +4150,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1923.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4482,6 +4191,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4520,6 +4232,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4558,6 +4273,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4596,6 +4314,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1900.0, 1900.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4635,6 +4356,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2000.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4674,6 +4398,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2100.0, 2100.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4713,6 +4440,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4752,6 +4482,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1923.0, 1923.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4791,6 +4524,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier relation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4830,6 +4566,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1823.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -4972,7 +4711,7 @@ observations:
       reason: source T_range_K [2000.0, 2000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -6128,7 +5867,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

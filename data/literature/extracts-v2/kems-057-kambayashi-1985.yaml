@@ -21,7 +21,7 @@ observations:
       reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -90,8 +90,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::2
   identity:
     quantity:
-      tag: value
-      value: ion_intensity_ratio
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity_ratio
     species:
       formula: P2O5
       phase:
@@ -100,51 +100,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: unknown
-      reason: source does not state subtype
-    per:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -185,6 +143,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_time does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -225,6 +186,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1633.0, 1663.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_time does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -265,6 +229,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_T does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -373,8 +340,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::8
   identity:
     quantity:
-      tag: value
-      value: ion_intensity
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity
     species:
       formula: Fe
       phase:
@@ -383,51 +350,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: unknown
-      reason: source does not state subtype
-    per:
-      tag: not_applicable
-      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile ion_intensity does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile ion_intensity does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile ion_intensity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile ion_intensity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile ion_intensity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -555,7 +480,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -967,7 +892,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1008,7 +933,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1263,6 +1188,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_gas_reaction_delta_G does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

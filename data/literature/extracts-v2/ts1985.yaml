@@ -61,6 +61,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -101,8 +104,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -111,12 +114,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000002497541'
   uncertainty:
     kind: printed
     verbatim:
@@ -162,8 +207,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -172,12 +217,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000001316026'
   uncertainty:
     kind: printed
     verbatim:
@@ -223,8 +310,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -233,12 +320,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000005613808'
   uncertainty:
     kind: printed
     verbatim:
@@ -284,8 +413,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -294,12 +423,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000001572606'
   uncertainty:
     kind: printed
     verbatim:
@@ -345,8 +516,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -355,12 +526,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000006024951'
   uncertainty:
     kind: printed
     verbatim:
@@ -406,8 +619,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -416,12 +629,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000001945924'
   uncertainty:
     kind: printed
     verbatim:
@@ -467,8 +722,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -477,12 +732,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000007818527'
   uncertainty:
     kind: printed
     verbatim:
@@ -528,8 +825,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -538,12 +835,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000238555'
   uncertainty:
     kind: printed
     verbatim:
@@ -589,8 +928,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -599,12 +938,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000006316268'
   uncertainty:
     kind: printed
     verbatim:
@@ -650,8 +1031,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -660,12 +1041,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000468739'
   uncertainty:
     kind: printed
     verbatim:
@@ -711,8 +1134,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -721,12 +1144,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00001088305'
   uncertainty:
     kind: printed
     verbatim:
@@ -772,8 +1237,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_from_table2_AT_B'
+      tag: value
+      value: activity
     species:
       formula: Na2O
       phase:
@@ -782,12 +1247,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier from_table2_AT_B does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00002270189'
   uncertainty:
     kind: printed
     verbatim:
@@ -846,6 +1353,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1373.15, 1573.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -882,8 +1392,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::8
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+      tag: value
+      value: activity
     species:
       formula: SiO2
       phase:
@@ -892,12 +1402,54 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00601'
   uncertainty:
     kind: printed
     verbatim:
@@ -908,7 +1460,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: derived_gibbs_duhem
-    model: derived_gibbs_duhem
+    model: gibbs_duhem
   admission:
     status: pending
     reason: source does not state admission_status

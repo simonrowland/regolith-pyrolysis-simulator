@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2060.0, 2500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier intermediate_range_reliable does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -58,6 +61,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -97,7 +103,7 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -124,7 +130,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_BC_12065'
     species:
-      formula: AlO
+      formula: BC
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -134,6 +140,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2320.0, 2500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier 12065 does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -172,6 +181,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1600.0, 2000.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only_not_tabulated does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -211,6 +223,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1725.0, 1794.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -449,6 +464,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1250.0, 1500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only_rapid_depletion does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -486,6 +504,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1650.0, 1927.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -525,6 +546,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1583.0, 1725.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -600,6 +624,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1250.0, 1500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only_rapid_depletion does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -637,6 +664,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1299.0, 1429.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_digitization_rejected does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -694,6 +724,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1325.0, 1475.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_digitization_rejected does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -749,6 +782,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1396.0, 1499.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier over_lunar_basalt does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -788,6 +824,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2015.0, 2500.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier atomic_oxygen does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -945,7 +984,7 @@ observations:
       reason: source T_range_K [1850.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -969,8 +1008,8 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::5
   identity:
     quantity:
-      tag: value
-      value: mass_loss_rate
+      tag: unknown
+      reason: source units name partial pressure, not mass_loss_rate
     species:
       formula: SiO
       phase:
@@ -979,51 +1018,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1650.0, 2200.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: unknown
-      reason: source does not state sweep_gas
-    exposure:
-      tag: unknown
-      reason: source does not state exposure
-    sample_mass_kg:
-      tag: unknown
-      reason: source does not state sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1065,7 +1062,7 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1105,7 +1102,7 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1143,7 +1140,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1183,7 +1180,7 @@ observations:
       reason: source T_range_K [1850.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1224,7 +1221,7 @@ observations:
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1264,7 +1261,7 @@ observations:
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1302,6 +1299,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only_comparable_to_TiO does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1338,6 +1338,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only_comparable_to_TiO2 does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering

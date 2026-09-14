@@ -6,8 +6,8 @@ observations:
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::2
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: O2
       phase:
@@ -16,51 +16,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering

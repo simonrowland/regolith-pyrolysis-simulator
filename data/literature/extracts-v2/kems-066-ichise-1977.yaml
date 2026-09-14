@@ -78,6 +78,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -180,6 +183,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -845,8 +851,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use formation_elements
     reference_state:
-      tag: not_applicable
-      reason: profile ion_intensity_ratio does not use reference_state
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
     reservoir:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use reservoir
@@ -966,7 +972,7 @@ observations:
       reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1005,6 +1011,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier temperature_composition_equation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1046,6 +1055,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier temperature_equation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

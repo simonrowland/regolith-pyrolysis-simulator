@@ -53,6 +53,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -167,6 +170,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -283,7 +289,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -322,7 +328,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -360,7 +366,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -398,7 +404,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

@@ -246,7 +246,7 @@ observations:
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -286,7 +286,7 @@ observations:
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -326,7 +326,7 @@ observations:
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -366,7 +366,7 @@ observations:
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -405,6 +405,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -445,6 +448,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

@@ -94,8 +94,8 @@ observations:
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Mg
       phase:
@@ -104,51 +104,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.15, 1773.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -488,8 +446,8 @@ observations:
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -498,51 +456,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.15, 1773.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering

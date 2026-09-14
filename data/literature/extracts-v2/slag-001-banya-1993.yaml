@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier quadratic_formalism does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -65,7 +68,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -103,6 +106,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier quadratic_expansion does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -228,6 +234,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier solid_standard_state does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -271,6 +280,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1723.0, 1723.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier FetO_liquid_standard_state does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -312,6 +324,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier cristobalite does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -401,7 +416,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -442,7 +457,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -484,7 +499,7 @@ observations:
       reason: source T_range_K [1430.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -524,7 +539,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -938,6 +953,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier ij_Xi_Xj_vs_deltaH298 does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -978,6 +996,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier Fe2+_M_vs_cation_radius does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1146,6 +1167,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier FetO does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1346,7 +1370,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'activity_MnO_SiO2_binary'
     species:
-      formula: SiO2
+      formula: MnO
       phase:
         tag: unknown
         reason: phase string 'silicate_slag' is not in the closed automatic map
@@ -1356,6 +1380,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.0, 1773.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier SiO2_binary does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1399,6 +1426,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1723.0, 1723.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier FetO does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1731,9 +1761,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1771,9 +1804,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1811,9 +1847,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1851,9 +1890,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1891,9 +1933,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1931,9 +1976,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1972,9 +2020,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

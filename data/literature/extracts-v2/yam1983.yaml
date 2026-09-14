@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier range does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -56,6 +59,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -108,8 +114,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: source does not state method_class
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
   admission:
     status: pending
     reason: source does not state admission_status

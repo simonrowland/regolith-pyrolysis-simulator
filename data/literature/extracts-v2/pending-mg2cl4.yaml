@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [800, 1000]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [800, 1000] is a temperature domain, not the observable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [800, 1000] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:

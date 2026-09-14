@@ -261,6 +261,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1261.0, 1492.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_time_heating does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -301,6 +304,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1261.0, 1492.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_time_cooling does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -341,6 +347,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1241.0, 1244.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier monovariant_solidus_liquidus does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -463,7 +472,7 @@ observations:
       reason: source T_range_K [1234.9, 1667.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -505,7 +514,7 @@ observations:
       reason: source T_range_K [1800.0, 1800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
   identity:
     quantity:
-      tag: value
-      value: interaction_parameter
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not interaction_parameter
     species:
       formula: P
       phase:
@@ -16,51 +16,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: unknown
-      reason: source does not state subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile interaction_parameter does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -693,7 +651,7 @@ observations:
       value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -745,7 +703,7 @@ observations:
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

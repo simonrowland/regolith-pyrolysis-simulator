@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -451,7 +454,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -624,6 +627,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier composition_equation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -758,6 +764,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

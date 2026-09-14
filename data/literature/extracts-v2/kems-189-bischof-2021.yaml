@@ -18,7 +18,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -55,7 +55,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -117,8 +117,8 @@ observations:
   experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source units are dimensionless ordering, not a numeric activity coefficient
     species:
       formula: Ga
       phase:
@@ -127,54 +127,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: qualifier coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -236,8 +194,8 @@ observations:
   experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: source units are dimensionless ordering, not a numeric activity coefficient
     species:
       formula: In
       phase:
@@ -246,54 +204,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
+      reason: qualifier coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -330,7 +246,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

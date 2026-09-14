@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.2355/isijinternational.29.843::4
   identity:
     quantity:
-      tag: value
-      value: activity
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
     species:
       formula: Fe
       phase:
@@ -16,51 +16,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -88,8 +46,8 @@ observations:
   experiment_id: 10.2355/isijinternational.29.843::1
   identity:
     quantity:
-      tag: value
-      value: ion_intensity
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity
     species:
       formula: Fe
       phase:
@@ -98,51 +56,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: unknown
-      reason: source does not state subtype
-    per:
-      tag: not_applicable
-      reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1973.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile ion_intensity does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile ion_intensity does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile ion_intensity does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile ion_intensity does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile ion_intensity does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile ion_intensity does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile ion_intensity does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile ion_intensity does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -238,7 +154,7 @@ observations:
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -512,6 +428,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -653,6 +572,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

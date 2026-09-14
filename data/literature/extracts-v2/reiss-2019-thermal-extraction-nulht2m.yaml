@@ -321,6 +321,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [123.14999999999998, 1073.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier vs_setpoint_T does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -404,7 +407,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

@@ -17,8 +17,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -48,7 +48,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -62,8 +62,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '2130'
   uncertainty:
     kind: none
   evidence:
@@ -94,8 +94,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -125,7 +125,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -139,8 +139,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '2952.078'
   uncertainty:
     kind: none
   evidence:
@@ -171,8 +171,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -202,7 +202,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -216,8 +216,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1809'
   uncertainty:
     kind: none
   evidence:
@@ -250,8 +250,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -280,8 +280,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -295,8 +295,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '3134'
   uncertainty:
     kind: none
   evidence:
@@ -502,8 +502,8 @@ observations:
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::JANAF1998_P4O10_pure_solid_sublimation_screening
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: P4O10
       phase:
@@ -512,54 +512,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 500.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -985,8 +943,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1016,7 +974,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1030,8 +988,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1045'
   uncertainty:
     kind: none
   evidence:
@@ -1062,8 +1020,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1092,8 +1050,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1107,8 +1065,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1693.15'
   uncertainty:
     kind: none
   evidence:
@@ -1140,8 +1098,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1171,7 +1129,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1185,8 +1143,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '950'
   uncertainty:
     kind: none
   evidence:
@@ -1217,8 +1175,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1248,7 +1206,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1262,8 +1220,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1519'
   uncertainty:
     kind: none
   evidence:
@@ -1294,8 +1252,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1325,7 +1283,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1339,8 +1297,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '2334.526'
   uncertainty:
     kind: none
   evidence:
@@ -1371,8 +1329,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1402,7 +1360,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1416,8 +1374,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1073.8'
   uncertainty:
     kind: none
   evidence:
@@ -1450,8 +1408,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1480,8 +1438,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1495,8 +1453,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1738.15'
   uncertainty:
     kind: none
   evidence:
@@ -1529,8 +1487,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1560,7 +1518,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1574,8 +1532,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1269'
   uncertainty:
     kind: none
   evidence:
@@ -1607,8 +1565,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1637,8 +1595,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1652,8 +1610,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1977.15'
   uncertainty:
     kind: none
   evidence:
@@ -1685,8 +1643,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1716,7 +1674,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source pressure_basis 'near 1 atm (fixed-point recommendation)' is not a numeric pressure
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1730,8 +1688,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '370.96'
   uncertainty:
     kind: none
   evidence:
@@ -1764,8 +1722,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1794,8 +1752,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1809,8 +1767,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1156'
   uncertainty:
     kind: none
   evidence:
@@ -1842,8 +1800,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: triple_point_temperature
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1873,7 +1831,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1887,8 +1845,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '370.98'
   uncertainty:
     kind: none
   evidence:
@@ -1920,8 +1878,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -1951,7 +1909,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -1965,8 +1923,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1685'
   uncertainty:
     kind: none
   evidence:
@@ -1998,8 +1956,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -2029,7 +1987,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source pressure_basis 'JANAF 1 bar thermo (FUGACITY=1 at this T in table construction)' is not a numeric pressure
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -2043,8 +2001,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '3504.616'
   uncertainty:
     kind: none
   evidence:
@@ -2075,8 +2033,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: melting_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -2106,7 +2064,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -2120,8 +2078,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1939'
   uncertainty:
     kind: none
   evidence:
@@ -2152,8 +2110,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: normal_boiling_point
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -2183,7 +2141,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -2197,8 +2155,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '3630.956'
   uncertainty:
     kind: none
   evidence:
@@ -2229,8 +2187,8 @@ observations:
         tag: unknown
         reason: phase unknown; polymorph unresolved
     subtype:
-      tag: unknown
-      reason: source does not state subtype
+      tag: value
+      value: solid_solid_transition
     per:
       tag: not_applicable
       reason: profile transition_temperature does not use per
@@ -2260,7 +2218,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: source does not state a numeric total_pressure_Pa
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -2274,8 +2232,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source does not name a transition_temperature field
+    kind: point
+    point: '1166'
   uncertainty:
     kind: none
   evidence:
@@ -2388,7 +2346,8 @@ observations:
       reason: source T_range_K [1500, 2200]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2200] is a temperature domain, not the observable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [1500, 2200] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2425,7 +2384,8 @@ observations:
       reason: source T_range_K [1500, 2200]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2200] is a temperature domain, not the observable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [1500, 2200] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2462,7 +2422,8 @@ observations:
       reason: source T_range_K [1100, 1500]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1100, 1500] is a temperature domain, not the observable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [1100, 1500] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:
@@ -3036,6 +2997,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [300, 2000]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier or_speciation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point; T_range_K [300, 2000] is a temperature domain,
@@ -3153,7 +3117,8 @@ observations:
       reason: source T_range_K [1700, 2000]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1700, 2000] is a temperature domain, not the observable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [1700, 2000] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:
@@ -3332,8 +3297,8 @@ observations:
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-012
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: P2
       phase:
@@ -3342,54 +3307,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3411,8 +3331,8 @@ observations:
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::P-013
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: P4
       phase:
@@ -3421,54 +3341,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

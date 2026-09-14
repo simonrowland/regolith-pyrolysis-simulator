@@ -2378,8 +2378,8 @@ observations:
   experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: compilation record does not state a closed quantity
     species:
       formula: usgs-b1544-table-1
       phase:
@@ -2388,51 +2388,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
     unavailable_reason: series list had no numeric coordinate/value pairs

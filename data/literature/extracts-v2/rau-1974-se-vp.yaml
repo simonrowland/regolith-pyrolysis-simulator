@@ -19,6 +19,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [400, 1000]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier total_plus_speciation does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point; T_range_K [400, 1000] is a temperature domain,

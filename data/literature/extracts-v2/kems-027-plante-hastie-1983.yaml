@@ -85,22 +85,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_CsBO2'
+      tag: value
+      value: activity
     species:
-      formula: Cs
+      formula: CsBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000004'
   uncertainty:
     kind: printed
     verbatim:
@@ -144,22 +186,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_CsBO2'
+      tag: value
+      value: activity
     species:
-      formula: Cs
+      formula: CsBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: value
       value: '1200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000004'
   uncertainty:
     kind: printed
     verbatim:
@@ -198,13 +282,16 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_CsBO2_fit'
     species:
-      formula: Cs
+      formula: CsBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -235,19 +322,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_CsBO2_ideal_mixing'
+      tag: value
+      value: activity
     species:
-      formula: Cs
+      formula: CsBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0004'
   uncertainty:
     kind: none
   evidence:
@@ -256,7 +388,7 @@ observations:
       value: model_derived
     original_method_class: model_derived
     attribution: a(CsBO2)calc = 4 x 10^-4
-    model: model_derived
+    model: ideal_mixing
   admission:
     status: pending
     reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
@@ -313,7 +445,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_CsBO2'
     species:
-      formula: Cs
+      formula: CsBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
@@ -364,7 +496,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_LiBO2'
     species:
-      formula: Li
+      formula: LiBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
@@ -413,7 +545,7 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_NaBO2'
     species:
-      formula: Na
+      formula: NaBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
@@ -548,22 +680,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_LiBO2'
+      tag: value
+      value: activity
     species:
-      formula: Li
+      formula: LiBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1073.15, 1423.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.1'
   uncertainty:
     kind: printed
     verbatim:
@@ -597,19 +771,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::6
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_LiBO2'
+      tag: value
+      value: activity
     species:
-      formula: Li
+      formula: LiBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.1'
   uncertainty:
     kind: printed
     verbatim:
@@ -639,13 +858,16 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_LiBO2_fit'
     species:
-      formula: Li
+      formula: LiBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -676,22 +898,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::7
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_NaBO2'
+      tag: value
+      value: activity
     species:
-      formula: Na
+      formula: NaBO2
       phase:
         tag: unknown
         reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1073.15, 1423.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.01'
   uncertainty:
     kind: printed
     verbatim:
@@ -727,19 +991,64 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::5
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_NaBO2'
+      tag: value
+      value: activity
     species:
-      formula: Na
+      formula: NaBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.01'
   uncertainty:
     kind: printed
     verbatim:
@@ -769,13 +1078,16 @@ observations:
       tag: unknown
       reason: unsupported quantity 'partial_pressure_NaBO2_fit'
     species:
-      formula: Na
+      formula: NaBO2
       phase:
         tag: unknown
         reason: source does not state phase
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    reference_state:
+      tag: unknown
+      reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

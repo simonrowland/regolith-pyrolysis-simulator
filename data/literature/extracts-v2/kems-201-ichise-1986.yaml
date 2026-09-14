@@ -107,6 +107,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1700.0, 1910.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier measurement_qualitative_arrest_search does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -148,7 +151,7 @@ observations:
       reason: source T_range_K [1703.0, 1942.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -270,6 +273,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1820.0, 1820.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier arrest_curve does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -393,7 +399,7 @@ observations:
       reason: source T_range_K [1703.0, 1942.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source does not name a delta_fG field
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
