@@ -1623,6 +1623,69 @@ def _quantity_corroborated(
     return False
 
 
+_NEVER_QUALIFY_QUANTITY = frozenset(
+    {
+        "condensation_coefficient",
+        "log10_Psat_over_P0",
+    }
+)
+_FORMULA_SUFFIX_RE = re.compile(
+    r"^([A-Z][a-z]?(?:\d+)?(?:[A-Z][a-z]?(?:\d+)?)*)(?:_(.*))?$"
+)
+_DERIVATION_SUFFIX_WORDS = ("gibbs_duhem", "ideal_mixing")
+
+
+def split_qualified_quantity(raw: str) -> tuple[Quantity | None, str | None]:
+    """Split activity_CsBO2 into (ACTIVITY, 'CsBO2'). Never cross quantities."""
+
+    if not raw or raw in _NEVER_QUALIFY_QUANTITY:
+        return None, None
+    closed = sorted(((q.value, q) for q in Quantity), key=lambda kv: -len(kv[0]))
+    for prefix, quantity in closed:
+        if raw.startswith(prefix + "_"):
+            return quantity, raw[len(prefix) + 1 :]
+    for alias, quantity in sorted(QUANTITY_ALIASES.items(), key=lambda kv: -len(kv[0])):
+        if raw.startswith(alias + "_"):
+            return quantity, raw[len(alias) + 1 :]
+    return None, None
+
+
+def _co_present_quantity_field(quantity: Quantity, values: Mapping[str, Any]) -> bool:
+    keys = QUANTITY_SOURCE_FIELDS.get(quantity, ())
+    if quantity is Quantity.ACTIVITY:
+        keys = ("activity",)
+    for key in keys:
+        if key == "value":
+            continue
+        if key in values and values.get(key) not in (None, ""):
+            return True
+    return False
+
+
+def parse_quantity_suffix(suffix: str | None) -> tuple[str | None, str | None, str | None]:
+    """Return (species_formula, derivation_word, reference_reason)."""
+
+    if not suffix:
+        return None, None, None
+    formula = None
+    rest = suffix
+    match = _FORMULA_SUFFIX_RE.match(suffix)
+    if match:
+        formula = match.group(1)
+        rest = match.group(2) or ""
+    derivation = None
+    for word in _DERIVATION_SUFFIX_WORDS:
+        if word == rest or rest.startswith(word + "_") or word in rest.split("_"):
+            derivation = word
+            break
+    reference = None
+    if derivation is None and formula is None:
+        reference = suffix
+    elif derivation is None and rest:
+        reference = rest
+    return formula, derivation, reference
+
+
 def map_quantity(
     obs_type: str | None,
     values: Mapping[str, Any] | None,
@@ -1644,6 +1707,15 @@ def map_quantity(
             if contradiction:
                 return State.unknown(contradiction), contradiction
             return State.of(inferred), None
+        if isinstance(raw, str) and raw:
+            qualified, _suffix = split_qualified_quantity(raw)
+            if qualified is not None and _co_present_quantity_field(qualified, values):
+                contradiction = _quantity_contradiction(
+                    qualified, obs_type, values, units, row
+                )
+                if contradiction:
+                    return State.unknown(contradiction), contradiction
+                return State.of(qualified), None
     quantity_absent = raw is None or raw == ""
     if quantity_absent and units is not None and str(units).strip():
         unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
@@ -3385,6 +3457,17 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
+        raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
+        if isinstance(raw_quantity, str):
+            _qualified, suffix = split_qualified_quantity(raw_quantity)
+            suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
+                suffix
+            )
+            if suffix_formula:
+                species = make_species(
+                    suffix_formula, phase, polymorph=polymorph_from_extract(obs)
+                )
 
         t_payload = dict(values)
         if obs.get("T_K") is not None:
@@ -3421,7 +3504,19 @@ class Migrator:
             method_class,
             evaluator_family=values.get("evaluator_family"),
             attribution=obs.get("quote") if isinstance(obs.get("quote"), str) else None,
+            model=suffix_derivation,
         )
+        if suffix_derivation and (
+            not evidence.class_.is_value
+            or evidence.class_.value is not EvidenceClass.MODEL_DERIVED
+        ):
+            evidence = Evidence(
+                class_=State.of(EvidenceClass.MODEL_DERIVED),
+                original_method_class=evidence.original_method_class
+                or (str(method_class) if method_class else None),
+                model=suffix_derivation,
+                attribution=evidence.attribution,
+            )
         if ev_reason:
             self.result.add_queue(
                 work.work_id,
@@ -3492,6 +3587,18 @@ class Migrator:
             )
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
+        if suffix_reference:
+            ident_kwargs["reference_state"] = State.unknown(
+                f"qualifier {suffix_reference} does not name a reference_state"
+            )
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["reference_state"],
+                f"qualifier {suffix_reference} does not name a reference_state",
+                source=source_key,
+                observation_id=obs_id,
+            )
         if q_token is Quantity.TRANSITION_TEMPERATURE:
             kind = values.get("property_kind") or values.get("quantity")
             if isinstance(kind, str) and kind:

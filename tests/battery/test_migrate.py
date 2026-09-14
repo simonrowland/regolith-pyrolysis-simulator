@@ -2500,6 +2500,66 @@ def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
     assert token is Quantity.DELTA_FG
 
 
+def test_l05g1a_qualified_activity_token_lifts_activity(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity_CsBO2",
+        units="dimensionless",
+        values={
+            "quantity": "activity_CsBO2",
+            "activity": 4.0e-6,
+            "T_K": 1200.0,
+            "method_class": "measured_direct",
+        },
+        obs_type="activity_coefficient",
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = (
+        "plante_hastie_1983_csbo2_activity_1200K"
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert quantity_token(obs.identity) is not Quantity.ACTIVITY_COEFFICIENT
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("4e-06")
+    assert obs.identity.species.formula == "CsBO2"
+
+
+def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity_vapor_reference_eq7",
+        units="dimensionless",
+        values={
+            "quantity": "activity_vapor_reference_eq7",
+            "activity": 0.12,
+            "method_class": "measured_direct",
+        },
+        obs_type="activity_coefficient",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.identity.reference_state is not None
+    assert obs.identity.reference_state.is_unknown
+    assert "vapor_reference_eq7" in (obs.identity.reference_state.reason or "")
+    assert any("reference_state" in (e.axes or ()) for e in result.queue)
+
+
+def test_l05g1a_does_not_cross_condensation_or_log_pressure() -> None:
+    state, reason = map_quantity(
+        None, {"quantity": "condensation_coefficient", "activity": 0.2}
+    )
+    assert not state.is_value
+    state, reason = map_quantity(
+        None,
+        {"quantity": "log10_Psat_over_P0", "table_kJ_mol": 316.034, "activity": 1},
+    )
+    assert not state.is_value
+    assert "unsupported" in (reason or "")
+
+
 def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="",
