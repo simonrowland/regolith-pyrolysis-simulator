@@ -359,8 +359,12 @@ def test_j04_named_source_fallthrough_includes_unmapped_token(tmp_path: Path) ->
         encoding="utf-8",
     )
     result = migrate(root, write=False)
-    assert "independent_tabulation" in result.evidence_fallthrough
-    assert result.evidence_fallthrough["independent_tabulation"] >= 1
+    obs = result.observations["named-source-fallthrough"]
+    from simulator.battery.enums import EvidenceClass
+
+    assert obs.evidence.class_.is_value
+    assert obs.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+    assert obs.evidence.original_method_class == "independent_tabulation"
 
 
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
@@ -968,7 +972,11 @@ def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> No
     ]
     assert psat.identity.quantity.is_unknown
     assert quantity_token(psat.identity) is not Quantity.DELTA_FG
-    assert "log10_Psat_over_P0" in (psat.identity.quantity.reason or "")
+    assert quantity_token(psat.identity) is not Quantity.P_SAT
+    assert (psat.identity.quantity.reason or "") == (
+        "the table value is the Gibbs energy of the vaporization "
+        "reaction and the reaction identity is not lifted"
+    )
 
 
 def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
@@ -1944,6 +1952,17 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
 
         visit_AsyncFunctionDef = visit_FunctionDef
 
+        def visit_Assign(self, node: ast.Assign) -> None:
+            if isinstance(node.value, ast.Name):
+                for target in node.targets:
+                    if not isinstance(target, ast.Name):
+                        continue
+                    if node.value.id in {"Value", "select_declared_source"}:
+                        assert False, (
+                            f"alias {target.id} = {node.value.id} at line {node.lineno}"
+                        )
+            self.generic_visit(node)
+
         def visit_Call(self, node: ast.Call) -> None:
             name = None
             if isinstance(node.func, ast.Name):
@@ -1952,6 +1971,17 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
                 name = node.func.attr
                 if isinstance(node.func.value, ast.Name) and node.func.value.id == "Value":
                     name = f"Value.{node.func.attr}"
+            elif isinstance(node.func, ast.Call):
+                inner = node.func
+                inner_name = None
+                if isinstance(inner.func, ast.Name):
+                    inner_name = inner.func.id
+                elif isinstance(inner.func, ast.Attribute):
+                    inner_name = inner.func.attr
+                if inner_name in {"getattr", "globals"}:
+                    assert False, (
+                        f"getattr/globals constructor bypass at line {node.lineno}"
+                    )
             owner = func_stack[-1] if func_stack else "<module>"
             if name in {"Value", "point_of", "Value.point_of"}:
                 assert owner in allowed_value, (
@@ -2005,11 +2035,119 @@ def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    (root / "data" / "literature" / "kems_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "sources": {"fixture-source": {"citation": "Fixture"}},
+                "cases": {
+                    "c1": {
+                        "source_id": "fixture-source",
+                        "points": [
+                            {
+                                "species": "Na",
+                                "coordinate": {"temperature_K": 1200},
+                                "partial_pressure_pa": 1.0,
+                            }
+                        ],
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (root / "data" / "literature" / "mre_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "m1": {
+                        "paper_citation": {"title": "MRE"},
+                        "cases": {
+                            "one": {
+                                "comparison_points": [
+                                    {
+                                        "observable_id": "mre_applied_charge_C",
+                                        "expected_value": 1.0,
+                                        "species": "O2",
+                                    }
+                                ]
+                            }
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "iron_olivine_kems": {
+                        "species": "Fe",
+                        "temperature_range_k": [1700, 1800],
+                        "measured_langmuir_to_effusion_flux_ratio": {"range": [0.011, 0.02]},
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (root / "data" / "literature" / "refractory_vaporization_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "nist_janaf_named_nodes": {
+                    "temperature_K": 1800,
+                    "log10_kf": {"Al": {"value": 1.0, "table": "Al-005"}},
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    _write_compilation(
+        root,
+        "janaf-comp",
+        "table-1",
+        {
+            "schema_version": "literature_compilation.v1",
+            "source_id": "janaf-comp",
+            "record_id": "table-1",
+            "table": {
+                "table_id": "Al-005",
+                "standard_state_as_published": "0.1 MPa",
+                "index_entry": {"formula": "Al", "state": "g"},
+                "values": [
+                    {
+                        "temperature": {"value": 298.15},
+                        "delta_fG": 0.0,
+                        "log10_Kf": 0.0,
+                    }
+                ],
+            },
+        },
+    )
+    _write_compilation(
+        root,
+        "robie-comp",
+        "atomic-weight-001",
+        {
+            "schema_version": "literature_compilation.v1",
+            "source_id": "robie-comp",
+            "record_id": "atomic-weight-001",
+            "record_kind": "atomic_weight",
+            "rows": [{"atomic_weight": {"value": 227}}],
+        },
+    )
     migrate(root, write=False)
     served = {name for _file, _line, name in boundary_served_callers()}
     assert served
     unexpected = served - BOUNDARY_INGEST_CALLERS
     assert not unexpected, unexpected
+    missing = BOUNDARY_INGEST_CALLERS - served
+    assert not missing, missing
 
 
 def test_k02_t_range_is_domain_not_value(tmp_path: Path) -> None:
@@ -2096,7 +2234,7 @@ def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
         if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
     ]
     assert phase_entries
-    assert any("phase" in (e.why or "").lower() or True for e in phase_entries)
+    assert any("phase" in (e.why or "").lower() for e in phase_entries)
 
 
 def _quantity_state(obs) -> tuple[object, str | None]:
@@ -2630,3 +2768,347 @@ def test_l05c1_costa_control_is_not_condensation() -> None:
     )
     assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
     assert reason is None
+
+
+def test_l03_per_mol_o2_ledger_lifts_delta_fg(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "comparison_quantity": "delta_fG_kJ_mol",
+                "points": [
+                    {
+                        "key": "janaf::Al-096:T=1100::ellingham::delta_fG_kJ_per_mol_O2",
+                        "source_id": "fixture-source",
+                        "species": "Al",
+                        "comparison_quantity": "delta_fG_kJ_per_mol_O2",
+                        "temperature_K": 1100,
+                        "table_kJ_mol": -885.524,
+                        "note": "rescaled 2*dfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] -> Al",
+                        "provenance_class": "independent_tabulation",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations[
+        "janaf::Al-096:T=1100::ellingham::delta_fG_kJ_per_mol_O2"
+    ]
+    assert quantity_token(obs.identity) is Quantity.DELTA_FG
+    assert obs.identity.per.is_value
+    from simulator.battery.enums import PerBasis
+
+    assert obs.identity.per.value is PerBasis.MOL_O2
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("-885.524")
+    assert obs.derivation is not None
+    assert "rescaled" in obs.derivation.relation
+    assert obs.evidence.class_.is_value
+    from simulator.battery.enums import EvidenceClass
+
+    assert obs.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+
+
+def test_l04_log10_psat_over_p0_is_not_a_pressure(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    reason = (
+        "the table value is the Gibbs energy of the vaporization "
+        "reaction and the reaction identity is not lifted"
+    )
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": "janaf::Al-005:T=100::log10_Psat_over_P0",
+                        "source_id": "fixture-source",
+                        "species": "Al",
+                        "comparison_quantity": "log10_Psat_over_P0",
+                        "temperature_K": 100,
+                        "table_kJ_mol": 316.034,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["janaf::Al-005:T=100::log10_Psat_over_P0"]
+    assert quantity_token(obs.identity) is not Quantity.P_SAT
+    assert quantity_token(obs.identity) is not Quantity.P_PARTIAL
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any(reason == (e.why or "") for e in result.queue if e.observation_id == obs.observation_id)
+
+
+def test_l05c3_tm_k_and_delta_f_g_298_and_table_log10_kf(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="K and kK as published",
+        values={
+            "property_kind": "melting_point_and_enthalpy_of_fusion",
+            "T_m_K": 1405.0,
+            "T_m_uncertainty_K": 100.0,
+            "T_range_K": [1405.0, 1405.0],
+            "method_class": "compilation_calculated_table",
+        },
+        obs_type="transition_point",
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = "LH84_Na2O_fusion"
+    se = yaml.safe_load(yaml.safe_dump(extract["species"]["Na"]["observations"][0]))
+    se["observation_id"] = "NEA05_Se2_g"
+    se["type"] = "gibbs_table"
+    se["units"] = "kJ/mol"
+    se["values"] = {
+        "quantity": "delta_fG",
+        "Delta_f_G_298_kJ_mol": 92.4,
+        "method_class": "compilation_calculated_table",
+    }
+    extract["species"]["Na"]["observations"].append(se)
+    root = _write_min_tree(tmp_path, extract)
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": "janaf::B-133:T=300::table_self_check::log10_Kf",
+                        "source_id": "fixture-source",
+                        "species": "B",
+                        "comparison_quantity": "log10_Kf",
+                        "temperature_K": 300,
+                        "table_kJ_mol": -5516.922,
+                        "table_log10_Kf": 966.926,
+                        "provenance_class": "engine_own_input",
+                        "status": "mismatch",
+                        "finding_class": "compilation_table_self_check",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    fusion = result.observations["fixture-source::LH84_Na2O_fusion"]
+    assert quantity_token(fusion.identity) is Quantity.TRANSITION_TEMPERATURE
+    assert fusion.value.kind is ValueKind.POINT
+    assert fusion.value.point == as_decimal("1405.0")
+    assert fusion.identity.subtype.value == "melting_point_and_enthalpy_of_fusion"
+    assert fusion.identity.temperature_K is None or fusion.identity.temperature_K.is_not_applicable
+    assert fusion.identity.total_pressure_Pa.is_unknown
+    assert fusion.uncertainty.kind.value == "printed"
+    assert "100" in str(fusion.uncertainty.verbatim)
+    se2 = result.observations["fixture-source::NEA05_Se2_g"]
+    assert quantity_token(se2.identity) is Quantity.DELTA_FG
+    assert se2.value.kind is ValueKind.POINT
+    assert se2.value.point == as_decimal("92.4")
+    assert se2.identity.temperature_K.is_value
+    assert se2.identity.temperature_K.value == as_decimal("298.15")
+    logk = result.observations["janaf::B-133:T=300::table_self_check::log10_Kf"]
+    assert quantity_token(logk.identity) is Quantity.LOG10_KF
+    assert logk.value.kind is ValueKind.POINT
+    assert logk.value.point == as_decimal("966.926")
+    assert logk.value.point != as_decimal("-5516.922")
+    assert logk.notices
+    assert "compilation_table_self_check" in logk.notices[0].reason
+
+
+def test_l05g2b_langmuir_range_is_in_temperature_reason(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "iron_olivine_kems": {
+                        "species": "Fe",
+                        "temperature_range_k": [1700, 1800],
+                        "measured_langmuir_to_effusion_flux_ratio": {
+                            "range": [0.011, 0.02]
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["iron_olivine_kems"]
+    reason = getattr(obs.identity.temperature_K, "reason", "") or ""
+    assert "1700" in reason and "1800" in reason
+
+
+def test_l05g3_expected_value_is_not_a_generic_closed_quantity_field(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="delta_fG",
+        units="kJ_per_mol",
+        values={
+            "quantity": "delta_fG",
+            "expected_value": -100.0,
+            "method_class": "measured_direct",
+        },
+        obs_type="gibbs_table",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.DELTA_FG
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_l05g0_store_atomic_weight_is_not_delta_fg() -> None:
+    path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "observations-v2"
+        / "compilations-robie-hemingway-1995-usgs-b2131.yaml"
+    )
+    if not path.is_file():
+        pytest.skip("migrated store not generated yet")
+    stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rows = [
+        o
+        for o in stored.get("observations") or []
+        if str(o.get("observation_id") or "").endswith("atomic-weight-001")
+    ]
+    assert rows
+    q = (rows[0].get("identity") or {}).get("quantity") or {}
+    assert q.get("tag") == "unknown"
+    assert q.get("value") != "delta_fG"
+
+
+def test_l04_store_never_lifts_log10_psat_as_pressure() -> None:
+    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not obs_dir.is_dir():
+        pytest.skip("migrated store not generated yet")
+    bad = []
+    for path in sorted(obs_dir.glob("*.yaml")):
+        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for obs in stored.get("observations") or []:
+            oid = str(obs.get("observation_id") or "")
+            if "log10_Psat_over_P0" not in oid:
+                continue
+            q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
+            if q in {"p_sat", "p_partial"}:
+                bad.append(f"{oid} stored {q}")
+    assert not bad, bad[:10]
+
+
+def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
+    roots = [
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    ]
+    if not roots[0].is_dir():
+        pytest.skip("migrated store not generated yet")
+    bad = []
+    for folder in roots:
+        for path in sorted(folder.glob("*.yaml")):
+            stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+            for obs in stored.get("observations") or []:
+                q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
+                if q != "evaporation_coefficient_alpha":
+                    continue
+                val = obs.get("value") or {}
+                if val.get("kind") != "point":
+                    continue
+                amount = as_decimal(val.get("point"))
+                if not (as_decimal("0") < amount <= as_decimal("1")):
+                    bad.append(f"{obs.get('observation_id')} alpha={amount}")
+    assert not bad, bad[:20]
+
+
+def test_l05c5_store_unavailable_values_are_queued() -> None:
+    queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+    roots = [
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    ]
+    if not queue_path.is_file() or not roots[0].is_dir():
+        pytest.skip("migrated store not generated yet")
+    queued = yaml.safe_load(queue_path.read_text(encoding="utf-8")) or {}
+    entries = queued.get("entries") or queued.get("queue") or queued
+    if isinstance(entries, dict):
+        entries = entries.get("items") or []
+    by_id: dict[str, list[str]] = {}
+    if isinstance(entries, list):
+        for e in entries:
+            if not isinstance(e, dict):
+                continue
+            oid = str(e.get("observation_id") or "")
+            why = str(e.get("why") or "")
+            axes = e.get("axes") or []
+            by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
+    missing = []
+    scanned = 0
+    for folder in roots:
+        for path in sorted(folder.glob("*.yaml")):
+            stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+            for obs in stored.get("observations") or []:
+                val = obs.get("value") or {}
+                if val.get("kind") != "unavailable":
+                    continue
+                scanned += 1
+                oid = str(obs.get("observation_id") or "")
+                q = ((obs.get("identity") or {}).get("quantity") or {}).get("value") or (
+                    ((obs.get("identity") or {}).get("quantity") or {}).get("reason") or ""
+                )
+                blob = " ".join(by_id.get(oid) or [])
+                if not blob:
+                    missing.append(oid)
+                    continue
+                token = str(q)
+                if token and token not in blob and "field" not in blob.lower() and "value" not in blob.lower():
+                    missing.append(f"{oid} queue={blob!r} token={token!r}")
+    assert scanned > 0
+    assert not missing, missing[:20]
+
+
+def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="delta_fG",
+        units="",
+        values={"quantity": "delta_fG", "method_class": "measured_direct"},
+        obs_type="gibbs_table",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": "ledger-logk",
+                        "source_id": "fixture-source",
+                        "species": "B",
+                        "comparison_quantity": "log10_Kf",
+                        "temperature_K": 300,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    logk = result.observations["ledger-logk"]
+    assert logk.value.kind is ValueKind.UNAVAILABLE
+    assert any(
+        e.observation_id == "ledger-logk"
+        and "value" in (e.axes or ())
+        and ("log10_Kf" in (e.why or "") or "field" in (e.why or ""))
+        for e in result.queue
+    )

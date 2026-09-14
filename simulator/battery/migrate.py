@@ -1397,6 +1397,7 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "delta_fG": Quantity.DELTA_FG,
     "delta_fG_298_kJ_mol": Quantity.DELTA_FG,
+    "Delta_f_G_298_kJ_mol": Quantity.DELTA_FG,
     "deltafG": Quantity.DELTA_FG,
     "delta_fG_kJ_mol": Quantity.DELTA_FG,
     "table_kJ_mol": Quantity.DELTA_FG,
@@ -2145,6 +2146,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.DELTA_FG: (
         "delta_fG",
         "delta_fG_298_kJ_mol",
+        "Delta_f_G_298_kJ_mol",
         "deltafG",
         "delta_fG_kJ_mol",
         "table_kJ_mol",
@@ -2153,6 +2155,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "value",
     ),
     Quantity.LOG10_KF: (
+        "table_log10_Kf",
         "log10_Kf",
         "log10_kf",
         "log10_formation_equilibrium_constant",
@@ -2180,7 +2183,6 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     ),
 }
 
-_DECLARED_GENERIC_VALUE_KEYS = ("expected_value",)
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
 AXIS_TEMPERATURE_K = "temperature_K"
 AXIS_STANDARD_PRESSURE_PA = "standard_pressure_Pa"
@@ -2423,13 +2425,6 @@ def _selection_from_named_field(
         if q_token is Quantity.LOG10_KF and key == "value":
             trail = "identity"
         return _point_selection(amount, key, trail, payload, condition_ranges)
-    for key in _DECLARED_GENERIC_VALUE_KEYS:
-        if key not in payload:
-            continue
-        amount = _numeric_field(payload, key)
-        if amount is None:
-            continue
-        return _point_selection(amount, key, "as_published", payload, condition_ranges)
     raw_range = payload.get("range")
     if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
         lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
@@ -3587,6 +3582,13 @@ class Migrator:
             )
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
+        if (
+            q_token is Quantity.DELTA_FG
+            and t_known is None
+            and isinstance(values, Mapping)
+            and values.get("Delta_f_G_298_kJ_mol") is not None
+        ):
+            ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
         if suffix_reference:
             ident_kwargs["reference_state"] = State.unknown(
                 f"qualifier {suffix_reference} does not name a reference_state"
@@ -3724,12 +3726,21 @@ class Migrator:
                 observation_id=obs_id,
             )
 
+        uncertainty = uncertainty_for(obs.get("uncertainty"))
+        t_m_unc = values.get("T_m_uncertainty_K") if isinstance(values, Mapping) else None
+        if q_token is Quantity.TRANSITION_TEMPERATURE and t_m_unc is not None:
+            verbatim = {"T_m_uncertainty_K": t_m_unc}
+            if isinstance(obs.get("uncertainty"), Mapping):
+                verbatim.update(obs.get("uncertainty"))
+            elif obs.get("uncertainty"):
+                verbatim["source_uncertainty"] = obs.get("uncertainty")
+            uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation = Observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             identity=identity,
             value=value,
-            uncertainty=uncertainty_for(obs.get("uncertainty")),
+            uncertainty=uncertainty,
             evidence=evidence,
             admission=admission,
             notices=(),
@@ -3993,19 +4004,26 @@ class Migrator:
         species: Species,
         value: Value,
         evidence: Evidence,
-        temperature_K: Decimal | None = None,
+        temperature_K: Decimal | State[Decimal] | None = None,
         standard_pressure_Pa: Decimal | None = None,
         uncertainty: Uncertainty | None = None,
         method: State[MethodToken] | None = None,
         equipment: object = None,
         source_row_index: int | None = None,
         derivation: Derivation | None = None,
+        per: PerBasis | State[PerBasis] | None = None,
+        notices: tuple[Notice, ...] = (),
+        value_reason: str | None = None,
     ) -> Observation:
         ident_kwargs: dict[str, Any] = {}
-        if temperature_K is not None:
+        if isinstance(temperature_K, State):
+            ident_kwargs["temperature_K"] = temperature_K
+        elif temperature_K is not None:
             ident_kwargs["temperature_K"] = State.of(temperature_K)
         if standard_pressure_Pa is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
+        if per is not None:
+            ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
         identity = fill_identity(quantity, species, **ident_kwargs)
         if species.phase.is_unknown:
             self.result.add_queue(
@@ -4013,6 +4031,25 @@ class Migrator:
                 locator,
                 ["phase"],
                 species.phase.reason or "missing phase",
+                source=source_key,
+                observation_id=observation_id,
+            )
+        if value.kind is ValueKind.UNAVAILABLE:
+            q_label = (
+                quantity.value
+                if isinstance(quantity, Quantity)
+                else (quantity.value.value if quantity.is_value else "unknown")
+            )
+            why = value_reason or value.unavailable_reason or (
+                f"source does not name a {q_label} field"
+            )
+            if str(q_label) not in why:
+                why = f"{q_label}: {why}"
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["value"],
+                why,
                 source=source_key,
                 observation_id=observation_id,
             )
@@ -4027,7 +4064,7 @@ class Migrator:
             source=source_key,
         )
         point_conditions = None
-        if temperature_K is not None:
+        if temperature_K is not None and not isinstance(temperature_K, State):
             point_conditions = {"temperature_K": located_value(temperature_K, locator)}
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
@@ -4051,7 +4088,7 @@ class Migrator:
                 status=AdmissionStatus.PENDING,
                 reason="source does not state admission_status",
             ),
-            notices=(),
+            notices=notices,
             source_id=source_id,
             locator=locator,
             read_from=read_from,
@@ -4269,15 +4306,17 @@ class Migrator:
             if isinstance(t_range, list) and len(t_range) == 2 and t_range[0] == t_range[1]:
                 t_payload["T_K"] = t_range[0]
             t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
-            t = t_sel.amount if t_sel.available else None
+            t: Decimal | State[Decimal] | None = t_sel.amount if t_sel.available else None
             if t_sel.condition_ranges and t is None:
                 self.result.measured.range_only_T += 1
                 name, lo, hi = t_sel.condition_ranges[0]
+                reason = f"source {name} [{lo}, {hi}]; no midpoint invented"
+                t = State.unknown(reason)
                 self.result.add_queue(
                     work.work_id,
                     loc,
                     ["temperature_K"],
-                    f"source {name} [{lo}, {hi}]; no midpoint invented",
+                    reason,
                     source=rel,
                     observation_id=str(meas_id),
                 )
@@ -4398,6 +4437,8 @@ class Migrator:
         if not isinstance(doc, Mapping):
             return
         # battery field is a ledger name, not an 8-rail token — do not rail-map it.
+        metric_units = str(doc.get("metric_units") or "").strip()
+        energy_unit_ok = metric_units in {"", "kJ/mol", "kJ_per_mol"}
         points = doc.get("points") or []
         if not isinstance(points, list):
             return
@@ -4420,26 +4461,124 @@ class Migrator:
             )
             formula = str(point.get("species") or "unknown")
             stated_q = point.get("comparison_quantity") or point.get("quantity")
-            quantity_payload = dict(point)
-            if stated_q and not quantity_payload.get("quantity"):
-                quantity_payload["quantity"] = stated_q
-            ledger_quantity, q_reason = map_quantity(
-                None, quantity_payload, units="kJ_per_mol", row=point
+            obs_id = str(
+                point.get("key")
+                or f"{source_id}:{point.get('observation_id')}:{point.get('temperature_K')}"
             )
-            if q_reason:
+            log10_psat_reason = (
+                "the table value is the Gibbs energy of the vaporization "
+                "reaction and the reaction identity is not lifted"
+            )
+            per: PerBasis | None = None
+            derivation = None
+            notices: tuple[Notice, ...] = ()
+            value_reason = None
+            if stated_q == "log10_Psat_over_P0":
+                ledger_quantity = State.unknown(log10_psat_reason)
                 self.result.add_queue(
                     work.work_id,
                     loc,
-                    ["quantity"],
-                    q_reason,
+                    ["quantity", "value"],
+                    log10_psat_reason,
                     source=rel,
-                    observation_id=str(point.get("key") or point.get("observation_id")),
+                    observation_id=obs_id,
                 )
+                table_sel = _unavailable_selection(log10_psat_reason)
+                value_reason = log10_psat_reason
+            else:
+                quantity_payload = dict(point)
+                if stated_q and not quantity_payload.get("quantity"):
+                    quantity_payload["quantity"] = stated_q
+                units = "kJ_per_mol" if energy_unit_ok else None
+                if not energy_unit_ok and stated_q not in {"log10_Kf", "log10_kf"}:
+                    ledger_quantity = State.unknown(
+                        f"ledger header metric_units {metric_units!r} is not kJ/mol"
+                    )
+                    q_reason = ledger_quantity.reason
+                    table_sel = _unavailable_selection(
+                        f"ledger header metric_units {metric_units!r} is not kJ/mol"
+                    )
+                    value_reason = table_sel.reason
+                else:
+                    ledger_quantity, q_reason = map_quantity(
+                        None, quantity_payload, units=units, row=point
+                    )
+                    select_q = ledger_quantity
+                    if stated_q == "log10_Kf":
+                        select_q = Quantity.LOG10_KF
+                        ledger_quantity = State.of(Quantity.LOG10_KF)
+                        q_reason = None
+                    table_sel = select_declared_source(
+                        select_q,
+                        None if stated_q == "log10_Kf" else units,
+                        point,
+                    )
+                    if (
+                        stated_q == "log10_Kf"
+                        and table_sel.field_name == "table_kJ_mol"
+                    ):
+                        table_sel = _unavailable_selection(
+                            "table_kJ_mol is Gibbs energy, not log10_Kf"
+                        )
+                if q_reason:
+                    self.result.add_queue(
+                        work.work_id,
+                        loc,
+                        ["quantity"],
+                        q_reason,
+                        source=rel,
+                        observation_id=obs_id,
+                    )
+                if stated_q == "delta_fG_kJ_per_mol_O2":
+                    ledger_quantity = State.of(Quantity.DELTA_FG)
+                    per = PerBasis.MOL_O2
+                    if energy_unit_ok:
+                        table_sel = select_declared_source(
+                            Quantity.DELTA_FG, units, point
+                        )
+                    note = str(point.get("note") or "")
+                    if note:
+                        derivation = Derivation(
+                            relation=note,
+                            inputs=(f"source:{obs_id}",),
+                            parameters=(),
+                            output_unit="kJ/mol",
+                        )
             t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, point)
             t = t_sel.amount if t_sel.available else None
-            table_sel = select_declared_source(ledger_quantity, "kJ_per_mol", point)
             value = table_sel.value
-            obs_id = str(point.get("key") or f"{source_id}:{point.get('observation_id')}:{t}")
+            finding = str(point.get("finding_class") or "")
+            if finding == "compilation_table_self_check":
+                q_for_notice = (
+                    ledger_quantity.value
+                    if isinstance(ledger_quantity, Quantity)
+                    else (
+                        ledger_quantity.value
+                        if isinstance(ledger_quantity, State) and ledger_quantity.is_value
+                        else Quantity.LOG10_KF
+                    )
+                )
+                notices = (
+                    Notice(
+                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                        affected_quantities=(q_for_notice,),
+                        reason=(
+                            "diagnostic compilation_table_self_check; "
+                            f"provenance_class={point.get('provenance_class')} "
+                            f"status={point.get('status')}; not a scoring residual"
+                        ),
+                        origin=obs_id,
+                    ),
+                )
+            evidence = Evidence(
+                class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
+                original_method_class=str(
+                    point.get("method_class")
+                    or point.get("provenance_class")
+                    or "compilation"
+                ),
+                model=str(point.get("finding_class") or point.get("provenance_class") or ""),
+            )
             self._generic_obs(
                 work=work,
                 source_id=source_id,
@@ -4449,10 +4588,14 @@ class Migrator:
                 quantity=ledger_quantity,
                 species=make_species(formula, map_phase(point.get("phase"))[0]),
                 value=value,
-                evidence=self._evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
+                evidence=evidence,
                 temperature_K=t if t is not None and t > 0 else None,
                 method=map_method(point.get("method") or point.get("regime")),
                 source_row_index=row_index,
+                derivation=derivation,
+                per=per,
+                notices=notices,
+                value_reason=value_reason,
             )
             if t is not None and t <= 0:
                 self.result.add_queue(
