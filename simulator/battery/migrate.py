@@ -37,7 +37,7 @@ import json
 import re
 import unicodedata
 from collections import defaultdict
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass, replace
 from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
@@ -203,6 +203,7 @@ METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
     "model_derived_from_Kstar_with_alpha_e_adopted_unity": EvidenceClass.MODEL_DERIVED,
     "model_derived_inverse_fit": EvidenceClass.MODEL_DERIVED,
     "model_derived_second_law_fit": EvidenceClass.MODEL_DERIVED,
+    "magma_model_companion_workbook": EvidenceClass.MODEL_DERIVED,
     "compilation_calculated_table": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_derived": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_foreign": EvidenceClass.COMPILATION_ASSESSED,
@@ -1388,6 +1389,28 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+def compilation_phase_text(doc: Mapping[str, Any]) -> object:
+    """First nonempty printed phase field. Empty string is absence, not a token."""
+
+    for key in ("phase", "phase_as_published"):
+        raw = doc.get(key)
+        if isinstance(raw, str) and raw.strip():
+            return raw
+        if raw not in (None, "", [], {}):
+            return raw
+    raw = doc.get("phase_state_as_published")
+    if isinstance(raw, list):
+        parts = [str(x).strip() for x in raw if x not in (None, "")]
+        if parts:
+            return " ".join(parts)
+    if isinstance(raw, str) and raw.strip():
+        return raw
+    raw = doc.get("state_note_as_published")
+    if isinstance(raw, str) and raw.strip():
+        return raw
+    return None
+
+
 # A source field that uniquely names one closed quantity. Pressure columns are
 # omitted: they do not distinguish p_sat from p_partial.
 _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
@@ -1598,6 +1621,11 @@ def _quantity_corroborated(
             return True
         return False
     if candidate is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        raw_range = values.get("alpha_range")
+        if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
+            lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
+            if lo is not None and hi is not None:
+                return True
         form = values.get("alpha_form")
         if isinstance(form, Mapping) and str(form.get("type") or "").lower() == "arrhenius":
             blob = _row_text_blob(None, values, units, row)
@@ -1614,6 +1642,10 @@ def _quantity_corroborated(
             for key in ("value_K", "T_m_K", "T_K", "temperature_K", "T_C", "T")
         )
     if candidate is Quantity.P_SAT:
+        if values.get("source_form") and values.get("coefficients"):
+            return True
+        if _is_pressure_point_list(values.get("points")):
+            return True
         return any(key in values for key, _unit in _PRESSURE_SERIES_KEYS) or any(
             key in values for key in ("P", "p", "series")
         )
@@ -1687,12 +1719,62 @@ def parse_quantity_suffix(suffix: str | None) -> tuple[str | None, str | None, s
     return formula, derivation, reference
 
 
+def _is_pressure_point_list(items: object) -> bool:
+    """True when a points list is tabulated T plus a pressure column."""
+
+    if not isinstance(items, list) or not items or not isinstance(items[0], Mapping):
+        return False
+    first = items[0]
+    has_t = any(
+        key in first
+        for key in ("T_K", "temperature_K", "T", "temperature", "T_C")
+    )
+    has_p = any(key in first for key, _unit in _PRESSURE_SERIES_KEYS) or any(
+        key in first for key in ("P", "p")
+    )
+    return has_t and has_p
+
+
+def _pressure_series_quantity(
+    values: object,
+    units: str | None,
+    row: Mapping[str, Any] | None,
+) -> Quantity | None:
+    """Quantity for a tabulated T/P list. Row type cannot decide p_sat vs p_partial."""
+
+    items: list[Any] | None = None
+    values_map = values if isinstance(values, Mapping) else None
+    if isinstance(values, list) and values:
+        items = values
+    elif isinstance(values_map, Mapping):
+        if isinstance(values_map.get("points"), list) and values_map.get("points"):
+            items = values_map.get("points")  # type: ignore[assignment]
+        elif isinstance(values_map.get("series"), list) and values_map.get("series"):
+            items = values_map.get("series")  # type: ignore[assignment]
+    if not items or not isinstance(items[0], Mapping):
+        return None
+    first = items[0]
+    has_p = any(key in first for key, _unit in _PRESSURE_SERIES_KEYS) or any(
+        key in first for key in ("P", "p", "pressure_bar", "p_Pa")
+    )
+    if not has_p:
+        return None
+    blob = _row_text_blob(None, values_map, units, row)
+    if "equilibrium vapor" in blob or "zero fractional vaporization" in blob:
+        return Quantity.P_PARTIAL
+    return None
+
+
 def map_quantity(
     obs_type: str | None,
-    values: Mapping[str, Any] | None,
+    values: Mapping[str, Any] | list[Any] | None,
     units: str | None = None,
     row: Mapping[str, Any] | None = None,
 ) -> tuple[State[Quantity], str | None]:
+    if isinstance(values, list):
+        values = (
+            {"points": values} if _is_pressure_point_list(values) else {"series": values}
+        )
     raw = None
     if isinstance(values, Mapping):
         raw = values.get("quantity")
@@ -1740,6 +1822,15 @@ def map_quantity(
             State.unknown(f"payload names conflicting quantities {labels}"),
             f"conflicting quantity fields {labels}",
         )
+    if quantity_absent:
+        from_series = _pressure_series_quantity(values, units, row)
+        if from_series is not None:
+            contradiction = _quantity_contradiction(
+                from_series, obs_type, values, units, row
+            )
+            if contradiction:
+                return State.unknown(contradiction), contradiction
+            return State.of(from_series), None
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
@@ -1896,6 +1987,7 @@ def evidence_for(
     evaluator_family: object = None,
     attribution: str | None = None,
     model: str | None = None,
+    regime: object = None,
 ) -> tuple[Evidence, str | None]:
     """Return Evidence and an optional queue reason."""
 
@@ -1910,6 +2002,29 @@ def evidence_for(
             None,
         )
     if original is None or original == "":
+        regime_text = str(regime).strip() if isinstance(regime, str) else ""
+        if regime_text:
+            mapped_regime = METHOD_CLASS_MAP.get(regime_text)
+            if mapped_regime is not None:
+                return (
+                    Evidence(
+                        class_=State.of(mapped_regime),
+                        original_method_class=regime_text,
+                        model=(
+                            regime_text
+                            if mapped_regime is EvidenceClass.MODEL_DERIVED
+                            else model
+                        ),
+                    ),
+                    None,
+                )
+            return (
+                Evidence(
+                    class_=State.unknown(f"unmapped regime {regime_text!r}"),
+                    original_method_class=regime_text,
+                ),
+                f"unmapped regime {regime_text}",
+            )
         return (
             Evidence(class_=State.unknown("source does not state method_class")),
             "absent method_class",
@@ -2292,6 +2407,167 @@ def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
     return _as_dec_or_none(raw)
 
 
+def _formation_gibbs_cell_flags(cell: object) -> tuple[bool, bool, bool]:
+    """Return (numeric, printed, ocr_suspect_with_no_parsed_value)."""
+
+    if cell is None or cell == "":
+        return False, False, False
+    if isinstance(cell, Mapping):
+        amount = _as_dec_or_none(cell.get("value"))
+        as_published = cell.get("as_published")
+        printed = as_published not in (None, "") or cell.get("value") not in (None, "")
+        ocr_nv = bool(cell.get("ocr_suspect")) and amount is None
+        return amount is not None, printed, ocr_nv
+    amount = _as_dec_or_none(cell)
+    if amount is not None:
+        return True, True, False
+    if isinstance(cell, str) and cell.strip():
+        return False, True, False
+    return False, False, False
+
+
+def _unit_as_printed(unit_map: object, column: str) -> str | None:
+    if not isinstance(unit_map, Mapping):
+        return None
+    if column.startswith("formation."):
+        raw = unit_map.get("formation_gibbs_energy")
+    else:
+        raw = (
+            unit_map.get(column)
+            or unit_map.get("formation_gibbs_energy")
+            or unit_map.get("delta_f_G")
+        )
+    if raw in (None, ""):
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def _iter_formation_gibbs_cells(
+    payload: Mapping[str, Any],
+    unit_map: Mapping[str, Any] | None = None,
+) -> list[tuple[str, object, str | None]]:
+    """Every formation-Gibbs spelling this source uses, with the printed unit."""
+
+    if unit_map is None:
+        raw_units = payload.get("units_as_published")
+        unit_map = raw_units if isinstance(raw_units, Mapping) else {}
+    found: list[tuple[str, object, str | None]] = []
+    if "delta_f_G" in payload:
+        found.append(
+            ("delta_f_G", payload.get("delta_f_G"), _unit_as_printed(unit_map, "delta_f_G"))
+        )
+    if "formation_gibbs_energy" in payload:
+        found.append(
+            (
+                "formation_gibbs_energy",
+                payload.get("formation_gibbs_energy"),
+                _unit_as_printed(unit_map, "formation_gibbs_energy"),
+            )
+        )
+    cells = payload.get("cells")
+    if isinstance(cells, Mapping) and "formation_gibbs_energy" in cells:
+        found.append(
+            (
+                "formation_gibbs_energy",
+                cells.get("formation_gibbs_energy"),
+                _unit_as_printed(unit_map, "formation_gibbs_energy"),
+            )
+        )
+    formation = payload.get("formation")
+    if isinstance(formation, Mapping):
+        for basis, body in formation.items():
+            if not isinstance(body, Mapping) or "gibbs_energy" not in body:
+                continue
+            column = f"formation.{basis}.gibbs_energy"
+            found.append(
+                (column, body.get("gibbs_energy"), _unit_as_printed(unit_map, column))
+            )
+    for key in ("series", "rows"):
+        items = payload.get(key)
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if isinstance(item, Mapping):
+                found.extend(_iter_formation_gibbs_cells(item, unit_map))
+    return found
+
+
+def _census_formation_gibbs(
+    payload: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Per-column counts of printed formation Gibbs cells."""
+
+    by_column: dict[str, dict[str, Any]] = {}
+    for column, cell, unit in _iter_formation_gibbs_cells(payload):
+        info = by_column.setdefault(
+            column,
+            {"count": 0, "numeric": 0, "printed": 0, "ocr_nv": 0, "unit": unit},
+        )
+        if info.get("unit") in (None, "") and unit:
+            info["unit"] = unit
+        numeric, printed, ocr_nv = _formation_gibbs_cell_flags(cell)
+        info["count"] += 1
+        if numeric:
+            info["numeric"] += 1
+        if printed:
+            info["printed"] += 1
+        if ocr_nv:
+            info["ocr_nv"] += 1
+    return by_column
+
+
+def _delta_fg_unavailable_reason(
+    payload: Mapping[str, Any],
+    q_token: Quantity | None,
+) -> str | None:
+    """Honest reason when formation Gibbs is printed but not imported.
+
+    Does not lift a number. Returns None when this source does not use a
+    formation-Gibbs spelling, so the caller may then claim absence.
+    """
+
+    if q_token not in {None, Quantity.DELTA_FG}:
+        return None
+    census = _census_formation_gibbs(payload)
+    if not census:
+        return None
+    numeric_bits: list[str] = []
+    ocr_bits: list[str] = []
+    named_bits: list[str] = []
+    for column, info in census.items():
+        unit = info.get("unit")
+        unit_clause = (
+            f", unit as printed {unit}" if unit else ", unit as printed not stated"
+        )
+        if info["numeric"]:
+            numeric_bits.append(
+                f"{info['numeric']} numeric formation Gibbs cells "
+                f"(column {column}{unit_clause})"
+            )
+        elif info["ocr_nv"]:
+            n = info["printed"] or info["count"]
+            ocr_bits.append(
+                f"all {n} printed {column} cells are OCR-suspect with no parsed value"
+            )
+        else:
+            named_bits.append(
+                f"source names {info['count']} {column} cells with no parsed numeric value"
+            )
+    if numeric_bits:
+        return (
+            "source prints "
+            + " and ".join(numeric_bits)
+            + "; not imported by the generic migrator; "
+            "awaiting the per-source compilation generator"
+        )
+    if ocr_bits:
+        return "; ".join(ocr_bits)
+    if named_bits:
+        return "; ".join(named_bits)
+    return None
+
+
 def _unused_ancillary(payload: Mapping[str, Any], used: str | None) -> tuple[str, ...]:
     return tuple(k for k in _ANCILLARY_SERIES_KEYS if k in payload and k != used)
 
@@ -2425,11 +2701,20 @@ def _selection_from_named_field(
         if q_token is Quantity.LOG10_KF and key == "value":
             trail = "identity"
         return _point_selection(amount, key, trail, payload, condition_ranges)
-    raw_range = payload.get("range")
+    range_key = None
+    raw_range = None
+    if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA and "alpha_range" in payload:
+        range_key = "alpha_range"
+        raw_range = payload.get("alpha_range")
+    elif "range" in payload:
+        range_key = "range"
+        raw_range = payload.get("range")
     if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
         lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
         if lo is not None and hi is not None:
-            return _interval_selection(lo, hi, "range", payload, condition_ranges)
+            return _interval_selection(
+                lo, hi, range_key or "range", payload, condition_ranges
+            )
     return None
 
 
@@ -2438,6 +2723,7 @@ def _series_selection_from_items(
     q_token: Quantity | None,
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+    parent: Mapping[str, Any] | None = None,
 ) -> SourceSelection:
     points: list[tuple[Decimal, Decimal]] = []
     for item in series:
@@ -2453,6 +2739,15 @@ def _series_selection_from_items(
             field_name="series",
             unit_trail="as_published",
             condition_ranges=condition_ranges,
+        )
+    census_payload: dict[str, Any] = dict(parent or {})
+    census_payload["series"] = series
+    gibbs_reason = _delta_fg_unavailable_reason(census_payload, q_token)
+    if gibbs_reason:
+        return _unavailable_selection(
+            gibbs_reason,
+            condition_ranges=condition_ranges,
+            field_name="series",
         )
     return _unavailable_selection(
         "series list had no numeric coordinate/value pairs",
@@ -2564,8 +2859,13 @@ def select_declared_source(
 
     q_token = _quantity_token(declared)
     series = payload.get("series")
+    if not (isinstance(series, list) and series):
+        points_list = payload.get("points")
+        series = points_list if _is_pressure_point_list(points_list) else None
     if isinstance(series, list) and series:
-        return _series_selection_from_items(series, q_token, units, condition_ranges)
+        return _series_selection_from_items(
+            series, q_token, units, condition_ranges, parent=payload
+        )
 
     tabulated = payload.get("tabulated_delta_fG_kJ_mol")
     if isinstance(tabulated, list) and tabulated and q_token in {None, Quantity.DELTA_FG}:
@@ -2670,6 +2970,15 @@ def select_declared_source(
     if named is not None:
         return named
 
+    if payload.get("source_form") and payload.get("coefficients"):
+        form = str(payload.get("source_form") or "").strip()
+        return _unavailable_selection(
+            f"source prints evaluator {form}; form is not a stored series or point",
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+            field_name="source_form",
+        )
+
     if payload.get("segments"):
         return SourceSelection(
             value=Value(
@@ -2696,6 +3005,13 @@ def select_declared_source(
             field_name="semantics",
             condition_ranges=condition_ranges,
         )
+    gibbs_reason = _delta_fg_unavailable_reason(payload, q_token)
+    if gibbs_reason:
+        return _unavailable_selection(
+            gibbs_reason,
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+        )
     if condition_ranges:
         name, lo, hi = condition_ranges[0]
         return _unavailable_selection(
@@ -2715,7 +3031,7 @@ def select_declared_source(
 
 
 def empty_value_from_payload(
-    values: Mapping[str, Any] | None,
+    values: Mapping[str, Any] | list[Any] | None,
     obs_type: str | None,
     units: str | None,
     quantity: Quantity | State[Quantity] | None = None,
@@ -2728,6 +3044,10 @@ def empty_value_from_payload(
 
     exploded: list[dict[str, Any]] = []
     q_token = _quantity_token(quantity)
+    if isinstance(values, list):
+        values = (
+            {"points": values} if _is_pressure_point_list(values) else {"series": values}
+        )
     if not isinstance(values, Mapping):
         sel = select_declared_source(q_token, units, None)
         return sel.value, exploded, sel
@@ -3234,7 +3554,11 @@ class Migrator:
 
     def _experiment_id(self, work_id: str, locator: Locator | None, fallback: str) -> str:
         if locator is not None:
-            key = locator.table or locator.record or locator.figure or locator.source_path
+            key = locator.table or locator.record or locator.figure
+            if not key and locator.source_path:
+                loc_path = str(locator.source_path)
+                if not loc_path.startswith("data/literature/compilations/"):
+                    key = locator.source_path
             if key:
                 return f"{work_id}::{key}"
         return f"{work_id}::{fallback}"
@@ -3405,8 +3729,17 @@ class Migrator:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or f"{source_id}:missing")
         obs_id = f"{source_id}::{raw_obs_id}"
-        values = obs.get("values") if isinstance(obs.get("values"), Mapping) else {}
-        values = values or {}
+        raw_values = obs.get("values")
+        if isinstance(raw_values, list):
+            values = (
+                {"points": raw_values}
+                if _is_pressure_point_list(raw_values)
+                else {"series": raw_values}
+            )
+        elif isinstance(raw_values, Mapping):
+            values = dict(raw_values)
+        else:
+            values = {}
         locator = locator_from_mapping(
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
@@ -3493,6 +3826,7 @@ class Migrator:
                 measured.gibbs_reference_101325 += 1
 
         method_class = values.get("method_class")
+        regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
         evidence, ev_reason = self._evidence_for(
@@ -3500,6 +3834,7 @@ class Migrator:
             evaluator_family=values.get("evaluator_family"),
             attribution=obs.get("quote") if isinstance(obs.get("quote"), str) else None,
             model=suffix_derivation,
+            regime=regime,
         )
         if suffix_derivation and (
             not evidence.class_.is_value
@@ -3712,7 +4047,8 @@ class Migrator:
                 work.work_id,
                 locator,
                 ["value"],
-                "printed series had no numeric coordinate/value pairs; parent retained",
+                value_sel.reason
+                or "printed series had no numeric coordinate/value pairs; parent retained",
                 source=source_key,
                 observation_id=obs_id,
             )
@@ -4041,7 +4377,7 @@ class Migrator:
                 else (quantity.value.value if quantity.is_value else "unknown")
             )
             why = value_reason or value.unavailable_reason or (
-                f"source does not name a {q_label} field"
+                f"{q_label} value is unavailable"
             )
             if str(q_label) not in why:
                 why = f"{q_label}: {why}"
@@ -4238,8 +4574,22 @@ class Migrator:
                             formula, map_phase(point.get("phase"))[0]
                         ),
                         value=value,
-                        evidence=Evidence(
-                            class_=State.unknown("mre sidecar does not state method_class")
+                        evidence=(
+                            evidence_for(
+                                point.get("method_class")
+                                or point.get("method")
+                                or point.get("regime")
+                            )[0]
+                            if (
+                                point.get("method_class")
+                                or point.get("method")
+                                or point.get("regime")
+                            )
+                            else Evidence(
+                                class_=State.unknown(
+                                    "mre sidecar does not state method_class"
+                                )
+                            )
                         ),
                         method=State.unknown("mre method not a closed token"),
                         uncertainty=uncertainty_for(point.get("uncertainty")),
@@ -4664,9 +5014,11 @@ class Migrator:
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(doc.get("formula") or record_id)
-        phase, _unmapped = map_phase(doc.get("phase"))
+        phase, _unmapped = map_phase(compilation_phase_text(doc))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
+        if not locator.source_path:
+            locator = replace(locator, source_path=rel)
         t = None
         p_std = None
         rows = doc.get("rows")
@@ -4695,7 +5047,15 @@ class Migrator:
                 observation_id=f"{source_id}:{record_id}",
             )
         if series_items:
-            sel = select_declared_source(quantity, None, {"series": series_items})
+            sel = select_declared_source(
+                quantity,
+                None,
+                {
+                    "series": series_items,
+                    "units_as_published": doc.get("units_as_published"),
+                    "column_ids": doc.get("column_ids"),
+                },
+            )
         else:
             sel = select_declared_source(quantity, None, doc)
         value = sel.value

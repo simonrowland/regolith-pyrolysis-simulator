@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import unicodedata
 from pathlib import Path
 
@@ -3111,4 +3112,406 @@ def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
         and "value" in (e.axes or ())
         and ("log10_Kf" in (e.why or "") or "field" in (e.why or ""))
         for e in result.queue
+    )
+
+
+_USGS_F1_FAMILIES = (
+    "robie-hemingway-fisher-1978-usgs-b1452",
+    "hemingway-haas-robinson-1982-usgs-b1544",
+    "robie-waldbaum-1968-usgs-b1259",
+)
+_ABSENT_DELTA_FG_CLAIM = re.compile(
+    r"does not name a delta_fG field|series list had no numeric coordinate/value pairs|"
+    r"source does not name a delta_fG",
+    re.I,
+)
+
+
+def _copy_compilation_record(root: Path, source_id: str, filename: str) -> Path:
+    src = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / source_id
+        / "records"
+        / filename
+    )
+    dest = (
+        root
+        / "data"
+        / "literature"
+        / "compilations"
+        / source_id
+        / "records"
+        / filename
+    )
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(src.read_bytes())
+    return dest
+
+
+def _copy_extract(root: Path, filename: str) -> Path:
+    src = REPO_ROOT / "data" / "literature" / "extracts" / filename
+    dest = root / "data" / "literature" / "extracts" / filename
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(src.read_bytes())
+    return dest
+
+
+def _record_has_numeric_gibbs(doc: dict) -> bool:
+    from simulator.battery.migrate import _census_formation_gibbs
+
+    census = _census_formation_gibbs(doc)
+    return any(info["numeric"] for info in census.values())
+
+
+def test_f1_usgs_unavailable_reasons_match_printed_gibbs_cells(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    copies = [
+        (
+            "robie-hemingway-fisher-1978-usgs-b1452",
+            "robie-hemingway-fisher-1978-usgs-b1452-0004.json",
+        ),
+        (
+            "robie-hemingway-fisher-1978-usgs-b1452",
+            "robie-hemingway-fisher-1978-usgs-b1452-0011-phase-02.json",
+        ),
+        (
+            "hemingway-haas-robinson-1982-usgs-b1544",
+            "usgs-b1544-al2sio5-reference.json",
+        ),
+        (
+            "robie-waldbaum-1968-usgs-b1259",
+            "b1259-ht-0001-silver-reference-state.json",
+        ),
+        (
+            "robie-waldbaum-1968-usgs-b1259",
+            "b1259-298k-0001-silver.json",
+        ),
+    ]
+    for source_id, filename in copies:
+        _copy_compilation_record(root, source_id, filename)
+    result = migrate(root, write=False)
+
+    b1452 = result.observations[
+        "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0004"
+    ]
+    assert quantity_token(b1452.identity) is Quantity.DELTA_FG
+    assert b1452.value.kind is ValueKind.UNAVAILABLE
+    reason = b1452.value.unavailable_reason or ""
+    assert _ABSENT_DELTA_FG_CLAIM.search(reason) is None, reason
+    assert "formation_gibbs_energy" in reason
+    assert "kJ/1101" in reason
+    assert "not imported by the generic migrator" in reason
+    assert "per-source compilation generator" in reason
+
+    ocr = result.observations[
+        "robie-hemingway-fisher-1978-usgs-b1452:"
+        "robie-hemingway-fisher-1978-usgs-b1452-0011-phase-02"
+    ]
+    ocr_reason = ocr.value.unavailable_reason or ""
+    assert "OCR-suspect" in ocr_reason
+    assert "formation_gibbs_energy" in ocr_reason
+    assert _ABSENT_DELTA_FG_CLAIM.search(ocr_reason) is None, ocr_reason
+
+    b1544 = result.observations[
+        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference"
+    ]
+    b1544_reason = b1544.value.unavailable_reason or ""
+    assert "formation.from_the_elements.gibbs_energy" in b1544_reason
+    assert "formation.from_the_oxides.gibbs_energy" in b1544_reason
+    assert "kJ/mol" in b1544_reason
+    assert "not imported by the generic migrator" in b1544_reason
+    assert _ABSENT_DELTA_FG_CLAIM.search(b1544_reason) is None, b1544_reason
+
+    ht = result.observations[
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state"
+    ]
+    ht_reason = ht.value.unavailable_reason or ""
+    assert "delta_f_G" in ht_reason
+    assert "not imported by the generic migrator" in ht_reason
+    assert _ABSENT_DELTA_FG_CLAIM.search(ht_reason) is None, ht_reason
+
+    silver = result.observations[
+        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"
+    ]
+    silver_reason = silver.value.unavailable_reason or ""
+    assert "delta_f_G" in silver_reason
+    assert "cal gfw^-1" in silver_reason
+    assert "not imported by the generic migrator" in silver_reason
+    assert _ABSENT_DELTA_FG_CLAIM.search(silver_reason) is None, silver_reason
+
+
+def test_f1_store_usgs_reasons_do_not_deny_printed_gibbs() -> None:
+    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not obs_dir.is_dir():
+        pytest.skip("migrated store not generated yet")
+    bad: list[str] = []
+    for source_id in _USGS_F1_FAMILIES:
+        path = obs_dir / f"compilations-{source_id}.yaml"
+        if not path.is_file():
+            continue
+        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        records_dir = (
+            REPO_ROOT / "data" / "literature" / "compilations" / source_id / "records"
+        )
+        for obs in stored.get("observations") or []:
+            q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
+            if q != "delta_fG":
+                continue
+            val = obs.get("value") or {}
+            if val.get("kind") != "unavailable":
+                continue
+            reason = str(val.get("unavailable_reason") or "")
+            loc = obs.get("locator") or {}
+            record_id = loc.get("record") or str(obs.get("observation_id") or "").split(":", 1)[-1]
+            rec_path = records_dir / f"{record_id}.json"
+            if not rec_path.is_file():
+                continue
+            doc = json.loads(rec_path.read_text(encoding="utf-8"))
+            if not _record_has_numeric_gibbs(doc):
+                continue
+            if _ABSENT_DELTA_FG_CLAIM.search(reason):
+                bad.append(f"{obs.get('observation_id')} reason={reason!r}")
+    assert not bad, bad[:12]
+
+
+def test_f2_phase_quotes_printed_text_and_keeps_unknown(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _copy_compilation_record(
+        root,
+        "robie-hemingway-fisher-1978-usgs-b1452",
+        "robie-hemingway-fisher-1978-usgs-b1452-0004.json",
+    )
+    _copy_compilation_record(
+        root,
+        "hemingway-haas-robinson-1982-usgs-b1544",
+        "usgs-b1544-al2sio5-reference.json",
+    )
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-298k-0001-silver.json",
+    )
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-298k-0002-ag-aqueous-ion.json",
+    )
+    _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-298k-0048-li-aqueous-ion.json",
+    )
+    result = migrate(root, write=False)
+
+    b1452 = result.observations[
+        "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0004"
+    ]
+    phase = b1452.identity.species.phase
+    assert phase.is_unknown
+    assert "does not state phase" not in (phase.reason or "")
+    assert "Face-cente" in (phase.reason or "")
+    assert "not in the closed automatic map" in (phase.reason or "")
+
+    b1544 = result.observations[
+        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference"
+    ]
+    assert b1544.identity.species.phase.is_unknown
+    assert "Sillimanite" in (b1544.identity.species.phase.reason or "")
+    assert "does not state phase" not in (b1544.identity.species.phase.reason or "")
+
+    silver = result.observations[
+        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"
+    ]
+    assert silver.identity.species.phase.is_unknown
+    assert "does not state phase" in (silver.identity.species.phase.reason or "")
+
+    aqueous = result.observations[
+        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0002-ag-aqueous-ion"
+    ]
+    assert aqueous.identity.species.phase.is_unknown
+    assert "aqueous ion" in (aqueous.identity.species.phase.reason or "")
+    assert "does not state phase" not in (aqueous.identity.species.phase.reason or "")
+
+    note_only = result.observations[
+        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0048-li-aqueous-ion"
+    ]
+    assert note_only.identity.species.phase.is_unknown
+    assert "Std. state" in (note_only.identity.species.phase.reason or "")
+    assert "does not state phase" not in (note_only.identity.species.phase.reason or "")
+
+
+def test_f3_compilation_locator_names_the_record_file(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    dest = _copy_compilation_record(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "b1259-298k-0001-silver.json",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"]
+    rel = dest.relative_to(root).as_posix()
+    assert obs.locator.source_path == rel
+    assert dest.is_file()
+
+
+def test_f3_store_every_compilation_observation_has_existing_source_path() -> None:
+    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not obs_dir.is_dir():
+        pytest.skip("migrated store not generated yet")
+    missing: list[str] = []
+    for path in sorted(obs_dir.glob("compilations-*.yaml")):
+        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for obs in stored.get("observations") or []:
+            loc = obs.get("locator") or {}
+            rel = loc.get("source_path")
+            oid = obs.get("observation_id")
+            if not rel:
+                missing.append(f"{oid} missing source_path")
+                continue
+            if not (REPO_ROOT / str(rel)).is_file():
+                missing.append(f"{oid} source_path {rel!r} does not exist")
+    assert not missing, missing[:20]
+
+
+def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
+    tmp_path: Path,
+) -> None:
+    br72 = _extract_observation(
+        "behrens-rosenblatt-1972.yaml", "NIST_BR72_arsenolite_As4O6"
+    )
+    state, _reason = map_quantity(
+        br72.get("type"), br72.get("values"), units=br72.get("units"), row=br72
+    )
+    assert state.is_value and state.value is Quantity.P_SAT
+
+    hab = _extract_observation("habermann-daane-1964.yaml", "Hab64_Yb_metal_antoine")
+    state, _reason = map_quantity(
+        hab.get("type"), hab.get("values"), units=hab.get("units"), row=hab
+    )
+    assert state.is_value and state.value is Quantity.P_SAT
+
+    stull = _extract_observation("nist-webbook.yaml", "NIST_Stull47_As2O3_highT")
+    state, _reason = map_quantity(
+        stull.get("type"), stull.get("values"), units=stull.get("units"), row=stull
+    )
+    assert state.is_value and state.value is Quantity.P_SAT
+
+    se = _extract_observation("nist-webbook.yaml", "NIST_Stull_Se_total_P")
+    state, _reason = map_quantity(
+        se.get("type"), se.get("values"), units=se.get("units"), row=se
+    )
+    assert state.is_value and state.value is Quantity.P_SAT
+    assert (se.get("values") or {}).get("gas_basis") == "TOTAL_PRESSURE_not_species"
+
+    bic = _extract_observation(
+        "berkowitz-chupka-inghram-1957.yaml", "BIC57_VO_absolute_points"
+    )
+    state, _reason = map_quantity(
+        bic.get("type"), bic.get("values"), units=bic.get("units"), row=bic
+    )
+    assert state.is_value and state.value is Quantity.P_SAT
+
+    costa = _extract_observation(
+        "costa-jacobson-2015.yaml", "costa_jacobson_2015_sio_olivine_kems"
+    )
+    state, _reason = map_quantity(
+        costa.get("type"), costa.get("values"), units=costa.get("units"), row=costa
+    )
+    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+
+    sf04 = _extract_observation(
+        "sf04-magma-companion-workbook.yaml", "sf04_workbook_tho_fe_pressure_series"
+    )
+    state, _reason = map_quantity(
+        sf04.get("type"), sf04.get("values"), units=sf04.get("units"), row=sf04
+    )
+    assert state.is_value and state.value is Quantity.P_PARTIAL
+
+    root = _write_min_tree(tmp_path)
+    for fname in (
+        "behrens-rosenblatt-1972.yaml",
+        "habermann-daane-1964.yaml",
+        "nist-webbook.yaml",
+        "berkowitz-chupka-inghram-1957.yaml",
+        "costa-jacobson-2015.yaml",
+        "sf04-magma-companion-workbook.yaml",
+    ):
+        _copy_extract(root, fname)
+    result = migrate(root, write=False)
+
+    br72_obs = result.observations[
+        "behrens-rosenblatt-1972::NIST_BR72_arsenolite_As4O6"
+    ]
+    assert quantity_token(br72_obs.identity) is Quantity.P_SAT
+    assert br72_obs.value.kind is ValueKind.UNAVAILABLE
+    assert "log10(P_bar) = A" in (br72_obs.value.unavailable_reason or "")
+
+    hab_obs = result.observations["habermann-daane-1964::Hab64_Yb_metal_antoine"]
+    assert quantity_token(hab_obs.identity) is Quantity.P_SAT
+    assert hab_obs.value.kind is ValueKind.UNAVAILABLE
+    assert "log10(P_mmHg) = A" in (hab_obs.value.unavailable_reason or "")
+
+    stull_obs = result.observations["nist-webbook::NIST_Stull47_As2O3_highT"]
+    assert quantity_token(stull_obs.identity) is Quantity.P_SAT
+    assert stull_obs.value.kind is ValueKind.UNAVAILABLE
+    assert "log10(P_bar) = A" in (stull_obs.value.unavailable_reason or "")
+
+    se_obs = result.observations["nist-webbook::NIST_Stull_Se_total_P"]
+    assert quantity_token(se_obs.identity) is Quantity.P_SAT
+    assert se_obs.value.kind is ValueKind.UNAVAILABLE
+    assert "log10(P_bar) = A" in (se_obs.value.unavailable_reason or "")
+
+    bic_rows = [
+        o
+        for o in result.observations.values()
+        if "BIC57_VO_absolute_points" in o.observation_id
+    ]
+    assert bic_rows
+    assert all(quantity_token(o.identity) is Quantity.P_SAT for o in bic_rows)
+    amounts = sorted(
+        float(o.value.point)
+        for o in bic_rows
+        if o.value.kind is ValueKind.POINT and o.value.point is not None
+    )
+    series_parent = [
+        o for o in bic_rows if o.value.kind is ValueKind.SERIES and o.value.series
+    ]
+    assert amounts == [0.116, 0.155] or (
+        series_parent
+        and {float(p) for _t, p in series_parent[0].value.series} == {0.116, 0.155}
+    )
+
+    costa_obs = result.observations[
+        "costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems"
+    ]
+    assert quantity_token(costa_obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert costa_obs.value.kind is ValueKind.INTERVAL
+    assert costa_obs.value.interval_low == as_decimal("0.003")
+    assert costa_obs.value.interval_high == as_decimal("0.036")
+
+    sf04_rows = [
+        o
+        for o in result.observations.values()
+        if "sf04_workbook_tho_fe_pressure_series" in o.observation_id
+    ]
+    assert sf04_rows
+    assert all(quantity_token(o.identity) is Quantity.P_PARTIAL for o in sf04_rows)
+    assert any(
+        o.value.kind is ValueKind.SERIES
+        or (o.value.kind is ValueKind.POINT and o.value.point is not None)
+        for o in sf04_rows
+    )
+    assert all(
+        o.evidence.class_.is_value
+        and o.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        for o in sf04_rows
+    )
+    assert all(
+        o.evidence.class_.value is not EvidenceClass.MEASURED_DIRECT
+        and o.evidence.class_.value is not EvidenceClass.MEASURED_REDUCED
+        and o.evidence.class_.value is not EvidenceClass.MEASURED_TABULATED
+        for o in sf04_rows
     )
