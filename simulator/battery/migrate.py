@@ -4540,7 +4540,7 @@ class Migrator:
                     if note:
                         derivation = Derivation(
                             relation=note,
-                            inputs=(f"source:{obs_id}",),
+                            inputs=(choose_read_from(work, loc),),
                             parameters=(),
                             output_unit="kJ/mol",
                         )
