@@ -1,17 +1,21 @@
 # Reference PDFs
 
+PDFs are not kept in this repository. The source documents live in the private
+corpus repository (`regolith-corpus`, `raw/<source_id>/`), which is also the source of
+record for extracts; `tests/test_corpus_extract_mirror.py` keeps the two in step. The
+sidecar `.md` notes below stay here.
+
 `data/literature/extracts/SCHEMA.md` is authoritative: **`source_id` is the
 extract filename stem**. One extract file is one literature source.
 
 ```text
-docs/references/pdfs/<NN-topic>/<source_id>.pdf
+regolith-corpus raw/<source_id>/<source_id>.pdf     # PDF, private corpus repo only
 docs/references/pdfs/<NN-topic>/<source_id>.md      # sibling sidecar
 data/literature/extracts/<source_id>.yaml           # measurement extract
 ```
 
 SCHEMA example: extract `data/literature/extracts/costa-jacobson-2015.yaml`
-declares `source_id: costa-jacobson-2015`. The PDF and sidecar stems match that
-id when a copy is filed here.
+declares `source_id: costa-jacobson-2015`. The corpus PDF and the sidecar stems match that id.
 
 ## Choosing a new source_id
 

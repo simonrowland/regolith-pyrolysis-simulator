@@ -1,6 +1,7 @@
 """Lossless checks against the USGS B1544 OCR layer, not simulator predictions."""
 
 import copy
+import os
 from decimal import Decimal
 from pathlib import Path
 
@@ -25,7 +26,10 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
     sha256_file,
 )
 
-PDF = COMPILATION_ROOT / "source" / SOURCE_PDF_NAME
+# The source PDF lives in the private corpus repository, not in the simulator repository.
+# REGOLITH_CORPUS_ROOT points a gate at a corpus checkout (same default as the extract mirror test).
+CORPUS_CHECKOUT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+PDF = CORPUS_CHECKOUT / "raw" / "hemingway-haas-robinson-1982-usgs-b1544" / SOURCE_PDF_NAME
 
 PRINTED_CP_REVERSALS = (
     ("usgs-b1544-al2sio5-reference", "153.47", "153.27", 29),
@@ -60,12 +64,16 @@ def test_coverage_manifest_records_census(corpus):
 
 def test_source_hash_and_role(corpus):
     manifest, records = corpus
-    assert sha256_file(PDF) == EXPECTED_PDF_SHA256
     pdf_entry = next(s for s in manifest["source_files"] if s["path"].endswith(".pdf"))
     assert pdf_entry["sha256"] == EXPECTED_PDF_SHA256
     for record in records:
         assert record["compilation_role"] == ROLE
         assert record["schema_version"] == "literature_compilation.v1"
+
+
+@pytest.mark.skipif(not PDF.is_file(), reason="regolith-corpus checkout with the B1544 source PDF is absent")
+def test_source_pdf_bytes_match_expected_hash():
+    assert sha256_file(PDF) == EXPECTED_PDF_SHA256
 
 
 def assert_nested_equal(loaded, fresh, path="record"):

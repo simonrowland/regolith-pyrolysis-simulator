@@ -144,3 +144,7 @@ data/literature/compilations/janaf/source-cache/
 # local grind/optimizer run roots (Dropbox-ignored via xattr; multi-GB sqlite caches)
 /local-runs/
 docs/chemistry-provenance.notes.md
+
+# Source PDFs live in the private corpus repository (regolith-corpus raw/<source_id>/),
+# never in the simulator repository. Sidecar .md notes and extracts stay here.
+*.pdf

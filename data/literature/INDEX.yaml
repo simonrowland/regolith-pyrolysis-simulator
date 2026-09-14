@@ -9,18 +9,16 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 168
+  sources: 167
   extracts: 166
-  pdfs_present_in_worktree: 44
+  pdfs_present_in_worktree: 0
   extracts_with_private_locators: 37
-  pdfs_tracked_99_kems_langmuir: 39
-  pdfs_without_extract: 2
-  extracts_without_pdf: 124
+  pdfs_tracked_99_kems_langmuir: 0
+  pdfs_without_extract: 0
+  extracts_without_pdf: 166
   alias_groups_needing_resolution: 34
 gaps:
-  pdfs_without_extract:
-  - kems-137-bischof-2023-mmc1
-  - wu-1993-feo-mgo-sio2
+  pdfs_without_extract: []
   extracts_without_pdf:
   - ames-walsh-white-1967
   - banchor-matsui-naito-1986
@@ -32,6 +30,7 @@ gaps:
   - datz-and-smith-1961
   - datz-smith-taylor-1961-nacl-vapor
   - fedkin-grossman-ghiorso-2006
+  - fegley-2023-chemical-equilibrium-calculations-bu
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
@@ -40,21 +39,47 @@ gaps:
   - habermann-daane-1964
   - iapws-95-psat-liquid
   - iupac-o2-solid-psat
+  - ivtan-cro2-g
   - ivtan-mno-coo-thermo
   - janaf-4th
+  - kems-001-homma-1966
+  - kems-002-ohno-1967
+  - kems-003-pound-1972
+  - kems-005-fedkin-2006
   - kems-006-zhang-2021
+  - kems-007-costa-2015
+  - kems-008-schaefer-fegley-2004
+  - kems-009-safarian-2013
+  - kems-010-richter-2007
+  - kems-011-wetzel-gail-2013
+  - kems-012-sossi-2019
   - kems-014-drowart-2005
+  - kems-015-hashimoto-1983
+  - kems-016-stolyarova-1992
+  - kems-017-stolyarova-2013
+  - kems-018-stolyarova-2012
+  - kems-019-miller-armatys-2013
+  - kems-020-hastie-1981-nbsir
   - kems-021-plante-1992-feo
+  - kems-022-demaria-1971
   - kems-023-demaria-1973
   - kems-025-markova-1983
   - kems-026-markova-1984
+  - kems-027-plante-hastie-1983
   - kems-028-yakovlev-1984
   - kems-029-yakovlev-shornikov-2011
+  - kems-031-halwax-2024
+  - kems-032-copland-jacobson-2010
   - kems-033-shornikov-2010
+  - kems-035-sauerborn-2005
   - kems-036-sesko-2024
+  - kems-037-richter-2002
   - kems-038-matchett-2006
   - kems-040-stolyarova-2015
+  - kems-041-sossi-fegley-2018
+  - kems-042-plante-1979
   - kems-044-robinot-2026
+  - kems-045-sossi-2018-pnas-cr
   - kems-047-turkdogan-1984-isij
   - kems-048-turkdogan-2001-sio2-gamma
   - kems-049-kato-1993-ms-review
@@ -66,24 +91,34 @@ gaps:
   - kems-069-furukawa-1976
   - kems-087-yamada-kato-1980
   - kems-088-ichise-1975
+  - kems-093-piacente-1975
   - kems-095-ueda-1986
+  - kems-097-ikeda-1978
   - kems-103-fraser-1983
   - kems-105-yamada-1983
   - kems-111-ichise-1982
   - kems-112-ichise-1989
+  - kems-114-nichols-1995
   - kems-116-nunoue-1987
   - kems-118-yamamoto-1983
   - kems-119-furukawa-1975
   - kems-120-ueshima-1984
   - kems-127-qi-1989
+  - kems-132-nakajima-2016
   - kems-133-costa-2017
+  - kems-137-bischof-2023
+  - kems-138-bischof-2023
+  - kems-139-jacobson-2024
   - kems-140-heck-2025
   - kems-169-nakazawa-1976
+  - kems-184-behrens-1979
   - kems-188-nanjo-1976
+  - kems-189-bischof-2021
   - kems-190-wu-1993
   - kems-198-ichise-ueshima-1989
   - kems-200-ueshima-1983
   - kems-201-ichise-1986
+  - kems-ms2000-044
   - lamoreaux-hildenbrand-1984
   - lamoreaux-hildenbrand-hildenbrand-1987
   - lh87-al-o-gas-species
@@ -132,20 +167,25 @@ gaps:
   - ref-052-na-o-gas
   - reiss-2019-thermal-extraction-nulht2m
   - richter-et-al-2007
+  - robinot-2025-promes-review
   - safarian-engh-2013-si-pure-langmuir
   - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - sf04-magma-companion-workbook
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
+  - smales-1971-lpsc-12022
   - sossi-et-al-2019
   - span-wagner-1996-co2-psat
+  - stebbins-carmichael-weill-1983
   - steurer-1985-vapor-phase-pyrolysis
   - steurer-1992-vapor-phase-pyrolysis
   - street-2010-thermal-properties-simulants
+  - ts1985
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
   - wilkerson-2023-jsc1a-outgassing
+  - yam1983
   untracked_files: []
   extracts_with_private_locators:
   - fegley-2023-chemical-equilibrium-calculations-bu
@@ -190,212 +230,95 @@ gaps:
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
     missing_fields: &id001
     - doi
-  - source_id: kems-002-ohno-1967
-    sidecar_path: null
-    missing_fields: &id002
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-    missing_fields: &id003
+    missing_fields: &id002
     - retrieval_url
   - source_id: kems-005-fedkin-2006
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-    missing_fields: &id004
-    - retrieval_url
-  - source_id: kems-007-costa-2015
-    sidecar_path: null
-    missing_fields: &id005
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
-  - source_id: kems-008-schaefer-fegley-2004
-    sidecar_path: null
-    missing_fields: &id006
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
-  - source_id: kems-009-safarian-2013
-    sidecar_path: null
-    missing_fields: &id007
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
+    missing_fields: &id003
     - retrieval_url
   - source_id: kems-011-wetzel-gail-2013
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-    missing_fields: &id008
+    missing_fields: &id004
     - retrieved_date
     - retrieval_url
   - source_id: kems-012-sossi-2019
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-    missing_fields: &id009
+    missing_fields: &id005
     - sha256
     - retrieved_date
   - source_id: kems-014-drowart-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-    missing_fields: &id010
+    missing_fields: &id006
     - sha256
-    - retrieval_url
-  - source_id: kems-016-stolyarova-1992
-    sidecar_path: null
-    missing_fields: &id011
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
-  - source_id: kems-018-stolyarova-2012
-    sidecar_path: null
-    missing_fields: &id012
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
     - retrieval_url
   - source_id: kems-022-demaria-1971
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-    missing_fields: &id013
+    missing_fields: &id007
     - doi
-  - source_id: kems-031-halwax-2024
-    sidecar_path: null
-    missing_fields: &id014
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
-  - source_id: kems-032-copland-jacobson-2010
-    sidecar_path: null
-    missing_fields: &id015
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   - source_id: kems-035-sauerborn-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-    missing_fields: &id016
+    missing_fields: &id008
     - doi
   - source_id: kems-036-sesko-2024
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-    missing_fields: &id017
+    missing_fields: &id009
     - sha256
-    - retrieval_url
-  - source_id: kems-037-richter-2002
-    sidecar_path: null
-    missing_fields: &id018
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
     - retrieval_url
   - source_id: kems-041-sossi-fegley-2018
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-    missing_fields: &id019
+    missing_fields: &id010
     - retrieval_url
   - source_id: kems-042-plante-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-    missing_fields: &id020
+    missing_fields: &id011
     - sha256
-  - source_id: kems-045-sossi-2018-pnas-cr
-    sidecar_path: null
-    missing_fields: &id021
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   - source_id: kems-050-gorokhov-1977
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-    missing_fields: &id022
+    missing_fields: &id012
     - doi
     - sha256
   - source_id: kems-093-piacente-1975
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-    missing_fields: &id023
+    missing_fields: &id013
     - doi
   - source_id: kems-103-fraser-1983
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-    missing_fields: &id024
+    missing_fields: &id014
     - sha256
   - source_id: kems-114-nichols-1995
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-    missing_fields: &id025
+    missing_fields: &id015
     - doi
   - source_id: kems-133-costa-2017
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-    missing_fields: &id026
+    missing_fields: &id016
     - sha256
-  - source_id: kems-137-bischof-2023-mmc1
-    sidecar_path: null
-    missing_fields: &id027
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   - source_id: kems-140-heck-2025
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-    missing_fields: &id028
+    missing_fields: &id017
     - sha256
   - source_id: kems-184-behrens-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-    missing_fields: &id029
+    missing_fields: &id018
     - doi
     - sha256
   - source_id: kems-ms2000-044
     sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-    missing_fields: &id030
+    missing_fields: &id019
     - doi
     - retrieval_url
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-    missing_fields: &id031
+    missing_fields: &id020
     - doi
     - retrieved_date
   - source_id: stebbins-carmichael-weill-1983
     sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-    missing_fields: &id032
+    missing_fields: &id021
     - doi
     - retrieved_date
-  - source_id: ts1985
-    sidecar_path: null
-    missing_fields: &id033
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
-  - source_id: yam1983
-    sidecar_path: null
-    missing_fields: &id034
-    - citation
-    - doi
-    - license_or_oa_basis
-    - sha256
-    - retrieved_date
-    - retrieval_url
   source_id_collisions:
   - type: filename_stem_mismatch
     key: kems-ms2000-044
@@ -530,7 +453,6 @@ gaps:
     key: bischof-2023
     source_ids:
     - kems-137-bischof-2023
-    - kems-137-bischof-2023-mmc1
     - kems-138-bischof-2023
     resolution: owner/controller
   - type: source_id_alias
@@ -1221,14 +1143,14 @@ sources:
   doi: 10.1016/j.chemer.2023.125961
   report_number: null
   identifier: 10.1016/j.chemer.2023.125961
-  pdf_status: present
-  pdf_path: docs/references/pdfs/02-thermochemistry/fegley-2023-chemical-equilibrium-calculations-bu.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 093cbfa92e10c8ad1fd210083b64370ff26f0c47b0eae8d6e1ebde8e8566c2ba
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/fegley-2023-chemical-equilibrium-calculations-bu.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml
     review_status: draft
@@ -1244,7 +1166,7 @@ sources:
       path: raw/fegley-2023-chemical-equilibrium-calculations-bu/fegley-2023-chemical-equilibrium-calculations-bu.pdf
       present: true
       sha256: 093cbfa92e10c8ad1fd210083b64370ff26f0c47b0eae8d6e1ebde8e8566c2ba
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/fegley-2023-chemical-equilibrium-calculations-bu/sidecar.yaml
       present: true
@@ -1750,14 +1672,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: f8929e9bf38d67adf221bad8e8c79beff2aeeb2861c1de095a8630f8e1b0b7f6
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
   sidecar_missing_fields: *id001
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/ivtan-cro2-g.yaml
     review_status: draft
@@ -1772,7 +1694,7 @@ sources:
       path: raw/ivtan-cro2-g/ivtan-cro2-g.pdf
       present: true
       sha256: f8929e9bf38d67adf221bad8e8c79beff2aeeb2861c1de095a8630f8e1b0b7f6
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/ivtan-cro2-g/sidecar.yaml
       present: true
@@ -1920,14 +1842,14 @@ sources:
   doi: 10.2320/jinstmet1952.30.6_515
   report_number: null
   identifier: 10.2320/jinstmet1952.30.6_515
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 697fe8c64d73886a86ae4b171613cf0aead21df80405d81f3458d3c446c21d14
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-001-homma-1966.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-001-homma-1966.yaml
     review_status: draft
@@ -1943,7 +1865,7 @@ sources:
       path: raw/kems-001-homma-1966/kems-001-homma-1966.pdf
       present: true
       sha256: 697fe8c64d73886a86ae4b171613cf0aead21df80405d81f3458d3c446c21d14
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-001-homma-1966/sidecar.yaml
       present: true
@@ -1973,14 +1895,20 @@ sources:
   doi: 10.2320/jinstmet1952.31.10_1164
   report_number: null
   identifier: 10.2320/jinstmet1952.31.10_1164
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-002-ohno-1967.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 6cc070016e906739168814eba733772d3b9e258b969627d4e88856f0ffdd4687
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id002
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-002-ohno-1967.yaml
     review_status: draft
@@ -1996,7 +1924,7 @@ sources:
       path: raw/kems-002-ohno-1967/kems-002-ohno-1967.pdf
       present: true
       sha256: 6cc070016e906739168814eba733772d3b9e258b969627d4e88856f0ffdd4687
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-002-ohno-1967/sidecar.yaml
       present: true
@@ -2030,13 +1958,13 @@ sources:
   doi: 10.1063/1.3253096
   report_number: null
   identifier: 10.1063/1.3253096
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: e9d7aa7924e4b6c8982e9dfc75cf3bf75a665d2c95ef55fe2424572120c5e5cb
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-  sidecar_missing_fields: *id003
+  sidecar_missing_fields: *id002
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
@@ -2055,7 +1983,7 @@ sources:
       path: raw/kems-003-pound-1972/kems-003-pound-1972.pdf
       present: true
       sha256: e9d7aa7924e4b6c8982e9dfc75cf3bf75a665d2c95ef55fe2424572120c5e5cb
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-003-pound-1972/sidecar.yaml
       present: true
@@ -2088,13 +2016,13 @@ sources:
   doi: 10.1016/j.gca.2005.08.014
   report_number: null
   identifier: 10.1016/j.gca.2005.08.014
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: fb4370290c5d86efd97490de83c0e811dcaf75ae84050153f0636685e9e63600
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-  sidecar_missing_fields: *id004
+  sidecar_missing_fields: *id003
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
@@ -2113,7 +2041,7 @@ sources:
       path: raw/kems-005-fedkin-2006/kems-005-fedkin-2006.pdf
       present: true
       sha256: fb4370290c5d86efd97490de83c0e811dcaf75ae84050153f0636685e9e63600
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-005-fedkin-2006/sidecar.yaml
       present: true
@@ -2203,14 +2131,20 @@ sources:
   doi: null
   report_number: NTRS 20150002321
   identifier: NTRS 20150002321
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-007-costa-2015.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: fa9c9c9297ace9cb9e677cba12351c3c326cdef6d7ae66d2d31f0688426374ff
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id005
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-007-costa-2015.yaml
     review_status: draft
@@ -2226,7 +2160,7 @@ sources:
       path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
       present: true
       sha256: fa9c9c9297ace9cb9e677cba12351c3c326cdef6d7ae66d2d31f0688426374ff
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-007-costa-2015/sidecar.yaml
       present: true
@@ -2258,14 +2192,20 @@ sources:
   doi: 10.1016/j.icarus.2003.08.023
   report_number: null
   identifier: 10.1016/j.icarus.2003.08.023
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-008-schaefer-fegley-2004.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: c50765341a3be2cdd0e305cda582f996f4f3a7046469e327043a70493f46c46c
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id006
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-008-schaefer-fegley-2004.yaml
     review_status: draft
@@ -2281,7 +2221,7 @@ sources:
       path: raw/kems-008-schaefer-fegley-2004/kems-008-schaefer-fegley-2004.pdf
       present: true
       sha256: c50765341a3be2cdd0e305cda582f996f4f3a7046469e327043a70493f46c46c
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-008-schaefer-fegley-2004/sidecar.yaml
       present: true
@@ -2311,14 +2251,20 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-009-safarian-2013.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 4b8330567349e54b9642880efc46f7633c1af7ccfa280ae3808cf8601fa624d3
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id007
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-009-safarian-2013.yaml
     review_status: draft
@@ -2334,7 +2280,7 @@ sources:
       path: raw/kems-009-safarian-2013/kems-009-safarian-2013.pdf
       present: true
       sha256: 4b8330567349e54b9642880efc46f7633c1af7ccfa280ae3808cf8601fa624d3
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-009-safarian-2013/sidecar.yaml
       present: true
@@ -2366,11 +2312,11 @@ sources:
   doi: 10.1016/j.gca.2007.09.005
   report_number: null
   identifier: 10.1016/j.gca.2007.09.005
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: b4155d8af4d8ab48ae6a90d954596d9d9daa5e3c5bb35d13b54480721ccb19a9
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.md
   sidecar_missing_fields: []
   access_status: held
@@ -2389,7 +2335,7 @@ sources:
       path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf
       present: true
       sha256: b4155d8af4d8ab48ae6a90d954596d9d9daa5e3c5bb35d13b54480721ccb19a9
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-010-richter-2007/sidecar.yaml
       present: true
@@ -2420,13 +2366,13 @@ sources:
   doi: 10.1051/0004-6361/201220803
   report_number: null
   identifier: 10.1051/0004-6361/201220803
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: e4cfdd959dfed9f911cc6afc8a0dc8cdad009f31771596e28834eacf032ccf6b
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-  sidecar_missing_fields: *id008
+  sidecar_missing_fields: *id004
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
@@ -2443,7 +2389,7 @@ sources:
       path: raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf
       present: true
       sha256: e4cfdd959dfed9f911cc6afc8a0dc8cdad009f31771596e28834eacf032ccf6b
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-011-wetzel-gail-2013/sidecar.yaml
       present: true
@@ -2475,14 +2421,14 @@ sources:
   doi: 10.1016/j.gca.2019.06.021
   report_number: null
   identifier: 10.1016/j.gca.2019.06.021
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: fcf005d7380c2487eb97a24e0ab0aee05acc97d522428c87b6c4c765720020a4
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-  sidecar_missing_fields: *id009
-  access_status: held
+  sidecar_missing_fields: *id005
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
     review_status: draft
@@ -2498,7 +2444,7 @@ sources:
       path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
       present: true
       sha256: fcf005d7380c2487eb97a24e0ab0aee05acc97d522428c87b6c4c765720020a4
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-012-sossi-2019/sidecar.yaml
       present: true
@@ -2536,7 +2482,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-  sidecar_missing_fields: *id010
+  sidecar_missing_fields: *id006
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
@@ -2584,14 +2530,14 @@ sources:
   doi: 10.2343/geochemj.17.111
   report_number: null
   identifier: 10.2343/geochemj.17.111
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-015-hashimoto-1983.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: d0948c1e8d6d843e9e30d8d85c6c25c9a0e5e7c9b97f6d55d6429132107d7af7
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-015-hashimoto-1983.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-015-hashimoto-1983.yaml
     review_status: draft
@@ -2607,7 +2553,7 @@ sources:
       path: raw/kems-015-hashimoto-1983/kems-015-hashimoto-1983.pdf
       present: true
       sha256: d0948c1e8d6d843e9e30d8d85c6c25c9a0e5e7c9b97f6d55d6429132107d7af7
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-015-hashimoto-1983/sidecar.yaml
       present: true
@@ -2637,14 +2583,20 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-016-stolyarova-1992.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: d8cb86b6f118de8d78fd007b413e4c2ae8c38cc1f3f5de06c18ed3ac51967372
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id011
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-016-stolyarova-1992.yaml
     review_status: draft
@@ -2660,7 +2612,7 @@ sources:
       path: raw/kems-016-stolyarova-1992/kems-016-stolyarova-1992.pdf
       present: true
       sha256: d8cb86b6f118de8d78fd007b413e4c2ae8c38cc1f3f5de06c18ed3ac51967372
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-016-stolyarova-1992/sidecar.yaml
       present: true
@@ -2690,14 +2642,14 @@ sources:
   doi: 10.2174/1874396x01307010057
   report_number: null
   identifier: 10.2174/1874396x01307010057
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-017-stolyarova-2013.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: dd4c37200290a118557bfda5395d9553a2c52f7e7f2a694fd166e82679f63869
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-017-stolyarova-2013.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-017-stolyarova-2013.yaml
     review_status: draft
@@ -2713,7 +2665,7 @@ sources:
       path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
       present: true
       sha256: dd4c37200290a118557bfda5395d9553a2c52f7e7f2a694fd166e82679f63869
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-017-stolyarova-2013/sidecar.yaml
       present: true
@@ -2743,14 +2695,20 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-018-stolyarova-2012.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 7a9c05dd81d50994911b82a891f0bc82f80994e4a30535b2c593ffeb441b4d2f
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id012
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-018-stolyarova-2012.yaml
     review_status: draft
@@ -2766,7 +2724,7 @@ sources:
       path: raw/kems-018-stolyarova-2012/kems-018-stolyarova-2012.pdf
       present: true
       sha256: 7a9c05dd81d50994911b82a891f0bc82f80994e4a30535b2c593ffeb441b4d2f
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-018-stolyarova-2012/sidecar.yaml
       present: true
@@ -2797,14 +2755,14 @@ sources:
   doi: 10.2174/1874396X01307010002
   report_number: null
   identifier: 10.2174/1874396X01307010002
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-019-miller-armatys-2013.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 0b30fe164d5144ff845faf06afe4ffa55b3278babe2451080198ab94529922e4
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-019-miller-armatys-2013.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-019-miller-armatys-2013.yaml
     review_status: draft
@@ -2819,7 +2777,7 @@ sources:
       path: raw/kems-019-miller-armatys-2013/kems-019-miller-armatys-2013.pdf
       present: true
       sha256: 0b30fe164d5144ff845faf06afe4ffa55b3278babe2451080198ab94529922e4
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-019-miller-armatys-2013/sidecar.yaml
       present: true
@@ -2849,14 +2807,14 @@ sources:
   doi: 10.6028/NBS.IR.81-2279
   report_number: NBSIR 81-2279
   identifier: 10.6028/NBS.IR.81-2279
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-020-hastie-1981-nbsir.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 0d636804cffa773a18ff3c81cf68ff139939eedf4fa882faf76911b4552e8a8d
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-020-hastie-1981-nbsir.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
     review_status: draft
@@ -2872,7 +2830,7 @@ sources:
       path: raw/kems-020-hastie-1981-nbsir/kems-020-hastie-1981-nbsir.pdf
       present: true
       sha256: 0d636804cffa773a18ff3c81cf68ff139939eedf4fa882faf76911b4552e8a8d
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-020-hastie-1981-nbsir/sidecar.yaml
       present: true
@@ -2961,13 +2919,13 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 6068fe24df64202e61bc4f7491f453d0f34158fff962d39dc90d356096fcd796
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-  sidecar_missing_fields: *id013
+  sidecar_missing_fields: *id007
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
@@ -2984,7 +2942,7 @@ sources:
       path: raw/kems-022-demaria-1971/kems-022-demaria-1971.pdf
       present: true
       sha256: 6068fe24df64202e61bc4f7491f453d0f34158fff962d39dc90d356096fcd796
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-022-demaria-1971/sidecar.yaml
       present: true
@@ -3190,14 +3148,14 @@ sources:
   doi: 10.6028/NBS.IR.83-2731
   report_number: NBSIR 83-2731
   identifier: 10.6028/NBS.IR.83-2731
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-027-plante-hastie-1983.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: c246e1866d67faac6fd48d18051c60c57bddcf92c2dd2e3983abdda92e459df8
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-027-plante-hastie-1983.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-027-plante-hastie-1983.yaml
     review_status: draft
@@ -3213,7 +3171,7 @@ sources:
       path: raw/kems-027-plante-hastie-1983/kems-027-plante-hastie-1983.pdf
       present: true
       sha256: c246e1866d67faac6fd48d18051c60c57bddcf92c2dd2e3983abdda92e459df8
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-027-plante-hastie-1983/sidecar.yaml
       present: true
@@ -3361,14 +3319,20 @@ sources:
   doi: 10.1007/s11663-024-02995-6
   report_number: null
   identifier: 10.1007/s11663-024-02995-6
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-031-halwax-2024.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 9d60e03e008c173aa5facb3eb80621f01f78e737e743b3547d8c19740132f026
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id014
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-031-halwax-2024.yaml
     review_status: draft
@@ -3388,7 +3352,7 @@ sources:
       path: raw/kems-031-halwax-2024/kems-031-halwax-2024.pdf
       present: true
       sha256: 9d60e03e008c173aa5facb3eb80621f01f78e737e743b3547d8c19740132f026
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-031-halwax-2024/sidecar.yaml
       present: true
@@ -3418,14 +3382,20 @@ sources:
   doi: null
   report_number: NTRS 20110001597
   identifier: NTRS 20110001597
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-032-copland-jacobson-2010.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: a72ca745e22531dc42dc7b4d59813ac8a38f255af86023e56f1d1098637dff92
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id015
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-032-copland-jacobson-2010.yaml
     review_status: draft
@@ -3441,7 +3411,7 @@ sources:
       path: raw/kems-032-copland-jacobson-2010/kems-032-copland-jacobson-2010.pdf
       present: true
       sha256: a72ca745e22531dc42dc7b4d59813ac8a38f255af86023e56f1d1098637dff92
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-032-copland-jacobson-2010/sidecar.yaml
       present: true
@@ -3529,14 +3499,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 764845565460a247ae6dc68a66673d1ad4dc95521d748b3b25ce1d813f11a027
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-  sidecar_missing_fields: *id016
-  access_status: held
+  sidecar_missing_fields: *id008
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
     review_status: draft
@@ -3552,7 +3522,7 @@ sources:
       path: raw/kems-035-sauerborn-2005/kems-035-sauerborn-2005.pdf
       present: true
       sha256: 764845565460a247ae6dc68a66673d1ad4dc95521d748b3b25ce1d813f11a027
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-035-sauerborn-2005/sidecar.yaml
       present: true
@@ -3591,7 +3561,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-  sidecar_missing_fields: *id017
+  sidecar_missing_fields: *id009
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
@@ -3642,14 +3612,20 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-037-richter-2002.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: c64b38eacaa46219824d76d546304aa62e866e989e4260c7188d321e3122d8ae
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id018
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-037-richter-2002.yaml
     review_status: draft
@@ -3665,7 +3641,7 @@ sources:
       path: raw/kems-037-richter-2002/kems-037-richter-2002.pdf
       present: true
       sha256: c64b38eacaa46219824d76d546304aa62e866e989e4260c7188d321e3122d8ae
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-037-richter-2002/sidecar.yaml
       present: true
@@ -3814,13 +3790,13 @@ sources:
   doi: 10.2138/rmg.2018.84.11
   report_number: null
   identifier: 10.2138/rmg.2018.84.11
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: d46a4c09ea9b57e89f34ba41630dd839fb2f64ed4943a886b779bde262dca282
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-  sidecar_missing_fields: *id019
+  sidecar_missing_fields: *id010
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
@@ -3837,7 +3813,7 @@ sources:
       path: raw/kems-041-sossi-fegley-2018/kems-041-sossi-fegley-2018.pdf
       present: true
       sha256: d46a4c09ea9b57e89f34ba41630dd839fb2f64ed4943a886b779bde262dca282
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-041-sossi-fegley-2018/sidecar.yaml
       present: true
@@ -3871,14 +3847,14 @@ sources:
   doi: 10.6028/NBS.SP.561v1
   report_number: NBS Special Publication 561
   identifier: 10.6028/NBS.SP.561v1
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: a46c2132d5741f6321311cd2d9160d1cc51098bfa30cbb2672bcadf3fa84427b
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-  sidecar_missing_fields: *id020
-  access_status: held
+  sidecar_missing_fields: *id011
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
     review_status: draft
@@ -3893,7 +3869,7 @@ sources:
       path: raw/kems-042-plante-1979/kems-042-plante-1979.pdf
       present: true
       sha256: a46c2132d5741f6321311cd2d9160d1cc51098bfa30cbb2672bcadf3fa84427b
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-042-plante-1979/sidecar.yaml
       present: true
@@ -3988,14 +3964,20 @@ sources:
   doi: 10.1073/pnas.1809060115
   report_number: null
   identifier: 10.1073/pnas.1809060115
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 47384f82da878b0590098d9eaf0d3e7b8f828f665ca62aeb4d6b0a8631a36514
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id021
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml
     review_status: draft
@@ -4010,7 +3992,7 @@ sources:
       path: raw/kems-045-sossi-2018-pnas-cr/kems-045-sossi-2018-pnas-cr.pdf
       present: true
       sha256: 6f4f7b74ab9a3e26f381b79fba929c7af24b02d0be5bf6c4e183c7e145b70ffb
-      matches_simulator: false
+      matches_simulator: null
     sidecar:
       path: raw/kems-045-sossi-2018-pnas-cr/sidecar.yaml
       present: true
@@ -4226,7 +4208,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-  sidecar_missing_fields: *id022
+  sidecar_missing_fields: *id012
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -4681,14 +4663,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 5cd60861bd4d04a70a44ea0b3203b6931b139c68b3a9d2d70c6ded39f39b8797
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-  sidecar_missing_fields: *id023
-  access_status: held
+  sidecar_missing_fields: *id013
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-093-piacente-1975.yaml
     review_status: draft
@@ -4703,7 +4685,7 @@ sources:
       path: raw/kems-093-piacente-1975/kems-093-piacente-1975.pdf
       present: true
       sha256: 5cd60861bd4d04a70a44ea0b3203b6931b139c68b3a9d2d70c6ded39f39b8797
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-093-piacente-1975/sidecar.yaml
       present: true
@@ -4792,14 +4774,14 @@ sources:
   doi: 10.5702/massspec1953.26.159
   report_number: null
   identifier: 10.5702/massspec1953.26.159
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-097-ikeda-1978.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: c8e224284e6075c7dbf2df29c2cba1c6de81696d76df0d967e4dc36d6a8fe6c1
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-097-ikeda-1978.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-097-ikeda-1978.yaml
     review_status: draft
@@ -4814,7 +4796,7 @@ sources:
       path: raw/kems-097-ikeda-1978/kems-097-ikeda-1978.pdf
       present: true
       sha256: c8e224284e6075c7dbf2df29c2cba1c6de81696d76df0d967e4dc36d6a8fe6c1
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-097-ikeda-1978/sidecar.yaml
       present: true
@@ -4851,7 +4833,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-  sidecar_missing_fields: *id024
+  sidecar_missing_fields: *id014
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-103-fraser-1983.yaml
@@ -5074,14 +5056,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: ef3a44e75a503a36b43e8d4f17772b7bf23da8940118478528a08361469dfe8e
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-  sidecar_missing_fields: *id025
-  access_status: held
+  sidecar_missing_fields: *id015
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-114-nichols-1995.yaml
     review_status: draft
@@ -5096,7 +5078,7 @@ sources:
       path: raw/kems-114-nichols-1995/kems-114-nichols-1995.pdf
       present: true
       sha256: ef3a44e75a503a36b43e8d4f17772b7bf23da8940118478528a08361469dfe8e
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-114-nichols-1995/sidecar.yaml
       present: true
@@ -5418,14 +5400,14 @@ sources:
   doi: 10.5702/massspectrometry.S0055
   report_number: null
   identifier: 10.5702/massspectrometry.S0055
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-132-nakajima-2016.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 04e482068ebbefe7cd1a2fd0e93ab97217cfe48610ed45919615b9b522227de0
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-132-nakajima-2016.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-132-nakajima-2016.yaml
     review_status: draft
@@ -5440,7 +5422,7 @@ sources:
       path: raw/kems-132-nakajima-2016/kems-132-nakajima-2016.pdf
       present: true
       sha256: 04e482068ebbefe7cd1a2fd0e93ab97217cfe48610ed45919615b9b522227de0
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-132-nakajima-2016/sidecar.yaml
       present: true
@@ -5477,7 +5459,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-  sidecar_missing_fields: *id026
+  sidecar_missing_fields: *id016
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-133-costa-2017.yaml
@@ -5524,15 +5506,14 @@ sources:
   doi: 10.1016/j.gca.2023.08.027
   report_number: null
   identifier: 10.1016/j.gca.2023.08.027
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
-  pdf_last_seen:
-  - docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
-  pdf_sha256: f45740c7726edc4a281f98ec83930cf15abebddd4ef7d3e1d9b9cb01e0322c3c
-  pdf_tracked: true
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-137-bischof-2023.yaml
     review_status: draft
@@ -5547,7 +5528,7 @@ sources:
       path: raw/kems-137-bischof-2023/kems-137-bischof-2023.pdf
       present: true
       sha256: f45740c7726edc4a281f98ec83930cf15abebddd4ef7d3e1d9b9cb01e0322c3c
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-137-bischof-2023/sidecar.yaml
       present: true
@@ -5570,54 +5551,6 @@ sources:
       last_stage: scored
       date: '2026-09-06'
     commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
-- source_id: kems-137-bischof-2023-mmc1
-  aliases: []
-  citation: null
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023-mmc1.pdf
-  pdf_last_seen: []
-  pdf_sha256: d1f83880470ef1b12bb01083a8d7a80b3a6ccf5e28a310c43bbfb5aa12ca37c7
-  pdf_tracked: true
-  sidecar_path: null
-  sidecar_missing_fields: *id027
-  access_status: held
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/kems-137-bischof-2023-mmc1/kems-137-bischof-2023-mmc1.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/kems-137-bischof-2023-mmc1/sidecar.yaml
-      present: false
-    text:
-      path: text/kems-137-bischof-2023-mmc1
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/kems-137-bischof-2023-mmc1
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/kems-137-bischof-2023-mmc1.yaml
-      present: false
-      matches_simulator: null
-    ledger:
-      path: ledger/kems-137-bischof-2023-mmc1.yaml
-      present: false
-      error: null
-      last_stage: null
-      date: null
-    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-138-bischof-2023
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Quantification
@@ -5626,14 +5559,14 @@ sources:
   doi: 10.1016/j.calphad.2022.102507
   report_number: null
   identifier: 10.1016/j.calphad.2022.102507
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-138-bischof-2023.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: cd9ab2b731850400e2562fd4b915e9f9737ecac30fdf4944ca2d1cd724a17485
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-138-bischof-2023.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-138-bischof-2023.yaml
     review_status: draft
@@ -5648,7 +5581,7 @@ sources:
       path: raw/kems-138-bischof-2023/kems-138-bischof-2023.pdf
       present: true
       sha256: cd9ab2b731850400e2562fd4b915e9f9737ecac30fdf4944ca2d1cd724a17485
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-138-bischof-2023/sidecar.yaml
       present: true
@@ -5679,14 +5612,14 @@ sources:
   doi: 10.1002/rcm.9744
   report_number: null
   identifier: 10.1002/rcm.9744
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-139-jacobson-2024.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 3896c027a2c5add755999981b3232bae6735844113f2560a95d11c4324190218
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-139-jacobson-2024.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-139-jacobson-2024.yaml
     review_status: draft
@@ -5701,7 +5634,7 @@ sources:
       path: raw/kems-139-jacobson-2024/kems-139-jacobson-2024.pdf
       present: true
       sha256: 3896c027a2c5add755999981b3232bae6735844113f2560a95d11c4324190218
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-139-jacobson-2024/sidecar.yaml
       present: true
@@ -5738,7 +5671,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-  sidecar_missing_fields: *id028
+  sidecar_missing_fields: *id017
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-140-heck-2025.yaml
@@ -5844,14 +5777,14 @@ sources:
   doi: null
   report_number: NBS Special Publication 561
   identifier: NBS Special Publication 561
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 02bcfb56d0d2cb67ad7686bd574c625abc6227910cebce3cf2cf9a38e7571e57
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-  sidecar_missing_fields: *id029
-  access_status: held
+  sidecar_missing_fields: *id018
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-184-behrens-1979.yaml
     review_status: draft
@@ -5866,7 +5799,7 @@ sources:
       path: raw/kems-184-behrens-1979/kems-184-behrens-1979.pdf
       present: true
       sha256: 02bcfb56d0d2cb67ad7686bd574c625abc6227910cebce3cf2cf9a38e7571e57
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-184-behrens-1979/sidecar.yaml
       present: true
@@ -5955,14 +5888,14 @@ sources:
   doi: 10.7185/gold2021.7353
   report_number: null
   identifier: 10.7185/gold2021.7353
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/kems-189-bischof-2021.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 3a20da0144fd1684261520e67a120937a0ef80bf865ca66bdc4afafdfc90d26e
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-189-bischof-2021.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/kems-189-bischof-2021.yaml
     review_status: draft
@@ -5977,7 +5910,7 @@ sources:
       path: raw/kems-189-bischof-2021/kems-189-bischof-2021.pdf
       present: true
       sha256: 3a20da0144fd1684261520e67a120937a0ef80bf865ca66bdc4afafdfc90d26e
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-189-bischof-2021/sidecar.yaml
       present: true
@@ -6243,14 +6176,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 3d78f4e6403b3512176071c79a8ac88e263f7d87c5b1e0159e2e133fb0f4d1b1
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-  sidecar_missing_fields: *id030
-  access_status: held
+  sidecar_missing_fields: *id019
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
     review_status: draft
@@ -6266,7 +6199,7 @@ sources:
       path: raw/kems-ms2000-044/kems-ms2000-044.pdf
       present: true
       sha256: 3d78f4e6403b3512176071c79a8ac88e263f7d87c5b1e0159e2e133fb0f4d1b1
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/kems-ms2000-044/sidecar.yaml
       present: true
@@ -9131,14 +9064,14 @@ sources:
   doi: 10.1016/j.actaastro.2025.05.008
   report_number: null
   identifier: 10.1016/j.actaastro.2025.05.008
-  pdf_status: present
-  pdf_path: docs/references/pdfs/03-vacuum-pyrolysis/robinot-2025-promes-review.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 13dd75d461b66eaad6651f379db240b9cf742d061d769145d5cc92c7663bad23
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/03-vacuum-pyrolysis/robinot-2025-promes-review.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts:
   - path: data/literature/extracts/robinot-2025-promes-review.yaml
     review_status: draft
@@ -9153,7 +9086,7 @@ sources:
       path: raw/robinot-2025-promes-review/robinot-2025-promes-review.pdf
       present: true
       sha256: 13dd75d461b66eaad6651f379db240b9cf742d061d769145d5cc92c7663bad23
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/robinot-2025-promes-review/sidecar.yaml
       present: true
@@ -9535,14 +9468,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 7af2b6b0f870ba5b92a3ec6f490449eb7c9fc2f20f069a8bab9a21762e014fec
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-  sidecar_missing_fields: *id031
-  access_status: held
+  sidecar_missing_fields: *id020
+  access_status: OA
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
     review_status: draft
@@ -9558,7 +9491,7 @@ sources:
       path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
       present: true
       sha256: 7af2b6b0f870ba5b92a3ec6f490449eb7c9fc2f20f069a8bab9a21762e014fec
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/smales-1971-lpsc-12022/sidecar.yaml
       present: true
@@ -9708,14 +9641,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: present
-  pdf_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 5246cf5b6bfd79f16961aac8264757af04da1d308e5d6b860aac747a44b2d8d6
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-  sidecar_missing_fields: *id032
-  access_status: held
+  sidecar_missing_fields: *id021
+  access_status: OA
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
     review_status: draft
@@ -9731,7 +9664,7 @@ sources:
       path: raw/stebbins-carmichael-weill-1983/stebbins-carmichael-weill-1983.pdf
       present: true
       sha256: 5246cf5b6bfd79f16961aac8264757af04da1d308e5d6b860aac747a44b2d8d6
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/stebbins-carmichael-weill-1983/sidecar.yaml
       present: true
@@ -9938,14 +9871,20 @@ sources:
   doi: 10.2355/tetsutohagane1955.71.7_815
   report_number: null
   identifier: 10.2355/tetsutohagane1955.71.7_815
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/ts1985.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 8345faa48d38200c457cb0af9a15c44c4cddedad8c93cac3ca1d118de4a7c7c8
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id033
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/ts1985.yaml
     review_status: draft
@@ -9960,7 +9899,7 @@ sources:
       path: raw/ts1985/ts1985.pdf
       present: true
       sha256: 8345faa48d38200c457cb0af9a15c44c4cddedad8c93cac3ca1d118de4a7c7c8
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/ts1985/sidecar.yaml
       present: true
@@ -10171,14 +10110,14 @@ sources:
   doi: 10.2355/isijinternational.33.26
   report_number: null
   identifier: 10.2355/isijinternational.33.26
-  pdf_status: present
-  pdf_path: docs/references/pdfs/02-thermochemistry/wu-1993-feo-mgo-sio2.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: 7f0812efada072157055f4330e0ef484d17612385a8140b8d7c0027b9765f1de
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/wu-1993-feo-mgo-sio2.md
   sidecar_missing_fields: []
-  access_status: held
+  access_status: OA
   extracts: []
   battery_datasets: []
   hunt_ids: []
@@ -10221,14 +10160,20 @@ sources:
   doi: 10.2320/jinstmet1952.47.9_736
   report_number: null
   identifier: 10.2320/jinstmet1952.47.9_736
-  pdf_status: present
-  pdf_path: docs/references/pdfs/99-kems-langmuir/yam1983.pdf
+  pdf_status: ABSENT
+  pdf_path: null
   pdf_last_seen: []
-  pdf_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
-  pdf_tracked: true
+  pdf_sha256: null
+  pdf_tracked: null
   sidecar_path: null
-  sidecar_missing_fields: *id034
-  access_status: held
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
   extracts:
   - path: data/literature/extracts/yam1983.yaml
     review_status: draft
@@ -10243,7 +10188,7 @@ sources:
       path: raw/yam1983/yam1983.pdf
       present: true
       sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
-      matches_simulator: true
+      matches_simulator: null
     sidecar:
       path: raw/yam1983/sidecar.yaml
       present: true
