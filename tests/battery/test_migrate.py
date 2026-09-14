@@ -34,6 +34,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     convert_temperature_to_k,
     map_phase,
+    map_quantity,
     load_migrated_store,
     migrate,
     pressure_from_equipment,
@@ -2094,3 +2095,227 @@ def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
     ]
     assert phase_entries
     assert any("phase" in (e.why or "").lower() or True for e in phase_entries)
+
+
+def _quantity_state(obs) -> tuple[object, str | None]:
+    ident = obs.identity
+    token = quantity_token(ident)
+    reason = None
+    q = ident.quantity
+    if hasattr(q, "reason"):
+        reason = q.reason
+    return token, reason
+
+
+def _queue_blob(result, obs_id: str) -> str:
+    return " ".join(
+        e.why or ""
+        for e in result.queue
+        if e.observation_id == obs_id or (e.observation_id or "").endswith(obs_id)
+    )
+
+
+def test_l01_type_does_not_assign_contradicted_alpha(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="dimensionless",
+        values={
+            "method_class": "model_derived",
+            "olette_alpha_theoretical": 1095,
+            "not_hkl_langmuir_coefficient": True,
+            "note": "Not an experimental HKL coefficient",
+        },
+        obs_type="alpha",
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = (
+        "homma_1966_mn_olette_theoretical_quoted_deep"
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, reason = _quantity_state(obs)
+    assert token is None
+    blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
+    assert "not_hkl_langmuir_coefficient" in blob or "HKL" in blob
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_gibbs_type_does_not_assign_dissociation_note(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="kJ/mol and J/(mol·K) for formation; over_R in kK as published",
+        values={
+            "gas_species": "EuO",
+            "note": "dissociation energies of gaseous REE monoxides; numeric D0 not transcribed",
+        },
+        obs_type="gibbs_table",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, reason = _quantity_state(obs)
+    assert token is None
+    blob = " ".join(filter(None, [reason, _queue_blob(result, obs.observation_id)]))
+    assert "dissociation" in blob.lower()
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_gibbs_type_does_not_assign_vapor_pressure_equations(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="kJ/mol and J/(mol·K) for formation; over_R in kK as published",
+        values={
+            "note": "equations for partial vapor pressures over VO; numeric A,B not recovered",
+        },
+        obs_type="gibbs_table",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is None
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_activity_type_does_not_assign_ordering_units(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="dimensionless ordering (not a numeric gamma)",
+        values={"semantics": "bound_not_point_ordering", "speciation_note": "VO(g) > V(g)"},
+        obs_type="activity_coefficient",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is None
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_rate_type_does_not_assign_partial_pressure_units(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="as published (partial pressure; Fig. 5 lg P scale)",
+        values={"gas_species": "SiO(g)", "semantics": "bound_not_point_ordering"},
+        obs_type="rate_series",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is None
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_alpha_field_is_not_hkl_when_flagged(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="dimensionless",
+        values={
+            "alpha": 115,
+            "not_hkl_langmuir_coefficient": True,
+            "method_class": "measured_direct",
+        },
+        obs_type="alpha",
+    )
+    extract["species"]["Na"]["observations"][0]["regime"] = (
+        "olette_relative_evaporation_coefficient"
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is None
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any("quantity" in (e.axes or ()) for e in result.queue)
+
+
+def test_l01_janaf_evaluator_gibbs_table_stays_delta_fg(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="NASA CEA polynomial",
+        values={
+            "evaluator_family": "nasa_cea_9",
+            "reference_pressure_Pa": 100000.0,
+            "segments": [{"T_min_K": 300.0, "T_max_K": 1000.0}],
+            "method_class": "compilation_calculated_table",
+        },
+        obs_type="gibbs_table",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is Quantity.DELTA_FG
+
+
+def test_l01_costa_olivine_alpha_stays_evaporation_coefficient(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="",
+        units="dimensionless",
+        values={"alpha": 0.02, "method_class": "measured_direct", "gas_species": "Fe(g)"},
+        obs_type="alpha",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    token, _reason = _quantity_state(obs)
+    assert token is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("0.02")
+
+
+def test_l01_map_quantity_direct_witnesses() -> None:
+    cases = [
+        (
+            "alpha",
+            {"not_hkl_langmuir_coefficient": True, "note": "Not an experimental HKL coefficient"},
+            "dimensionless",
+            None,
+        ),
+        (
+            "gibbs_table",
+            {"note": "dissociation energies of gaseous REE monoxides including EuO"},
+            "kJ/mol and J/(mol·K) for formation; over_R in kK as published",
+            None,
+        ),
+        (
+            "gibbs_table",
+            {"note": "equations for partial vapor pressures over VO"},
+            "kJ/mol and J/(mol·K) for formation; over_R in kK as published",
+            None,
+        ),
+        (
+            "activity_coefficient",
+            {"semantics": "bound_not_point_ordering"},
+            "dimensionless ordering (not a numeric gamma)",
+            None,
+        ),
+        (
+            "rate_series",
+            {"semantics": "bound_not_point_ordering"},
+            "partial pressure; Fig. 5 lg P scale",
+            None,
+        ),
+    ]
+    for obs_type, values, units, expected in cases:
+        state, reason = map_quantity(obs_type, values, units=units)
+        assert not state.is_value, (obs_type, state, reason)
+        assert reason
+
+    ok, _reason = map_quantity(
+        "gibbs_table",
+        {"evaluator_family": "nasa_cea_9", "reference_pressure_Pa": 100000, "segments": [{}]},
+        units="NASA CEA polynomial",
+    )
+    assert ok.is_value and ok.value is Quantity.DELTA_FG
+    ok, _reason = map_quantity("alpha", {"alpha": 0.02}, units="dimensionless")
+    assert ok.is_value and ok.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    bad, reason = map_quantity(
+        "alpha",
+        {"alpha": 115, "not_hkl_langmuir_coefficient": True},
+        units="dimensionless",
+        row={"regime": "olette_relative_evaporation_coefficient"},
+    )
+    assert not bad.is_value
+    assert reason and "not_hkl" in reason or "Olette" in (reason or "") or "outside" in (reason or "")

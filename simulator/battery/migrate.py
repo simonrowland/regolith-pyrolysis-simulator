@@ -1426,26 +1426,232 @@ def _quantities_named_by_payload(
     return frozenset(named)
 
 
+def _row_text_blob(
+    obs_type: str | None,
+    values: Mapping[str, Any] | None,
+    units: str | None,
+    row: Mapping[str, Any] | None,
+) -> str:
+    parts: list[str] = [str(obs_type or ""), str(units or "")]
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        for key in (
+            "note",
+            "semantics",
+            "standard_state",
+            "regime",
+            "quote",
+            "header_quote",
+            "cell_quote",
+            "method",
+            "form",
+            "alpha_note",
+        ):
+            raw = src.get(key)
+            if raw not in (None, ""):
+                parts.append(str(raw))
+        loc = src.get("locator")
+        if isinstance(loc, Mapping):
+            for loc_key in ("note", "paragraph", "section"):
+                if loc.get(loc_key):
+                    parts.append(str(loc[loc_key]))
+    return " ".join(parts).lower()
+
+
+def _alpha_numeric(values: Mapping[str, Any] | None) -> Decimal | None:
+    if not isinstance(values, Mapping) or "alpha" not in values:
+        return None
+    return _numeric_field(values, "alpha")
+
+
+def _quantity_contradiction(
+    candidate: Quantity,
+    obs_type: str | None,
+    values: Mapping[str, Any] | None,
+    units: str | None,
+    row: Mapping[str, Any] | None,
+) -> str | None:
+    """Why this row is not the inferred quantity. None if nothing contradicts it."""
+
+    blob = _row_text_blob(obs_type, values, units, row)
+    units_l = str(units or "").strip().lower()
+    semantics = None
+    flag_not_hkl = False
+    if isinstance(values, Mapping):
+        semantics = values.get("semantics")
+        flag_not_hkl = values.get("not_hkl_langmuir_coefficient") is True
+    if isinstance(row, Mapping) and row.get("not_hkl_langmuir_coefficient") is True:
+        flag_not_hkl = True
+
+    if candidate is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        if flag_not_hkl:
+            return "source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha"
+        if "olette" in blob or "relative volatil" in blob or "relative evaporation" in blob:
+            return "source names Olette relative volatility, not an HKL/Langmuir alpha"
+        if (
+            "condens" in blob
+            or "film growth" in blob
+            or "growth coefficient" in blob
+            or "growth/condensation" in blob
+        ):
+            return "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
+        amount = _alpha_numeric(values)
+        if amount is not None and not (Decimal("0") < amount <= Decimal("1")):
+            return (
+                f"source alpha {amount} lies outside (0, 1]; "
+                "not a Langmuir/HKL evaporation coefficient"
+            )
+        if semantics in {"bound_not_point_ordering", "bound_not_point"}:
+            return f"source semantics {semantics} is ordering/categorical, not a numeric alpha"
+
+    if candidate is Quantity.ACTIVITY_COEFFICIENT:
+        if "not a numeric gamma" in units_l or "not a numeric gamma" in blob:
+            return "source units are dimensionless ordering, not a numeric activity coefficient"
+        if "ordering" in units_l or semantics in {
+            "bound_not_point_ordering",
+            "bound_not_point",
+        }:
+            return "source is an ordering or categorical statement, not an activity coefficient"
+        if "speciation" in blob and "gamma" not in blob:
+            return "source is gas-species speciation/dominance ordering, not an activity coefficient"
+
+    if candidate is Quantity.DELTA_FG:
+        if "dissociation energ" in blob or "numeric d0" in blob:
+            return "source note names dissociation energy, not delta_fG"
+        if "equations for partial vapor" in blob or "partial vapor pressure" in blob:
+            return "source note names partial vapor-pressure equations, not delta_fG"
+        if "critical pressure" in blob or "critical temperature" in blob or (
+            isinstance(values, Mapping) and ("Tc_K" in values or "Pc_bar" in values)
+        ):
+            return "source reports critical constants, not delta_fG"
+        if "calorimetr" in blob or "heat of fusion" in blob or "heat content" in blob:
+            if not (
+                isinstance(values, Mapping)
+                and (
+                    values.get("evaluator_family")
+                    or values.get("tabulated_delta_fG_kJ_mol")
+                    or any(
+                        key in values
+                        for key in _UNIQUE_QUANTITY_FIELDS
+                        if _UNIQUE_QUANTITY_FIELDS[key] is Quantity.DELTA_FG
+                    )
+                )
+            ):
+                return "source is calorimetric enthalpy/heat content, not delta_fG"
+        if isinstance(values, Mapping) and (
+            values.get("enthalpy_kcal_mol") is not None
+            or "enthalpy" in str(values.get("header_quote") or "").lower()
+            or "Δh" in str(values.get("header_quote") or "").lower()
+        ):
+            if not any(
+                key in values
+                for key in _UNIQUE_QUANTITY_FIELDS
+                if _UNIQUE_QUANTITY_FIELDS[key] is Quantity.DELTA_FG
+            ):
+                return "source cells/headers report enthalpy, not delta_fG"
+        if "kd" in blob and ("mol/l" in blob or "log10(kd" in blob or "kp_atm" in blob):
+            return "source is a Kd/Kp dissociation equilibrium, not delta_fG"
+        if "sublimation enthalpy" in blob or "boiling-point summary" in blob:
+            return "source is sublimation enthalpy / boiling-point summary, not delta_fG"
+
+    if candidate is Quantity.MASS_LOSS_RATE:
+        if "partial pressure" in units_l or "lg p" in units_l or "lg p" in blob:
+            return "source units name partial pressure, not mass_loss_rate"
+
+    if semantics in {"bound_not_point_ordering", "bound_not_point"} and candidate not in {
+        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        Quantity.ACTIVITY_COEFFICIENT,
+    }:
+        return f"source semantics {semantics} is ordering/categorical, not {candidate.value}"
+    return None
+
+
+def _quantity_corroborated(
+    candidate: Quantity,
+    values: Mapping[str, Any] | None,
+    units: str | None,
+    row: Mapping[str, Any] | None,
+) -> bool:
+    """A numeric field, evaluator, series, or parametric producer of this quantity."""
+
+    named = _quantities_named_by_payload(values)
+    if candidate in named:
+        return True
+    if not isinstance(values, Mapping):
+        values = {}
+    if candidate is Quantity.DELTA_FG:
+        if values.get("evaluator_family"):
+            return True
+        if values.get("tabulated_delta_fG_kJ_mol"):
+            return True
+        if values.get("segments") and values.get("reference_pressure_Pa") is not None:
+            return True
+        if values.get("functions") or values.get("g_parameter"):
+            return True
+        return False
+    if candidate is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        form = values.get("alpha_form")
+        if isinstance(form, Mapping) and str(form.get("type") or "").lower() == "arrhenius":
+            blob = _row_text_blob(None, values, units, row)
+            if "condens" in blob or "film" in blob or "growth" in blob:
+                return False
+            return True
+        return False
+    if candidate is Quantity.TRANSITION_TEMPERATURE:
+        return any(
+            key in values
+            for key in ("value_K", "T_m_K", "T_K", "temperature_K", "T_C", "T")
+        )
+    if candidate is Quantity.P_SAT:
+        return any(key in values for key, _unit in _PRESSURE_SERIES_KEYS) or any(
+            key in values for key in ("P", "p", "series")
+        )
+    if candidate is Quantity.ACTIVITY_COEFFICIENT:
+        return "gamma" in values or "activity_coefficient" in values
+    if candidate is Quantity.MASS_LOSS_RATE:
+        return "mass_loss_rate" in values
+    return False
+
+
 def map_quantity(
     obs_type: str | None,
     values: Mapping[str, Any] | None,
     units: str | None = None,
+    row: Mapping[str, Any] | None = None,
 ) -> tuple[State[Quantity], str | None]:
     raw = None
     if isinstance(values, Mapping):
         raw = values.get("quantity")
         if isinstance(raw, str) and raw in QUANTITY_ALIASES:
-            return State.of(QUANTITY_ALIASES[raw]), None
+            inferred = QUANTITY_ALIASES[raw]
+            contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+            if contradiction:
+                return State.unknown(contradiction), contradiction
+            return State.of(inferred), None
         if isinstance(raw, str) and raw in {q.value for q in Quantity}:
-            return State.of(Quantity(raw)), None
+            inferred = Quantity(raw)
+            contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+            if contradiction:
+                return State.unknown(contradiction), contradiction
+            return State.of(inferred), None
     quantity_absent = raw is None or raw == ""
     if quantity_absent and units is not None and str(units).strip():
         unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
         if unit_mapped is not None:
+            contradiction = _quantity_contradiction(
+                unit_mapped, obs_type, values, units, row
+            )
+            if contradiction:
+                return State.unknown(contradiction), contradiction
             return State.of(unit_mapped), None
     named = _quantities_named_by_payload(values)
     if quantity_absent and len(named) == 1:
-        return State.of(next(iter(named))), None
+        inferred = next(iter(named))
+        contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+        if contradiction:
+            return State.unknown(contradiction), contradiction
+        return State.of(inferred), None
     if quantity_absent and len(named) > 1:
         labels = ", ".join(sorted(q.value for q in named))
         return (
@@ -1453,7 +1659,21 @@ def map_quantity(
             f"conflicting quantity fields {labels}",
         )
     if quantity_absent and obs_type in TYPE_QUANTITY:
-        return State.of(TYPE_QUANTITY[obs_type]), None
+        inferred = TYPE_QUANTITY[obs_type]
+        if not _quantity_corroborated(inferred, values, units, row):
+            reason = (
+                "row type is a curation label, not a statement of the observable"
+            )
+            contradiction = _quantity_contradiction(
+                inferred, obs_type, values, units, row
+            )
+            if contradiction:
+                reason = contradiction
+            return State.unknown(reason), reason
+        contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+        if contradiction:
+            return State.unknown(contradiction), contradiction
+        return State.of(inferred), None
     if isinstance(raw, str) and raw:
         return (
             State.unknown(f"unsupported quantity {raw!r}"),
@@ -2337,8 +2557,6 @@ def empty_value_from_payload(
 
     exploded: list[dict[str, Any]] = []
     q_token = _quantity_token(quantity)
-    if q_token is None and obs_type == "gibbs_table":
-        q_token = Quantity.DELTA_FG
     if not isinstance(values, Mapping):
         sel = select_declared_source(q_token, units, None)
         return sel.value, exploded, sel
@@ -3051,7 +3269,9 @@ class Migrator:
         species = make_species(
             species_formula, phase, polymorph=polymorph_from_extract(obs)
         )
-        quantity, q_reason = map_quantity(obs_type, values, units=obs.get("units"))
+        quantity, q_reason = map_quantity(
+            obs_type, values, units=obs.get("units"), row=obs
+        )
         if q_reason:
             self.result.add_queue(
                 work.work_id,
@@ -3702,7 +3922,9 @@ class Migrator:
                     formula = str(point.get("species") or "unknown")
                     stated_q = point.get("quantity") or point.get("observable_id")
                     mre_quantity, q_reason = map_quantity(
-                        None, {"quantity": stated_q} if stated_q else None
+                        None,
+                        {"quantity": stated_q} if stated_q else None,
+                        row=point,
                     )
                     if q_reason:
                         self.result.add_queue(
@@ -3958,7 +4180,7 @@ class Migrator:
             if stated_q and not quantity_payload.get("quantity"):
                 quantity_payload["quantity"] = stated_q
             ledger_quantity, q_reason = map_quantity(
-                None, quantity_payload, units="kJ_per_mol"
+                None, quantity_payload, units="kJ_per_mol", row=point
             )
             if q_reason:
                 self.result.add_queue(
