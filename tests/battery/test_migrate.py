@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import unicodedata
 from pathlib import Path
 
@@ -35,6 +36,7 @@ from simulator.battery.migrate import (
     convert_temperature_to_k,
     map_phase,
     map_quantity,
+    compilation_quantity_from_record,
     load_migrated_store,
     migrate,
     pressure_from_equipment,
@@ -2428,6 +2430,89 @@ def test_l05c1_alpha_outside_unit_interval_is_unknown() -> None:
     assert reason and "outside" in reason
     state, _reason = map_quantity("alpha", {"alpha": 0.02}, units="dimensionless")
     assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+
+
+def _write_compilation(root: Path, source_id: str, record_id: str, doc: dict) -> Path:
+    path = (
+        root
+        / "data"
+        / "literature"
+        / "compilations"
+        / source_id
+        / "auxiliary"
+        / f"{record_id}.json"
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    return path
+
+
+def test_l05g0_atomic_weight_rows_are_not_delta_fg(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _write_compilation(
+        root,
+        "robie-hemingway-1995-usgs-b2131",
+        "atomic-weight-001",
+        {
+            "schema_version": "literature_compilation.v1",
+            "source_id": "robie-hemingway-1995-usgs-b2131",
+            "record_id": "atomic-weight-001",
+            "record_kind": "atomic_weight",
+            "formula": "Ac",
+            "rows": [{"atomic_weight": {"value": 227}}],
+        },
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["robie-hemingway-1995-usgs-b2131:atomic-weight-001"]
+    token, reason = _quantity_state(obs)
+    assert token is None
+    assert reason and "closed quantity" in reason
+    assert any(
+        e.observation_id == obs.observation_id and "quantity" in (e.axes or ())
+        for e in result.queue
+    )
+
+
+def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    _write_compilation(
+        root,
+        "robie-waldbaum-1968-usgs-b1259",
+        "al-ht",
+        {
+            "schema_version": "literature_compilation.v1",
+            "source_id": "robie-waldbaum-1968-usgs-b1259",
+            "record_id": "al-ht",
+            "table_kind": "high_temperature",
+            "formula": "Al",
+            "rows": [
+                {
+                    "temperature": {"value": 298.15},
+                    "delta_f_G": {"value": 0.0},
+                    "delta_fG": 0.0,
+                }
+            ],
+        },
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["robie-waldbaum-1968-usgs-b1259:al-ht"]
+    token, _reason = _quantity_state(obs)
+    assert token is Quantity.DELTA_FG
+
+
+def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
+    state, reason = compilation_quantity_from_record(
+        {"record_kind": "atomic_weight", "rows": [{"atomic_weight": {"value": 227}}]}
+    )
+    assert not state.is_value
+    assert reason == "compilation record does not state a closed quantity"
+    state, reason = compilation_quantity_from_record(
+        {
+            "table_kind": "high_temperature",
+            "rows": [{"temperature": {"value": 1100}, "delta_f_G": {"value": -100.0}}],
+        }
+    )
+    assert state.is_value and state.value is Quantity.DELTA_FG
 
 
 def test_l05c1_costa_control_is_not_condensation() -> None:

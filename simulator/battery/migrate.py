@@ -1691,6 +1691,90 @@ def map_quantity(
     return State.unknown("source does not state a closed quantity"), "missing quantity"
 
 
+_COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
+    "delta_f_G": Quantity.DELTA_FG,
+    "delta_fG": Quantity.DELTA_FG,
+    "delta_fG_kJ_mol": Quantity.DELTA_FG,
+    "deltafG": Quantity.DELTA_FG,
+    "Gf": Quantity.DELTA_FG,
+    "formation_gibbs_energy": Quantity.DELTA_FG,
+    "log_Kf": Quantity.LOG10_KF,
+    "log10_Kf": Quantity.LOG10_KF,
+    "log10_kf": Quantity.LOG10_KF,
+    "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
+}
+_COMPILATION_KIND_NOT_QUANTITY = frozenset(
+    {
+        "atomic_weight",
+        "atomic_weights_1963",
+        "heat_content_and_entropy",
+        "heat_capacity_coefficients",
+        "symbols_constants",
+        "symbols_and_constants",
+        "critical_summaries_bibliography",
+        "formula_continuation_prefix",
+        "formula_continuation_suffix",
+        "section_continuation_header",
+        "unverified_identity",
+        "auxiliary_numeric_table",
+    }
+)
+_COMPILATION_UNKNOWN_REASON = "compilation record does not state a closed quantity"
+
+
+def _compilation_cell_quantities(payload: Mapping[str, Any]) -> set[Quantity]:
+    named: set[Quantity] = set()
+    for key, quantity in _COMPILATION_CELL_QUANTITY.items():
+        raw = payload.get(key)
+        if raw is None or raw == "":
+            continue
+        named.add(quantity)
+    cells = payload.get("cells")
+    if isinstance(cells, Mapping):
+        named.update(_compilation_cell_quantities(cells))
+    return named
+
+
+def compilation_quantity_from_record(
+    doc: Mapping[str, Any],
+) -> tuple[State[Quantity], str | None]:
+    """Quantity only from record_kind, table kind, column labels, or cell keys."""
+
+    kind = str(doc.get("record_kind") or "")
+    table_kind = str(doc.get("table_kind") or "")
+    if kind in _COMPILATION_KIND_NOT_QUANTITY or table_kind in _COMPILATION_KIND_NOT_QUANTITY:
+        return State.unknown(_COMPILATION_UNKNOWN_REASON), _COMPILATION_UNKNOWN_REASON
+    named: set[Quantity] = set()
+    labels = doc.get("column_labels_as_published") or doc.get("column_labels") or ()
+    if isinstance(labels, (list, tuple)):
+        joined = " ".join(str(x) for x in labels).lower()
+        if "delta_fg" in joined.replace(" ", "") or "δfg" in joined or "dfg" in joined:
+            named.add(Quantity.DELTA_FG)
+        if "log_kf" in joined.replace(" ", "") or "log10_kf" in joined.replace(" ", ""):
+            named.add(Quantity.LOG10_KF)
+    units = doc.get("units_as_published")
+    if isinstance(units, Mapping):
+        for key, quantity in _COMPILATION_CELL_QUANTITY.items():
+            if key in units:
+                named.add(quantity)
+    rows = doc.get("rows")
+    if isinstance(rows, list):
+        for row in rows:
+            if isinstance(row, Mapping):
+                named.update(_compilation_cell_quantities(row))
+    if Quantity.DELTA_FG in named:
+        return State.of(Quantity.DELTA_FG), None
+    if len(named) == 1:
+        return State.of(next(iter(named))), None
+    if len(named) > 1:
+        labels_txt = ", ".join(sorted(q.value for q in named))
+        return (
+            State.unknown(f"compilation record names conflicting quantities {labels_txt}"),
+            f"compilation record names conflicting quantities {labels_txt}",
+        )
+    return State.unknown(_COMPILATION_UNKNOWN_REASON), _COMPILATION_UNKNOWN_REASON
+
+
 def lineage_parents_from_source(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
@@ -4289,14 +4373,11 @@ class Migrator:
         phase, _unmapped = map_phase(doc.get("phase"))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
-        quantity: Quantity | State[Quantity] = State.unknown(
-            "compilation record does not state a closed quantity"
-        )
         t = None
         p_std = None
         rows = doc.get("rows")
+        series_items: list[dict[str, Any]] = []
         if isinstance(rows, list):
-            series_items: list[dict[str, Any]] = []
             for row in rows:
                 if not isinstance(row, Mapping):
                     continue
@@ -4309,7 +4390,17 @@ class Migrator:
                     elif row.get("temperature") is not None:
                         item["T_K"] = row.get("temperature")
                 series_items.append(item)
-            quantity = Quantity.DELTA_FG
+        quantity, q_reason = compilation_quantity_from_record(doc)
+        if q_reason:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["quantity"],
+                q_reason,
+                source=rel,
+                observation_id=f"{source_id}:{record_id}",
+            )
+        if series_items:
             sel = select_declared_source(quantity, None, {"series": series_items})
         else:
             sel = select_declared_source(quantity, None, doc)
