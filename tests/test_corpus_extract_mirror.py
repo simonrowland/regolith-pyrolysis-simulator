@@ -25,3 +25,17 @@ def test_corpus_extracts_are_byte_identical_in_simulator_mirror() -> None:
         dest = dest_dir / src.name
         assert dest.is_file(), f"simulator mirror missing {src.name}"
         assert dest.read_bytes() == src.read_bytes(), f"simulator mirror diverged: {src.name}"
+
+
+@pytest.mark.skipif(not CORPUS_ROOT.is_dir(), reason="regolith-corpus checkout is absent")
+def test_simulator_extracts_are_byte_identical_in_corpus_mirror() -> None:
+    src_dir = REPO_ROOT / "data" / "literature" / "extracts"
+    dest_dir = CORPUS_ROOT / "extracts"
+    assert src_dir.is_dir(), f"simulator extracts directory missing: {src_dir}"
+    assert dest_dir.is_dir(), f"corpus extracts directory missing: {dest_dir}"
+    simulator_files = sorted(p for p in src_dir.glob("*.yaml") if not p.name.startswith("_"))
+    assert simulator_files, "simulator extracts/ has no yaml files to mirror"
+    for src in simulator_files:
+        dest = dest_dir / src.name
+        assert dest.is_file(), f"corpus missing {src.name}"
+        assert dest.read_bytes() == src.read_bytes(), f"corpus diverged: {src.name}"
