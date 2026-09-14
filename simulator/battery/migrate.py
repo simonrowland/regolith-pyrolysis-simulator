@@ -1487,13 +1487,19 @@ def _quantity_contradiction(
     if candidate is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
         if flag_not_hkl:
             return "source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha"
-        if "olette" in blob or "relative volatil" in blob or "relative evaporation" in blob:
+        regime = ""
+        if isinstance(row, Mapping):
+            regime = str(row.get("regime") or "")
+        if isinstance(values, Mapping) and values.get("regime"):
+            regime = str(values.get("regime") or regime)
+        if "olette" in regime.lower() or re.search(
+            r"relative volatil|relative evaporation coefficient", blob
+        ):
             return "source names Olette relative volatility, not an HKL/Langmuir alpha"
-        if (
-            "condens" in blob
-            or "film growth" in blob
-            or "growth coefficient" in blob
-            or "growth/condensation" in blob
+        if re.search(
+            r"\bcondensation\b|film growth|growth coefficient|growth/condensation|"
+            r"alpha\(cond\)|α\(cond\)",
+            blob,
         ):
             return "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
         amount = _alpha_numeric(values)
@@ -1594,7 +1600,10 @@ def _quantity_corroborated(
         form = values.get("alpha_form")
         if isinstance(form, Mapping) and str(form.get("type") or "").lower() == "arrhenius":
             blob = _row_text_blob(None, values, units, row)
-            if "condens" in blob or "film" in blob or "growth" in blob:
+            if re.search(
+                r"\bcondensation\b|film growth|growth coefficient|growth/condensation",
+                blob,
+            ):
                 return False
             return True
         return False

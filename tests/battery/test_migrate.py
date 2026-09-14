@@ -2319,3 +2319,124 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     )
     assert not bad.is_value
     assert reason and "not_hkl" in reason or "Olette" in (reason or "") or "outside" in (reason or "")
+
+
+_TYPE_CONTRADICTIONS = [
+    ("ames-walsh-white-1967.yaml", "Ames67_EuO_dissociation"),
+    ("ames-walsh-white-1967.yaml", "Ames67_YbO_dissociation"),
+    ("banchor-matsui-naito-1986.yaml", "Ban86_equations"),
+    ("datz-and-smith-1961.yaml", "Datz1961_TableII_Kd"),
+    ("datz-and-smith-1961.yaml", "JANAF1998_WebBook_Shomate"),
+    ("datz-and-smith-1961.yaml", "Datz1961_TableII_Kd_nacl_side"),
+    ("habermann-daane-1964.yaml", "Hab64_Eu_metal_third_law"),
+    ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_theoretical_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_cu_olette_theoretical_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_sn_olette_theoretical_quoted_deep"),
+    ("kems-011-wetzel-gail-2013.yaml", "wetzel_gail_2013_sio_growth_alpha_arrhenius"),
+    ("kems-011-wetzel-gail-2013.yaml", "wetzel_gail_2013_sio_growth_class_b1"),
+    ("kems-022-demaria-1971.yaml", "demaria_1971_sio_lunar_basalt_kems_main_cell"),
+    ("kems-041-sossi-fegley-2018.yaml", "sossi_fegley_2018_alias_SF18_T1_P4O10_KEMS_dominance"),
+    ("kems-041-sossi-fegley-2018.yaml", "sossi_fegley_2018_alias_sf18_speciation_VO_VO2"),
+    ("kems-041-sossi-fegley-2018.yaml", "sossi_fegley_2018_alias_SF18_Eu2O3_window"),
+    ("kems-041-sossi-fegley-2018.yaml", "sossi_fegley_2018_alias_SF18_Yb2O3_window"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si_second_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si_second_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si_third_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si_third_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_si_activation_enthalpy"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_si_equilibrium_enthalpy_and_barrier"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si2c_second_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si2c_second_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si2c_third_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_si2c_third_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_si2c_formation_enthalpies"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_sic2_second_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_sic2_second_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_sic2_third_law_this_work"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_table1_sic2_third_law_reference_10"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_activation_enthalpy"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_equilibrium_enthalpy_and_barrier"),
+    ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_formation_enthalpies"),
+    ("nist-webbook.yaml", "Rau74_critical_constants"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_tables_1_7"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_tables_1_7"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_tables_3_7"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_tables_3_7"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_tables_1_7"),
+    ("wetzel-gail-2013-sio-arrhenius.yaml", "wetzel_gail_2013_sio_arrhenius"),
+]
+_FIELD_ALPHA_CONTRADICTIONS = [
+    ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_alpha_exp_table1"),
+    ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_class_fence_b1"),
+    ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_experimental_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_class_fence_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_cu_olette_alpha_exp_table2"),
+    ("kems-001-homma-1966.yaml", "homma_1966_cu_olette_class_fence_b1"),
+    ("kems-001-homma-1966.yaml", "homma_1966_cu_olette_experimental_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_cu_olette_class_fence_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_sn_olette_alpha_exp_table3"),
+    ("kems-001-homma-1966.yaml", "homma_1966_sn_olette_class_fence_b1"),
+    ("kems-001-homma-1966.yaml", "homma_1966_sn_olette_experimental_quoted_deep"),
+    ("kems-001-homma-1966.yaml", "homma_1966_sn_olette_class_fence_quoted_deep"),
+    ("kems-002-ohno-1967.yaml", "ohno_1967_mn_olette_alpha_table3"),
+    ("kems-002-ohno-1967.yaml", "ohno_1967_cu_olette_alpha_table3"),
+    ("kems-002-ohno-1967.yaml", "ohno_1967_sn_olette_alpha_table3"),
+    ("kems-002-ohno-1967.yaml", "ohno_1967_cr_olette_alpha_table3"),
+]
+
+
+def _extract_observation(fname: str, observation_id: str) -> dict:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / fname).read_text(encoding="utf-8")
+    )
+    for body in (source.get("species") or {}).values():
+        if not isinstance(body, dict):
+            continue
+        for row in body.get("observations") or []:
+            if isinstance(row, dict) and row.get("observation_id") == observation_id:
+                return row
+    raise AssertionError(f"missing extract row {fname}::{observation_id}")
+
+
+def test_l05c1_type_contradictions_are_quantity_unknown() -> None:
+    assert len(_TYPE_CONTRADICTIONS) == 42
+    for fname, oid in _TYPE_CONTRADICTIONS:
+        row = _extract_observation(fname, oid)
+        values = row.get("values") if isinstance(row.get("values"), dict) else {}
+        state, reason = map_quantity(
+            row.get("type"), values, units=row.get("units"), row=row
+        )
+        assert not state.is_value, (oid, state, reason)
+        assert reason
+
+
+def test_l05c1_olette_alpha_fields_are_quantity_unknown() -> None:
+    assert len(_FIELD_ALPHA_CONTRADICTIONS) == 16
+    for fname, oid in _FIELD_ALPHA_CONTRADICTIONS:
+        row = _extract_observation(fname, oid)
+        values = row.get("values") if isinstance(row.get("values"), dict) else {}
+        state, reason = map_quantity(
+            row.get("type"), values, units=row.get("units"), row=row
+        )
+        assert not state.is_value, (oid, state, reason)
+        assert reason
+
+
+def test_l05c1_alpha_outside_unit_interval_is_unknown() -> None:
+    state, reason = map_quantity("alpha", {"alpha": 115}, units="dimensionless")
+    assert not state.is_value
+    assert reason and "outside" in reason
+    state, _reason = map_quantity("alpha", {"alpha": 0.02}, units="dimensionless")
+    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+
+
+def test_l05c1_costa_control_is_not_condensation() -> None:
+    row = _extract_observation(
+        "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"
+    )
+    values = row.get("values") if isinstance(row.get("values"), dict) else {}
+    state, reason = map_quantity(
+        row.get("type"), values, units=row.get("units"), row=row
+    )
+    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert reason is None
