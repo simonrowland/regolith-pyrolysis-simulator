@@ -61,7 +61,8 @@ observations:
       value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -74,7 +75,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -110,7 +111,8 @@ observations:
       reason: source T_range_K [1623.0, 1943.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -122,7 +124,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -150,7 +152,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1500'
@@ -165,19 +167,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -192,7 +194,8 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity field
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, cited, a_Fe, W_at_percent,
+      T_K, authors_comment'
   uncertainty:
     kind: printed
     verbatim:
@@ -204,7 +207,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -245,7 +248,8 @@ observations:
       reason: qualifier or_activity_coefficient_equations does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_or_activity_coefficient_equations'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -258,7 +262,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -286,7 +290,8 @@ observations:
       value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -299,7 +304,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -337,7 +342,8 @@ observations:
       value: '1773'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -350,7 +356,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:
@@ -388,7 +394,8 @@ observations:
       value: '1823'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_quantities'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -401,7 +408,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-120-ueshima-1984
   locator:

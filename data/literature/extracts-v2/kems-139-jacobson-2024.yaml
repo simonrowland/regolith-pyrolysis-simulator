@@ -66,7 +66,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_HfO_g'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -79,7 +80,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -116,7 +117,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -144,8 +145,8 @@ observations:
       tag: unknown
       reason: source T_range_K [2500.0, 2500.0]; no midpoint invented
   value:
-    kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    kind: categorical
+    categorical: bound_not_point_ordering
   uncertainty:
     kind: printed
     verbatim:
@@ -158,7 +159,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -184,7 +185,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -196,7 +197,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -225,7 +226,8 @@ observations:
       reason: source T_range_K [1976.0, 1976.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_reaction_enthalpy'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -239,7 +241,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -267,7 +269,8 @@ observations:
       reason: source T_range_K [1934.0, 2034.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_average'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -280,7 +283,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:
@@ -308,7 +311,8 @@ observations:
       reason: source T_range_K [1934.0, 2034.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_and_compiled_ion_intensity';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -320,7 +324,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-139-jacobson-2024
   locator:

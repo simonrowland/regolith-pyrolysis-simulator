@@ -111,7 +111,8 @@ observations:
       value: '1973'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -123,7 +124,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
@@ -164,7 +165,8 @@ observations:
       reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -176,7 +178,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:

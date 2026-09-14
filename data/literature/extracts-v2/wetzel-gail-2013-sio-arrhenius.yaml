@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [1000.0, 1800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -35,7 +36,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: wetzel-gail-2013-sio-arrhenius
   locator:

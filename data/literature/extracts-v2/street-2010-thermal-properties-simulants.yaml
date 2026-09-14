@@ -18,7 +18,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'mass_loss'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -31,7 +31,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: street-2010-thermal-properties-simulants
   locator:
@@ -55,7 +55,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermal_program_and_apparatus'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -65,7 +66,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: street-2010-thermal-properties-simulants
   locator:
@@ -90,7 +91,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_tga_curves'; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -131,7 +132,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_tga_curves'; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -172,7 +173,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_temperature_windows'; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -182,7 +184,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: street-2010-thermal-properties-simulants
   locator:
@@ -206,7 +208,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_mineralogy'; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -216,7 +218,7 @@ observations:
     original_method_class: quoted_from_other_workers
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: street-2010-thermal-properties-simulants
   locator:
@@ -243,7 +245,8 @@ observations:
       reason: source T_range_K [563.15, 1591.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_transition_temperatures'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -253,7 +256,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: street-2010-thermal-properties-simulants
   locator:

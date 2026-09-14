@@ -33,7 +33,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -73,7 +73,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -113,7 +113,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -153,7 +153,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -193,7 +193,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -233,7 +233,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -274,7 +274,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -314,7 +314,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -339,7 +339,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -351,7 +351,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -500,7 +500,7 @@ observations:
       reason: source T_range_K [1473.15, 2073.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'post_run_mass_balance'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -540,7 +540,7 @@ observations:
       reason: source T_range_K [1473.15, 2073.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'post_run_mass_balance'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -552,7 +552,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -581,7 +581,7 @@ observations:
       reason: source T_range_K [1473.15, 2073.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_oxygen_yield'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -593,7 +593,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -661,7 +661,8 @@ observations:
       reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_molecular_oxygen_yield'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -715,7 +716,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:
@@ -744,7 +745,7 @@ observations:
       reason: source T_range_K [1473.15, 2073.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_oxygen_yield'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -759,7 +760,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-044-robinot-2026
   locator:

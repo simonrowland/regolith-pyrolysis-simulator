@@ -18,7 +18,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -32,7 +32,7 @@ observations:
     original_method_class: analytical_composition
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: smales-1971-lpsc-12022
   locator:
@@ -56,7 +56,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -70,7 +70,7 @@ observations:
     original_method_class: analytical_composition
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: smales-1971-lpsc-12022
   locator:

@@ -21,7 +21,7 @@ observations:
       reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sublimation_enthalpy'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -34,7 +34,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -395,7 +395,8 @@ observations:
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -411,7 +412,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -438,7 +439,8 @@ observations:
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -453,7 +455,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -480,7 +482,8 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -493,7 +496,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -531,25 +534,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -564,7 +567,8 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_partial field
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, model_or_data_source,
+      column_scale, fragment_note, rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -577,7 +581,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -605,7 +609,7 @@ observations:
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'saturation_pressure'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -618,7 +622,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -643,7 +647,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -688,7 +692,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, gas_species,
+      T_C_as_printed, internal_standard, rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -700,7 +705,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -728,7 +733,7 @@ observations:
       reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'internal_standard'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -740,7 +745,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -778,25 +783,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -811,7 +816,8 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a p_partial field
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, model_or_data_source,
+      column_scale, rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -824,7 +830,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -852,7 +858,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'detected_ionic_species'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -864,7 +870,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -892,7 +898,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'appearance_potential'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -905,7 +911,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -933,7 +939,7 @@ observations:
       reason: source T_range_K [1573.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'appearance_potential'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -945,7 +951,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -970,7 +976,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -1015,7 +1021,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
+      T_K, T_K_conversion, internal_standard, activity_ion_ratio_column, composition_basis, rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -1029,7 +1036,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -1067,7 +1074,7 @@ observations:
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'melt_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1079,7 +1086,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -1104,7 +1111,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -1149,7 +1156,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, internal_standard,
+      sample_5_note, asterisk_note, activity_ion_ratio_definition, rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -1162,7 +1170,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -1193,7 +1201,8 @@ observations:
       reason: qualifier and_gas_reaction_delta_G does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_and_gas_reaction_delta_G'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1207,7 +1216,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:
@@ -1235,7 +1244,7 @@ observations:
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1249,7 +1258,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-057-kambayashi-1985
   locator:

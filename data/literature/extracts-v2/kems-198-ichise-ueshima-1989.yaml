@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [1234.9, 1234.9]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Tm_minus_Tb_temperature_correction'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -34,7 +35,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -62,7 +63,7 @@ observations:
       reason: source T_range_K [1241.0, 1244.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solidus_and_liquidus'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -74,7 +75,7 @@ observations:
     original_method_class: author_estimate
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -101,7 +102,8 @@ observations:
       reason: source T_range_K [1241.0, 1492.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'invariant_reaction_and_solidus_liquidus_temperatures';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -114,7 +116,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -142,7 +144,8 @@ observations:
       reason: source T_range_K [1261.0, 1416.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_heat_absorbed_q'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -154,7 +157,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -182,7 +185,8 @@ observations:
       reason: source T_range_K [1667.0, 1667.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'TA4_minus_Tb_temperature_correction'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -195,7 +199,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -472,7 +476,8 @@ observations:
       reason: source T_range_K [1234.9, 1667.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -485,7 +490,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:
@@ -514,7 +519,8 @@ observations:
       reason: source T_range_K [1800.0, 1800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_temperature_sensitivity'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -555,7 +561,8 @@ observations:
       reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_and_present_invariant_temperatures'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -567,7 +574,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-198-ichise-ueshima-1989
   locator:

@@ -75,7 +75,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -111,7 +111,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -136,7 +136,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'mann_fit_atomic_ionization_cross_section_coefficients';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -148,7 +149,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -173,7 +174,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'maximum_atomic_ionization_cross_section'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -185,7 +187,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -209,7 +211,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_atomic_ionization_cross_section'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -221,7 +224,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -245,7 +248,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_molecular_ionization_cross_section';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -257,7 +261,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:
@@ -293,7 +297,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-014-drowart-2005
   locator:

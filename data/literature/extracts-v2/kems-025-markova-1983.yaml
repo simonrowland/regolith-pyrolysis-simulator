@@ -381,7 +381,7 @@ observations:
       reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensed_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -393,7 +393,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-025-markova-1983
   locator:
@@ -461,7 +461,8 @@ observations:
       reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -473,7 +474,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-025-markova-1983
   locator:

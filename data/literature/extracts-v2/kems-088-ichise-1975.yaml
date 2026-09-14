@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -35,7 +36,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-088-ichise-1975
   locator:
@@ -63,7 +64,7 @@ observations:
       reason: source T_range_K [1757.15, 1857.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vaporization'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -508,7 +509,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -553,7 +554,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, composition_basis,
+      points'
   uncertainty:
     kind: printed
     verbatim:
@@ -565,7 +567,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-088-ichise-1975
   locator:
@@ -593,7 +595,8 @@ observations:
       reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -605,7 +608,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-088-ichise-1975
   locator:
@@ -634,7 +637,8 @@ observations:
       reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'belton_fruehan_integrand_linear_fit'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -647,7 +651,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-088-ichise-1975
   locator:
@@ -675,7 +679,8 @@ observations:
       reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_chemical_analysis'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -687,7 +692,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-088-ichise-1975
   locator:

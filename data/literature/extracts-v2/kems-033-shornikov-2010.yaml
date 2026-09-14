@@ -18,7 +18,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_melt_composition'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -30,7 +31,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-033-shornikov-2010
   locator:
@@ -136,7 +137,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_melt_composition'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -148,7 +150,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-033-shornikov-2010
   locator:
@@ -175,7 +177,8 @@ observations:
       value: '2300'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'preset_reducing_partial_pressures'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -188,7 +191,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-033-shornikov-2010
   locator:

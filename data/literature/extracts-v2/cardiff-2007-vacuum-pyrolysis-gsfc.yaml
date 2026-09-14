@@ -60,7 +60,8 @@ observations:
       reason: source T_range_K [821.15, 2140.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'residue_EDS_atomic_ratio'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -72,7 +73,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   locator:
@@ -218,7 +219,7 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'complete_vaporization'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -230,7 +231,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   locator:
@@ -266,7 +267,8 @@ observations:
       reason: source T_range_K [821.15, 2140.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vacuum_pyrolysis_experiment_summary'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -279,7 +281,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   locator:

@@ -33,7 +33,7 @@ observations:
     original_method_class: solar_vacuum_pyrolysis_free_evaporation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -72,7 +72,7 @@ observations:
     original_method_class: solar_vacuum_pyrolysis_free_evaporation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -112,7 +112,7 @@ observations:
     original_method_class: solar_vacuum_pyrolysis_free_evaporation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -151,7 +151,7 @@ observations:
     original_method_class: solar_vacuum_pyrolysis_free_evaporation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -224,7 +224,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -236,7 +236,7 @@ observations:
     original_method_class: analytical_composition
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -261,7 +261,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_bulk_compositions'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -273,7 +274,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:
@@ -313,7 +314,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-036-sesko-2024
   locator:

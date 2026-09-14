@@ -79,7 +79,7 @@ observations:
       until virtually all of the magnesium has evaporated.
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -164,7 +164,7 @@ observations:
       until virtually all of the magnesium has evaporated.
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -188,10 +188,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
@@ -209,22 +209,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -233,7 +233,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a evaporation_coefficient_alpha field
+    unavailable_reason: printed field alpha is null; absence is not a measured zero
   uncertainty:
     kind: printed
     verbatim:
@@ -279,7 +279,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'published_alpha_and_flux_arrhenius_fits'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -337,7 +338,8 @@ observations:
       reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vacuum_evaporation_flux_J_Mg_vs_T'; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -382,7 +384,8 @@ observations:
       reason: source T_range_K [1973.15, 2173.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_surface_area_series'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -701,7 +704,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -1038,7 +1041,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -1375,7 +1378,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -1712,7 +1715,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -2049,7 +2052,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -2386,7 +2389,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -2723,7 +2726,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -3060,7 +3063,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -3397,7 +3400,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -3734,7 +3737,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -4071,7 +4074,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -4408,7 +4411,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -4745,7 +4748,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -5082,7 +5085,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -5419,7 +5422,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -5756,7 +5759,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -6093,7 +6096,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -6430,7 +6433,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -6767,7 +6770,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -7104,7 +7107,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -7441,7 +7444,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -7778,7 +7781,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -8115,7 +8118,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -8452,7 +8455,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -8789,7 +8792,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -9126,7 +9129,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -9463,7 +9466,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -9800,7 +9803,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -10137,7 +10140,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -10474,7 +10477,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -10811,7 +10814,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -11148,7 +11151,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -11485,7 +11488,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -11822,7 +11825,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -12159,7 +12162,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -12496,7 +12499,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -12833,7 +12836,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -13170,7 +13173,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -13507,7 +13510,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -13844,7 +13847,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -14181,7 +14184,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -14518,7 +14521,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -14855,7 +14858,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -15192,7 +15195,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -15529,7 +15532,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -15866,7 +15869,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -16203,7 +16206,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -16540,7 +16543,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -16877,7 +16880,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -17214,7 +17217,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -17551,7 +17554,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -17611,10 +17614,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
@@ -17632,22 +17635,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -17656,7 +17659,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a evaporation_coefficient_alpha field
+    unavailable_reason: printed field alpha is null; absence is not a measured zero
   uncertainty:
     kind: printed
     verbatim:
@@ -17700,7 +17703,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'published_alpha_and_flux_arrhenius_fits'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17783,7 +17787,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -17871,7 +17875,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -17959,7 +17963,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18047,7 +18051,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18135,7 +18139,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18223,7 +18227,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18311,7 +18315,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18399,7 +18403,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18487,7 +18491,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18575,7 +18579,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18663,7 +18667,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18751,7 +18755,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18839,7 +18843,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -18927,7 +18931,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19015,7 +19019,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19103,7 +19107,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19191,7 +19195,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19279,7 +19283,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19367,7 +19371,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19455,7 +19459,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19543,7 +19547,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19631,7 +19635,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19719,7 +19723,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19807,7 +19811,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19895,7 +19899,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -19983,7 +19987,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20071,7 +20075,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20159,7 +20163,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20247,7 +20251,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20335,7 +20339,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20423,7 +20427,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20511,7 +20515,7 @@ observations:
       residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-010-richter-2007
   locator:
@@ -20571,7 +20575,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20609,7 +20614,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20647,7 +20653,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20685,7 +20692,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20723,7 +20731,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20761,7 +20770,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'magnesium_loss_inferred_from_isotope_fractionation';
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:

@@ -34,7 +34,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-050-gorokhov-1977
   locator:
@@ -66,7 +66,8 @@ observations:
       reason: source T_range_K [2242.0, 2690.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_reaction_enthalpy_0K'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -85,7 +86,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-050-gorokhov-1977
   locator:
@@ -116,7 +117,8 @@ observations:
       reason: source T_range_K [2242.0, 2690.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_dissociation_energy_0K'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -144,7 +146,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-050-gorokhov-1977
   locator:

@@ -820,7 +820,7 @@ def _admission_from_plain(payload: object) -> Admission:
         )
     return Admission(
         status=AdmissionStatus(str(payload.get("status") or "pending")),
-        reason=str(payload.get("reason") or "source does not state admission_status"),
+        reason=str(payload.get("reason") or "no observation admission_status mapped from source"),
         superseded_by=payload.get("superseded_by"),
         decided_by=decided,
     )
@@ -1408,6 +1408,14 @@ def compilation_phase_text(doc: Mapping[str, Any]) -> object:
     raw = doc.get("state_note_as_published")
     if isinstance(raw, str) and raw.strip():
         return raw
+    rows = doc.get("rows")
+    if isinstance(rows, list):
+        phases = list(dict.fromkeys(
+            str(row["phase_as_published"]).strip()
+            for row in rows if isinstance(row, Mapping) and row.get("phase_as_published")
+        ))
+        if phases:
+            return "multi-phase table: " + "; ".join(phases)
     return None
 
 
@@ -1489,6 +1497,34 @@ def _alpha_numeric(values: Mapping[str, Any] | None) -> Decimal | None:
     return _numeric_field(values, "alpha")
 
 
+def _bulk_composition_pressure_fence(values: Mapping[str, Any] | None) -> str | None:
+    if not isinstance(values, Mapping):
+        return None
+    if (
+        values.get("quantity") == "potassium_partial_pressure_as_published"
+        and _numeric_field(values, "P_K_atm_as_published") is not None
+        and values.get("reason") == (
+            "Printed pressure retained; no equilibrium comparator claimed for bulk "
+            "composition in the two-phase region."
+        )
+    ):
+        return str(values["reason"])
+    return None
+
+
+def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
+    form = str(values.get("source_form") or "")
+    if not form or not values.get("coefficients"):
+        return False
+    output = form.split("=", 1)[0].strip()
+    if "=" in form and not re.search(r"\bP(?:_|\b)|pressure", output, re.I):
+        return False
+    return bool(re.search(r"\bP_(?:bar|mmHg|Pa|atm|Torr)\b", output, re.I)) or (
+        bool(re.search(r"\bP\b|pressure", output, re.I))
+        and str(units or "").lower() in {"bar", "mmhg", "pa", "atm", "torr"}
+    )
+
+
 def _quantity_contradiction(
     candidate: Quantity,
     obs_type: str | None,
@@ -1507,6 +1543,23 @@ def _quantity_contradiction(
         flag_not_hkl = values.get("not_hkl_langmuir_coefficient") is True
     if isinstance(row, Mapping) and row.get("not_hkl_langmuir_coefficient") is True:
         flag_not_hkl = True
+
+    if candidate in {Quantity.P_SAT, Quantity.P_PARTIAL}:
+        if isinstance(values, Mapping):
+            if values.get("gas_basis") == "TOTAL_PRESSURE_not_species":
+                return (
+                    "source states total vapour pressure over a multi-species vapour, "
+                    "not a single Sen monomer; v2.1 has no total-vapour-pressure identity"
+                )
+            if values.get("source_form") and values.get("coefficients") and not _pressure_evaluator(values, units):
+                return f"source evaluator {values['source_form']!r} does not produce a corroborated pressure"
+        if candidate is Quantity.P_SAT and (
+            "not pure-component saturation pressure" in blob
+            or "partial vapor pressure over silicate melt" in blob
+        ):
+            return "source names partial pressure over a melt, not pure-component saturation pressure"
+        if "dimensionless" in units_l and "pressure" not in units_l:
+            return f"source units {units!r} do not denote pressure"
 
     if candidate is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
         if flag_not_hkl:
@@ -1593,7 +1646,8 @@ def _quantity_contradiction(
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.ACTIVITY_COEFFICIENT,
     }:
-        return f"source semantics {semantics} is ordering/categorical, not {candidate.value}"
+        if not (candidate is Quantity.P_PARTIAL and _bulk_composition_pressure_fence(values)):
+            return f"source semantics {semantics} is ordering/categorical, not {candidate.value}"
     return None
 
 
@@ -1642,7 +1696,7 @@ def _quantity_corroborated(
             for key in ("value_K", "T_m_K", "T_K", "temperature_K", "T_C", "T")
         )
     if candidate is Quantity.P_SAT:
-        if values.get("source_form") and values.get("coefficients"):
+        if _pressure_evaluator(values, units):
             return True
         if _is_pressure_point_list(values.get("points")):
             return True
@@ -1862,6 +1916,8 @@ _COMPILATION_CELL_QUANTITY: dict[str, Quantity] = {
     "deltafG": Quantity.DELTA_FG,
     "Gf": Quantity.DELTA_FG,
     "formation_gibbs_energy": Quantity.DELTA_FG,
+    "formation_gibbs": Quantity.DELTA_FG,
+    "log_kf": Quantity.LOG10_KF,
     "log_Kf": Quantity.LOG10_KF,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
@@ -1883,7 +1939,7 @@ _COMPILATION_KIND_NOT_QUANTITY = frozenset(
         "auxiliary_numeric_table",
     }
 )
-_COMPILATION_UNKNOWN_REASON = "compilation record does not state a closed quantity"
+_COMPILATION_UNKNOWN_REASON = "printed compilation columns are not mapped to a closed quantity"
 
 
 def _compilation_cell_quantities(payload: Mapping[str, Any]) -> set[Quantity]:
@@ -2101,7 +2157,7 @@ def admission_for(
     if raw_status is None or raw_status == "":
         return Admission(
             status=AdmissionStatus.PENDING,
-            reason="source does not state admission_status",
+            reason="no observation admission_status mapped from source",
         )
     text = str(raw_status)
     closed = {s.value: s for s in AdmissionStatus}
@@ -2200,7 +2256,10 @@ def fill_identity(
         for name in profile.required:
             state = payload.get(name)
             if state is None or (isinstance(state, State) and state.is_not_applicable):
-                payload[name] = State.unknown(f"source does not state {name}")
+                payload[name] = State.unknown(
+                    "no single temperature_K mapped from source" if name == "temperature_K"
+                    else f"no {name} mapped from source"
+                )
                 changed = True
         for name in profile.permitted_not_applicable:
             state = payload.get(name)
@@ -2230,6 +2289,7 @@ def fill_identity(
 _PRESSURE_SERIES_KEYS = (
     ("pressure_atm", "atm"),
     ("p_atm", "atm"),
+    ("P_K_atm_as_published", "atm"),
     ("P_atm", "atm"),
     ("pressure_bar", "bar"),
     ("P_bar", "bar"),
@@ -2466,14 +2526,10 @@ def _iter_formation_gibbs_cells(
             )
         )
     cells = payload.get("cells")
-    if isinstance(cells, Mapping) and "formation_gibbs_energy" in cells:
-        found.append(
-            (
-                "formation_gibbs_energy",
-                cells.get("formation_gibbs_energy"),
-                _unit_as_printed(unit_map, "formation_gibbs_energy"),
-            )
-        )
+    if isinstance(cells, Mapping):
+        for column in ("formation_gibbs_energy", "formation_gibbs"):
+            if column in cells:
+                found.append((column, cells[column], _unit_as_printed(unit_map, column)))
     formation = payload.get("formation")
     if isinstance(formation, Mapping):
         for basis, body in formation.items():
@@ -2570,6 +2626,68 @@ def _delta_fg_unavailable_reason(
 
 def _unused_ancillary(payload: Mapping[str, Any], used: str | None) -> tuple[str, ...]:
     return tuple(k for k in _ANCILLARY_SERIES_KEYS if k in payload and k != used)
+
+
+def _printed_column_counts(payload: Mapping[str, Any]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    columns = payload.get("columns") or []
+    headings = [str(c.get("heading_as_published") or c.get("heading_raw") or i)
+                for i, c in enumerate(columns) if isinstance(c, Mapping)]
+    items = payload.get("rows") or payload.get("series") or payload.get("points") or []
+    if not isinstance(items, list):
+        return counts
+
+    def visit(cell: object, name: str) -> None:
+        if isinstance(cell, Mapping) and not any(k in cell for k in ("value", "raw", "as_published")):
+            for key, value in cell.items():
+                visit(value, f"{name}.{key}" if name else str(key))
+        elif isinstance(cell, list):
+            for i, value in enumerate(cell):
+                label = headings[i] if i < len(headings) else f"column[{i}]"
+                visit(value, label)
+        else:
+            raw = cell.get("value") if isinstance(cell, Mapping) else cell
+            counts.setdefault(name, 0)
+            if not isinstance(raw, bool) and _as_dec_or_none(raw) is not None:
+                counts[name] += 1
+
+    for item in items:
+        if not isinstance(item, Mapping):
+            continue
+        if "cells" in item:
+            visit(item["cells"], "")
+        else:
+            for key, cell in item.items():
+                if key in {"source_row_index", "source_line", "raw", "locator", "index"}:
+                    continue
+                visit(cell, key)
+    return counts
+
+
+def _unmapped_columns_reason(payload: Mapping[str, Any], q_token: Quantity | None) -> str:
+    counts = _printed_column_counts(payload)
+    columns = ", ".join(f"{name}: {n} numeric cells" for name, n in counts.items())
+    cause = "declared quantity is unknown" if q_token is None else f"columns not mapped to {q_token.value}"
+    if set(counts) == {"atomic_weight"}:
+        return (
+            f"source prints scalar-only atomic_weight: {counts['atomic_weight']} numeric cells "
+            "and no coordinate; " + cause + "; awaiting the per-source compilation generator"
+        )
+    return (
+        f"source column census ({columns or 'no parsed columns'}); {cause}; "
+        "no mapped coordinate/value pair selected"
+    )
+
+
+def _compilation_temperature_state(doc: Mapping[str, Any]) -> State[Decimal]:
+    counts = _printed_column_counts(doc)
+    coordinates = [name for name in counts if re.search(r"temperature|^T(?:_|$)|^cp_\d+_k", name)]
+    if coordinates or doc.get("temperature_grid"):
+        return State.unknown(
+            "source prints a temperature grid (" + ", ".join(coordinates or ["temperature_grid"])
+            + "); series coordinate, not a single identity temperature_K"
+        )
+    return State.unknown("no single temperature_K mapped from compilation record")
 
 
 def _unavailable_selection(
@@ -2741,7 +2859,10 @@ def _series_selection_from_items(
             condition_ranges=condition_ranges,
         )
     census_payload: dict[str, Any] = dict(parent or {})
-    census_payload["series"] = series
+    if "rows" in census_payload:
+        census_payload.pop("series", None)
+    else:
+        census_payload["series"] = series
     gibbs_reason = _delta_fg_unavailable_reason(census_payload, q_token)
     if gibbs_reason:
         return _unavailable_selection(
@@ -2750,7 +2871,7 @@ def _series_selection_from_items(
             field_name="series",
         )
     return _unavailable_selection(
-        "series list had no numeric coordinate/value pairs",
+        _unmapped_columns_reason(census_payload, q_token),
         condition_ranges=condition_ranges,
         field_name="series",
     )
@@ -2777,6 +2898,7 @@ def select_declared_source(
     if declared == AXIS_TEMPERATURE_K:
         for key, unit in (
             ("T_K", "K"),
+            ("T_K_as_published", "K"),
             ("temperature_K", "K"),
             ("T_C", "C"),
         ):
@@ -2858,6 +2980,15 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if q_token is None and payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
+        reason = (declared.reason if isinstance(declared, State) else None) or (
+            f"unsupported quantity {payload['quantity']!r}" if payload.get("quantity")
+            else "declared quantity is unknown"
+        )
+        return SourceSelection(
+            value=Value(ValueKind.CATEGORICAL, categorical=str(payload["semantics"])),
+            field_name="semantics", reason=reason, condition_ranges=condition_ranges,
+        )
     series = payload.get("series")
     if not (isinstance(series, list) and series):
         points_list = payload.get("points")
@@ -2893,6 +3024,12 @@ def select_declared_source(
             )
 
     if q_token is None:
+        if payload.get("source_form") and payload.get("coefficients"):
+            reason = declared.reason if isinstance(declared, State) else "declared quantity is unknown"
+            return _unavailable_selection(
+                f"{reason}; source prints evaluator {payload['source_form']}; no observable selected",
+                condition_ranges=condition_ranges, field_name="source_form",
+            )
         if payload.get("segments"):
             return SourceSelection(
                 value=Value(
@@ -2941,19 +3078,11 @@ def select_declared_source(
                 field_name="intervals",
                 condition_ranges=condition_ranges,
             )
-        if payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
-            return SourceSelection(
-                value=Value(
-                    ValueKind.CATEGORICAL, categorical=str(payload.get("semantics"))
-                ),
-                field_name="semantics",
-                condition_ranges=condition_ranges,
-            )
         if condition_ranges:
             name, lo, hi = condition_ranges[0]
             return _unavailable_selection(
                 (
-                    f"source values have no printed scalar/series point; "
+                    f"declared quantity is unknown; no observable selected; "
                     f"{name} [{lo}, {hi}] is a temperature domain, not the observable"
                 ),
                 condition_ranges=condition_ranges,
@@ -2961,7 +3090,9 @@ def select_declared_source(
                 field_name=name,
             )
         return _unavailable_selection(
-            "declared quantity is unknown; refusing to pick a number",
+            "declared quantity is unknown; "
+            + ((declared.reason + "; ") if isinstance(declared, State) and declared.reason else "")
+            + "refusing to pick a number",
             condition_ranges=condition_ranges,
             unused_ancillary=unused,
         )
@@ -3012,11 +3143,19 @@ def select_declared_source(
             condition_ranges=condition_ranges,
             unused_ancillary=unused,
         )
+    present = [key for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()) if key in payload]
+    if present:
+        reason = "; ".join(
+            f"printed field {key} is null; absence is not a measured zero"
+            if payload[key] is None else f"printed field {key} is not numeric: {payload[key]!r}"
+            for key in present
+        )
+        return _unavailable_selection(reason, condition_ranges=condition_ranges, unused_ancillary=unused)
     if condition_ranges:
         name, lo, hi = condition_ranges[0]
         return _unavailable_selection(
             (
-                f"source values have no printed {q_token.value}; "
+                f"no mapped numeric {q_token.value} selected; "
                 f"{name} [{lo}, {hi}] is a temperature domain, not the observable"
             ),
             condition_ranges=condition_ranges,
@@ -3024,7 +3163,7 @@ def select_declared_source(
             field_name=name,
         )
     return _unavailable_selection(
-        f"source does not name a {q_token.value} field",
+        f"no mapped {q_token.value} field selected; source fields: " + ", ".join(payload),
         condition_ranges=condition_ranges,
         unused_ancillary=unused,
     )
@@ -3043,30 +3182,29 @@ def empty_value_from_payload(
     """
 
     exploded: list[dict[str, Any]] = []
-    q_token = _quantity_token(quantity)
     if isinstance(values, list):
         values = (
             {"points": values} if _is_pressure_point_list(values) else {"series": values}
         )
     if not isinstance(values, Mapping):
-        sel = select_declared_source(q_token, units, None)
+        sel = select_declared_source(quantity, units, None)
         return sel.value, exploded, sel
 
     series = values.get("series")
     if isinstance(series, list) and series:
         for i, item in enumerate(series):
             exploded.append({"index": i, "item": item, "units": units})
-        sel = select_declared_source(q_token, units, values)
+        sel = select_declared_source(quantity, units, values)
         return sel.value, exploded, sel
 
     tabulated = values.get("tabulated_delta_fG_kJ_mol")
     if isinstance(tabulated, list) and tabulated:
         for i, item in enumerate(tabulated):
             exploded.append({"index": i, "item": item, "units": "kJ_per_mol"})
-        sel = select_declared_source(q_token, "kJ_per_mol", values)
+        sel = select_declared_source(quantity, "kJ_per_mol", values)
         return sel.value, exploded, sel
 
-    sel = select_declared_source(q_token, units, values)
+    sel = select_declared_source(quantity, units, values)
     return sel.value, exploded, sel
 
 
@@ -3745,7 +3883,7 @@ class Migrator:
         )
         assert locator is not None
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
-        phase_raw = values.get("phase", obs.get("phase")) if values else obs.get("phase")
+        phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase, unmapped_phase = map_phase(phase_raw)
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
@@ -4079,7 +4217,13 @@ class Migrator:
             uncertainty=uncertainty,
             evidence=evidence,
             admission=admission,
-            notices=(),
+            notices=(Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                reason=_bulk_composition_pressure_fence(values),
+                origin=obs_id,
+                band=str(values["equilibrium_status"]),
+            ),) if _bulk_composition_pressure_fence(values) else (),
             source_id=source_id,
             locator=locator,
             read_from=read_from,
@@ -4422,7 +4566,7 @@ class Migrator:
             evidence=evidence,
             admission=Admission(
                 status=AdmissionStatus.PENDING,
-                reason="source does not state admission_status",
+                reason="no observation admission_status mapped from source",
             ),
             notices=notices,
             source_id=source_id,
@@ -5019,7 +5163,7 @@ class Migrator:
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
         if not locator.source_path:
             locator = replace(locator, source_path=rel)
-        t = None
+        t = _compilation_temperature_state(doc)
         p_std = None
         rows = doc.get("rows")
         series_items: list[dict[str, Any]] = []
@@ -5052,8 +5196,10 @@ class Migrator:
                 None,
                 {
                     "series": series_items,
+                    "rows": rows,
                     "units_as_published": doc.get("units_as_published"),
                     "column_ids": doc.get("column_ids"),
+                    "columns": doc.get("columns"),
                 },
             )
         else:
@@ -5137,6 +5283,7 @@ class Migrator:
                 species=species,
                 value=dg_sel.value,
                 evidence=evidence,
+                temperature_K=_compilation_temperature_state({"rows": rows}),
                 standard_pressure_Pa=p_std,
                 method=State.of(MethodToken.TABULATION),
             )
@@ -5151,6 +5298,7 @@ class Migrator:
                 species=species,
                 value=log_sel.value,
                 evidence=evidence,
+                temperature_K=_compilation_temperature_state({"rows": rows}),
                 standard_pressure_Pa=p_std,
                 method=State.of(MethodToken.TABULATION),
             )

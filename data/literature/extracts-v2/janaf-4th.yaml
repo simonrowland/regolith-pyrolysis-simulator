@@ -72,7 +72,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -149,7 +149,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -226,7 +226,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -305,7 +305,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -333,19 +333,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 1100.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -396,7 +396,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -424,19 +424,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 2500.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -491,7 +491,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -517,7 +517,8 @@ observations:
       reason: source T_range_K [298.15, 500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -526,7 +527,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -552,19 +553,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 2500.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -617,7 +618,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -645,19 +646,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 2500.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -712,7 +713,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -740,19 +741,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 2500.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -815,7 +816,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -843,19 +844,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298.15, 2500.0]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -918,7 +919,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -998,7 +999,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1075,7 +1076,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1153,7 +1154,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1230,7 +1231,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1307,7 +1308,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1384,7 +1385,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1463,7 +1464,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1542,7 +1543,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1620,7 +1621,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1698,7 +1699,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1777,7 +1778,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1855,7 +1856,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -1933,7 +1934,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2011,7 +2012,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2088,7 +2089,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2165,7 +2166,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2242,7 +2243,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2268,19 +2269,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1500, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2310,7 +2311,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1500, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2319,7 +2320,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2346,7 +2347,7 @@ observations:
       reason: source T_range_K [1500, 2200]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [1500, 2200] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1500, 2200] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -2356,7 +2357,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2384,7 +2385,7 @@ observations:
       reason: source T_range_K [1500, 2200]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [1500, 2200] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1500, 2200] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -2394,7 +2395,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2422,7 +2423,7 @@ observations:
       reason: source T_range_K [1100, 1500]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [1100, 1500] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1100, 1500] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -2432,7 +2433,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2458,19 +2459,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1500, 2200]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2500,7 +2501,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2200] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1500, 2200] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2509,7 +2510,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2553,7 +2554,7 @@ observations:
       reason: profile p_sat does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2577,7 +2578,7 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed p_sat; T_range_K [1200, 2000] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric p_sat selected; T_range_K [1200, 2000] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2586,7 +2587,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2612,19 +2613,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1500, 2200]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2654,7 +2655,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2200] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1500, 2200] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2663,7 +2664,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2689,19 +2690,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1500, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2731,7 +2732,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1500, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1500, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2740,7 +2741,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2768,19 +2769,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [298, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2810,7 +2811,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [298, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [298, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2819,7 +2820,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2845,19 +2846,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1000, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2887,7 +2888,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1000, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1000, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2896,7 +2897,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -2922,19 +2923,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1000, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2964,7 +2965,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1000, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1000, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -2973,7 +2974,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3002,7 +3003,7 @@ observations:
       reason: qualifier or_speciation does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [300, 2000] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [300, 2000] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -3012,7 +3013,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3056,7 +3057,7 @@ observations:
       reason: profile p_sat does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3080,7 +3081,7 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed p_sat; T_range_K [333, 483] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric p_sat selected; T_range_K [333, 483] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -3089,7 +3090,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3117,7 +3118,7 @@ observations:
       reason: source T_range_K [1700, 2000]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [1700, 2000] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1700, 2000] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -3127,7 +3128,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3155,19 +3156,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1800, 2500]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3197,7 +3198,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed delta_fG; T_range_K [1800, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric delta_fG selected; T_range_K [1800, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -3206,7 +3207,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3251,7 +3252,7 @@ observations:
       reason: profile p_sat does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3275,7 +3276,7 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed p_sat; T_range_K [1941, 2500] is a temperature domain, not the observable
+    unavailable_reason: no mapped numeric p_sat selected; T_range_K [1941, 2500] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -3284,7 +3285,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3309,7 +3310,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3318,7 +3320,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3343,7 +3345,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3352,7 +3355,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3380,19 +3383,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3433,7 +3436,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3461,19 +3464,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3514,7 +3517,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3542,19 +3545,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3595,7 +3598,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3623,19 +3626,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3674,7 +3677,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:
@@ -3702,19 +3705,19 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: unknown
-      reason: source does not state standard_pressure_Pa
+      reason: no standard_pressure_Pa mapped from source
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -3753,7 +3756,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: janaf-4th
   locator:

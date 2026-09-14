@@ -252,7 +252,8 @@ observations:
       reason: source T_range_K [1200.0, 1750.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_fragmentation_correction_f_i'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -264,7 +265,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -292,7 +293,8 @@ observations:
       reason: source T_range_K [1200.0, 1750.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'KMS_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -304,7 +306,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -343,25 +345,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -391,7 +393,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -428,25 +430,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -476,7 +478,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -513,25 +515,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -561,7 +563,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -598,25 +600,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -646,7 +648,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -683,25 +685,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -731,7 +733,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -768,25 +770,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -816,7 +818,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -844,7 +846,8 @@ observations:
       reason: source T_range_K [1200.0, 1750.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'adopted_ionisation_cross_section'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -856,7 +859,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -884,7 +887,8 @@ observations:
       reason: source T_range_K [1510.0, 1752.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -896,7 +900,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -985,7 +989,7 @@ observations:
     model: model
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1013,7 +1017,8 @@ observations:
       reason: source T_range_K [1510.0, 1752.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1025,7 +1030,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1053,7 +1058,8 @@ observations:
       reason: source T_range_K [1210.0, 1611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1065,7 +1071,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1094,7 +1100,8 @@ observations:
       reason: source T_range_K [1210.0, 1611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_formation_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1106,7 +1113,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1144,25 +1151,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1193,7 +1200,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1230,25 +1237,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1279,7 +1286,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1307,7 +1314,8 @@ observations:
       reason: source T_range_K [1425.0, 1550.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'stoichiometry_derived_pO2'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -1319,7 +1327,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1360,7 +1368,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1388,7 +1396,8 @@ observations:
       reason: source T_range_K [1510.0, 1752.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_reaction_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1400,7 +1409,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1428,7 +1437,8 @@ observations:
       reason: source T_range_K [1210.0, 1611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_reaction_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1440,7 +1450,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1468,7 +1478,7 @@ observations:
       reason: source T_range_K [1510.0, 1750.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_run_parameters'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1480,7 +1490,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1508,7 +1518,7 @@ observations:
       reason: source T_range_K [1209.0, 1610.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_run_parameters'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1520,7 +1530,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1548,7 +1558,8 @@ observations:
       reason: source T_range_K [1200.0, 1750.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pO2_from_metal_bearing_species'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1560,7 +1571,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1592,7 +1603,7 @@ observations:
       reason: qualifier isotherm does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_intensity_isotherm'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1610,7 +1621,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1661,7 +1672,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1689,7 +1700,8 @@ observations:
       reason: source T_range_K [1510.0, 1752.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_reaction_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1701,7 +1713,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1742,7 +1754,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -1770,7 +1782,8 @@ observations:
       reason: source T_range_K [1210.0, 1611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_reaction_3rd_law'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1782,7 +1795,7 @@ observations:
     original_method_class: author_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-138-bischof-2023
   locator:

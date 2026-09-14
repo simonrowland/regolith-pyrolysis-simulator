@@ -21,7 +21,7 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
@@ -30,10 +30,10 @@ observations:
       value: '100000'
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -82,7 +82,7 @@ observations:
     model: shomate
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-mno-coo-thermo
   locator:
@@ -109,7 +109,7 @@ observations:
       reason: profile delta_fG does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
@@ -118,10 +118,10 @@ observations:
       value: '100000'
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: unknown
-      reason: source does not state formation_elements
+      reason: no formation_elements mapped from source
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -170,7 +170,7 @@ observations:
     model: shomate
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-mno-coo-thermo
   locator:

@@ -550,7 +550,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
@@ -571,13 +571,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -592,7 +592,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, points'
   uncertainty:
     kind: printed
     verbatim:
@@ -606,7 +607,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-095-ueda-1986
   locator:
@@ -634,7 +635,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
@@ -655,13 +656,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -676,7 +677,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, points'
   uncertainty:
     kind: printed
     verbatim:
@@ -689,7 +691,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-095-ueda-1986
   locator:
@@ -717,7 +719,8 @@ observations:
       reason: source T_range_K [1840.0, 2020.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -729,7 +732,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-095-ueda-1986
   locator:
@@ -758,7 +761,7 @@ observations:
       reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'mixing_functions'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -771,7 +774,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-095-ueda-1986
   locator:
@@ -799,7 +802,7 @@ observations:
       reason: source T_range_K [1840.0, 2020.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'post_run_xrd_phases'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -811,7 +814,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-095-ueda-1986
   locator:

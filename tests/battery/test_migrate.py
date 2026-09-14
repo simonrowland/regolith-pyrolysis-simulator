@@ -392,7 +392,7 @@ def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> Non
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     assert obs.admission.status is AdmissionStatus.PENDING
-    assert "does not state admission" in obs.admission.reason
+    assert obs.admission.reason == "no observation admission_status mapped from source"
     assert obs.evidence.class_.tag is StateTag.UNKNOWN
     # Phase was stated as gas — that is a lift, not a default.
     assert obs.identity.species.phase.is_value
@@ -1964,6 +1964,13 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
                         )
             self.generic_visit(node)
 
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+            if isinstance(node.value, ast.Name):
+                assert node.value.id not in {"Value", "select_declared_source"}, (
+                    f"annotated boundary alias at line {node.lineno}"
+                )
+            self.generic_visit(node)
+
         def visit_Call(self, node: ast.Call) -> None:
             name = None
             if isinstance(node.func, ast.Name):
@@ -1983,6 +1990,20 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
                     assert False, (
                         f"getattr/globals constructor bypass at line {node.lineno}"
                     )
+                if isinstance(inner.func, ast.Attribute) and inner.func.attr == "get":
+                    receiver = inner.func.value
+                    assert not (isinstance(receiver, ast.Call)
+                                and isinstance(receiver.func, ast.Name)
+                                and receiver.func.id == "globals"), (
+                        f"globals().get constructor bypass at line {node.lineno}"
+                    )
+            elif isinstance(node.func, ast.Subscript):
+                receiver = node.func.value
+                assert not (isinstance(receiver, ast.Call)
+                            and isinstance(receiver.func, ast.Name)
+                            and receiver.func.id == "globals"), (
+                    f"globals subscript constructor bypass at line {node.lineno}"
+                )
             owner = func_stack[-1] if func_stack else "<module>"
             if name in {"Value", "point_of", "Value.point_of"}:
                 assert owner in allowed_value, (
@@ -2749,7 +2770,7 @@ def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
         {"record_kind": "atomic_weight", "rows": [{"atomic_weight": {"value": 227}}]}
     )
     assert not state.is_value
-    assert reason == "compilation record does not state a closed quantity"
+    assert reason == "printed compilation columns are not mapped to a closed quantity"
     state, reason = compilation_quantity_from_record(
         {
             "table_kind": "high_temperature",
@@ -3403,7 +3424,8 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     state, _reason = map_quantity(
         se.get("type"), se.get("values"), units=se.get("units"), row=se
     )
-    assert state.is_value and state.value is Quantity.P_SAT
+    assert state.is_unknown
+    assert "total vapour pressure over a multi-species vapour" in state.reason
     assert (se.get("values") or {}).get("gas_basis") == "TOTAL_PRESSURE_not_species"
 
     bic = _extract_observation(
@@ -3460,9 +3482,10 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     assert "log10(P_bar) = A" in (stull_obs.value.unavailable_reason or "")
 
     se_obs = result.observations["nist-webbook::NIST_Stull_Se_total_P"]
-    assert quantity_token(se_obs.identity) is Quantity.P_SAT
+    assert se_obs.identity.quantity.is_unknown
+    assert "no total-vapour-pressure identity" in se_obs.identity.quantity.reason
     assert se_obs.value.kind is ValueKind.UNAVAILABLE
-    assert "log10(P_bar) = A" in (se_obs.value.unavailable_reason or "")
+    assert "total vapour pressure" in (se_obs.value.unavailable_reason or "")
 
     bic_rows = [
         o

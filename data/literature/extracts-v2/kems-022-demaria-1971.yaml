@@ -24,7 +24,8 @@ observations:
       reason: qualifier intermediate_range_reliable does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 14 numeric cells, p_atm: 14 numeric cells, p_Pa: 14 numeric cells, instrument:
+      0 numeric cells, sample: 14 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -36,7 +37,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -77,7 +78,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -105,7 +106,8 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_Kp_and_delta_H0'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -117,7 +119,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -148,7 +150,8 @@ observations:
       reason: qualifier 12065 does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 6 numeric cells, p_atm: 6 numeric cells, p_Pa: 6 numeric cells, instrument:
+      0 numeric cells, sample: 6 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -160,7 +163,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -202,7 +205,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -233,7 +236,8 @@ observations:
       reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 2 numeric cells, p_atm: 2 numeric cells, p_Pa: 2 numeric cells, sample:
+      2 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -245,7 +249,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -273,10 +277,10 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -288,19 +292,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -327,7 +331,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -355,7 +359,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1300.0, 1800.0]; no midpoint invented
@@ -370,19 +374,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -409,7 +413,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -447,7 +451,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -488,7 +492,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -519,7 +523,8 @@ observations:
       reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 8 numeric cells, p_atm: 8 numeric cells, p_Pa: 8 numeric cells, instrument:
+      0 numeric cells, sample: 8 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -531,7 +536,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -562,7 +567,8 @@ observations:
       reason: qualifier initial_points does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 3 numeric cells, p_atm: 3 numeric cells, p_Pa: 3 numeric cells, sample:
+      3 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -574,7 +580,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -602,7 +608,8 @@ observations:
       reason: source T_range_K [1400.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'multi_cell_activity_geometry'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -612,7 +619,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -651,7 +658,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -682,7 +689,8 @@ observations:
       reason: qualifier figure_digitization_rejected does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_figure_digitization_rejected';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -743,7 +751,8 @@ observations:
       reason: qualifier figure_digitization_rejected does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_figure_digitization_rejected';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -802,7 +811,8 @@ observations:
       reason: qualifier over_lunar_basalt does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 7 numeric cells, p_atm: 7 numeric cells, p_Pa: 7 numeric cells, sample:
+      7 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -814,7 +824,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -845,7 +855,8 @@ observations:
       reason: qualifier atomic_oxygen does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 13 numeric cells, p_atm: 13 numeric cells, p_Pa: 13 numeric cells, instrument:
+      0 numeric cells, sample: 13 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -857,7 +868,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -885,7 +896,7 @@ observations:
       reason: source T_range_K [1250.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensed_sample_mass'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -898,7 +909,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -935,7 +946,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -962,7 +973,8 @@ observations:
       reason: source T_range_K [1250.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pressure_calibration_standard'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -974,7 +986,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1002,7 +1014,8 @@ observations:
       reason: source T_range_K [1850.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_delta_H0_from_simultaneous_partial_pressures';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1014,7 +1027,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1054,7 +1067,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1082,7 +1095,8 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_delta_H0_table6'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -1094,7 +1108,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1122,7 +1136,8 @@ observations:
       reason: source T_range_K [2360.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_delta_H0_table6_summary'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1135,7 +1150,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1160,7 +1175,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_and_second_law_delta_H0'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1172,7 +1188,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1200,7 +1216,8 @@ observations:
       reason: source T_range_K [1850.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_delta_H0_table6_summary'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1213,7 +1230,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1241,7 +1258,8 @@ observations:
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_and_second_law_delta_H0'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1253,7 +1271,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1281,7 +1299,8 @@ observations:
       reason: source T_range_K [2000.0, 2170.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_delta_H0_table6'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -1293,7 +1312,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1334,7 +1353,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:
@@ -1376,7 +1395,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-022-demaria-1971
   locator:

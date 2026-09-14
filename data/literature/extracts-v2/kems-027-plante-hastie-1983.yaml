@@ -101,7 +101,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1200'
@@ -116,19 +116,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -202,7 +202,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1200'
@@ -217,19 +217,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -295,7 +295,8 @@ observations:
       reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_CsBO2_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -338,10 +339,10 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -353,19 +354,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -431,7 +432,7 @@ observations:
       mixture present.
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -458,7 +459,9 @@ observations:
       reason: source T_range_K [1100.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 7 numeric cells, invT_times_1e4_K_inv: 7 numeric cells, log10_P_atm: 7
+      numeric cells, p_atm: 7 numeric cells, p_Pa: 7 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
+      unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -509,7 +512,9 @@ observations:
       reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 9 numeric cells, invT_times_1e4_K_inv: 9 numeric cells, log10_P_atm: 9
+      numeric cells, p_atm: 9 numeric cells, p_Pa: 9 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
+      unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -558,7 +563,9 @@ observations:
       reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: series list had no numeric coordinate/value pairs
+    unavailable_reason: 'source column census (T_K: 9 numeric cells, invT_times_1e4_K_inv: 9 numeric cells, log10_P_atm: 9
+      numeric cells, p_atm: 9 numeric cells, p_Pa: 9 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
+      unknown; no mapped coordinate/value pair selected'
   uncertainty:
     kind: printed
     verbatim:
@@ -657,7 +664,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'KMS_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -669,7 +677,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -697,7 +705,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1073.15, 1423.15]; no midpoint invented
@@ -712,19 +720,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -788,10 +796,10 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -803,19 +811,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -872,7 +880,8 @@ observations:
       reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_LiBO2_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -915,7 +924,7 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1073.15, 1423.15]; no midpoint invented
@@ -930,19 +939,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1008,10 +1017,10 @@ observations:
       reason: profile activity does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -1023,19 +1032,19 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1092,7 +1101,8 @@ observations:
       reason: qualifier fit does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_NaBO2_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1216,7 +1226,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_offgas_composition'; refusing to pick a
+      number
   uncertainty:
     kind: none
   evidence:
@@ -1302,7 +1313,7 @@ observations:
       reason: source T_range_K [1123.15, 1423.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensed_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1314,7 +1325,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1342,7 +1353,8 @@ observations:
       reason: source T_range_K [1073.15, 1423.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'calculated_oxide_equivalent_mass_loss'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1355,7 +1367,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1383,7 +1395,8 @@ observations:
       reason: source T_range_K [333.0, 2500.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'model_offgas_mole_fraction'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:

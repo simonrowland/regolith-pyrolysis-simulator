@@ -21,7 +21,7 @@ observations:
       value: '1778'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'consolute_temperature'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -33,7 +33,7 @@ observations:
     original_method_class: author_estimate
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -153,7 +153,8 @@ observations:
       reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_wagner_epsilon';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -167,7 +168,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -194,7 +195,8 @@ observations:
       reason: source T_range_K [1473.0, 1883.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -206,7 +208,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -233,7 +235,7 @@ observations:
       reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -245,7 +247,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -269,7 +271,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -314,7 +316,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, composition_basis,
+      rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -326,7 +329,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -357,7 +360,8 @@ observations:
       reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_gamma_and_partial_molar_heats'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -370,7 +374,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -394,7 +398,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -439,7 +443,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, composition_basis,
+      rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -451,7 +456,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -490,7 +495,8 @@ observations:
       reason: qualifier and_wagner_interaction_parameter does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_and_wagner_interaction_parameter';
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -503,7 +509,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:
@@ -530,7 +536,8 @@ observations:
       reason: source T_range_K [1810.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -542,7 +549,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-118-yamamoto-1983
   locator:

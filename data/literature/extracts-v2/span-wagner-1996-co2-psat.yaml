@@ -39,7 +39,7 @@ observations:
       reason: profile p_sat does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -63,8 +63,7 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed p_sat; T_range_K [216.592, 304.1282] is a temperature domain, not the
-      observable
+    unavailable_reason: no mapped numeric p_sat selected; T_range_K [216.592, 304.1282] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:
@@ -73,7 +72,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: span-wagner-1996-co2-psat
   locator:

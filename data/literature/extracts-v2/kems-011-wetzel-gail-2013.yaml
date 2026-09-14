@@ -34,7 +34,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-011-wetzel-gail-2013
   locator:
@@ -79,7 +79,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-011-wetzel-gail-2013
   locator:
@@ -106,7 +106,8 @@ observations:
       reason: source T_range_K [1000.0, 1800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -155,7 +156,8 @@ observations:
       reason: source T_range_K [1000.0, 1400.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
+      refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -197,7 +199,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Ta_Knudsen_source_for_SiO_film_deposition'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -207,7 +210,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-011-wetzel-gail-2013
   locator:

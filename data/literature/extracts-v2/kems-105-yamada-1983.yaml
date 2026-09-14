@@ -58,10 +58,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1873'
@@ -76,19 +76,19 @@ observations:
       reason: profile interaction_parameter does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile interaction_parameter does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile interaction_parameter does not use sweep_gas
@@ -103,7 +103,8 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a interaction_parameter field
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P_Al,
+      epsilon_P_Al_as_printed, T_C_as_printed, T_K, a_Fe_source, note'
   uncertainty:
     kind: printed
     verbatim:
@@ -116,7 +117,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:
@@ -151,10 +152,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1873'
@@ -169,19 +170,19 @@ observations:
       reason: profile interaction_parameter does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile interaction_parameter does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile interaction_parameter does not use sweep_gas
@@ -196,7 +197,8 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a interaction_parameter field
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source,
+      epsilon_P_Si, epsilon_P_Si_as_printed, T_C_as_printed, T_K, authors_comment'
   uncertainty:
     kind: printed
     verbatim:
@@ -210,7 +212,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:
@@ -245,10 +247,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1873'
@@ -263,19 +265,19 @@ observations:
       reason: profile interaction_parameter does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile interaction_parameter does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile interaction_parameter does not use sweep_gas
@@ -290,7 +292,9 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a interaction_parameter field
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_as_printed,
+      T_K, T_K_conversion, composition, composition_basis, epsilon_P_Si, epsilon_P_Al, epsilon_P_Ti, epsilon_P_V, epsilon_P_Cr,
+      epsilon_P_Co, epsilon_P_Ni, epsilon_P_Nb, epsilon_P_Mo, rows, e_column_note, al_body_text_disagreement'
   uncertainty:
     kind: printed
     verbatim:
@@ -311,7 +315,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:
@@ -651,7 +655,8 @@ observations:
       value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -665,7 +670,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:
@@ -703,7 +708,7 @@ observations:
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_purity'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -715,7 +720,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:
@@ -740,10 +745,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
@@ -758,19 +763,19 @@ observations:
       reason: profile interaction_parameter does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: not_applicable
       reason: profile interaction_parameter does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile interaction_parameter does not use sweep_gas
@@ -785,7 +790,8 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a interaction_parameter field
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_header_as_printed,
+      rows'
   uncertainty:
     kind: printed
     verbatim:
@@ -797,7 +803,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-105-yamada-1983
   locator:

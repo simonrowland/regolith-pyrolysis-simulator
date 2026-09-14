@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [1568.0, 2662.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_log10_gamma_coefficients'; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -32,7 +33,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -56,7 +57,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -66,7 +68,7 @@ observations:
     original_method_class: measured KEMS
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -101,25 +103,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -166,7 +168,7 @@ observations:
     original_method_class: measured_kems
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -192,7 +194,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1700'
@@ -213,13 +215,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -248,7 +250,7 @@ observations:
     original_method_class: authors_preferred_average_of_kems_derived_gammas
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -286,7 +288,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1586.4'
@@ -307,13 +309,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -341,7 +343,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -383,7 +385,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1598'
@@ -404,13 +406,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -438,7 +440,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -480,7 +482,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1695.4'
@@ -501,13 +503,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -535,7 +537,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -577,7 +579,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1608.6'
@@ -598,13 +600,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -632,7 +634,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -674,7 +676,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1619.2'
@@ -695,13 +697,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -729,7 +731,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -771,7 +773,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1630.8'
@@ -792,13 +794,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -826,7 +828,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -868,7 +870,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1642.5'
@@ -889,13 +891,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -923,7 +925,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -965,7 +967,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
@@ -986,13 +988,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1020,7 +1022,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1062,7 +1064,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1664.7'
@@ -1083,13 +1085,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1117,7 +1119,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1159,7 +1161,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1674.2'
@@ -1180,13 +1182,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1214,7 +1216,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1256,7 +1258,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1684.8'
@@ -1277,13 +1279,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1311,7 +1313,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1353,7 +1355,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -1374,13 +1376,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1408,7 +1410,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1450,7 +1452,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -1471,13 +1473,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1505,7 +1507,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1547,7 +1549,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -1568,13 +1570,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1602,7 +1604,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1644,7 +1646,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -1665,13 +1667,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1699,7 +1701,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1741,7 +1743,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -1762,13 +1764,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1796,7 +1798,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1838,7 +1840,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -1859,13 +1861,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1893,7 +1895,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -1935,7 +1937,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -1956,13 +1958,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1990,7 +1992,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2032,7 +2034,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -2053,13 +2055,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2087,7 +2089,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2129,7 +2131,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -2150,13 +2152,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2184,7 +2186,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2226,7 +2228,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -2247,13 +2249,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2281,7 +2283,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2323,7 +2325,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -2344,13 +2346,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2378,7 +2380,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2420,7 +2422,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1743'
@@ -2441,13 +2443,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2475,7 +2477,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2517,7 +2519,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1743'
@@ -2538,13 +2540,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2572,7 +2574,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2614,7 +2616,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -2635,13 +2637,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2669,7 +2671,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2711,7 +2713,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -2732,13 +2734,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2766,7 +2768,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2808,7 +2810,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -2829,13 +2831,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2863,7 +2865,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -2905,7 +2907,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1425.6'
@@ -2926,13 +2928,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -2960,7 +2962,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3000,7 +3002,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1437.2'
@@ -3021,13 +3023,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3055,7 +3057,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3095,7 +3097,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1548.3'
@@ -3116,13 +3118,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3150,7 +3152,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3190,7 +3192,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1557.8'
@@ -3211,13 +3213,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3245,7 +3247,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3285,7 +3287,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1571.6'
@@ -3306,13 +3308,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3340,7 +3342,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3380,7 +3382,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1588.5'
@@ -3401,13 +3403,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3435,7 +3437,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3475,7 +3477,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1601.2'
@@ -3496,13 +3498,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3530,7 +3532,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3570,7 +3572,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1613.9'
@@ -3591,13 +3593,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3625,7 +3627,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3665,7 +3667,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1626.6'
@@ -3686,13 +3688,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3720,7 +3722,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3760,7 +3762,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1638.2'
@@ -3781,13 +3783,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3815,7 +3817,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3855,7 +3857,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1650.9'
@@ -3876,13 +3878,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -3910,7 +3912,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -3950,7 +3952,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1662.6'
@@ -3971,13 +3973,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4005,7 +4007,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4045,7 +4047,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1449.9'
@@ -4066,13 +4068,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4100,7 +4102,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4140,7 +4142,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1674.2'
@@ -4161,13 +4163,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4195,7 +4197,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4235,7 +4237,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1685.8'
@@ -4256,13 +4258,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4290,7 +4292,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4330,7 +4332,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1699.6'
@@ -4351,13 +4353,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4385,7 +4387,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4425,7 +4427,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1712.3'
@@ -4446,13 +4448,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4480,7 +4482,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4520,7 +4522,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1719.7'
@@ -4541,13 +4543,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4575,7 +4577,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4615,7 +4617,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1733.4'
@@ -4636,13 +4638,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4670,7 +4672,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4710,7 +4712,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1461.6'
@@ -4731,13 +4733,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4765,7 +4767,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4805,7 +4807,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1474.2'
@@ -4826,13 +4828,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4860,7 +4862,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4900,7 +4902,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1486.9'
@@ -4921,13 +4923,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -4955,7 +4957,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -4995,7 +4997,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1498.6'
@@ -5016,13 +5018,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5050,7 +5052,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5090,7 +5092,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1511.3'
@@ -5111,13 +5113,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5145,7 +5147,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5185,7 +5187,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1522.9'
@@ -5206,13 +5208,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5240,7 +5242,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5280,7 +5282,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1535.6'
@@ -5301,13 +5303,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5335,7 +5337,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5375,7 +5377,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1538.8'
@@ -5396,13 +5398,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5430,7 +5432,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5470,7 +5472,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1547.2'
@@ -5491,13 +5493,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5525,7 +5527,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5565,7 +5567,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1555.7'
@@ -5586,13 +5588,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5620,7 +5622,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5660,7 +5662,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1564.2'
@@ -5681,13 +5683,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5715,7 +5717,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5755,7 +5757,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1577.9'
@@ -5776,13 +5778,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5810,7 +5812,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5850,7 +5852,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1587.4'
@@ -5871,13 +5873,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -5905,7 +5907,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -5945,7 +5947,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1598'
@@ -5966,13 +5968,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6000,7 +6002,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6040,7 +6042,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1609.7'
@@ -6061,13 +6063,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6095,7 +6097,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6135,7 +6137,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1618.1'
@@ -6156,13 +6158,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6190,7 +6192,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6230,7 +6232,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1631.9'
@@ -6251,13 +6253,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6285,7 +6287,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6325,7 +6327,8 @@ observations:
       reason: source T_range_K [1568.0, 2662.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_log10_gamma_coefficients'; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -6336,7 +6339,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6360,7 +6363,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -6370,7 +6374,7 @@ observations:
     original_method_class: measured KEMS
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6405,25 +6409,25 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: source does not state reaction
+      reason: no reaction mapped from source
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: source does not state reference_state
+      reason: no reference_state mapped from source
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -6470,7 +6474,7 @@ observations:
     original_method_class: measured_kems
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6496,7 +6500,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1674'
@@ -6517,13 +6521,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6551,7 +6555,7 @@ observations:
     original_method_class: authors_preferred_average_of_kems_derived_gammas
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6587,7 +6591,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1586.4'
@@ -6608,13 +6612,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6642,7 +6646,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6682,7 +6686,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1598'
@@ -6703,13 +6707,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6737,7 +6741,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6777,7 +6781,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1695.4'
@@ -6798,13 +6802,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6832,7 +6836,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6872,7 +6876,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1608.6'
@@ -6893,13 +6897,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6927,7 +6931,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -6967,7 +6971,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1619.2'
@@ -6988,13 +6992,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7022,7 +7026,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7062,7 +7066,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1630.8'
@@ -7083,13 +7087,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7117,7 +7121,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7157,7 +7161,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1642.5'
@@ -7178,13 +7182,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7212,7 +7216,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7252,7 +7256,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
@@ -7273,13 +7277,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7307,7 +7311,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7347,7 +7351,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1664.7'
@@ -7368,13 +7372,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7402,7 +7406,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7442,7 +7446,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1674.2'
@@ -7463,13 +7467,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7497,7 +7501,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7537,7 +7541,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1684.8'
@@ -7558,13 +7562,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7592,7 +7596,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7632,7 +7636,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -7653,13 +7657,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7687,7 +7691,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7727,7 +7731,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -7748,13 +7752,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7782,7 +7786,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7822,7 +7826,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -7843,13 +7847,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7877,7 +7881,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -7917,7 +7921,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -7938,13 +7942,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -7972,7 +7976,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8012,7 +8016,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8033,13 +8037,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8067,7 +8071,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8107,7 +8111,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8128,13 +8132,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8162,7 +8166,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8202,7 +8206,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8223,13 +8227,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8257,7 +8261,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8297,7 +8301,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8318,13 +8322,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8352,7 +8356,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8392,7 +8396,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -8413,13 +8417,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8447,7 +8451,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8487,7 +8491,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -8508,13 +8512,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8542,7 +8546,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8582,7 +8586,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1741.9'
@@ -8603,13 +8607,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8637,7 +8641,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8677,7 +8681,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1743'
@@ -8698,13 +8702,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8732,7 +8736,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8772,7 +8776,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1743'
@@ -8793,13 +8797,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8827,7 +8831,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8867,7 +8871,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8888,13 +8892,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -8922,7 +8926,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -8962,7 +8966,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -8983,13 +8987,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9017,7 +9021,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9057,7 +9061,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1740.8'
@@ -9078,13 +9082,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9112,7 +9116,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9152,7 +9156,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1401.3'
@@ -9173,13 +9177,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9207,7 +9211,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9247,7 +9251,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1413.9'
@@ -9268,13 +9272,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9302,7 +9306,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9342,7 +9346,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1522.9'
@@ -9363,13 +9367,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9397,7 +9401,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9437,7 +9441,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1535.6'
@@ -9458,13 +9462,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9492,7 +9496,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9532,7 +9536,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1548.3'
@@ -9553,13 +9557,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9587,7 +9591,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9627,7 +9631,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1557.8'
@@ -9648,13 +9652,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9682,7 +9686,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9722,7 +9726,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1571.6'
@@ -9743,13 +9747,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9777,7 +9781,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9817,7 +9821,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1588.5'
@@ -9838,13 +9842,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9872,7 +9876,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -9912,7 +9916,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1601.2'
@@ -9933,13 +9937,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -9967,7 +9971,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10007,7 +10011,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1613.9'
@@ -10028,13 +10032,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10062,7 +10066,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10102,7 +10106,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1626.6'
@@ -10123,13 +10127,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10157,7 +10161,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10197,7 +10201,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1638.2'
@@ -10218,13 +10222,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10252,7 +10256,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10292,7 +10296,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1425.6'
@@ -10313,13 +10317,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10347,7 +10351,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10387,7 +10391,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1650.9'
@@ -10408,13 +10412,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10442,7 +10446,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10482,7 +10486,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1662.6'
@@ -10503,13 +10507,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10537,7 +10541,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10577,7 +10581,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1674.2'
@@ -10598,13 +10602,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10632,7 +10636,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10672,7 +10676,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1685.8'
@@ -10693,13 +10697,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10727,7 +10731,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10767,7 +10771,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1699.6'
@@ -10788,13 +10792,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10822,7 +10826,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10862,7 +10866,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1712.3'
@@ -10883,13 +10887,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -10917,7 +10921,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -10957,7 +10961,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1719.7'
@@ -10978,13 +10982,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11012,7 +11016,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11052,7 +11056,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1733.4'
@@ -11073,13 +11077,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11107,7 +11111,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11147,7 +11151,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1437.2'
@@ -11168,13 +11172,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11202,7 +11206,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11242,7 +11246,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1449.9'
@@ -11263,13 +11267,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11297,7 +11301,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11337,7 +11341,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1461.6'
@@ -11358,13 +11362,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11392,7 +11396,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11432,7 +11436,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1474.2'
@@ -11453,13 +11457,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11487,7 +11491,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11527,7 +11531,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1486.9'
@@ -11548,13 +11552,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11582,7 +11586,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11622,7 +11626,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1498.6'
@@ -11643,13 +11647,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11677,7 +11681,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11717,7 +11721,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1511.3'
@@ -11738,13 +11742,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11772,7 +11776,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11812,7 +11816,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1538.8'
@@ -11833,13 +11837,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11867,7 +11871,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -11907,7 +11911,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1547.2'
@@ -11928,13 +11932,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11962,7 +11966,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12002,7 +12006,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1555.7'
@@ -12023,13 +12027,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12057,7 +12061,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12097,7 +12101,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1564.2'
@@ -12118,13 +12122,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12152,7 +12156,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12192,7 +12196,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1577.9'
@@ -12213,13 +12217,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12247,7 +12251,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12287,7 +12291,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1587.4'
@@ -12308,13 +12312,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12342,7 +12346,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12382,7 +12386,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1598'
@@ -12403,13 +12407,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12437,7 +12441,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12477,7 +12481,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1609.7'
@@ -12498,13 +12502,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12532,7 +12536,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12572,7 +12576,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1618.1'
@@ -12593,13 +12597,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12627,7 +12631,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12667,7 +12671,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1631.9'
@@ -12688,13 +12692,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -12722,7 +12726,7 @@ observations:
     original_method_class: derived_from_kems_equilibrium_constants
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12762,7 +12766,7 @@ observations:
       reason: source T_range_K [1874.0, 2662.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -12773,7 +12777,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12800,7 +12804,7 @@ observations:
       reason: source T_range_K [1781.0, 2611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -12811,7 +12815,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:
@@ -12838,7 +12842,8 @@ observations:
       reason: source T_range_K [1400.0, 1742.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'mole_fraction_for_activity_calculation'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -12850,7 +12855,7 @@ observations:
     original_method_class: measured_LA_ICP_MS
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-137-bischof-2023
   locator:

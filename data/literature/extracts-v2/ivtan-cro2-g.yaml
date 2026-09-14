@@ -37,7 +37,7 @@ observations:
     original_method_class: compilation_calculated_table
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-cro2-g
   locator:
@@ -66,7 +66,8 @@ observations:
       reason: source T_range_K [0.0, 298.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'adopted_formation_enthalpy'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -84,7 +85,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-cro2-g
   locator:
@@ -117,7 +118,8 @@ observations:
       reason: source T_range_K [298.15, 298.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'competing_formation_enthalpy'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -130,7 +132,7 @@ observations:
     original_method_class: review_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-cro2-g
   locator:
@@ -159,7 +161,8 @@ observations:
       reason: source T_range_K [100.0, 6000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'tabulated_thermo_functions'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -180,7 +183,7 @@ observations:
     original_method_class: compilation_calculated_table
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ivtan-cro2-g
   locator:

@@ -24,7 +24,8 @@ observations:
       reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -37,7 +38,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -363,7 +364,8 @@ observations:
       reason: source T_range_K [1818.15, 1900.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -375,7 +377,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -403,7 +405,8 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -416,7 +419,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -454,7 +457,8 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_molar_heat_of_solution'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -468,7 +472,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -503,7 +507,7 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
@@ -548,7 +552,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a ion_intensity_ratio field
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, log_base,
+      points'
   uncertainty:
     kind: printed
     verbatim:
@@ -560,7 +565,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -588,7 +593,8 @@ observations:
       reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -601,7 +607,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -632,7 +638,8 @@ observations:
       reason: qualifier composition_equation does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_composition_equation'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -646,7 +653,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -726,7 +733,8 @@ observations:
       reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_chemical_analysis'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -738,7 +746,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -769,7 +777,8 @@ observations:
       reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -783,7 +792,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:
@@ -821,7 +830,8 @@ observations:
       value: '1818.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'excess_gibbs_regular_solution'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -833,7 +843,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-069-furukawa-1976
   locator:

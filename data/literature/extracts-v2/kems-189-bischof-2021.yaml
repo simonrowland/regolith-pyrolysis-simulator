@@ -18,7 +18,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -30,7 +30,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -55,7 +55,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -67,7 +67,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -104,7 +104,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -132,7 +132,8 @@ observations:
       reason: qualifier coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source units are dimensionless ordering, not a numeric activity coefficient;
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -144,7 +145,7 @@ observations:
     original_method_class: qualitative_comparison
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -181,7 +182,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -209,7 +210,8 @@ observations:
       reason: qualifier coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source units are dimensionless ordering, not a numeric activity coefficient;
+      refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -221,7 +223,7 @@ observations:
     original_method_class: qualitative_comparison
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -246,7 +248,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'KMS_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -258,7 +261,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -296,7 +299,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -333,7 +336,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -370,7 +373,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -407,7 +410,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -444,7 +447,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -481,7 +484,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -518,7 +521,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -556,7 +559,7 @@ observations:
     original_method_class: authors_reduced_from_ion_intensities
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:
@@ -593,7 +596,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-189-bischof-2021
   locator:

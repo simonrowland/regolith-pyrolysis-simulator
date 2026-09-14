@@ -66,7 +66,8 @@ observations:
       reason: source T_range_K [1973.0, 2740.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bond_dissociation_and_Tvap'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -78,7 +79,7 @@ observations:
     original_method_class: secondary_compilation
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-038-matchett-2006
   locator:
@@ -105,7 +106,8 @@ observations:
       reason: source T_range_K [821.15, 2140.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vacuum_pyrolysis_experiment_summary'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -117,7 +119,7 @@ observations:
     original_method_class: solar_fresnel_vacuum_pyrolysis
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-038-matchett-2006
   locator:

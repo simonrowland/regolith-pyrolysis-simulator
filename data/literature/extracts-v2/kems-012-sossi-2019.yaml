@@ -21,7 +21,8 @@ observations:
       value: '1573.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -83,7 +84,8 @@ observations:
       reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -97,7 +99,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -128,7 +130,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
@@ -149,13 +151,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -222,10 +224,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -243,13 +245,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -264,7 +266,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel, source_inconsistency'
   uncertainty:
     kind: printed
     verbatim:
@@ -279,7 +282,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -313,7 +316,8 @@ observations:
       value: '1573.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -375,7 +379,8 @@ observations:
       reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -389,7 +394,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -420,7 +425,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
@@ -441,13 +446,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -514,10 +519,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -535,13 +540,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -556,7 +561,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel, source_inconsistency'
   uncertainty:
     kind: printed
     verbatim:
@@ -571,7 +577,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -605,7 +611,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -667,7 +674,8 @@ observations:
       reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -690,7 +698,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -726,7 +734,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -772,7 +781,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -787,7 +797,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -822,7 +832,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -885,7 +896,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -926,7 +938,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -962,7 +974,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1923.15]; no midpoint invented
@@ -983,13 +995,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1057,10 +1069,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -1078,13 +1090,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -1099,7 +1111,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -1138,7 +1151,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1172,7 +1185,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -1218,7 +1232,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1233,7 +1248,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1268,7 +1283,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1331,7 +1347,8 @@ observations:
       reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1363,7 +1380,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1399,7 +1416,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1462,7 +1480,8 @@ observations:
       reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1494,7 +1513,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1530,7 +1549,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -1576,7 +1596,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1591,7 +1612,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1626,7 +1647,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1699,7 +1721,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1800,7 +1822,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -1901,7 +1923,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2002,7 +2024,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2103,7 +2125,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2204,7 +2226,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2305,7 +2327,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2406,7 +2428,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2507,7 +2529,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2608,7 +2630,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2709,7 +2731,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2810,7 +2832,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -2911,7 +2933,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3012,7 +3034,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3113,7 +3135,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3214,7 +3236,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3315,7 +3337,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3416,7 +3438,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3517,7 +3539,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3618,7 +3640,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3719,7 +3741,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3820,7 +3842,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -3921,7 +3943,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4022,7 +4044,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4123,7 +4145,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4224,7 +4246,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4325,7 +4347,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4426,7 +4448,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4527,7 +4549,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4628,7 +4650,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4729,7 +4751,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4830,7 +4852,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -4931,7 +4953,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5032,7 +5054,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5133,7 +5155,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5234,7 +5256,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5335,7 +5357,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5436,7 +5458,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5537,7 +5559,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5638,7 +5660,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5739,7 +5761,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5840,7 +5862,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -5941,7 +5963,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6020,7 +6042,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6083,7 +6106,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6124,7 +6148,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6160,7 +6184,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -6181,13 +6205,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6255,10 +6279,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -6276,13 +6300,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6297,7 +6321,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -6336,7 +6361,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6370,7 +6395,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -6416,7 +6442,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6431,7 +6458,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6463,10 +6490,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -6484,22 +6511,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -6550,7 +6577,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_inference'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6564,7 +6592,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6598,7 +6626,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6661,7 +6690,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6684,7 +6714,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6712,10 +6742,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -6733,22 +6763,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -6797,7 +6827,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_inference'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6811,7 +6842,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -6845,7 +6876,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
@@ -6866,13 +6897,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6940,10 +6971,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -6961,13 +6992,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -6982,7 +7013,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -7005,7 +7037,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7039,7 +7071,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -7085,7 +7118,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -7098,7 +7132,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7133,7 +7167,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -7206,7 +7241,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7307,7 +7342,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7408,7 +7443,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7509,7 +7544,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7610,7 +7645,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7711,7 +7746,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7812,7 +7847,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -7913,7 +7948,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8014,7 +8049,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8115,7 +8150,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8216,7 +8251,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8317,7 +8352,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8418,7 +8453,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8519,7 +8554,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8620,7 +8655,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8721,7 +8756,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8822,7 +8857,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -8923,7 +8958,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9024,7 +9059,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9125,7 +9160,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9226,7 +9261,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9327,7 +9362,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9428,7 +9463,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9529,7 +9564,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9630,7 +9665,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9731,7 +9766,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9832,7 +9867,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -9933,7 +9968,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10034,7 +10069,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10135,7 +10170,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10236,7 +10271,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10337,7 +10372,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10438,7 +10473,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10539,7 +10574,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10640,7 +10675,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10741,7 +10776,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10842,7 +10877,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -10943,7 +10978,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11044,7 +11079,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11145,7 +11180,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11246,7 +11281,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11347,7 +11382,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11448,7 +11483,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11527,7 +11562,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11590,7 +11626,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11613,7 +11650,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11644,7 +11681,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11707,7 +11745,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11730,7 +11769,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11761,7 +11800,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
@@ -11782,13 +11821,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11856,10 +11895,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -11877,13 +11916,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -11898,7 +11937,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -11921,7 +11961,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -11955,7 +11995,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -12001,7 +12042,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -12014,7 +12056,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -14909,7 +14951,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15010,7 +15052,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15111,7 +15153,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15212,7 +15254,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15313,7 +15355,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15414,7 +15456,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15515,7 +15557,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15616,7 +15658,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15717,7 +15759,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15818,7 +15860,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -15919,7 +15961,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16020,7 +16062,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16121,7 +16163,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16222,7 +16264,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16323,7 +16365,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16424,7 +16466,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16525,7 +16567,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16626,7 +16668,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16727,7 +16769,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16828,7 +16870,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -16929,7 +16971,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17030,7 +17072,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17131,7 +17173,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17232,7 +17274,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17333,7 +17375,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17434,7 +17476,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17535,7 +17577,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17636,7 +17678,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17737,7 +17779,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17838,7 +17880,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -17939,7 +17981,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18040,7 +18082,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18141,7 +18183,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18242,7 +18284,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18343,7 +18385,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18444,7 +18486,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18545,7 +18587,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18646,7 +18688,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18747,7 +18789,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18848,7 +18890,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -18949,7 +18991,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19050,7 +19092,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19151,7 +19193,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19230,7 +19272,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -19276,7 +19319,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19289,7 +19333,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19324,7 +19368,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'one_percent_evaporation_temperature'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -19372,7 +19417,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'one_percent_evaporation_temperature'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19385,7 +19431,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19416,7 +19462,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19479,7 +19526,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19511,7 +19559,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19547,7 +19595,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19610,7 +19659,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19642,7 +19692,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19678,7 +19728,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -19724,7 +19775,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19739,7 +19791,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19771,10 +19823,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -19792,22 +19844,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -19863,7 +19915,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_inference'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19877,7 +19930,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -19912,7 +19965,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19963,7 +20017,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_inference'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19977,7 +20032,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20009,10 +20064,10 @@ observations:
         reason: phase unknown; polymorph unresolved
     subtype:
       tag: unknown
-      reason: source does not state subtype
+      reason: no subtype mapped from source
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -20030,22 +20085,22 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use reference_state
     reservoir:
       tag: unknown
-      reason: source does not state reservoir
+      reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
-      reason: source does not state sweep_gas
+      reason: no sweep_gas mapped from source
     exposure:
       tag: unknown
-      reason: source does not state exposure
+      reason: no exposure mapped from source
     sample_mass_kg:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
@@ -20097,7 +20152,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_inference'; refusing to
+      pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20111,7 +20167,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20146,7 +20202,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20212,7 +20269,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20235,7 +20293,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20266,7 +20324,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20313,7 +20372,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20326,7 +20386,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20361,7 +20421,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
@@ -20382,13 +20442,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -20456,10 +20516,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -20477,13 +20537,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -20498,7 +20558,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -20521,7 +20582,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20555,7 +20616,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20617,7 +20679,8 @@ observations:
       reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20640,7 +20703,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20671,7 +20734,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20733,7 +20797,8 @@ observations:
       reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20756,7 +20821,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20787,7 +20852,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
@@ -20808,13 +20873,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -20881,10 +20946,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -20902,13 +20967,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -20923,7 +20988,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -20955,7 +21021,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -20990,7 +21056,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -21036,7 +21103,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -21051,7 +21119,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21086,7 +21154,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -21149,7 +21218,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -21181,7 +21251,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21217,7 +21287,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
@@ -21238,13 +21308,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -21312,10 +21382,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -21333,13 +21403,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -21354,7 +21424,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -21385,7 +21456,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21419,7 +21490,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -21465,7 +21537,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -21480,7 +21553,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21515,7 +21588,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -21588,7 +21662,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21689,7 +21763,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21790,7 +21864,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21891,7 +21965,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -21992,7 +22066,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22093,7 +22167,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22194,7 +22268,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22295,7 +22369,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22396,7 +22470,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22497,7 +22571,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22598,7 +22672,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22699,7 +22773,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22800,7 +22874,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -22901,7 +22975,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23002,7 +23076,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23103,7 +23177,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23204,7 +23278,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23305,7 +23379,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23406,7 +23480,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23507,7 +23581,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23608,7 +23682,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23709,7 +23783,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23810,7 +23884,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -23911,7 +23985,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24012,7 +24086,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24113,7 +24187,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24214,7 +24288,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24315,7 +24389,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24416,7 +24490,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24517,7 +24591,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24618,7 +24692,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24719,7 +24793,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24820,7 +24894,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -24921,7 +24995,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25022,7 +25096,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25123,7 +25197,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25224,7 +25298,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25325,7 +25399,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25426,7 +25500,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25527,7 +25601,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25628,7 +25702,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25729,7 +25803,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -25830,7 +25904,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -28769,7 +28843,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -28870,7 +28944,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -28971,7 +29045,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29072,7 +29146,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29173,7 +29247,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29274,7 +29348,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29375,7 +29449,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29476,7 +29550,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29577,7 +29651,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29678,7 +29752,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29779,7 +29853,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29880,7 +29954,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -29981,7 +30055,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30082,7 +30156,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30183,7 +30257,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30284,7 +30358,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30385,7 +30459,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30486,7 +30560,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30587,7 +30661,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30688,7 +30762,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30789,7 +30863,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30890,7 +30964,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -30991,7 +31065,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31092,7 +31166,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31193,7 +31267,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31294,7 +31368,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31395,7 +31469,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31496,7 +31570,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31597,7 +31671,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31698,7 +31772,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31799,7 +31873,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -31900,7 +31974,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32001,7 +32075,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32102,7 +32176,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32203,7 +32277,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32304,7 +32378,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32405,7 +32479,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32506,7 +32580,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32607,7 +32681,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32708,7 +32782,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32809,7 +32883,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -32910,7 +32984,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33011,7 +33085,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33090,7 +33164,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -33163,7 +33238,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33264,7 +33339,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33365,7 +33440,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33466,7 +33541,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33567,7 +33642,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33668,7 +33743,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33769,7 +33844,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33870,7 +33945,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -33971,7 +34046,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34072,7 +34147,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34173,7 +34248,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34274,7 +34349,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34375,7 +34450,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34476,7 +34551,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34577,7 +34652,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34678,7 +34753,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34779,7 +34854,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34880,7 +34955,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -34981,7 +35056,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35082,7 +35157,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35183,7 +35258,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35284,7 +35359,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35385,7 +35460,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35486,7 +35561,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35587,7 +35662,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35688,7 +35763,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35789,7 +35864,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35890,7 +35965,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -35991,7 +36066,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36092,7 +36167,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36193,7 +36268,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36294,7 +36369,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36395,7 +36470,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36496,7 +36571,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36597,7 +36672,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36698,7 +36773,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36799,7 +36874,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -36900,7 +36975,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37001,7 +37076,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37102,7 +37177,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37203,7 +37278,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37304,7 +37379,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37405,7 +37480,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37484,7 +37559,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -37557,7 +37633,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37658,7 +37734,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37759,7 +37835,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37860,7 +37936,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -37961,7 +38037,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38062,7 +38138,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38163,7 +38239,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38264,7 +38340,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38365,7 +38441,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38466,7 +38542,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38567,7 +38643,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38668,7 +38744,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38769,7 +38845,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38870,7 +38946,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -38971,7 +39047,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39072,7 +39148,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39173,7 +39249,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39274,7 +39350,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39375,7 +39451,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39476,7 +39552,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39577,7 +39653,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39678,7 +39754,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39779,7 +39855,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39880,7 +39956,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -39981,7 +40057,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40082,7 +40158,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40183,7 +40259,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40284,7 +40360,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40385,7 +40461,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40486,7 +40562,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40587,7 +40663,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40688,7 +40764,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40789,7 +40865,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40890,7 +40966,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -40991,7 +41067,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41092,7 +41168,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41193,7 +41269,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41294,7 +41370,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41395,7 +41471,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41496,7 +41572,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41597,7 +41673,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41698,7 +41774,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41799,7 +41875,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -41878,7 +41954,8 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -41941,7 +42018,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -41982,7 +42060,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42018,7 +42096,7 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
@@ -42039,13 +42117,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -42113,10 +42191,10 @@ observations:
       reason: profile activity_coefficient does not use subtype
     per:
       tag: unknown
-      reason: source does not state per
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -42134,13 +42212,13 @@ observations:
       reason: profile activity_coefficient does not use reservoir
     composition:
       tag: unknown
-      reason: source does not state composition
+      reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: source does not state fO2_Pa
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state total_pressure_Pa
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -42155,7 +42233,8 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source does not name a activity_coefficient field
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, evidence_class, method_class,
+      per_temperature_by_channel'
   uncertainty:
     kind: printed
     verbatim:
@@ -42194,7 +42273,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42228,7 +42307,8 @@ observations:
       reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -42274,7 +42354,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -42289,7 +42370,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42324,7 +42405,8 @@ observations:
       reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'open_furnace_residue_composition_vs_time'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -42397,7 +42479,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42498,7 +42580,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42599,7 +42681,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42700,7 +42782,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42801,7 +42883,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -42902,7 +42984,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43003,7 +43085,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43104,7 +43186,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43205,7 +43287,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43306,7 +43388,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43407,7 +43489,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43508,7 +43590,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43609,7 +43691,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43710,7 +43792,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43811,7 +43893,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -43912,7 +43994,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44013,7 +44095,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44114,7 +44196,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44215,7 +44297,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44316,7 +44398,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44417,7 +44499,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44518,7 +44600,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44619,7 +44701,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44720,7 +44802,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44821,7 +44903,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -44922,7 +45004,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45023,7 +45105,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45124,7 +45206,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45225,7 +45307,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45326,7 +45408,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45427,7 +45509,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45528,7 +45610,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45629,7 +45711,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45730,7 +45812,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45831,7 +45913,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -45932,7 +46014,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46033,7 +46115,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46134,7 +46216,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46235,7 +46317,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46336,7 +46418,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46437,7 +46519,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46538,7 +46620,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:
@@ -46639,7 +46721,7 @@ observations:
     original_method_class: measured_direct
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-012-sossi-2019
   locator:

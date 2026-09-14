@@ -21,7 +21,7 @@ observations:
       value: '1768'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'consolute_temperature'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -33,7 +33,7 @@ observations:
     original_method_class: author_estimate
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-116-nunoue-1987
   locator:
@@ -344,7 +344,8 @@ observations:
       reason: source T_range_K [1473.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -356,7 +357,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-116-nunoue-1987
   locator:
@@ -383,7 +384,7 @@ observations:
       reason: source T_range_K [1473.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -395,7 +396,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-116-nunoue-1987
   locator:
@@ -422,7 +423,8 @@ observations:
       reason: source T_range_K [1511.0, 1764.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'miscibility_gap_temperature'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -434,7 +436,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-116-nunoue-1987
   locator:
@@ -465,7 +467,8 @@ observations:
       reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -477,7 +480,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-116-nunoue-1987
   locator:

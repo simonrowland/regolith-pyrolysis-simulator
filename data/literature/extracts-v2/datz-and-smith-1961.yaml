@@ -18,7 +18,8 @@ observations:
         reason: not crystal
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source is a Kd/Kp dissociation equilibrium, not delta_fG; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -27,7 +28,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: datz-and-smith-1961
   locator:
@@ -51,7 +52,8 @@ observations:
         reason: not crystal
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source is a Kd/Kp dissociation equilibrium, not delta_fG; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -60,7 +62,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: datz-and-smith-1961
   locator:
@@ -84,7 +86,8 @@ observations:
         reason: not crystal
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -95,7 +98,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: datz-and-smith-1961
   locator:

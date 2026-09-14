@@ -21,7 +21,8 @@ observations:
       reason: source T_range_K [300.0, 300.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'clausing_factor_at_tabulated_L_over_r'; refusing
+      to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -31,7 +32,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-032-copland-jacobson-2010
   locator:
@@ -55,7 +56,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'clausing_factor_table'; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -67,7 +68,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-032-copland-jacobson-2010
   locator:
@@ -94,7 +95,8 @@ observations:
       reason: source T_range_K [300.0, 300.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'clausing_factor_table_I_verbatim'; refusing to
+      pick a number
   uncertainty:
     kind: none
   evidence:
@@ -104,7 +106,7 @@ observations:
     original_method_class: method_only
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-032-copland-jacobson-2010
   locator:
@@ -129,7 +131,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -141,7 +144,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-032-copland-jacobson-2010
   locator:
@@ -165,7 +168,8 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -177,7 +181,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-032-copland-jacobson-2010
   locator:

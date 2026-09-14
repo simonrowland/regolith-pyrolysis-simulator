@@ -72,7 +72,8 @@ observations:
       value: '714'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -85,7 +86,7 @@ observations:
     model: model_derived
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-188-nanjo-1976
   locator:
@@ -123,7 +124,8 @@ observations:
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
   uncertainty:
     kind: printed
     verbatim:
@@ -135,7 +137,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-188-nanjo-1976
   locator:
@@ -163,7 +165,8 @@ observations:
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_vaporization'; refusing to pick a
+      number
   uncertainty:
     kind: printed
     verbatim:
@@ -175,7 +178,7 @@ observations:
     original_method_class: quoted_measurement
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-188-nanjo-1976
   locator:
@@ -203,7 +206,8 @@ observations:
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -215,7 +219,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-188-nanjo-1976
   locator:
@@ -243,7 +247,8 @@ observations:
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
+      to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -255,7 +260,7 @@ observations:
     original_method_class: measured
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: kems-188-nanjo-1976
   locator:

@@ -21,7 +21,7 @@ observations:
       reason: source T_range_K [800, 1000]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point; T_range_K [800, 1000] is a temperature domain,
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [800, 1000] is a temperature domain,
       not the observable
   uncertainty:
     kind: none
@@ -31,7 +31,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: pending-mg2cl4
   locator:

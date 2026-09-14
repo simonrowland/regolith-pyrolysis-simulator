@@ -18,7 +18,8 @@ observations:
         reason: not crystal
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source note names dissociation energy, not delta_fG; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -27,7 +28,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ames-walsh-white-1967
   locator:
@@ -50,7 +51,8 @@ observations:
         reason: not crystal
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; source note names dissociation energy, not delta_fG; refusing to pick
+      a number
   uncertainty:
     kind: none
   evidence:
@@ -59,7 +61,7 @@ observations:
       reason: source does not state method_class
   admission:
     status: pending
-    reason: source does not state admission_status
+    reason: no observation admission_status mapped from source
   notices: []
   source_id: ames-walsh-white-1967
   locator:
