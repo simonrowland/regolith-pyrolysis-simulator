@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 167
-  extracts: 165
+  sources: 168
+  extracts: 166
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 2
-  extracts_without_pdf: 123
-  alias_groups_needing_resolution: 33
+  extracts_without_pdf: 124
+  alias_groups_needing_resolution: 34
 gaps:
   pdfs_without_extract:
   - kems-137-bischof-2023-mmc1
@@ -62,6 +62,7 @@ gaps:
   - kems-057-kambayashi-1985
   - kems-058-ohara-1987
   - kems-066-ichise-1977
+  - kems-067-yamada-1980
   - kems-069-furukawa-1976
   - kems-087-yamada-kato-1980
   - kems-088-ichise-1975
@@ -619,6 +620,12 @@ gaps:
     - kems-041-sossi-fegley-2018
     - kems-045-sossi-2018-pnas-cr
     resolution: owner/controller
+  - type: source_id_alias
+    key: yamada-1980
+    source_ids:
+    - kems-067-yamada-1980
+    - kems-087-yamada-kato-1980
+    resolution: owner/controller
 sources:
 - source_id: ames-walsh-white-1967
   aliases: []
@@ -676,7 +683,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: banchor-matsui-naito-1986
   aliases: []
   citation: Banchornheavakul, Matsui & Naito, J. Nucl. Sci. Technol. 23 (1986) 602–611
@@ -733,7 +740,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: behrens-rosenblatt-1972
   aliases: []
   citation: Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190
@@ -790,7 +797,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: berkowitz-chupka-inghram-1957
   aliases: []
   citation: Berkowitz, Chupka & Inghram, J. Chem. Phys. 27 (1957) 87–90
@@ -847,7 +854,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   aliases: []
   citation: Cardiff, Eric H., Pomeroy, Brian R., Banks, Ian S. and Benz, Alexis (2007), "Vacuum Pyrolysis
@@ -898,15 +905,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: costa-jacobson-2015
   aliases:
   - kems-007-costa-2015
@@ -965,7 +972,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: datz-1961-na2cl2
   aliases:
   - datz-smith-taylor-1961-nacl-vapor
@@ -1024,7 +1031,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: datz-and-smith-1961
   aliases: []
   citation: Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium
@@ -1082,7 +1089,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: datz-smith-taylor-1961-nacl-vapor
   aliases:
   - datz-1961-na2cl2
@@ -1144,7 +1151,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: fedkin-grossman-ghiorso-2006
   aliases:
   - REF-014
@@ -1206,7 +1213,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: fegley-2023-chemical-equilibrium-calculations-bu
   aliases: []
   citation: Fegley, B., Jr., Lodders, K., and Jacobson, N. S. (2023). Chemical Equilibrium Calculations
@@ -1259,7 +1266,7 @@ sources:
       error: null
       last_stage: scored
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: fray-schmitt-2009-ch4-1
   aliases:
   - fray-schmitt-2009-co-1
@@ -1318,7 +1325,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: fray-schmitt-2009-co-1
   aliases:
   - fray-schmitt-2009-ch4-1
@@ -1378,7 +1385,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: fray-schmitt-2009-nh3
   aliases: []
   citation: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary
@@ -1437,7 +1444,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: giauque-powell-1939-cl2
   aliases: []
   citation: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of
@@ -1497,7 +1504,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: giauque-ruehrwein-1939-hcn-psat
   aliases: []
   citation: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat
@@ -1556,7 +1563,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: habermann-daane-1964
   aliases: []
   citation: Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827
@@ -1613,7 +1620,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: iapws-95-psat-liquid
   aliases: []
   citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
@@ -1674,7 +1681,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: iupac-o2-solid-psat
   aliases: []
   citation: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure
@@ -1733,7 +1740,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ivtan-cro2-g
   aliases: []
   citation: 'Osina, E. L. & Gorokhov, L. N. (2009-12-24). IVTANTHERMO electronic continuation, Table 877,
@@ -1787,7 +1794,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ivtan-mno-coo-thermo
   aliases: []
   citation: IVTAN Thermodynamic Database electronic tables; per-species electronic-page identities retained
@@ -1845,7 +1852,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: janaf-4th
   aliases: []
   citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data
@@ -1905,7 +1912,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-001-homma-1966
   aliases: []
   citation: Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper and Tin from Molten
@@ -1958,7 +1965,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-002-ohno-1967
   aliases: []
   citation: Ohno, R. & Ishida, T. (1967), "Rate of Evaporation of Mn, Cu, Sn, Cr and S from Molten Iron
@@ -2011,7 +2018,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-003-pound-1972
   aliases:
   - REF-040
@@ -2070,7 +2077,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 42'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-005-fedkin-2006
   aliases:
   - REF-014
@@ -2128,7 +2135,7 @@ sources:
       error: null
       last_stage: deepened
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-006-zhang-2021
   aliases: []
   citation: Zhang et al. (2021), vacuum evaporation of Na, K and Rb from a basaltic silicate melt; diffusion-limited
@@ -2187,7 +2194,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-007-costa-2015
   aliases:
   - costa-jacobson-2015
@@ -2241,7 +2248,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-008-schaefer-fegley-2004
   aliases:
   - ref-016-sio-kems-1700-2000k
@@ -2296,7 +2303,7 @@ sources:
       error: null
       last_stage: scored
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-009-safarian-2013
   aliases: []
   citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans.
@@ -2349,7 +2356,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-010-richter-2007
   aliases:
   - richter-et-al-2007
@@ -2404,7 +2411,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-011-wetzel-gail-2013
   aliases:
   - wetzel-gail-2013-sio-arrhenius
@@ -2458,7 +2465,7 @@ sources:
       error: null
       last_stage: scored
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-012-sossi-2019
   aliases:
   - sossi-et-al-2019
@@ -2513,7 +2520,7 @@ sources:
       error: null
       last_stage: transcribed
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-014-drowart-2005
   aliases: []
   citation: 'Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), "High-temperature mass spectrometry:
@@ -2568,7 +2575,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-015-hashimoto-1983
   aliases: []
   citation: Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula — evaporation experiments
@@ -2622,7 +2629,7 @@ sources:
       error: null
       last_stage: battery
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-016-stolyarova-1992
   aliases: []
   citation: Stolyarova, V., Shornikov, S., Ivanov, G. & Shultz, M. (1992), "High temperature mass spectrometric
@@ -2675,7 +2682,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-017-stolyarova-2013
   aliases: []
   citation: Stolyarova, V.L. (2013), review/compilation on high-temperature mass spectrometry of oxide
@@ -2728,7 +2735,7 @@ sources:
       error: null
       last_stage: extraction_extended
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-018-stolyarova-2012
   aliases: []
   citation: Stolyarova, V. (2012), "Thermodynamic properties and vaporization processes of the ionic silicate
@@ -2781,7 +2788,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-019-miller-armatys-2013
   aliases: []
   citation: 'Miller, M. and Armatys, K. (2013), "Twenty Years of Knudsen Effusion Mass Spectrometry: Studies
@@ -2834,7 +2841,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-020-hastie-1981-nbsir
   aliases: []
   citation: Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1981), "Alkali Vapor Transport in Coal Conversion
@@ -2887,7 +2894,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-021-plante-1992-feo
   aliases: []
   citation: Plante, E. R., Hastie, J. W. & Kowalska, M. (1992), "Activity of FeO in the FeO-MgO-SiO2 System
@@ -2946,7 +2953,7 @@ sources:
       error: null
       last_stage: acquired_oa_reverified
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-022-demaria-1971
   aliases: []
   citation: De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation
@@ -2999,7 +3006,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 23'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-023-demaria-1973
   aliases: []
   citation: De Maria, G. & Piacente, V. (1973), "Vaporization Study of Selected Lunar Samples", Lunar
@@ -3049,15 +3056,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-023-demaria-1973.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-023-demaria-1973.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-025-markova-1983
   aliases: []
   citation: 'Markova, O. M., Yakovlev, O. I., Semenov, G. A. & Belov, A. N. (1983), "Vaporization of Lunar
@@ -3108,15 +3115,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-025-markova-1983.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-025-markova-1983.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-026-markova-1984
   aliases: []
   citation: Markova, O.M., Yakovlev, O.I., Belov, A.N. & Semenov, G.A. (1984), "The role of the vaporization
@@ -3166,15 +3173,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-026-markova-1984.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-026-markova-1984.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-027-plante-hastie-1983
   aliases: []
   citation: 'Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1983), NBSIR 83-2731, "Vaporization of Simulated
@@ -3228,7 +3235,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-028-yakovlev-1984
   aliases: []
   citation: 'Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), "The vaporization peculiarities
@@ -3278,15 +3285,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-028-yakovlev-1984.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-028-yakovlev-1984.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-029-yakovlev-shornikov-2011
   aliases: []
   citation: Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions",
@@ -3336,15 +3343,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-029-yakovlev-shornikov-2011.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-029-yakovlev-shornikov-2011.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-031-halwax-2024
   aliases:
   - halwax_sergeev_mueller_schenk_2024
@@ -3403,7 +3410,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-032-copland-jacobson-2010
   aliases: []
   citation: Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and
@@ -3456,7 +3463,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-033-shornikov-2010
   aliases: []
   citation: Shornikov, S. I. and Yakovlev, O. I. (2010), "A Study of CAI Melt Composition Changing During
@@ -3506,15 +3513,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-033-shornikov-2010.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-033-shornikov-2010.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-035-sauerborn-2005
   aliases: []
   citation: Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter
@@ -3567,7 +3574,7 @@ sources:
       error: null
       last_stage: deepened
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-036-sesko-2024
   aliases:
   - sesko_2024
@@ -3626,7 +3633,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-037-richter-2002
   aliases: []
   citation: 'Richter, F. M., Davis, A. M., Ebel, D. S. & Hashimoto, A. (2002), "Elemental and isotopic
@@ -3680,7 +3687,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-038-matchett-2006
   aliases: []
   citation: Matchett, J. (2006), "Production of Lunar Oxygen Through Vacuum Pyrolysis", Major Research
@@ -3739,7 +3746,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-040-stolyarova-2015
   aliases: []
   citation: 'Stolyarova, V. L. (2015), "Vaporization and Thermodynamics of Glass-Forming Oxide Melts:
@@ -3799,7 +3806,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-041-sossi-fegley-2018
   aliases: []
   citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and
@@ -3852,7 +3859,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 23'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-042-plante-1979
   aliases:
   - kems-042-nbs-sp561-v1-hastie-1979
@@ -3908,7 +3915,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-044-robinot-2026
   aliases:
   - robinot_2026
@@ -3964,15 +3971,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-044-robinot-2026.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-044-robinot-2026.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-045-sossi-2018-pnas-cr
   aliases: []
   citation: Sossi, P. A., Moynier, F. & van Zuilen, K. (2018), "Volatile loss following cooling and accretion
@@ -4017,15 +4024,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-045-sossi-2018-pnas-cr.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-045-sossi-2018-pnas-cr.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-047-turkdogan-1984-isij
   aliases: []
   citation: Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking
@@ -4076,15 +4083,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-047-turkdogan-1984-isij.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-047-turkdogan-1984-isij.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-048-turkdogan-2001-sio2-gamma
   aliases: []
   citation: Turkdogan, E. T. (2001), "Assessment of SiO2 Activity Coefficients in Molten Slags Relative
@@ -4134,15 +4141,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-048-turkdogan-2001-sio2-gamma.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-048-turkdogan-2001-sio2-gamma.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-049-kato-1993-ms-review
   aliases: []
   citation: Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry",
@@ -4192,15 +4199,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-049-kato-1993-ms-review.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-049-kato-1993-ms-review.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-050-gorokhov-1977
   aliases: []
   citation: 'Gorokhov, L. N., Gusarov, A. V. et al. (1977), "Масс-спектрометрическое определение энтальпий
@@ -4257,7 +4264,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 4'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-057-kambayashi-1985
   aliases: []
   citation: Kambayashi, S., Awaka, H. and Kato, E. (1985), "Mass Spectrometric Determination of Activities
@@ -4307,15 +4314,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-057-kambayashi-1985.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-057-kambayashi-1985.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-058-ohara-1987
   aliases: []
   citation: Ohara, N., Nunoue, S. and Kato, E. (1987), "Mass Spectrometric Determination of Interaction
@@ -4366,15 +4373,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-058-ohara-1987.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-058-ohara-1987.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-066-ichise-1977
   aliases: []
   citation: Ichise, E., Yamauchi, T. & Mori, T. (1977), "Knudsen Cell-Mass Spectrometric Study of the
@@ -4424,15 +4431,73 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-066-ichise-1977.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-066-ichise-1977.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
+- source_id: kems-067-yamada-1980
+  aliases: []
+  citation: Yamada, K., Abe, H. & Kato, E. (1980), "Mass Spectrometric Study of the Activity in Liquid
+    Fe-Si Alloys at 1600°C", Tetsu-to-Hagane 66(5):488-495, DOI 10.2355/tetsutohagane1955.66.5_488
+  doi: 10.2355/tetsutohagane1955.66.5_488
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.66.5_488
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-067-yamada-1980.yaml
+    review_status: draft
+    rows: 18
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-067-yamada-1980/kems-067-yamada-1980.pdf
+      present: true
+      sha256: 36278ceb79de10c58cad9a70f8f631f1c81a22a41716583e4979bd1030356525
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-067-yamada-1980/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-067-yamada-1980
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-067-yamada-1980
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-067-yamada-1980.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/kems-067-yamada-1980.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-09-14'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-069-furukawa-1976
   aliases: []
   citation: Furukawa, T. & Kato, E. (1976), "Thermodynamics of Binary Liquid Iron-Titanium Alloys by Mass
@@ -4483,15 +4548,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-069-furukawa-1976.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-069-furukawa-1976.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-087-yamada-kato-1980
   aliases: []
   citation: Yamada, K. & Kato, E. (1980), "Mass Spectrometric Study of the Activity of Phosphorus in Iron-Phosphorus
@@ -4542,15 +4607,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-087-yamada-kato-1980.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-087-yamada-kato-1980.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-088-ichise-1975
   aliases: []
   citation: Ichise, E., Kitano, K. & Mori, T. (1975), "The Determination of Activity Coefficient of Sulfur
@@ -4600,15 +4665,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-088-ichise-1975.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-088-ichise-1975.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-093-piacente-1975
   aliases: []
   citation: Piacente, V., Matoušek, J., Spoliti, M. & Di Paolo, V. (1975), "Mass spectrometric investigation
@@ -4660,7 +4725,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-095-ueda-1986
   aliases: []
   citation: Ueda, Y., Nishi, T., Oishi, T. & Ono, K. (1986), "Thermodynamic Study of the Liquid Ti-Co
@@ -4710,15 +4775,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-095-ueda-1986.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-095-ueda-1986.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-097-ikeda-1978
   aliases: []
   citation: Ikeda, Y., Tamaki, M. & Matsumoto, G. (1978), "A Mass Spectrometric Study of Vaporization
@@ -4771,7 +4836,7 @@ sources:
       error: null
       last_stage: scored
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-103-fraser-1983
   aliases: []
   citation: Fraser, D. G., Rammensee, W. & Jones, R. H. (1983), "The mixing properties of melts in the
@@ -4824,7 +4889,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 4'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-105-yamada-1983
   aliases: []
   citation: Yamada, K. and Kato, E. (1983), "Effect of Dilute Concentrations of Si, Al, Ti, V, Cr, Co,
@@ -4875,15 +4940,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-105-yamada-1983.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-105-yamada-1983.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-111-ichise-1982
   aliases: []
   citation: Ichise, E., Maruo, T., Sasho, H., Ueshima, Y. and Mori, T. (1982), "Knudsen Cell-mass Spectrometric
@@ -4934,15 +4999,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-111-ichise-1982.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-111-ichise-1982.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-112-ichise-1989
   aliases: []
   citation: Ichise, E. and Horikawa, K. (1989), "Thermodynamic Study of Fe-Ta and Fe-Nb Alloys by Means
@@ -4992,15 +5057,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-112-ichise-1989.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-112-ichise-1989.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-114-nichols-1995
   aliases: []
   citation: 'Nichols Jr., R. H., Wasserburg, G. J. & Grimley, R. T. (1995), "Evaporation of forsterite:
@@ -5053,7 +5118,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-116-nunoue-1987
   aliases: []
   citation: Nunoue, S. and Kato, E. (1987), "Mass Spectrometric Determination of the Miscibility Gap in
@@ -5104,15 +5169,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-116-nunoue-1987.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-116-nunoue-1987.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-118-yamamoto-1983
   aliases: []
   citation: Yamamoto, M., Mori, S. and Kato, E. (1983), "Mass Spectrometric Study of the Thermodynamic
@@ -5163,15 +5228,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-118-yamamoto-1983.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-118-yamamoto-1983.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-119-furukawa-1975
   aliases: []
   citation: Furukawa, T. and Kato, E. (1975), "Thermodynamic Properties of the Fe-V, Fe-V-Cr Alloys at
@@ -5221,15 +5286,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-119-furukawa-1975.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-119-furukawa-1975.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-120-ueshima-1984
   aliases: []
   citation: Ueshima, Y., Yamana, H., Sugiyama, T. and Ichise, E. (1984), "Knudsen Cell Mass Spectrometric
@@ -5279,15 +5344,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-120-ueshima-1984.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-120-ueshima-1984.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-127-qi-1989
   aliases: []
   citation: Qi, G., Hino, M. and Azakami, T. (1989), "Thermodynamic Study of Liquid Ag-In and Ag-Ga Alloys
@@ -5337,15 +5402,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-127-qi-1989.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-127-qi-1989.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-132-nakajima-2016
   aliases: []
   citation: Nakajima, K. (2016), "Determination of Optimal Vapor Pressure Data by the Second and Third
@@ -5397,7 +5462,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-133-costa-2017
   aliases: []
   citation: Costa, G. C. C., Jacobson, N. S. & Fegley Jr., B. (2017), "Vaporization and thermodynamics
@@ -5450,7 +5515,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 4'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-137-bischof-2023
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Determination
@@ -5504,7 +5569,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-137-bischof-2023-mmc1
   aliases: []
   citation: null
@@ -5552,7 +5617,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-138-bischof-2023
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Quantification
@@ -5605,7 +5670,7 @@ sources:
       error: null
       last_stage: deepened
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-139-jacobson-2024
   aliases: []
   citation: 'Jacobson, N. S., Colle, J.-Y., Stolyarova, V., Markus, T. & Nuta, I. (2024), "Knudsen effusion
@@ -5658,7 +5723,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-140-heck-2025
   aliases: []
   citation: Heck, W. F., Herrmann, A. D. & Jackson, C. R. M. (2025), "Experimental degassing of moderately
@@ -5711,7 +5776,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 4'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-169-nakazawa-1976
   aliases: []
   citation: Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "Activity Measurement on Cd-Zn Alloy with
@@ -5761,15 +5826,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-169-nakazawa-1976.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-169-nakazawa-1976.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-184-behrens-1979
   aliases:
   - kems-042-plante-1979
@@ -5823,7 +5888,7 @@ sources:
       error: null
       last_stage: scored
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-188-nanjo-1976
   aliases: []
   citation: Nanjo, M., Nakazawa, S., Yazawa, A. and Taniuchi, K. (1976), "A Thermodynamic Study of the
@@ -5873,15 +5938,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-188-nanjo-1976.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-188-nanjo-1976.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-189-bischof-2021
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2021), "Vaporisation
@@ -5934,7 +5999,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-190-wu-1993
   aliases:
   - wu-1993-feo-mgo-sio2
@@ -5995,7 +6060,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-198-ichise-ueshima-1989
   aliases: []
   citation: Ichise, E., Ueshima, Y. & Yamana, H. (1989), "Ion Intensity Thermal Analysis of Ag-Mn Alloy",
@@ -6045,15 +6110,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-198-ichise-ueshima-1989.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-198-ichise-ueshima-1989.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-200-ueshima-1983
   aliases: []
   citation: Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature
@@ -6103,15 +6168,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-200-ueshima-1983.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-200-ueshima-1983.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-201-ichise-1986
   aliases: []
   citation: Ichise, E., Ueshima, Y. & Miyagawa, S. (1986), "Reexamination of the High Temperature Region
@@ -6161,15 +6226,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/kems-201-ichise-1986.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/kems-201-ichise-1986.yaml
       present: true
       error: null
-      last_stage: decoded
+      last_stage: extracted
       date: '2026-09-13'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: kems-ms2000-044
   aliases:
   - ms2000-044
@@ -6220,10 +6285,10 @@ sources:
     ledger:
       path: ledger/kems-ms2000-044.yaml
       present: true
-      error: 'Invalid YAML: mapping values are not allowed here at line 51'
-      last_stage: null
-      date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      error: null
+      last_stage: deepened
+      date: '2026-09-06'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lamoreaux-hildenbrand-1984
   aliases:
   - ref-052-k-o-gas
@@ -6284,7 +6349,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lamoreaux-hildenbrand-hildenbrand-1987
   aliases:
   - lh87-al-o-gas-species
@@ -6346,7 +6411,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-al-o-gas-species
   aliases:
   - lamoreaux-hildenbrand-hildenbrand-1987
@@ -6408,7 +6473,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-beo-g
   aliases: []
   citation: LH87 BeO(g); JANAF BeO(g) — use one as fit, one as anchor at numeric land
@@ -6465,7 +6530,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-cao-g
   aliases:
   - lamoreaux-hildenbrand-hildenbrand-1987
@@ -6526,7 +6591,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-geo-g
   aliases: []
   citation: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
@@ -6583,7 +6648,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-in2o-g
   aliases: []
   citation: LH87 In–O gas (In2O); JANAF if present
@@ -6640,7 +6705,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-mgo-g
   aliases:
   - lamoreaux-hildenbrand-hildenbrand-1987
@@ -6703,7 +6768,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-pbo-g
   aliases: []
   citation: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide
@@ -6761,7 +6826,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: lh87-sno-g
   aliases: []
   citation: LH87 SnO(g); JANAF SnO(g)
@@ -6818,7 +6883,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: murchison-degassing-2023-springer
   aliases: []
   citation: 'Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti
@@ -6871,15 +6936,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/murchison-degassing-2023-springer.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/murchison-degassing-2023-springer.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: murchison-hydropyrolysis-1990s-gca
   aliases: []
   citation: 'Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E.
@@ -6931,15 +6996,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/murchison-hydropyrolysis-1990s-gca.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/murchison-hydropyrolysis-1990s-gca.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: nasa-cea-thermo
   aliases: []
   citation: McBride, B. J., Zehe, M. J. & Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic
@@ -7000,7 +7065,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: nist-srd69-p4
   aliases: []
   citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage)
@@ -7060,7 +7125,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: nist-webbook
   aliases: []
   citation: NIST Chemistry WebBook, SRD 69 (species thermochemistry pages)
@@ -7117,7 +7182,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-as2o3-second-primary
   aliases: []
   citation: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier
@@ -7176,7 +7241,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-bi2o3-kems
   aliases: []
   citation: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
@@ -7233,7 +7298,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-cacl2-kems-or-transpiration
   aliases: []
   citation: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride
@@ -7291,7 +7356,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-dual-primary-oso4
   aliases: []
   citation: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later
@@ -7350,7 +7415,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-kems-cro3
   aliases: []
   citation: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
@@ -7407,7 +7472,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-mg2cl4
   aliases: []
   citation: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
@@ -7464,7 +7529,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-mgcl2-measured-vp
   aliases: []
   citation: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
@@ -7521,7 +7586,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-p4o6-vp
   aliases: []
   citation: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if
@@ -7579,7 +7644,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-pages-moo3-vp
   aliases: []
   citation: MoO3 vaporization (Ackermann & Rauh; Blackburn) — this family is explicitly a cross-check
@@ -7637,7 +7702,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-pages-p4o10-sublimation
   aliases: []
   citation: Classical P4O10 sublimation vapor-pressure measurements (recover page-level primary independent
@@ -7695,7 +7760,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-pages-wo3-polymer-vp
   aliases: []
   citation: Classical WO3 / (WO3)n polymer vaporization (Ackermann & Rauh; Blackburn); JANAF WO3(g) polymers
@@ -7752,7 +7817,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-re2o7-second-series
   aliases: []
   citation: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if
@@ -7811,7 +7876,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pending-teo2-vp
   aliases: []
   citation: Primary TeO2 vapor-pressure / effusion papers (recover pages)
@@ -7868,7 +7933,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pound-1972-cr-langmuir-knudsen
   aliases:
   - REF-040
@@ -7931,7 +7996,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: pound-1972-mccabe-cr
   aliases:
   - REF-040
@@ -7996,7 +8061,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: rau-1974-se-vp
   aliases: []
   citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
@@ -8055,7 +8120,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-016-sio-kems-1700-2000k
   aliases:
   - kems-008-schaefer-fegley-2004
@@ -8121,7 +8186,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-al
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)
@@ -8179,7 +8244,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-bi
   aliases: []
   citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)
@@ -8236,7 +8301,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-ca
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)
@@ -8294,7 +8359,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-fe-liquid-equation
   aliases: []
   citation: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic
@@ -8353,7 +8418,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-k
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent
@@ -8411,7 +8476,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-mg
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)
@@ -8469,7 +8534,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-mn-if-not-in-fit
   aliases: []
   citation: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984)
@@ -8528,7 +8593,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-na
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations
@@ -8586,7 +8651,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-pb
   aliases: []
   citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected
@@ -8644,7 +8709,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-si
   aliases: []
   citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)
@@ -8702,7 +8767,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-th
   aliases: []
   citation: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion;
@@ -8760,7 +8825,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-032-zr
   aliases: []
   citation: 'Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)
@@ -8818,7 +8883,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-052-k-o-gas
   aliases:
   - lamoreaux-hildenbrand-1984
@@ -8878,7 +8943,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ref-052-na-o-gas
   aliases:
   - lamoreaux-hildenbrand-1984
@@ -8939,7 +9004,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: reiss-2019-thermal-extraction-nulht2m
   aliases: []
   citation: 'Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar
@@ -8990,15 +9055,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/reiss-2019-thermal-extraction-nulht2m.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/reiss-2019-thermal-extraction-nulht2m.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: richter-et-al-2007
   aliases:
   - kems-010-richter-2007
@@ -9057,7 +9122,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: robinot-2025-promes-review
   aliases: []
   citation: Robinot, J., Rodat, S., Abanades, S., Paillet, A. & Cowley, A. (2025), "Review of in-situ
@@ -9110,7 +9175,7 @@ sources:
       error: 'Invalid YAML: expected <block end>, but found ''-'' at line 18'
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: safarian-engh-2013-si-pure-langmuir
   aliases: []
   citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
@@ -9167,7 +9232,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   aliases: []
   citation: Schaefer, L. & Fegley, B., Jr. (2007), "Outgassing of ordinary chondritic material and some
@@ -9218,15 +9283,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: sf04-magma-companion-workbook
   aliases:
   - kems-008-schaefer-fegley-2004
@@ -9287,7 +9352,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: slag-001-banya-1993
   aliases: []
   citation: Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process
@@ -9345,7 +9410,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-07'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: slag-002-banya-hino-nagasaka-1993
   aliases: []
   citation: Ban-Ya, S., Hino, M. and Nagasaka, T. (1993), "Estimation of Water Vapor Solubility in Molten
@@ -9396,15 +9461,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/slag-002-banya-hino-nagasaka-1993.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/slag-002-banya-hino-nagasaka-1993.yaml
-      present: false
+      present: true
       error: null
-      last_stage: null
-      date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-07'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: slag-003-hino-kitagawa-banya-1993
   aliases: []
   citation: Hino, M., Kitagawa, S. and Ban-Ya, S. (1993), "Sulphide Capacities of CaO-Al2O3-MgO and CaO-Al2O3-SiO2
@@ -9454,15 +9519,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/slag-003-hino-kitagawa-banya-1993.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/slag-003-hino-kitagawa-banya-1993.yaml
-      present: false
+      present: true
       error: null
-      last_stage: null
-      date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-07'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: smales-1971-lpsc-12022
   aliases: []
   citation: Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings
@@ -9515,7 +9580,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: sossi-et-al-2019
   aliases:
   - kems-012-sossi-2019
@@ -9573,7 +9638,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: span-wagner-1996-co2-psat
   aliases: []
   citation: 'Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid
@@ -9634,7 +9699,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: stebbins-carmichael-weill-1983
   aliases: []
   citation: Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liquid
@@ -9688,7 +9753,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: steurer-1985-vapor-phase-pyrolysis
   aliases: []
   citation: 'Steurer, Wolfgang H. (1985), "Lunar Oxygen Production by Vapor Phase Pyrolysis", Space Manufacturing
@@ -9739,15 +9804,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/steurer-1985-vapor-phase-pyrolysis.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: steurer-1992-vapor-phase-pyrolysis
   aliases: []
   citation: 'Steurer, Wolfgang (1992), "Vapor Phase Pyrolysis", in Space Resources, Volume 3: Materials,
@@ -9797,15 +9862,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/steurer-1992-vapor-phase-pyrolysis.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/steurer-1992-vapor-phase-pyrolysis.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: street-2010-thermal-properties-simulants
   aliases: []
   citation: Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal
@@ -9856,15 +9921,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/street-2010-thermal-properties-simulants.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/street-2010-thermal-properties-simulants.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: ts1985
   aliases: []
   citation: Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts
@@ -9917,7 +9982,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: wetzel-gail-2013-sio-arrhenius
   aliases:
   - kems-011-wetzel-gail-2013
@@ -9976,7 +10041,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: wilkerson-2021-jsc1a-tga-ms-poster
   aliases: []
   citation: Wilkerson, Ryan P., Voecks, Gerald, Shulman, Holly S., Rickman, Doug L. and Effinger, Mike
@@ -10029,15 +10094,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/wilkerson-2021-jsc1a-tga-ms-poster.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: wilkerson-2023-jsc1a-outgassing
   aliases: []
   citation: Wilkerson, Ryan P., Petkov, Mihail P., Voecks, Gerald E., Lynch, Catherine S., Shulman, Holly
@@ -10089,15 +10154,15 @@ sources:
       file_count: 0
     extract:
       path: extracts/wilkerson-2023-jsc1a-outgassing.yaml
-      present: false
-      matches_simulator: null
+      present: true
+      matches_simulator: true
     ledger:
       path: ledger/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
       error: null
-      last_stage: decoded
-      date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+      last_stage: extracted
+      date: '2026-09-12'
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: wu-1993-feo-mgo-sio2
   aliases: []
   citation: Wu, P., Eriksson, G., Pelton, A. D. & Blander, M. (1993), “Prediction of the Thermodynamic
@@ -10147,7 +10212,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
 - source_id: yam1983
   aliases: []
   citation: Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-SiO2
@@ -10200,4 +10265,4 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+    commit: 2ef619255debb2beb4718b52908a77d8cf504b5f

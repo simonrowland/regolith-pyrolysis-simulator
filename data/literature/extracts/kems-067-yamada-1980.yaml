@@ -1,0 +1,1221 @@
+schema_version: literature_extract.v1
+source_id: kems-067-yamada-1980
+source:
+  citation: Yamada, K., Abe, H. & Kato, E. (1980), "Mass Spectrometric Study of the Activity
+    in Liquid Fe-Si Alloys at 1600°C", Tetsu-to-Hagane 66(5):488-495, DOI 10.2355/tetsutohagane1955.66.5_488
+  doi: 10.2355/tetsutohagane1955.66.5_488
+  url: https://doi.org/10.2355/tetsutohagane1955.66.5_488
+  year: 1980
+extraction:
+  method: Official J-STAGE OA PDF (raw/kems-067-yamada-1980/kems-067-yamada-1980.pdf). Japanese
+    body with English synopsis, table captions, and figure captions. pdftotext -layout is
+    a noisy OCR layer and is not data. Tables 1-2 and printed numerals transcribed from 400
+    dpi pdftoppm renders of PDF pages 1-8 (published pp. 488-495). Where the decode and the
+    render disagree, the render wins. Figs 1-9 listed figure-only; axes were not digitised.
+    Table 1 ion-current ratios kept as measured. log gamma_Si^o = -3.1 +/- 0.2 and epsilon_Si^Si
+    = 11.5 +/- 1.5 kept as model_derived (Belton-Fruehan integration of this-work ion ratios,
+    using a literature-average log gamma_Si = -0.33 at N_Si=0.5 as the integration constant).
+    Table 2 This work row kept distinct from quoted investigators. Japanese-only prose beyond
+    captions/numerals recorded as unseen.
+  date: '2026-09-13'
+  worker: extract-kems-067
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Si.observations[yamada_1980_ion_current_ratio_table1_1600C].values.points[0].I_Si_plus_count_per_s
+  value: 0.61
+  locator:
+    table: '1'
+    published_page: 490
+    pdf_page_index: 3
+    note: Table 1 first data row N_Si=0.058, I+_Si=0.61 count/s
+- path: species.Si.observations[yamada_1980_ion_current_ratio_table1_1600C].values.points[9].log_ISi_over_IFe_times_NFe_over_NSi
+  value: -0.096
+  locator:
+    table: '1'
+    published_page: 490
+    pdf_page_index: 3
+    note: Table 1 last data row N_Si=0.511, log(I+_Si/I+_Fe · N_Fe/N_Si)=-0.096
+- species: Si
+  observable: activity_coefficient
+  observation_id: yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+  field: log10_gamma_Si_infinite_dilution
+  value: -3.1
+  locator:
+    published_page: 494
+    pdf_page_index: 7
+    section: '5'
+    note: 'conclusion: log gamma_Si^o = -3.1 +/- 0.2'
+- species: Si
+  observable: activity_coefficient
+  observation_id: yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+  field: epsilon_Si_Si
+  value: 11.5
+  locator:
+    table: '2'
+    published_page: 493
+    pdf_page_index: 6
+    note: Table 2 This work epsilon_Si^Si = 11.5 +/- 1.5
+- species: Si
+  observable: activity_coefficient
+  observation_id: yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+  field: gamma_Si_infinite_dilution
+  value: 0.00079
+  locator:
+    table: '2'
+    published_page: 493
+    pdf_page_index: 6
+    note: Table 2 This work gamma_Si^o = 7.9 x 10^-4
+- species: Si
+  observable: rate_series
+  observation_id: yamada_1980_kems_geometry_and_calibration
+  field: chamber_voltage_V
+  value: 24.0
+  locator:
+    published_page: 493
+    pdf_page_index: 6
+    section: '4.5'
+    note: chamber voltage chosen as 24 V
+- path: species.Si.observations[yamada_1980_ion_current_ratio_table1_1600C].values.points[7].I_Fe_plus_V
+  value: 0.653
+  locator:
+    table: '1'
+    published_page: 490
+    pdf_page_index: 3
+    note: Table 1 N_Si=0.352, I+_Fe=0.653 V
+species:
+  Si:
+    observations:
+    - observation_id: yamada_1980_kems_geometry_and_calibration
+      type: rate_series
+      locator:
+        published_page: 488
+        pdf_page_index: 1
+        section: '2'
+        note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1
+          g. Japanese body transcribed for numerals and English captions only.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si_in_thoria_Knudsen_cell
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: Raoultian pure liquid Si and Fe; Belton-Fruehan ion-intensity-ratio
+        activities (eq 8). gamma_Si^o is the infinite-dilution Raoultian activity coefficient.
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: Ion-intensity measurement error +/-2% (section 4.1, citing Yamada et al.). T
+          held at 1600 C with W-26%Re/W-5%Re thermocouples at cell top and bottom, Kato-Furukawa
+          correction. Sample composition from charge ratio; pure-Fe effusion ~4.6 mg after
+          1 h at 1600 C. Chamber pressure unstated.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi Knudsen-cell mass spectrometer RM-6K, modified (Yamada and Kato
+          1977, ref 2)
+        chamber_voltage_V: 24.0
+        chamber_voltage_note: Chamber voltage is the ionizing-electron accelerating-supply
+          meter reading; actual ionizing voltage differs by 1-2 V. Fragmentation from SiO
+          appears above 30 V; fragment appearance taken as about 29 V. 24 V chosen.
+        ions_measured:
+        - 28Si+
+        - 28Si16O+
+        - Fe+
+        resolution_required_greater_than: 1500.0
+        temperature_C: 1600.0
+        temperature_method: W-26%Re / W-5%Re thermocouples at Knudsen-cell top and bottom;
+          Kato et al. correction; output recorded on an auto-balance recorder calibrated with
+          a DC voltage generator
+        sample_mass_g: 1.0
+        sample_mass_qualifier: about 1 g total charge
+        Fe_purity_pct: 99.99
+        Fe_source: Johnson-Matthey high-purity Fe, deoxidized via Fe-Al in alumina crucible
+          under high vacuum
+        Si_source: semiconductor-grade high-purity Si
+        Th_deoxidizer_at_pct_about: 0.6
+        Th_deoxidizer_note: 0.2 at% Th suppressed SiO for only about 2 h at 1600 C; 0.6 at%
+          used. At N_Si=0.2, Th was varied 0.4-0.9 at%; Fig. 4 labels 0.594, 0.398, 0.881
+          at% Th.
+        N_Si_range:
+        - 0.05
+        - 0.5
+        composition_basis: mole_fraction_N_Si
+        composition_from_charge_ratio: true
+        post_run_analysis: not_performed
+        pure_Fe_effusion_mg_after_1h_at_1600C: 4.6
+        ion_intensity_error_pct: 2.0
+        chamber_pressure: unstated
+        vacuum_quality: unstated
+        english_synopsis: 'The activities of Si and Fe have been determined in the Fe-Si system
+          at 1600 C by the use of a combination of a mass spectrometer and a Knudsen-cell.
+          In order to suppress the production of SiO gas, ThO2 was used for cell material.
+          The range of composition of Si was 0.05 < N_Si < 0.5, and Belton-Fruehan''s equation
+          was used to estimate the activity coefficient and the interaction coefficient, log
+          gamma_Si^o and epsilon_Si^Si from measured ion current ratios: log gamma_Si^o =
+          -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5.'
+        japanese_body: Japanese experimental prose beyond English captions, numerals, and
+          the English synopsis is recorded as unseen; not guessed.
+        missing_for_motzfeldt:
+        - numeric_orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - chamber_pressure
+      equipment:
+        cell_material:
+          value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried
+            and abandoned (no reproducible Fe/Si ion-intensity ratio; abundant SiO(g))
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: 2.3-2.4
+            note: self-made thoria cell; ThO2 used for cell material (English synopsis p.
+              488)
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.4
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: homemade cells; orifice diameter not constant, 0.4-0.7 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: '2.2'
+            note: sample total mass about 1 g; free surface not stated
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 488
+            pdf_page_index: 1
+            section: '2'
+            note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
+              was in high vacuum
+    - observation_id: yamada_1980_ion_current_ratio_table1_1600C
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 490
+        pdf_page_index: 3
+        note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at
+          1600 C
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: I+_Si in count/s (pulse counting); I+_Fe in V (analog). log(I+_Si/I+_Fe
+        · N_Fe/N_Si) as printed; N_Si mole fraction. Not converted to partial pressure.
+      regime: kems_effusion
+      units: I+_Si count/s; I+_Fe V; log column dimensionless as printed
+      uncertainty:
+        note: 'No per-row sigma on Table 1. Authors: ion-intensity error +/-2%. I+_Si and
+          I+_Fe are in different units so the ratio is an instrument ratio, not a dimensionless
+          pressure ratio.'
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C: 1600.0
+        T_K: 1873.15
+        composition_basis: mole_fraction_N_Si
+        n_points: 10
+        header_as_printed: N_Si | I+_Si (count/s) | I+_Fe (V) | log(I+_Si/I+_Fe · N_Fe/N_Si)
+        points:
+        - N_Si: 0.058
+          I_Si_plus_count_per_s: 0.61
+          I_Fe_plus_V: 2.132
+          log_ISi_over_IFe_times_NFe_over_NSi: -3.34
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.104
+          I_Si_plus_count_per_s: 2.81
+          I_Fe_plus_V: 3.914
+          log_ISi_over_IFe_times_NFe_over_NSi: -3.21
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.185
+          I_Si_plus_count_per_s: 11.28
+          I_Fe_plus_V: 3.239
+          log_ISi_over_IFe_times_NFe_over_NSi: -2.82
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.197
+          I_Si_plus_count_per_s: 13.68
+          I_Fe_plus_V: 2.115
+          log_ISi_over_IFe_times_NFe_over_NSi: -2.58
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.199
+          I_Si_plus_count_per_s: 16.19
+          I_Fe_plus_V: 2.211
+          log_ISi_over_IFe_times_NFe_over_NSi: -2.53
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.201
+          I_Si_plus_count_per_s: 26.23
+          I_Fe_plus_V: 2.816
+          log_ISi_over_IFe_times_NFe_over_NSi: -2.43
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.266
+          I_Si_plus_count_per_s: 76.36
+          I_Fe_plus_V: 1.852
+          log_ISi_over_IFe_times_NFe_over_NSi: -1.95
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.352
+          I_Si_plus_count_per_s: 333.7
+          I_Fe_plus_V: 0.653
+          log_ISi_over_IFe_times_NFe_over_NSi: -1.03
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.388
+          I_Si_plus_count_per_s: 688.2
+          I_Fe_plus_V: 0.56
+          log_ISi_over_IFe_times_NFe_over_NSi: -0.717
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+        - N_Si: 0.511
+          I_Si_plus_count_per_s: 928.6
+          I_Fe_plus_V: 0.109
+          log_ISi_over_IFe_times_NFe_over_NSi: -0.096
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+      equipment:
+        cell_material:
+          value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried
+            and abandoned (no reproducible Fe/Si ion-intensity ratio; abundant SiO(g))
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: 2.3-2.4
+            note: self-made thoria cell; ThO2 used for cell material (English synopsis p.
+              488)
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.4
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: homemade cells; orifice diameter not constant, 0.4-0.7 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: '2.2'
+            note: sample total mass about 1 g; free surface not stated
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 488
+            pdf_page_index: 1
+            section: '2'
+            note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
+              was in high vacuum
+    - observation_id: yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+      type: activity_coefficient
+      locator:
+        published_page: 492
+        pdf_page_index: 5
+        table: '2'
+        equation: '8'
+        note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work
+          gamma_Si^o = 7.9e-4
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: Raoultian pure liquid Si. gamma_Si^o is the infinite-dilution Raoultian
+        activity coefficient. epsilon_Si^Si is the Wagner interaction parameter. No 1 wt%
+        e_Si^Si printed for this work.
+      regime: kems_effusion
+      units: dimensionless log10 gamma, gamma, and epsilon; N_Si mole fraction
+      uncertainty:
+        log10_gamma_Si_infinite_dilution: 0.2
+        log10_gamma_Si_from_integration_curves_only: 0.15
+        epsilon_Si_Si: 1.5
+        as_printed: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5
+        note: 'Multiple graphical integrations of Fig. 6 gave -3.1 +/- 0.15; including the
+          N_Si=0.5 log gamma_Si assignment error yields +/- 0.2. epsilon error assigned by
+          the same method. Authors: log gamma_Si^o is more reliable than epsilon because the
+          integration area to N_Si=1 is large.'
+      values:
+        quantity: henrian_activity_coefficient_and_self_interaction_parameter
+        method_class: model_derived
+        model: Belton-Fruehan ion-intensity-ratio integration (eq 8) of this-work Table 1
+          KEMS, using the literature-average log gamma_Si = -0.33 at N_Si=0.5 as the integration
+          constant. epsilon_Si^Si from the infinite-dilution slope of the Fig. 6 integration
+          curve.
+        T_C: 1600.0
+        T_K: 1873.15
+        log10_gamma_Si_infinite_dilution: -3.1
+        gamma_Si_infinite_dilution: 0.00079
+        epsilon_Si_Si: 11.5
+        N_Si_window:
+        - 0.05
+        - 0.5
+        integration_constant_log10_gamma_Si_at_NSi_0p5: -0.33
+        integration_constant_source: average of Chipman, Woolley, Schwerdtfeger, Murakami,
+          Turkdogan at N_Si=0.5
+        eq8_as_printed: log gamma_Si = -integral from N_Si=0.5 to N_Si of N_Fe · d(log I+_Fe/I+_Si)
+          - log(N_Fe/N_Si) - 0.33
+      equipment:
+        cell_material:
+          value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried
+            and abandoned (no reproducible Fe/Si ion-intensity ratio; abundant SiO(g))
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: 2.3-2.4
+            note: self-made thoria cell; ThO2 used for cell material (English synopsis p.
+              488)
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.4
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: homemade cells; orifice diameter not constant, 0.4-0.7 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 490
+            pdf_page_index: 3
+            section: '3.1'
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 489
+            pdf_page_index: 2
+            section: '2.2'
+            note: sample total mass about 1 g; free surface not stated
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 488
+            pdf_page_index: 1
+            section: '2'
+            note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
+              was in high vacuum
+    - observation_id: yamada_1980_quoted_gamma_Si_NSi_0p5
+      type: activity_coefficient
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Quoted log gamma_Si at N_Si=0.5; not this-work KEMS
+      standard_state: Raoultian log gamma_Si at N_Si=0.5 as cited
+      regime: kems_effusion
+      units: dimensionless log10 gamma_Si
+      uncertainty:
+        note: 'Authors: the spread of the five cited log gamma_Si values at N_Si=0.5 is +0.07,
+          -0.04. Fig. 5 prints log gamma_Si = -0.33 +/- 0.05 at N_Si=0.5.'
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_measurement
+        N_Si: 0.5
+        composition_basis: mole_fraction
+        log10_gamma_Si_average_used_in_eq8: -0.33
+        points:
+        - investigators: Chipman et al.
+          ref: 13
+          log10_gamma_Si: -0.27
+        - investigators: Woolley et al.
+          ref: 14
+          log10_gamma_Si: -0.32
+        - investigators: Schwerdtfeger et al.
+          ref: 15
+          log10_gamma_Si: -0.37
+        - investigators: Murakami et al.
+          ref: 16
+          log10_gamma_Si: -0.34
+        - investigators: Turkdogan et al.
+          ref: 17
+          log10_gamma_Si: -0.36
+    - observation_id: yamada_1980_quoted_table2_investigators
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 493
+        pdf_page_index: 6
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si
+          alloy. This work row stored separately.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Quoted gamma_Si^o and epsilon_Si^Si; not this-work KEMS
+      standard_state: gamma_Si^o and epsilon_Si^Si as cited at 1600 C unless a different T
+        is printed. Printed dashes omitted, not stored as zero. Asterisk = Estimation by Fujisawa
+        et al. (ref 34).
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: Quoted; no uncertainties printed except where a T other than 1600 C is given.
+      values:
+        quantity: activity_coefficient_and_self_interaction_parameter
+        method_class: quoted_measurement
+        footnote_as_printed: Estimation by Fujisawa et al.
+        points:
+        - investigators: Gokcen & Chipman
+          year: 1952
+          ref: 23
+          gamma_Si_infinite_dilution: 0.0077
+          method_as_printed: Deoxidation equilibrium
+        - investigators: Sanbongi & Ohtani
+          year: 1953
+          ref: 24
+          gamma_Si_infinite_dilution: 0.013
+          T_C: 1520.0
+          method_as_printed: EMF
+        - investigators: Chipman et al.
+          year: 1954
+          ref: 25
+          gamma_Si_infinite_dilution: 0.0073
+          epsilon_Si_Si: 3.4
+          fujisawa_estimate: true
+          method_as_printed: Ag-Fe distribution
+        - investigators: Ohtani
+          year: 1955
+          ref: 26
+          gamma_Si_infinite_dilution: 0.0043
+          T_C: 1540.0
+          epsilon_Si_Si: 12.0
+          epsilon_T_C: 1540.0
+          fujisawa_estimate: true
+          method_as_printed: EMF
+        - investigators: Matoba et al.
+          year: 1959
+          ref: 27
+          gamma_Si_infinite_dilution: 0.011
+          epsilon_Si_Si: 37.0
+          method_as_printed: Fe-SiO2-H2/H2O equilibrium
+        - investigators: Chipman & Pillay
+          year: 1961
+          ref: 28
+          epsilon_Si_Si: 36.0
+          method_as_printed: Fe-SiO2-H2/H2O equilibrium
+        - investigators: Syui Tszen-Tzsi et al.
+          year: 1961
+          ref: 29
+          epsilon_Si_Si: 17.8
+          method_as_printed: vapor pressure
+        - investigators: Chipman & Elliott
+          year: 1963
+          ref: 30
+          gamma_Si_infinite_dilution: 0.0011
+          method_as_printed: Estimation
+        - investigators: Chipman & Baschwitz
+          year: 1963
+          ref: 13
+          gamma_Si_infinite_dilution: 0.00125
+          epsilon_Si_Si: 13.0
+          method_as_printed: Ag-Fe distribution
+        - investigators: Turkdogan et al.
+          year: 1963
+          ref: 17
+          gamma_Si_infinite_dilution: 0.00126
+          epsilon_Si_Si: 14.0
+          method_as_printed: Ag-Fe dist. & Si3N4 equilibrium
+        - investigators: Niwa & Shinmei
+          year: 1963
+          ref: 31
+          gamma_Si_infinite_dilution: 0.0007
+          epsilon_Si_Si: 10.0
+          method_as_printed: Estimation
+        - investigators: Smith & Taylar
+          year: 1964
+          ref: 20
+          gamma_Si_infinite_dilution: 0.00085
+          epsilon_Si_Si: 13.2
+          fujisawa_estimate: true
+          method_as_printed: Ag-Fe dist. & SiO2+2C=Si+2CO
+          name_as_printed: Smith & Taylar (Taylor in the reference list)
+        - investigators: Schwerdtfeger & Engell
+          year: 1964
+          ref: 15
+          gamma_Si_infinite_dilution: 0.0025
+          epsilon_Si_Si: 9.3
+          fujisawa_estimate: true
+          method_as_printed: EMF
+        - investigators: Murakami et al.
+          year: 1967
+          ref: 16
+          epsilon_Si_Si: 17.0
+          method_as_printed: Ag-Fe distribution
+        - investigators: Woolley & Elliott
+          year: 1967
+          ref: 14
+          gamma_Si_infinite_dilution: 0.00135
+          epsilon_Si_Si: 12.7
+          method_as_printed: Heat of mixing & estimation
+        - investigators: Fruehan
+          year: 1970
+          ref: 1
+          gamma_Si_infinite_dilution: 0.00457
+          epsilon_Si_Si: 9.8
+          method_as_printed: EMF
+        - investigators: Sakao et al.
+          year: 1971
+          ref: 32
+          epsilon_Si_Si: 9.1
+          T_C: 1560.0
+          method_as_printed: Fe-SiO-H2-H2O equilibrium
+        - investigators: Hultgren et al.
+          year: 1973
+          ref: 33
+          gamma_Si_infinite_dilution: 0.00132
+          epsilon_Si_Si: 8.0
+          fujisawa_estimate: true
+          method_as_printed: Estimation
+    - observation_id: yamada_1980_p_Si_estimate_NSi_below_0p05
+      type: psat_series
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        section: '3.1'
+        note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si_NSi_below_0.05
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: partial pressure of Si; atm as printed; not a calibrated KEMS absolute
+        pressure table
+      regime: kems_effusion
+      units: atm as printed
+      uncertainty:
+        note: 'Authors: considered to be about 10^-9 atm; fewer than 1 ion/s at 10^-20 A.'
+      values:
+        quantity: partial_pressure
+        method_class: author_estimate
+        gas_species: Si(g)
+        T_C: 1600.0
+        N_Si_less_than: 0.05
+        ion_current_A: 1.0e-20
+        p_atm_about: 1.0e-09
+        note: 'N_Si < 0.05: observed ion current 10^-20 A, fewer than 1 ion per second. High
+          resolution sacrificed sensitivity; minimum measurable vapor pressure about 2 orders
+          higher than usual. N_Si > 0.5: cell attacked and abundant SiO(g); experiment not
+          possible.'
+    - observation_id: yamada_1980_fragmentation_BeO_ThO2_ion_ratios
+      type: rate_series
+      locator:
+        published_page: 494
+        pdf_page_index: 7
+        equation: 12-14
+        note: 'BeO-cell and ThO2-cell I+_Fe : I+_Si : I+_SiO; K=0.25%'
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: ion-intensity ratios as printed; not converted to partial pressure
+      regime: kems_effusion
+      units: relative ion intensity; K as percent
+      uncertainty:
+        note: 'From Fig. 3, I+_SiO/I+_Si=16 implies about +5% of measured Si+ is fragment
+          and +0.02 in log(I+_Si/I+_Fe). Authors: this does not affect the Fig. 6 integration.'
+      values:
+        quantity: ion_current_ratio_and_fragment_fraction
+        method_class: measured
+        BeO_cell_IFe_ISi_ISiO:
+        - 1.0
+        - 0.0023
+        - 0.8
+        ThO2_cell_IFe_ISi_ISiO:
+        - 1.0
+        - 0.00024
+        - 0.0038
+        fragment_fraction_K_pct: 0.25
+        fragment_K_method_class: model_derived
+        fragment_K_model: eqs (12)-(14) solved for the SiO fragment contribution to Si+
+        example_ISiO_over_ISi_from_fig3: 16.0
+        example_fragment_contribution_pct_of_ISi: 5.0
+        example_log_ISi_over_IFe_error: 0.02
+    - observation_id: yamada_1980_fig1_peak_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 489
+        pdf_page_index: 2
+        note: Fig. 1. Relation between the measured peak and the reference peak.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 1. Relation between the measured peak and the reference peak.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 1. Relation between the measured peak and the reference peak.
+        note: 'M/e=28. Printed peak labels: Si+ peak = 1e-19 A; CO+ peak = 5e-16 A; N2+ peak;
+          C2H4+ peak. Resolution markers 1550, 2500, 1100. Not digitised.'
+        Si_plus_peak_A: 1.0e-19
+        CO_plus_peak_A: 5.0e-16
+        mass_to_charge: 28.0
+        printed_labels_not_axis_digitised: true
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig3_ISiO_over_ISi_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 490
+        pdf_page_index: 3
+        note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
+        note: 'This-work I+_SiO/I+_Si vs N_Si. Body: the ratio is about 20-30 (right-hand
+          axis of Fig. 3), close to the calculated ThO2-cell P_SiO/P_Si ~ 15. Curve not digitised.'
+        ISiO_over_ISi_about:
+        - 20.0
+        - 30.0
+        ISiO_over_ISi_source: Japanese body on published p. 490, right-hand axis of Fig. 3
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 490
+        pdf_page_index: 3
+        note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the
+          thorium concentration in the specimen for the deoxidizer.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate
+          the thorium concentration in the specimen for the deoxidizer.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate
+          the thorium concentration in the specimen for the deoxidizer.
+        note: English caption repeats the Fig. 3 wording (log I+_SiO/I+_Si). The printed ordinate
+          is Log(I+_Si/I+_Fe), and the Japanese body of section 3.1 states Fig. 4 is log(I+_Si/I+_Fe)
+          vs Si concentration. Th labels 0.594, 0.398 at% Th, 0.881 near N_Si=0.2. Numeric
+          ion ratios are in Table 1; this curve was not digitised.
+        ordinate_as_printed_on_axis: Log(I+_Si/I+_Fe)
+        english_caption_as_printed: Relation between log (I+_SiO/I+_Si) and N_Si
+        caption_axis_conflict: English caption matches Fig. 3; axis and Japanese body are
+          log(I+_Si/I+_Fe). Recorded as printed; not reconciled.
+        Th_at_pct_labels_near_NSi_0p2:
+        - 0.594
+        - 0.398
+        - 0.881
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig5_gamma_Si_comparison_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '5'
+        published_page: 491
+        pdf_page_index: 4
+        note: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: quoted Raoultian log gamma_Si; not this-work KEMS
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
+        note: 'Quoted log gamma_Si vs N_Si: Chipman, Woolley, Schwerdtfeger, Murakami, Turkdogan.
+          Printed label at N_Si=0.5: log gamma_Si = -0.33 +/- 0.05. Numeric quoted values
+          are in the N_Si=0.5 observation. Not digitised.'
+        log10_gamma_Si_at_NSi_0p5_as_printed_on_figure: -0.33
+        log10_gamma_Si_at_NSi_0p5_uncertainty_as_printed: 0.05
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig6_integration_curve_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 491
+        pdf_page_index: 4
+        note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+        note: Belton-Fruehan integrand vs log(I+_Si/I+_Fe · N_Fe/N_Si). Printed epsilon_Si^Si
+          = 11.5 +/- 1.5. Th labels 0.594, 0.398, 0.881 at% Th. Source of the this-work gamma
+          and epsilon; curve not digitised.
+        epsilon_Si_Si_as_printed_on_figure: 11.5
+        epsilon_Si_Si_uncertainty_as_printed: 1.5
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig7_gamma_Si_this_work_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 492
+        pdf_page_index: 5
+        note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
+        note: Present work vs Schwerdtfeger, Smith, Woolley, Chipman, Fruehan, Sakao et al.
+          (1560 C). Printed Log gamma_Si^o = -3.1 +/- 0.15. Numeric this-work values are in
+          the activity-coefficient observation. Not digitised.
+        log10_gamma_Si_o_as_printed_on_figure: -3.1
+        log10_gamma_Si_o_uncertainty_as_printed: 0.15
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig8_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '8'
+        published_page: 492
+        pdf_page_index: 5
+        note: Fig. 8. Activities for the Fe-Si system at 1600 C.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: Raoultian pure liquid Si and Fe as plotted
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 8. Activities for the Fe-Si system at 1600 C.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 8. Activities for the Fe-Si system at 1600 C.
+        note: 'a_Si and a_Fe vs N_Si with a Raoult''s-law line. Authors: both components deviate
+          strongly negatively from Raoultian in this composition range. No tabulated a_Si
+          or a_Fe series. Not digitised.'
+        species_plotted:
+        - a_Si
+        - a_Fe
+        authors_text: both components deviate strongly negatively from Raoult's law
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+    - observation_id: yamada_1980_fig9_ionization_efficiency_figure_only
+      type: rate_series
+      locator:
+        figure: '9'
+        published_page: 493
+        pdf_page_index: 6
+        note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
+        note: 'Ion intensity vs chamber voltage (V). Printed process labels: SiO+e=SiO++2e;
+          SiO+e=Si++O+2e; Si+e=Si++2e. Fragmentation from SiO above 30 V. Not digitised.'
+        fragmentation_onset_chamber_voltage_V_about: 30.0
+        fragment_appearance_voltage_V_about: 29.0
+        operating_chamber_voltage_V: 24.0
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+  Fe:
+    observations:
+    - observation_id: yamada_1980_fe_activity_fig8_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '8'
+        published_page: 492
+        pdf_page_index: 5
+        note: 'Fig. 8 a_Fe; conclusion: Raoultian negative deviation in 0.05 < N_Si < 0.5'
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Si
+      condensed_form:
+        state: liquid_Fe_Si_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Si in a homemade ThO2 Knudsen cell at 1600 C. Charge composition from
+          Fe:Si mixing ratio in the cell; post-run analysis not performed. Johnson-Matthey
+          Fe 99.99% deoxidized via Fe-Al in an alumina crucible under high vacuum; semiconductor-grade
+          Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
+          window 0.05 < N_Si < 0.5 (mole fraction).
+      standard_state: Raoultian pure liquid Fe
+      regime: kems_effusion
+      units: as plotted on Fig. 8; no numeric a_Fe table
+      uncertainty:
+        note: No tabulated a_Fe series; Fig. 8 not digitised.
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        model: Belton-Fruehan integration (eq 8) of this-work ion ratios
+        authors_text: In the measured range 0.05 < N_Si < 0.5 both Si and Fe activities deviate
+          strongly negatively from Raoult's law.
+  SiO:
+    observations:
+    - observation_id: yamada_1980_cell_po2_calculated
+      type: psat_series
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        section: '2.4'
+        equation: 2-5
+        note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: cell_oxide_in_equilibrium_with_Fe-Si-Al_Be_Th
+      standard_state: P_O2 / atm as printed; calculated from oxide Delta-G and dilute-solute
+        activities, not measured
+      regime: kems_effusion
+      units: atm as printed
+      uncertainty:
+        note: No Be or Th activity data; authors set N_Be=a_Be and N_Th=a_Th.
+      values:
+        quantity: equilibrium_oxygen_partial_pressure
+        method_class: model_derived
+        model: Oxide dissociation equilibria (2)-(4) with JANAF Delta-G (ref 5) and dilute
+          Al activity (eq 6). N_Al=N_Be=N_Th=0.01, N_Si=0.2, 1600 C.
+        T_C: 1600.0
+        N_Al: 0.01
+        N_Be: 0.01
+        N_Th: 0.01
+        N_Si: 0.2
+        P_O2_Al2O3_atm: 2.65e-17
+        P_O2_BeO_atm: 6.78e-20
+        P_O2_ThO2_atm: 9.23e-23
+        expected_PSiO_over_PSi_Al2O3_about: 10000.0
+        expected_PSiO_over_PSi_BeO_about: 200.0
+        expected_PSiO_over_PSi_ThO2_about: 15.0
+    - observation_id: yamada_1980_fig2_Si_O_po2_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 489
+        pdf_page_index: 2
+        note: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O
+          at 1600 C.
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: Si-O_system
+      standard_state: quoted Si-O equilibrium; a_Si=1 on the figure
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; axes not digitised
+      values:
+        quantity: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system
+          Si-O at 1600 C.
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O
+          at 1600 C.
+        note: Si-O equilibrium diagram from Kato and Yamamoto (ref 12), not this-work KEMS.
+          Al2O3, BeO, ThO2 P_O2 shown as dotted lines. a_Si=1 on the figure. Not digitised.
+        source_as_printed: Kato and Yamamoto, 学振140委資料, 47 (1977), ref 12
+        a_Si_on_figure: 1.0
+deepening:
+  dispatch_id: extract-kems-067
+  date: '2026-09-13'
+  quote_convention: English synopsis, table/figure captions, and numerals transcribed with
+    ASCII flattening of subscripts, gamma, epsilon, and Delta. Japanese body not translated.
+  kato_1993_citation_mismatch: Kato 1993 Table 1 rank 20 (Fe-Si) prints Yamada, Abe and Kato,
+    Tetsu-To-Hagane, 73, 868 (1980). That volume/page is Nunoue and Kato 1987 Fe-Sn (kems-116,
+    DOI 10.2355/tetsutohagane1955.73.7_868). This PDF is Tetsu-to-Hagane 66(5):488-495 (1980),
+    matched by title and content. Kato's second string Symp. Ser., Australia In. Min. Metall.,
+    23, 385 (1980) is a different document.
+  measured_rows_covered: 18
+  table_inventory:
+  - table: '1'
+    published_page: 490
+    pdf_page_index: 3
+    completeness: full
+    note: All 10 composition rows and 4 columns transcribed from the 400 dpi render. I+_Si
+      in count/s, I+_Fe in V. N_Si mole fraction.
+  - table: '2'
+    published_page: 493
+    pdf_page_index: 6
+    completeness: full
+    note: 18 investigator rows plus This work. Printed dashes omitted, not stored as zero.
+      Asterisk = Estimation by Fujisawa et al. This work 7.9e-4 / 11.5+/-1.5 stored separately
+      from the quoted rows. Investigator name Taylar recorded as printed.
+  class_ledger:
+    measured:
+    - yamada_1980_ion_current_ratio_table1_1600C
+    - yamada_1980_fragmentation_BeO_ThO2_ion_ratios
+    - yamada_1980_fig1_peak_figure_only
+    - yamada_1980_fig3_ISiO_over_ISi_figure_only
+    - yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
+    - yamada_1980_fig9_ionization_efficiency_figure_only
+    model_derived:
+    - yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+    - yamada_1980_cell_po2_calculated
+    - yamada_1980_fig6_integration_curve_figure_only
+    - yamada_1980_fig7_gamma_Si_this_work_figure_only
+    - yamada_1980_fig8_activities_figure_only
+    - yamada_1980_fe_activity_fig8_figure_only
+    quoted_measurement:
+    - yamada_1980_quoted_gamma_Si_NSi_0p5
+    - yamada_1980_quoted_table2_investigators
+    - yamada_1980_fig5_gamma_Si_comparison_figure_only
+    - yamada_1980_fig2_Si_O_po2_figure_only
+    author_estimate:
+    - yamada_1980_p_Si_estimate_NSi_below_0p05
+    method_only:
+    - yamada_1980_kems_geometry_and_calibration
+  primary_sources_cited:
+  - R. J. Fruehan, Met. Trans. 1 (1970) 865
+  - K. Yamada and E. Kato, Int. J. Mass Spectrometry and Ion Phys. 25 (1977) 461
+  - T. Furukawa and E. Kato, Tetsu-to-Hagane 61 (1975) 3060
+  - C. Wagner, Thermodynamics of Alloys (1952) 51 [Addison-Wesley]
+  - JANAF Thermochemical Tables, ed. D. R. Stull and H. Prophet (1971)
+  - Y. H. Chou and J. F. Elliott, Basic Open Hearth Steelmaking, AIME (1951) 638
+  - T. G. Wilder and J. F. Elliott, J. Electrochem. Soc. 107 (1960) 628
+  - F. Woolley and J. F. Elliott, Trans. Met. Soc. AIME 239 (1967) 1872
+  - E. Ichise, T. Yamauchi and T. Mori, Tetsu-to-Hagane 63 (1977) 417
+  - J. Chipman and T. P. Floridis, Acta Met. 3 (1955) 456
+  - G. V. Samsonov, Oxide handbook [Nisso Tsushinsha]
+  - E. Kato and M. Yamamoto, 19th Committee report 47 (1977)
+  - J. Chipman and R. Baschwitz, Trans. Met. Soc. AIME 227 (1963) 473
+  - K. Schwerdtfeger and H. J. Engell, Arch. Eisenhuttenw. 35 (1964) 533
+  - S. Murakami, S. Banya and T. Fuwa, Tetsu-to-Hagane 53 (1967) 779
+  - E. T. Turkdogan, P. Grieveson and J. F. Beisler, Trans. Met. Soc. AIME 227 (1963) 1258
+  - E. T. Turkdogan and P. Grieveson, Trans. Met. Soc. AIME 227 (1963) 1143
+  - G. R. Belton and R. J. Fruehan, J. Phys. Chem. 71 (1967) 1403
+  - G. Smith and J. Taylor, JISI 202 (1964) 577
+  - K. Yamada and E. Kato, Tetsu-to-Hagane 65 (1979) 264
+  - E. Kato and T. Furukawa, Trans. Castings Research Laboratory (Waseda) 27 (1974) 97
+  - N. A. Gokcen and J. Chipman, Trans. AIME 194 (1952) 171; 197 (1953) 1017
+  - K. Sanbongi and M. Ohtani, Tetsu-to-Hagane 39 (1953) 683
+  - J. Chipman, J. C. Fulton, N. A. Gokcen and G. R. Gaskey Jr., Acta Met. 2 (1954) 439
+  - M. Ohtani, Sci. Repts. Res. Inst. Tohoku Univ. A7 (1955) 487
+  - Y. Matoba, K. Gunji and T. Kuwana, Tetsu-to-Hagane 45 (1959) 1328
+  - J. Chipman and T. C. M. Pillay, Trans. Met. Soc. AIME 221 (1961) 1277
+  - S. Tszen-Tzsi, A. Yu. Polyakov and A. M. Samarin, Izv. Vysshikh Uchebn. Zavedenii, Chernaya
+    Met. (1961) 1, 12
+  - J. Chipman and J. F. Elliott, Electric Furnace Steelmaking ed. C. E. Sims, II (1963) 99,
+    133 [Interscience]
+  - K. Niwa and M. Shinmei, 19th Committee report 7267 (July 1963)
+  - H. Sakao, A. Kubo and Y. Ishino, Proc. ICSTIS, Suppl. Trans. ISIJ 11 (1971) 449
+  - R. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleiser and K. K. Kelley, Selected values
+    of the thermodynamic properties of binary alloys (1973) 840, 879 [ASM]
+  - T. Fujisawa, K. Imaoka and H. Sakao, Tetsu-to-Hagane 64 (1978) 196
+  battery_limitation: Load-bearing this-work numbers are Table 1 ion-current ratios at 1600
+    C and the Belton-Fruehan results log gamma_Si^o = -3.1 +/- 0.2, gamma_Si^o = 7.9e-4, epsilon_Si^Si
+    = 11.5 +/- 1.5. a_Si and a_Fe vs N_Si live only on Fig. 8 (not digitised).
