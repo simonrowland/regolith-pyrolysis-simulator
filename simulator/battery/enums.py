@@ -69,6 +69,7 @@ class Quantity(StrEnum):
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
     ION_INTENSITY_RATIO = "ion_intensity_ratio"
+    DELTA_FH = "delta_fH"
     DELTA_FG = "delta_fG"
     H_MINUS_H298 = "H_minus_H298"
     PARTIAL_MOLAR_ENTHALPY = "partial_molar_enthalpy"
@@ -302,6 +303,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",
     Quantity.ION_INTENSITY_RATIO: "dimensionless",
+    Quantity.DELTA_FH: "kJ_per_declared_mol_basis",
     Quantity.DELTA_FG: "kJ_per_declared_mol_basis",
     Quantity.H_MINUS_H298: "kJ_per_declared_mol_basis",
     Quantity.PARTIAL_MOLAR_ENTHALPY: "kJ_per_declared_mol_basis",
@@ -332,7 +334,9 @@ MEASURED_EVIDENCE = frozenset(
     }
 )
 
-FORMATION_QUANTITIES = frozenset({Quantity.DELTA_FG, Quantity.LOG10_KF})
+FORMATION_QUANTITIES = frozenset(
+    {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+)
 PURE_STANDARD_THERMO = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )
