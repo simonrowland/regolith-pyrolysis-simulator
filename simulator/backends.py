@@ -1374,10 +1374,10 @@ def _resolve_runner_strict(
             backend_config=backend_config,
         )
     if name in IMCC_SF04_BACKEND_NAMES:
-        from simulator.melt_backend.imcc_sf04.adapter import (
-            ImccSf04Backend,
-            ImccSf04ExtBackend,
-        )
+        from simulator.melt_backend.imcc_sf04.backend import (
+    ImccSf04Backend,
+    ImccSf04ExtBackend,
+)
 
         backend_cls = (
             ImccSf04ExtBackend

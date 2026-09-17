@@ -24,7 +24,15 @@ from simulator.melt_backend.imcc_sf04.adapter import (
     load_datapack,
 )
 
+from simulator.melt_backend.imcc_sf04.backend import (
+    ImccSf04Backend,
+    ImccSf04ExtBackend,
+)
+
 __all__ = [
+    # MeltBackend glue (simulator-facing)
+    "ImccSf04Backend",
+    "ImccSf04ExtBackend",
     # Adapter API (chunk 3)
     "ImccAdapterLabels",
     "ImccCompositionOutsideValidatedEnvelopeError",

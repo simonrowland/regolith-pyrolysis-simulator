@@ -22,7 +22,7 @@ from simulator.backends import (
 )
 from simulator.engine_local_config import identity_for
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.melt_backend.imcc_sf04.adapter import (
+from simulator.melt_backend.imcc_sf04.backend import (
     ImccSf04Backend,
     ImccSf04ExtBackend,
 )
