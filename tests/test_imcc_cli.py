@@ -485,3 +485,24 @@ def test_import_time_scanner_sees_every_construct_that_runs_on_import(tmp_path):
         assert target in _simulator_imports(probe), (
             f"{label!r} must still be visible to the full walk as a deferred reach"
         )
+
+
+def test_version_exits_zero_and_does_not_invent_a_number(capsys):
+    """--version shares the SystemExit(0) path with --help, so the remap must
+    pass it through. The string matters too: running from a checkout there is
+    no installed distribution, and a fabricated version on a scientific result
+    is worse than an honest unknown because it looks reproducible."""
+    assert cli.main(["--version"]) == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "imcc" in out
+    assert cli._resolve_version() in out
+
+
+def test_help_documents_the_exit_code_contract(capsys):
+    """The codes are the reason to script this at all. If they live only in the
+    module docstring, a caller has to read source to find them."""
+    assert cli.main(["--help"]) == cli.EXIT_OK
+    out = capsys.readouterr().out
+    assert "exit codes:" in out
+    assert "typed refusal" in out
+    assert "--oxide SiO2=" in out, "the repeated --oxide form needs an example"

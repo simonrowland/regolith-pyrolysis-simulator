@@ -257,12 +257,74 @@ def _cmd_solve(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _resolve_version() -> str:
+    """Code version for --version.
+
+    Reads installed distribution metadata when this runs as the standalone
+    package. In-tree -- executed out of a simulator checkout -- there is no
+    distribution to query, so say so rather than invent a number: a wrong
+    version string attached to a scientific result is worse than an honest
+    "unknown", because it looks reproducible and is not.
+    """
+    try:
+        from importlib.metadata import version
+
+        return version("openimcc")
+    except Exception:
+        return "in-tree (no installed distribution)"
+
+
+__version__ = _resolve_version()
+
+
+# The exit-code contract is the reason anyone would script this, so it belongs
+# in --help and not only in the module docstring. A caller that cannot tell a
+# refusal from a usage error has to parse stderr, which is exactly what the
+# typed codes exist to avoid.
+_EPILOG = """\
+exit codes:
+  0  solved
+  1  usage error -- the invocation was wrong
+  2  typed refusal -- the model declined, with a machine-readable code
+
+  A refusal is a RESULT, not a crash: out-of-domain temperature, a composition
+  outside the validated envelope and a malformed datapack each carry their own
+  code. Use --json to read it as {"status": "refused", "code": ...}.
+  --allow-extrapolation and --allow-out-of-envelope turn a refusal into an
+  answer; the answer is always flagged, never silently extrapolated.
+
+examples:
+  imcc describe --pack packs/imcc-sf04-v1.0.2.json
+
+  imcc solve --pack packs/imcc-sf04-v1.0.2.json --temperature 1800 \\
+      --basis-type wt \\
+      --oxide SiO2=45.4 --oxide MgO=8.1 --oxide FeO=10.9 --oxide CaO=11.4 \\
+      --oxide Al2O3=14.2 --oxide TiO2=3.2 --oxide Na2O=0.4 --oxide K2O=0.1
+
+  imcc --json solve --pack packs/imcc-sf04-v1.0.2.json --temperature 2200 \\
+      --composition melt.json --allow-extrapolation
+"""
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="imcc",
-        description="IMCC-SF04 melt-activity model: datapack in, activities out.",
+        description=(
+            "IMCC-SF04 melt-activity model: datapack in, activities out. "
+            "Solves ideal mixing of complex components for a silicate liquid, "
+            "returning per-parent-oxide activity and activity coefficient plus "
+            "the degree of association D."
+        ),
+        epilog=_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--json", action="store_true", help="emit JSON on stdout")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"imcc {__version__}",
+        help="print the engine version and exit",
+    )
 
     # --json is accepted BOTH before and after the subcommand. Users reach for
     # the trailing form ("solve ... --json") and argparse would otherwise reject
@@ -334,8 +396,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="evaluate outside the validated composition envelope and mark it",
     )
-    solve.add_argument("--tol", type=float, default=1.0e-12, help="residual tolerance")
-    solve.add_argument("--max-iter", type=int, default=100, help="Newton iteration cap")
+    solve.add_argument(
+        "--tol", type=float, default=1.0e-12,
+        help="residual tolerance for the speciation solve (default: 1e-12)",
+    )
+    solve.add_argument(
+        "--max-iter", type=int, default=100,
+        help="iteration cap before the solve is declared non-convergent (default: 100)",
+    )
     solve.set_defaults(func=_cmd_solve)
     return parser
 
