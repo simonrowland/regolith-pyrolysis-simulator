@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import contextlib
 import io
 import json
 import math
+import sys
 from pathlib import Path
 
 import yaml
@@ -248,3 +250,130 @@ def test_text_and_json_render(tmp_path: Path) -> None:
     assert payload["status_counts"]["refused"] == 1
     ids = {row["point_id"] for row in payload["points"]}
     assert ids == {"ok_sio2_1800", "ood_t500", "refused_held"}
+
+
+class _BlockImport:
+    """Meta-path finder that makes a package look uninstalled.
+
+    Raising from ``find_spec`` (rather than returning None) is what makes the
+    import fail instead of falling through to the real finders.
+    """
+
+    def __init__(self, prefixes: tuple[str, ...]) -> None:
+        self._prefixes = prefixes
+
+    def find_spec(self, fullname, path=None, target=None):  # noqa: D102, ANN001
+        for prefix in self._prefixes:
+            if fullname == prefix or fullname.startswith(prefix + "."):
+                raise ImportError(
+                    f"{fullname} blocked: simulating an extracted checkout"
+                )
+        return None
+
+
+@contextlib.contextmanager
+def _without_the_simulator_gas_layer():
+    """Approximate a standalone IMCC checkout: no simulator policy importable.
+
+    Already-imported submodules are evicted from ``sys.modules`` first, or the
+    deferred imports would be satisfied from cache and the block would be a
+    no-op that quietly passes.
+    """
+    blocked = ("simulator.accounting", "simulator.diagnostic_helpers")
+    saved = {k: v for k, v in sys.modules.items() if k.startswith(blocked)}
+    for key in saved:
+        del sys.modules[key]
+    finder = _BlockImport(blocked)
+    sys.meta_path.insert(0, finder)
+    try:
+        yield
+    finally:
+        sys.meta_path.remove(finder)
+        sys.modules.update(saved)
+
+
+def _gas_point(**overrides) -> dict:
+    point = {
+        "id": "pp_sio_1800",
+        "population": "inline_gas",
+        "composition_id": "cmas_in_domain",
+        "material_class": "cmas_slag",
+        "temperature_K": 1800.0,
+        "parent_oxide": "SiO2",
+        "species": "SiO",
+        "observable": "partial_pressure",
+        "measured": 1.0,
+        "units": "Pa",
+        "score": True,
+        "fO2_bar": 1.0e-10,
+        "convention": "p(SiO) against an independent fO2 pin",
+    }
+    point.update(overrides)
+    return point
+
+
+def test_bench_still_runs_without_the_simulator_gas_layer(tmp_path: Path) -> None:
+    """The extraction contract, tested by behaviour rather than by AST.
+
+    A standalone IMCC checkout has no ``simulator.accounting`` or
+    ``simulator.diagnostic_helpers``. The activity path is the engine's own
+    output and must keep scoring; the partial_pressure path borrows the
+    simulator's shared gas layer and must degrade to a TYPED REFUSAL -- a
+    traceback there would make the package unusable once lifted out.
+
+    The control matters: the same gas point scores ``ok`` with the layer
+    present (see ``test_gas_point_scores_when_the_layer_is_present``), so a
+    refusal here is caused by the block and not by the fixture being unscorable
+    for some unrelated reason.
+    """
+    fixture = _write_fixture(
+        tmp_path / "bench.yaml",
+        [
+            {
+                "id": "act_sio2_1800",
+                "population": "inline_ok",
+                "composition_id": "cmas_in_domain",
+                "material_class": "cmas_slag",
+                "temperature_K": 1800.0,
+                "parent_oxide": "SiO2",
+                "species": "SiO",
+                "observable": "activity",
+                "measured": 0.2,
+                "units": "dimensionless",
+                "score": True,
+                "convention": "a(SiO2), parent-oxide formula-unit basis",
+            },
+            _gas_point(),
+        ],
+    )
+
+    with _without_the_simulator_gas_layer():
+        report = run_bench(fixture, DATAPACK_PATH)
+
+    by_id = {row.point_id: row for row in report.points}
+
+    activity_row = by_id["act_sio2_1800"]
+    assert activity_row.status == "ok", (
+        "the activity path must not depend on simulator policy; "
+        f"got {activity_row.status}: {activity_row.reason}"
+    )
+    assert activity_row.predicted is not None
+    assert math.isfinite(float(activity_row.predicted))
+
+    gas_row = by_id["pp_sio_1800"]
+    assert gas_row.status == "refused"
+    assert gas_row.predicted is None
+    assert "shared gas layer refused" in gas_row.reason
+
+    # And the refusal stays out of the score, like every other refusal.
+    assert report.n_ok == 1
+    assert report.status_counts["refused"] == 1
+
+
+def test_gas_point_scores_when_the_layer_is_present(tmp_path: Path) -> None:
+    """Control for the test above -- without it, a refusal proves nothing."""
+    fixture = _write_fixture(tmp_path / "bench.yaml", [_gas_point()])
+    report = run_bench(fixture, DATAPACK_PATH)
+    row = report.points[0]
+    assert row.status == "ok", f"control point should score in-tree: {row.reason}"
+    assert row.predicted is not None and row.predicted > 0.0

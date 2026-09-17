@@ -169,6 +169,12 @@ def _render_solve_text(payload: Mapping[str, Any]) -> str:
     )
     if payload.get("extrapolated"):
         lines.append("  ** EXTRAPOLATED: outside a declared T domain **")
+    # Symmetry with the line above. --allow-out-of-envelope turns a refusal
+    # into an answer, so the answer has to SAY it is outside the validated
+    # composition envelope; JSON already carries labels.envelope_status, and
+    # text mode was printing a clean-looking result with no flag at all.
+    if isinstance(labels, Mapping) and labels.get("envelope_status") == "outside_validated":
+        lines.append("  ** OUTSIDE VALIDATED COMPOSITION ENVELOPE **")
     lines.append("")
     header = f"  {'parent':<8} {'x':>12} {'x*':>12} {'activity':>14} {'gamma':>12}"
     lines.append(header)
@@ -336,7 +342,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    try:
+        args = parser.parse_args(argv)
+    except SystemExit as exc:
+        # argparse's own usage errors exit 2, which is OUR typed-refusal code.
+        # Left alone, `imcc solve` with a missing --pack would be indis-
+        # tinguishable from the model declining to answer, and main() would
+        # raise instead of returning at all. Remap: --help/-h keeps its 0,
+        # everything else becomes EXIT_USAGE so exit 2 means exactly one thing.
+        code = exc.code if isinstance(exc.code, int) else EXIT_USAGE
+        return EXIT_OK if code == 0 else EXIT_USAGE
     try:
         return int(args.func(args))
     except ImccRefusal as exc:
