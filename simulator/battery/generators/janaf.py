@@ -69,6 +69,37 @@ PRINTED_CELL_ERRATUM_REASON = (
     "printed cell is out of line with both neighbouring rows and violates the "
     "Gibbs-function identity"
 )
+# B-133 at 300 K is the source disagreeing with itself, not a parse
+# defect and not a tolerance miss. The printed 300 K log Kf token is
+# the 298.15 K value copied down. Identity: log10 Kf =
+# -1000*delta_fG/(R*T*ln(10)) with R = 8.31441 J mol^-1 K^-1 gives
+# 5516.922 / (0.00831441 * 300 * ln(10)) ≈ 960.56 against printed
+# 966.926 (residual ≈ 6.4 vs rounding tolerance ≈ 1.6, about 4×, not
+# 10×). Do not widen the tolerance to absorb it.
+SOURCE_DISAGREEMENTS = (
+    {
+        "table_id": "B-133",
+        "temperature_as_published": "300",
+        "identity": "log10_Kf_from_delta_fG",
+        "kind": "source_disagreement",
+        "reason": (
+            "printed table repeats the 298.15 K log Kf token at the 300 K "
+            "row; not a parse error"
+        ),
+        "quoted_evidence": {
+            "298.15": {
+                "delta_fG": "-5519.114",
+                "log10_Kf": "966.926",
+                "negative_gibbs_enthalpy_function": "324.085",
+            },
+            "300": {
+                "delta_fG": "-5516.922",
+                "log10_Kf": "966.926",
+                "negative_gibbs_enthalpy_function": "324.085",
+            },
+        },
+    },
+)
 STORED_CELL_ERRATA = (
     {
         "table_id": "Hf-004",
@@ -709,6 +740,39 @@ def _segments(
 def _decimal_grain(token: str) -> Decimal:
     value = Decimal(token)
     return Decimal(1).scaleb(value.as_tuple().exponent)
+
+
+def _source_disagreement_for(failure: Mapping[str, str]) -> Mapping[str, Any] | None:
+    return next(
+        (
+            item
+            for item in SOURCE_DISAGREEMENTS
+            if item["table_id"] == failure.get("table_id")
+            and item["temperature_as_published"] == failure.get("temperature_as_published")
+            and item["identity"] == failure.get("identity")
+        ),
+        None,
+    )
+
+
+def _annotate_source_disagreements(
+    failures: Sequence[Mapping[str, str]],
+) -> list[dict[str, Any]]:
+    annotated: list[dict[str, Any]] = []
+    for failure in failures:
+        match = _source_disagreement_for(failure)
+        if match is None:
+            annotated.append(dict(failure))
+            continue
+        annotated.append(
+            {
+                **failure,
+                "kind": match["kind"],
+                "reason": match["reason"],
+                "quoted_evidence": match["quoted_evidence"],
+            }
+        )
+    return annotated
 
 
 def _printed_cell_erratum(
@@ -1588,8 +1652,8 @@ def generate_table(
                 if failure["identity"] == "negative_gibbs_enthalpy_function":
                     failures.append(failure)
     neighbour_sign_hits = _neighbour_sign_hits(observations)
-    stored_pair_failures = _stored_pair_identity_failures_from_observations(
-        observations, table_id
+    stored_pair_failures = _annotate_source_disagreements(
+        _stored_pair_identity_failures_from_observations(observations, table_id)
     )
     stored_pair_denominator = _stored_pair_identity_denominator(
         observations, stored_pair_failures
@@ -1650,6 +1714,9 @@ def generate_table(
         "transcription_identity_failures": failures,
         "stored_pair_identity_failures": stored_pair_failures,
         "stored_pair_identity_denominator": stored_pair_denominator,
+        "source_disagreements": [
+            item for item in SOURCE_DISAGREEMENTS if item["table_id"] == table_id
+        ],
         "scale_error_refusals": scale_error_refusals,
         "neighbour_sign_hits": neighbour_sign_hits,
         "neighbour_sign_scan": {

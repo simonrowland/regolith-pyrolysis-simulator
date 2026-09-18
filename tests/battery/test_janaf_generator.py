@@ -1019,6 +1019,23 @@ def test_non_data_marker_lines_are_recorded() -> None:
     assert len(observed) == 29
 
 
+def test_b133_300k_is_a_documented_source_disagreement() -> None:
+    generated = _generation("B-133")
+    failures = generated.report["stored_pair_identity_failures"]
+    assert len(failures) == 1
+    failure = failures[0]
+    assert failure["temperature_as_published"] == "300"
+    assert failure["kind"] == "source_disagreement"
+    assert "repeats the 298.15 K log Kf" in failure["reason"]
+    evidence = failure["quoted_evidence"]
+    assert evidence["298.15"]["log10_Kf"] == evidence["300"]["log10_Kf"] == "966.926"
+    assert evidence["298.15"]["delta_fG"] != evidence["300"]["delta_fG"]
+    assert _series_has_temperature(generated, Quantity.LOG10_KF, "300")
+    assert generated.report["source_disagreements"] == [
+        generator.SOURCE_DISAGREEMENTS[0]
+    ]
+
+
 def test_stored_pair_identity_reports_its_denominator() -> None:
     al006 = _generation("Al-006")
     assert al006.report["stored_pair_identity_denominator"] == {
