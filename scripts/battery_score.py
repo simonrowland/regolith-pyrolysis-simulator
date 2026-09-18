@@ -29,9 +29,12 @@ from simulator.battery.pins import (  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
     engines_from_names,
+    load_legacy_score_rows,
     load_score_context,
     render_score_report,
+    residual_to_plain,
     score_store,
+    status_diff_rows,
     write_residuals_jsonl,
 )
 
@@ -178,10 +181,13 @@ def main(argv: list[str] | None = None) -> int:
         payloads = load_residuals_jsonl(residuals_path)
         failures: list[dict] = []
         unmapped: list[str] = []
+        diffs: list[dict] = []
         pins_file = args.root / "data" / "battery" / "pins.yaml"
         live_keys = {str(row.get("key") or "") for row in payloads}
+        key_map: dict[str, str] = {}
         if pins_file.is_file():
             loaded = load_pins(pins_file)
+            key_map = loaded["key_map"]
             for record in loaded["pin_band_records"]:
                 if record.tombstone:
                     continue
@@ -197,14 +203,17 @@ def main(argv: list[str] | None = None) -> int:
                             else str(record.pin_band_value),
                         }
                     )
-            for old, new in loaded["key_map"].items():
-                if new not in live_keys:
-                    unmapped.append(old)
+        diffs, unmapped = status_diff_rows(
+            old_rows=load_legacy_score_rows(args.root),
+            new_rows=payloads,
+            key_map=key_map,
+        )
         report = render_score_report_from_payloads(
             payloads,
             engines=engines,
             hostname=socket.gethostname(),
             pin_failures=failures,
+            status_diff=diffs,
             unmapped_legacy_keys=unmapped,
         )
         report_path.write_text(report, encoding="utf-8")
@@ -240,20 +249,25 @@ def main(argv: list[str] | None = None) -> int:
 
     failures: list[dict] = []
     unmapped: list[str] = []
+    diffs: list[dict] = []
     pins_file = args.root / "data" / "battery" / "pins.yaml"
+    key_map: dict[str, str] = {}
     if pins_file.is_file():
         loaded = load_pins(pins_file)
+        key_map = loaded["key_map"]
         failures = pin_failures(residuals, loaded["pin_band_records"])
-        live_keys = {r.key for r in residuals}
-        for old, new in loaded["key_map"].items():
-            if new not in live_keys:
-                unmapped.append(old)
+    diffs, unmapped = status_diff_rows(
+        old_rows=load_legacy_score_rows(args.root),
+        new_rows=[residual_to_plain(residual) for residual in residuals],
+        key_map=key_map,
+    )
 
     report = render_score_report(
         residuals,
         context=context,
         engines=engines if not args.studio else engines_from_names(args.engines.split(",")),
         pin_failures=failures,
+        status_diff=diffs,
         unmapped_legacy_keys=unmapped,
         studio_hostname=studio_hostname,
     )

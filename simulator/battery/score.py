@@ -2228,6 +2228,57 @@ def _legacy_bucket(row: Mapping[str, object]) -> str:
     return "excluded"
 
 
+def load_legacy_score_rows(root: Path | None = None) -> list[dict[str, object]]:
+    """Old Gibbs / species-rail / vapour-pin rows for status_diff_rows."""
+
+    root = root or REPO_ROOT
+    rows: list[dict[str, object]] = []
+    for rel in (
+        "data/literature/gibbs_battery_residual_ledger.yaml",
+        "data/literature/species_rail_differential_ledger.yaml",
+    ):
+        path = root / rel
+        if not path.is_file():
+            continue
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping):
+            continue
+        for point in doc.get("points") or []:
+            if not isinstance(point, Mapping) or not point.get("key"):
+                continue
+            rows.append(
+                {
+                    "key": str(point["key"]),
+                    "status": str(point.get("status") or ""),
+                    "observation_id": str(point.get("observation_id") or ""),
+                }
+            )
+    vapour_path = root / "data" / "vapour_rail_validation_pins.yaml"
+    if vapour_path.is_file():
+        vapour = load_yaml(vapour_path)
+        if isinstance(vapour, Mapping):
+            species_block = vapour.get("species") or {}
+            if isinstance(species_block, Mapping):
+                for species, body in species_block.items():
+                    if not isinstance(body, Mapping):
+                        continue
+                    validations = body.get("validations") or {}
+                    if not isinstance(validations, Mapping):
+                        continue
+                    for engine, payload in validations.items():
+                        if not isinstance(payload, Mapping):
+                            continue
+                        if payload.get("pinned_residual_dex") is None:
+                            continue
+                        rows.append(
+                            {
+                                "key": f"vapour_rail_validation_pins::{species}::{engine}",
+                                "status": ResidualStatus.MATCH.value,
+                            }
+                        )
+    return rows
+
+
 def status_diff_rows(
     *,
     old_rows: Sequence[Mapping[str, object]],

@@ -621,6 +621,41 @@ def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
     assert outcome.passed is True
 
 
+def test_battery_score_script_runs_status_diff() -> None:
+    src = Path("scripts/battery_score.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    called = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "status_diff_rows" in called
+
+
+def test_status_diff_names_schema_axis_on_outcome_change() -> None:
+    from simulator.battery.score import status_diff_rows
+
+    diffs, unmapped = status_diff_rows(
+        old_rows=[{"key": "old-a", "status": "match"}],
+        new_rows=[{"key": "new-a", "status": "refused", "score_eligible": False}],
+        key_map={"old-a": "new-a"},
+    )
+    assert unmapped == []
+    assert len(diffs) == 1
+    assert diffs[0]["old"] == "scored"
+    assert diffs[0]["new"] == "refused"
+    assert diffs[0]["axis"] == "score_eligible/admission/evidence/gate"
+
+    match_flip, _ = status_diff_rows(
+        old_rows=[{"key": "old-b", "status": "match"}],
+        new_rows=[{"key": "new-b", "status": "mismatch", "score_eligible": True}],
+        key_map={"old-b": "new-b"},
+    )
+    assert match_flip[0]["axis"] == "decision_band"
+    assert match_flip[0]["old"] == "match"
+    assert match_flip[0]["new"] == "mismatch"
+
+
 def test_report_states_admission_alone_deaths_without_changing_the_rule() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
