@@ -4081,6 +4081,59 @@ def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:
     assert obs.identity.temperature_K.value is None
 
 
+def test_store_pyrolysis_yield_census_is_honest() -> None:
+    from simulator.battery.migrate import observation_from_plain
+    from simulator.battery.score import MEASURED_EVIDENCE, rail_for_quantity
+
+    files = [
+        REPO_ROOT / "data/literature/extracts-v2/kems-044-robinot-2026.yaml",
+        REPO_ROOT / "data/literature/extracts-v2/kems-035-sauerborn-2005.yaml",
+        REPO_ROOT / "data/literature/extracts-v2/cardiff-2007-vacuum-pyrolysis-gsfc.yaml",
+        REPO_ROOT / "data/literature/extracts-v2/kems-038-matchett-2006.yaml",
+        REPO_ROOT / "data/literature/observations-v2/vacuum_pyrolysis_measurements.yaml",
+    ]
+    rows = []
+    for path in files:
+        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for raw in stored.get("observations") or []:
+            obs = observation_from_plain(raw)
+            q = quantity_token(obs.identity)
+            formula = obs.identity.species.formula
+            if q is None:
+                continue
+            if rail_for_quantity(q, species_formula=formula) is Rail.PYROLYSIS_YIELD:
+                rows.append(obs)
+    assert len(rows) == 32
+    tokens = {quantity_token(o.identity) for o in rows}
+    assert Quantity.MASS_LOSS_FRACTION in tokens
+    assert Quantity.YIELD_FRACTION in tokens
+    assert Quantity.O2_YIELD in tokens
+    candidates = [
+        o
+        for o in rows
+        if o.evidence.class_.is_value
+        and o.evidence.class_.value in MEASURED_EVIDENCE
+        and o.admission.status in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+    ]
+    assert len(candidates) == 28
+    admitted = [o for o in candidates if o.admission.status is AdmissionStatus.ADMITTED]
+    pending = [o for o in candidates if o.admission.status is AdmissionStatus.PENDING]
+    assert len(admitted) == 18
+    assert len(pending) == 10
+    disagreed = [
+        o
+        for o in pending
+        if any(n.kind is NoticeKind.SOURCE_DISAGREEMENT for n in o.notices)
+    ]
+    assert len(disagreed) == 4
+    from simulator.battery.score import decision_band_for
+    from simulator.battery.enums import SourceRelation
+
+    assert decision_band_for(Quantity.MASS_LOSS_FRACTION, SourceRelation.INDEPENDENT) is None
+    assert decision_band_for(Quantity.O2_YIELD, SourceRelation.INDEPENDENT) is None
+    assert decision_band_for(Quantity.YIELD_FRACTION, SourceRelation.INDEPENDENT) is None
+
+
 def test_vacuum_pyrolysis_sidecar_loads_pomeroy_and_robinot_yields(
     tmp_path: Path,
 ) -> None:

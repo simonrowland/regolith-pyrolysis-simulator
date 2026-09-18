@@ -1,0 +1,46 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 94aef07ca77601ab38121f5c1f9ae3d4dad4a6404dab4bbcf595c56a9a049471
+  citation: Pomeroy and Cardiff 2006, A Proof of Concept of Vacuum Pyrolysis
+  source_ids:
+  - pomeroy_cardiff_2006_measurements
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:pomeroy_cardiff_2006_measurements
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 94aef07ca77601ab38121f5c1f9ae3d4dad4a6404dab4bbcf595c56a9a049471::pomeroy_cardiff_2006_measurements
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 94aef07ca77601ab38121f5c1f9ae3d4dad4a6404dab4bbcf595c56a9a049471
+  locator:
+    note: citation_id=pomeroy_cardiff_2006; source_location=LPI_Contribution_1332_p47_results; extraction_method=text

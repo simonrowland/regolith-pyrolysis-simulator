@@ -751,14 +751,14 @@ observations:
     figure: '2.2'
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:0
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'bulk_mass_loss_wt_pct'
+      tag: value
+      value: mass_loss_fraction
     species:
-      formula: O2
+      formula: SiO2
       phase:
         tag: unknown
         reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
@@ -768,45 +768,110 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
       tag: unknown
-      reason: source T_range_K [1673.15, 1853.15]; no midpoint invented
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mass_loss_wt_pct'; refusing to pick a number
+    kind: point
+    point: '0.011'
   uncertainty:
     kind: printed
     verbatim:
       note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
       evidence:
-        page: 88
-        paragraph: 3,2 % ihres Gewichtes verloren
+        page: 76
   notices: []
   source_id: kems-035-sauerborn-2005
   locator:
-    page: 88
-    paragraph: 3,2 % ihres Gewichtes verloren
+    page: 76
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 76
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.1'
+        locator:
+          page: 76
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 76
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:1
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'bulk_mass_loss_wt_pct'
+      tag: value
+      value: mass_loss_fraction
     species:
-      formula: O2
+      formula: MS1
       phase:
         tag: unknown
         reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
@@ -816,30 +881,776 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
       tag: unknown
-      reason: source T_range_K [1673.15, 1853.15]; no midpoint invented
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1815.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mass_loss_wt_pct'; refusing to pick a number
+    kind: point
+    point: '0.026'
   uncertainty:
     kind: printed
     verbatim:
       note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 82
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 82
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 82
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.6'
+        locator:
+          page: 82
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 82
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MS2
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1836.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.032'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 88
   notices: []
   source_id: kems-035-sauerborn-2005
   locator:
     page: 88
-    paragraph: 3,2 % ihres Gewichtes verloren
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1836.15'
+      locator:
+        page: 88
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.2'
+        locator:
+          page: 88
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 88
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::point:3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MS5
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.029'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 98
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 98
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 98
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.9'
+        locator:
+          page: 98
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 98
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:0
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.011'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 76
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 76
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 76
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.1'
+        locator:
+          page: 76
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 76
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MS1
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1815.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.026'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 82
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 82
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 82
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.6'
+        locator:
+          page: 82
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 82
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:2
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MS2
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1836.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.032'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 88
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 88
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1836.15'
+      locator:
+        page: 88
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.2'
+        locator:
+          page: 88
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 88
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::point:3
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: MS5
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.029'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 98
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 98
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 98
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.9'
+        locator:
+          page: 98
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 98
+    output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_melts_full_melt_model_1261_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
@@ -1283,8 +2094,8 @@ observations:
       note: none printed
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -1371,8 +2182,8 @@ observations:
       note: ILLEGIBLE cell not guessed; no printed sigma
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -1420,8 +2231,8 @@ observations:
       note: ILLEGIBLE cell not guessed; no printed sigma
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: pending
@@ -1461,8 +2272,8 @@ observations:
       note: ILLEGIBLE cell not guessed
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -1511,8 +2322,8 @@ observations:
       note: ILLEGIBLE cell not guessed
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: pending
@@ -1735,8 +2546,8 @@ observations:
       note: IR-camera surface temperatures; no printed sigma on Tmax
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -1786,8 +2597,8 @@ observations:
       note: IR-camera surface temperatures; no printed sigma on Tmax
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: pending
@@ -1829,8 +2640,8 @@ observations:
       note: IR-camera surface temperatures; no printed sigma on Tmax
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -1880,8 +2691,8 @@ observations:
       note: IR-camera surface temperatures; no printed sigma on Tmax
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: pending
@@ -2455,8 +3266,8 @@ observations:
       note: none printed
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
@@ -2506,8 +3317,8 @@ observations:
       note: none printed
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: pending
@@ -2547,8 +3358,8 @@ observations:
       note: not applicable
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'solar_vacuum_pyrolysis'
+      tag: value
+      value: measured_direct
     original_method_class: solar_vacuum_pyrolysis
   admission:
     status: superseded
