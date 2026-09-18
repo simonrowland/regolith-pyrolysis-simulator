@@ -621,6 +621,53 @@ def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
     assert outcome.passed is True
 
 
+def test_report_states_admission_alone_deaths_without_changing_the_rule() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    admitted = F.observation(
+        "o2-admitted",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    pending = replace(
+        admitted,
+        observation_id="o2-pending",
+        admission=replace(admitted.admission, status=AdmissionStatus.PENDING),
+    )
+    residual_admitted, _ = _compile(admitted, exp, _predict(Decimal("0"), ident))
+    residual_pending, _ = _compile(pending, exp, _predict(Decimal("0"), ident))
+    assert residual_admitted.score_eligible is True
+    assert residual_pending.score_eligible is False
+    assert residual_pending.status is ResidualStatus.MATCH
+    assert residual_pending.numeric is not None
+    assert residual_pending.exclusions == ("admission_admitted",)
+
+    from simulator.battery.score import admission_census, render_score_report
+
+    ctx = _context(F.work(), exp, admitted, pending)
+    census = admission_census(
+        (residual_admitted, residual_pending),
+        context=ctx,
+    )
+    assert census["comparison_candidates_pending"] == 1
+    assert census["comparison_candidates_admitted"] == 1
+    assert census["residuals_admission_alone"] == 1
+    assert census["unique_obs_admission_alone"] == 1
+    report = render_score_report(
+        (residual_admitted, residual_pending),
+        context=ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert "## Admission" in report
+    assert "die on admission alone" in report
+    assert "| residuals that die on admission alone | 1 |" in report
+    assert "stay in the comparison set as diagnostics" in report
+    assert "The admission rule is unchanged." in report
+
+
 def test_non_thermo_quantities_refuse_without_invented_band() -> None:
     """Vapour / activity / alpha / yield have no sourced agreement band."""
 

@@ -1775,6 +1775,65 @@ def refusal_census(residuals: Sequence[Residual]) -> dict[str, int]:
     return dict(sorted(counts.items()))
 
 
+def admission_census(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext | None = None,
+) -> dict[str, int]:
+    """How many comparison candidates die on admission, including admission alone.
+
+    Does not change the score_eligible rule. Pending remains diagnostic.
+    """
+
+    pending_candidates = 0
+    admitted_candidates = 0
+    if context is not None:
+        for obs in comparison_candidates(context):
+            if obs.admission.status is AdmissionStatus.PENDING:
+                pending_candidates += 1
+            elif obs.admission.status is AdmissionStatus.ADMITTED:
+                admitted_candidates += 1
+    with_admission = 0
+    admission_alone = 0
+    admission_alone_refs: set[str] = set()
+    with_admission_refs: set[str] = set()
+    for residual in residuals:
+        if "admission_admitted" not in residual.exclusions:
+            continue
+        with_admission += 1
+        with_admission_refs.add(residual.reference)
+        if all(name == "admission_admitted" for name in residual.exclusions):
+            admission_alone += 1
+            admission_alone_refs.add(residual.reference)
+    return {
+        "comparison_candidates_pending": pending_candidates,
+        "comparison_candidates_admitted": admitted_candidates,
+        "residuals_with_admission_exclusion": with_admission,
+        "residuals_admission_alone": admission_alone,
+        "unique_obs_admission_alone": len(admission_alone_refs),
+        "unique_obs_with_admission_exclusion": len(with_admission_refs),
+    }
+
+
+def admission_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
+    with_admission = 0
+    admission_alone = 0
+    admission_alone_refs: set[str] = set()
+    for row in rows:
+        exclusions = tuple(row.get("exclusions") or ())
+        if "admission_admitted" not in exclusions:
+            continue
+        with_admission += 1
+        if all(name == "admission_admitted" for name in exclusions):
+            admission_alone += 1
+            admission_alone_refs.add(str(row.get("reference") or ""))
+    return {
+        "residuals_with_admission_exclusion": with_admission,
+        "residuals_admission_alone": admission_alone,
+        "unique_obs_admission_alone": len(admission_alone_refs),
+    }
+
+
 def notice_backlog(residuals: Sequence[Residual]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for residual in residuals:
@@ -1843,6 +1902,25 @@ def render_score_report(
     else:
         for reason, n in census.items():
             lines.append(f"| `{reason}` | {n} |")
+    admit = admission_census(residuals, context=context)
+    lines.extend(
+        [
+            "",
+            "## Admission",
+            "",
+            "score_eligible requires canonical admission admitted. Pending rows",
+            "stay in the comparison set as diagnostics (flagged and priced when",
+            "numeric, never the empirical headline). The admission rule is unchanged.",
+            "",
+            "| count | n |",
+            "|---|---:|",
+            f"| comparison candidates pending | {admit['comparison_candidates_pending']} |",
+            f"| comparison candidates admitted | {admit['comparison_candidates_admitted']} |",
+            f"| residuals with admission_admitted exclusion | {admit['residuals_with_admission_exclusion']} |",
+            f"| residuals that die on admission alone | {admit['residuals_admission_alone']} |",
+            f"| unique observations that die on admission alone | {admit['unique_obs_admission_alone']} |",
+        ]
+    )
     lines.extend(
         [
             "",
@@ -2040,6 +2118,23 @@ def render_score_report_from_payloads(
     else:
         for reason, n in census.items():
             lines.append(f"| `{reason}` | {n} |")
+    admit = admission_census_payloads(rows)
+    lines.extend(
+        [
+            "",
+            "## Admission",
+            "",
+            "score_eligible requires canonical admission admitted. Pending rows",
+            "stay in the comparison set as diagnostics (flagged and priced when",
+            "numeric, never the empirical headline). The admission rule is unchanged.",
+            "",
+            "| count | n |",
+            "|---|---:|",
+            f"| residuals with admission_admitted exclusion | {admit['residuals_with_admission_exclusion']} |",
+            f"| residuals that die on admission alone | {admit['residuals_admission_alone']} |",
+            f"| unique observations that die on admission alone | {admit['unique_obs_admission_alone']} |",
+        ]
+    )
     lines.extend(
         [
             "",
