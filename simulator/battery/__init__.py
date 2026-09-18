@@ -1,8 +1,4 @@
-"""Empirical battery schema v2.1 — records, identity, validity, validator.
-
-Chunk 1 only: no wiring into calibration_battery, extracts, ledgers, or
-engines. Scoring and engine dispatch are chunk 2.
-"""
+"""Empirical battery schema v2.1 — records, identity, validity, scorer."""
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -44,6 +40,7 @@ from simulator.battery.records import (
     Work,
     union_notices,
 )
+from simulator.battery.score import SCORE_ENGINE_SET, score_store
 from simulator.battery.validate import ValidationReport, validate_corpus
 from simulator.battery.validity import (
     GateOutcome,
@@ -74,6 +71,7 @@ __all__ = (
     "Phase",
     "Quantity",
     "Rail",
+    "SCORE_ENGINE_SET",
     "ReferenceStateConvention",
     "RefusalReason",
     "Residual",
@@ -92,6 +90,7 @@ __all__ = (
     "log10K_from_delta_fG_kJ_mol",
     "rescale_energy_per_basis",
     "run_validity_gates",
+    "score_store",
     "standard_pressure_delta_g_kJ_per_mol",
     "table_self_consistency",
     "underdetermined_apparatus",

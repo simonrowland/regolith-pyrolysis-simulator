@@ -366,6 +366,26 @@ class EquilibrateCell:
 # ---------------------------------------------------------------------------
 
 
+def identity_battery_pot(
+    pot_id: str,
+    composition_wt_pct: Mapping[str, float],
+    *,
+    why: str = "v2.1 observation identity pot",
+) -> BinaryPot:
+    """Build a BinaryPot from an observation's solved-pot wt% vector.
+
+    The battery scorer reuses equilibrate_cell / isolated-cell machinery
+    rather than forking a second engine arm. Catalog pots stay untouched.
+    """
+
+    return BinaryPot(
+        pot_id=pot_id,
+        kato_1993_table4_system=None,
+        why=why,
+        composition_wt_pct=dict(composition_wt_pct),
+    )
+
+
 def temperature_grid_K(
     start: float, stop: float, step: float
 ) -> tuple[float, ...]:

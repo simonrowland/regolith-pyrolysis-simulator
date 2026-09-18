@@ -1,0 +1,497 @@
+"""v2.1 scorer: score_eligible conjuncts, refusals, IMCC set, pins, determinism.
+
+Expected values come from the schema contract, never from the code under test.
+"""
+
+from __future__ import annotations
+
+import ast
+import inspect
+from dataclasses import replace
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+import yaml
+
+from simulator.battery.enums import (
+    AdmissionStatus,
+    Authority,
+    Engine,
+    EvidenceClass,
+    ExecutionState,
+    MetricOperation,
+    NoticeKind,
+    Quantity,
+    ResidualStatus,
+    SourceRelation,
+)
+from simulator.battery.pins import (
+    PinBandRecord,
+    PinWidenError,
+    assert_never_widen,
+    pin_failures,
+    tombstone_for_changed_identity,
+)
+from simulator.battery.records import (
+    Execution,
+    Notice,
+    ResidualNumeric,
+    DecisionBand,
+)
+from simulator.battery.score import (
+    SCORE_ELIGIBLE_CONJUNCTS,
+    SCORE_ENGINE_SET,
+    EligibleConjuncts,
+    EnginePrediction,
+    ScoreContext,
+    compile_residual,
+    compute_metric,
+    dumps_residual_line,
+    engines_from_names,
+    parse_species_formula,
+    score_eligible_from_conjuncts,
+)
+from simulator.battery.validate import validate_corpus
+from tests.battery import factories as F
+
+
+def _green_conjuncts() -> EligibleConjuncts:
+    return EligibleConjuncts(
+        status=ResidualStatus.MATCH,
+        finite_numeric_point_endpoints=True,
+        valid_metric_domain=True,
+        reference_measured_evidence=True,
+        admission_admitted=True,
+        extract_review_permits_use=True,
+        validity_gates_pass=True,
+        identity_equal=True,
+        source_relation_independent_complete_ancestry=True,
+        candidate_engine_prediction_authority_allowed=True,
+        no_blocking_qualification=True,
+        selected_independent_lineage_level=True,
+    )
+
+
+def test_score_eligible_conjuncts_cover_the_spec() -> None:
+    assert SCORE_ELIGIBLE_CONJUNCTS == tuple(_green_conjuncts().as_mapping())
+    assert score_eligible_from_conjuncts(_green_conjuncts()) is True
+
+
+@pytest.mark.parametrize("conjunct", SCORE_ELIGIBLE_CONJUNCTS)
+def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
+    green = _green_conjuncts()
+    mapping = green.as_mapping()
+    assert mapping[conjunct] is True
+    # Mutate the named conjunct off. status is ResidualStatus, not a bool.
+    if conjunct == "status_match_or_mismatch":
+        red = replace(green, status=ResidualStatus.REFUSED)
+    else:
+        field = conjunct
+        red = replace(green, **{field: False})
+    assert score_eligible_from_conjuncts(red) is False
+    assert conjunct in red.exclusions()
+    assert score_eligible_from_conjuncts(green) is True
+
+
+def test_imcc_present_in_engine_set_by_construction() -> None:
+    assert Engine.IMCC_SF04 in SCORE_ENGINE_SET
+    assert Engine.IMCC_SF04_EXT in SCORE_ENGINE_SET
+    from simulator.battery import score as score_mod
+
+    tree = ast.parse(inspect.getsource(score_mod))
+    assignment = None
+    for node in tree.body:
+        if isinstance(node, ast.AnnAssign) and getattr(node.target, "id", None) == "SCORE_ENGINE_SET":
+            assignment = node.value
+            break
+        if isinstance(node, ast.Assign):
+            if any(getattr(t, "id", None) == "SCORE_ENGINE_SET" for t in node.targets):
+                assignment = node.value
+                break
+    assert assignment is not None
+    src = ast.dump(assignment)
+    assert "resolve_backend" not in src
+    assert "Call" not in src
+    with pytest.raises(ValueError, match="explicit SCORE_ENGINE_SET"):
+        engines_from_names(["nasa_cea_9"])
+
+
+def _context(work=None, experiment=None, *observations, review=None) -> ScoreContext:
+    w = work or F.work()
+    exp = experiment or F.tabulation_experiment()
+    obs = {o.observation_id: o for o in observations}
+    extract_review = {"": review, "janaf-4th": review}
+    for item in observations:
+        if item.source_id:
+            extract_review[item.source_id] = review
+    return ScoreContext(
+        works={w.work_id: w},
+        experiments={exp.experiment_id: exp},
+        observations=obs,
+        extract_review=extract_review,
+        hostname="test",
+    )
+
+
+def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
+    return EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:predict"),
+        value=value,
+        unit="kJ_per_declared_mol_basis",
+        authority=kwargs.get("authority", Authority.CERTIFIED),
+        notices=kwargs.get("notices", ()),
+        coefficient_sources=kwargs.get("coefficient_sources", ("nasa-cea-thermo",)),
+        lineage_complete=kwargs.get("lineage_complete", True),
+        identity=identity,
+        refusal_reason=kwargs.get("refusal_reason"),
+        refusal_detail=kwargs.get("refusal_detail", {}),
+    )
+
+
+def _compile(reference, experiment, predict, review=None, extra_obs=()):
+    ctx = _context(F.work(), experiment, reference, *extra_obs, review=review)
+    return compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        comparison_ids={reference.observation_id, *(o.observation_id for o in extra_obs)},
+        predict=lambda engine, obs, **kw: predict,
+    )
+
+
+def test_green_thermo_residual_is_score_eligible() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, candidate = _compile(ref, exp, _predict(Decimal("0"), ident))
+    assert residual.status is ResidualStatus.MATCH
+    assert residual.score_eligible is True
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("0")
+    assert candidate is not None
+    report = validate_corpus(
+        [F.work()],
+        [exp],
+        [ref, candidate],
+        [residual],
+    )
+    assert report.ok, [i.detail for i in report.issues]
+
+
+def test_refused_never_numeric() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-unknown-value",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    from simulator.battery.enums import ValueKind
+    from simulator.battery.records import Value
+
+    ref = replace(ref, value=Value(kind=ValueKind.UNAVAILABLE, unavailable_reason="not printed"))
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident))
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+
+
+def test_zero_never_priced_as_value() -> None:
+    """Absence/unavailable is a refusal, not a numeric zero."""
+
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-absent",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    from simulator.battery.enums import ValueKind
+    from simulator.battery.records import Value
+
+    ref = replace(ref, value=Value(kind=ValueKind.UNAVAILABLE, unavailable_reason="unknown quantity"))
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident))
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail.get("reason") in {
+        "unknown quantity",
+        "value_unavailable",
+        "value_unknown",
+    }
+
+
+def test_species_formula_unparsed_never_string_matched() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ident = replace(ident, species=replace(ident.species, formula="unknown"))
+    ref = F.observation(
+        "bad-formula",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("1"), ident))
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal.detail.get("reason") == "species_formula_unparsed"
+    assert parse_species_formula("unknown") is None
+    assert parse_species_formula("kems-007") is None
+    assert parse_species_formula("O2") == (("O", 2.0),)
+
+
+def test_compile_mutates_each_conjunct_off() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident))
+    assert residual.score_eligible is True
+
+    pending = replace(ref, admission=replace(ref.admission, status=AdmissionStatus.PENDING))
+    residual, _ = _compile(pending, exp, _predict(Decimal("0"), ident))
+    assert residual.score_eligible is False
+    assert "admission_admitted" in residual.exclusions
+
+    compiled = F.observation(
+        "o2-comp",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+    )
+    residual, _ = _compile(compiled, exp, _predict(Decimal("0"), ident))
+    assert residual.score_eligible is False
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident, lineage_complete=False))
+    assert residual.score_eligible is False
+
+    residual, _ = _compile(
+        ref, exp, _predict(Decimal("0"), ident, authority=Authority.REFUSED)
+    )
+    assert residual.score_eligible is False
+
+    other_T = replace(ident, temperature_K=replace(ident.temperature_K, value=Decimal("400")))
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), other_T))
+    assert residual.score_eligible is False
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident), review="rejected")
+    assert residual.score_eligible is False
+    assert "extract_review_permits_use" in residual.exclusions
+
+    kems = F.kems_experiment(orifice_area=None, clausing=None, kn=None, calibrated=False)
+    ident_p = F.psat_identity("Na")
+    ref_p = F.observation(
+        "na-psat",
+        kems.experiment_id,
+        ident_p,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, _ = _compile(
+        ref_p,
+        kems,
+        _predict(Decimal("0.1"), ident_p),
+    )
+    assert residual.score_eligible is False
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert "validity_gates_pass" in residual.exclusions
+
+    parent = F.observation(
+        "raw-parent",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    child = F.observation(
+        "derived-child",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=("raw-parent",),
+        source_id="work-1",
+    )
+    residual, _ = _compile(
+        child,
+        exp,
+        _predict(Decimal("0"), ident),
+        extra_obs=(parent,),
+    )
+    assert residual.score_eligible is False
+    assert "selected_independent_lineage_level" in residual.exclusions
+
+    ident_p = F.psat_identity("Na")
+    ref_p = F.observation(
+        "na-floor",
+        exp.experiment_id,
+        ident_p,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    floor = Notice(
+        kind=NoticeKind.FLOOR_INVERSION,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="floor",
+        origin="catalog:Na",
+        original=Decimal("1e-30"),
+    )
+    residual, _ = _compile(
+        ref_p,
+        exp,
+        _predict(Decimal("0.1"), ident_p, notices=(floor,)),
+    )
+    assert residual.score_eligible is False
+    assert residual.numeric is None or "no_blocking_qualification" in residual.exclusions or residual.status is ResidualStatus.REFUSED
+
+
+def test_qualification_notice_carried() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.activity_identity()
+    ref = F.observation(
+        "act-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    notice = Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="MELTS qualification outside commissioning band",
+        origin="engine:alphamelts",
+        band="SiO2 40-80 wt%",
+    )
+    residual, candidate = _compile(
+        ref,
+        exp,
+        _predict(
+            Decimal("0.5"),
+            ident,
+            notices=(notice,),
+            authority=Authority.EXTRAPOLATED,
+        ),
+    )
+    kinds = {n.kind for n in residual.notices}
+    assert NoticeKind.OUT_OF_CERTIFIED_BAND in kinds
+    assert candidate is not None
+    assert candidate.authority is Authority.EXTRAPOLATED
+
+
+def test_metric_domain_refuses_zero_and_negative_dex() -> None:
+    # Premise: dex = log10(C/R) requires C>0 and R>0. Zero is not a priceable dex.
+    assert compute_metric(MetricOperation.DEX, Decimal("0"), Decimal("1")) is None
+    assert compute_metric(MetricOperation.RELATIVE, Decimal("1"), Decimal("0")) is None
+    value = compute_metric(MetricOperation.DEX, Decimal("10"), Decimal("1"))
+    assert value == Decimal("1")
+    abs_v = compute_metric(MetricOperation.ABSOLUTE, Decimal("2"), Decimal("5"))
+    assert abs_v == Decimal("-3")
+
+
+def test_determinism_two_dumps_byte_identical() -> None:
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, candidate = _compile(
+        F.observation(
+            "o2-ref",
+            exp.experiment_id,
+            ident,
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        exp,
+        _predict(Decimal("0"), ident),
+    )
+    a = dumps_residual_line(residual, candidate)
+    b = dumps_residual_line(residual, candidate)
+    assert a == b
+
+
+def test_pins_never_widen() -> None:
+    baseline = [
+        PinBandRecord(
+            key="a",
+            expected_outcome="match",
+            evidence="test",
+            centre=Decimal("0"),
+            metric_operation="absolute",
+            metric_unit="kJ_per_declared_mol_basis",
+            pin_band_value=Decimal("0.05"),
+            pin_band_unit="kJ_per_declared_mol_basis",
+        )
+    ]
+    wider = [
+        replace(baseline[0], pin_band_value=Decimal("0.10")),
+    ]
+    with pytest.raises(PinWidenError, match="widened"):
+        assert_never_widen(wider, baseline)
+    narrower = [replace(baseline[0], pin_band_value=Decimal("0.02"))]
+    assert_never_widen(narrower, baseline)
+
+
+def test_changed_identity_preserves_tombstone() -> None:
+    old = PinBandRecord(
+        key="old-key",
+        expected_outcome="mismatch",
+        evidence="test",
+        centre=Decimal("0.4"),
+        metric_operation="absolute",
+        metric_unit="kJ_per_declared_mol_basis",
+        pin_band_value=Decimal("0.05"),
+        pin_band_unit="kJ_per_declared_mol_basis",
+    )
+    tomb = tombstone_for_changed_identity(old, new_key="new-key")
+    assert tomb.tombstone is True
+    assert tomb.key == "old-key"
+    assert tomb.centre == Decimal("0.4")
+    assert "old-key" in tomb.aliases
+
+
+def test_missing_live_result_is_coverage_failure() -> None:
+    record = PinBandRecord(
+        key="missing",
+        expected_outcome="match",
+        evidence="test",
+        centre=Decimal("0"),
+        metric_operation="dex",
+        metric_unit="dimensionless",
+        pin_band_value=Decimal("0.01"),
+        pin_band_unit="dimensionless",
+    )
+    failures = pin_failures([], [record])
+    assert failures
+    assert failures[0]["reason"] == "coverage_failure"
