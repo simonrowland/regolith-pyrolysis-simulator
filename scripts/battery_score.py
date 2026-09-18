@@ -185,7 +185,6 @@ def main(argv: list[str] | None = None) -> int:
         recorded = load_residuals_stamp(residuals_path)
         live = derive_store_stamp(args.root)
         mismatch = emit_store_stamp_mismatch_warning(recorded, live)
-        stamp = recorded if recorded is not None else live
         failures: list[dict] = []
         unmapped: list[str] = []
         diffs: list[dict] = []
@@ -222,9 +221,8 @@ def main(argv: list[str] | None = None) -> int:
             pin_failures=failures,
             status_diff=diffs,
             unmapped_legacy_keys=unmapped,
-            store_stamp=stamp,
+            store_stamp=recorded,
             mismatch_warning=mismatch,
-            root=args.root,
         )
         report_path.write_text(report, encoding="utf-8")
         print(f"report-only residuals={len(payloads)} pin_failures={len(failures)}")

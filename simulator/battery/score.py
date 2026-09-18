@@ -134,6 +134,9 @@ COMPILATION_SOURCE_MARKERS: frozenset[str] = frozenset(
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
 
 STORE_STAMP_KIND = "battery_store_stamp"
+UNKNOWN_STORE_PROVENANCE_LINE = (
+    "The measuring store for this ledger is unknown."
+)
 STORE_REVISION_PATHS: tuple[str, ...] = (
     "data/literature/observations-v2",
     "data/literature/extracts-v2",
@@ -1735,8 +1738,38 @@ def dumps_store_stamp(stamp: Mapping[str, object]) -> str:
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
+class UnregeneratedLedgerStampError(ValueError):
+    """Raised when a store stamp is requested for a ledger this run did not produce."""
+
+
+def stamp_existing_residuals_jsonl(
+    path: Path,
+    stamp: Mapping[str, object] | None = None,
+    *,
+    root: Path | None = None,
+) -> None:
+    """Refuse to stamp a residuals ledger this run did not regenerate.
+
+    The only writer is write_residuals_jsonl, which emits the stamp with
+    the residual body produced in the same scoring run. This named path
+    exists so a prepend onto an already-written body cannot recur.
+    """
+
+    del path, stamp, root
+    raise UnregeneratedLedgerStampError(
+        "cannot attach a store stamp to a residuals ledger that was not regenerated in this run"
+    )
+
+
 def is_store_stamp_payload(payload: object) -> bool:
     return isinstance(payload, Mapping) and payload.get("kind") == STORE_STAMP_KIND
+
+
+def store_stamp_has_known_revision(stamp: Mapping[str, object] | None) -> bool:
+    if not isinstance(stamp, Mapping):
+        return False
+    revision = stamp.get("revision")
+    return bool(revision) and str(revision) not in {"", "unknown"}
 
 
 def load_residuals_stamp(path: Path) -> dict[str, object] | None:
@@ -1757,10 +1790,11 @@ def store_stamp_mismatch_warning(
     live: Mapping[str, object],
 ) -> str | None:
     live_rev = str(live.get("revision") or "")
-    if not recorded or not recorded.get("revision"):
+    if not store_stamp_has_known_revision(recorded):
         return (
             f"residuals ledger has no store revision; live store is `{live_rev}`"
         )
+    assert recorded is not None
     recorded_rev = str(recorded["revision"])
     if recorded_rev != live_rev:
         return (
@@ -1781,18 +1815,22 @@ def emit_store_stamp_mismatch_warning(
 
 
 def format_store_stamp_report_lines(
-    stamp: Mapping[str, object],
+    stamp: Mapping[str, object] | None,
     *,
     mismatch_warning: str | None = None,
 ) -> list[str]:
-    lines = [
-        (
-            f"This report measured store `{stamp['revision']}`: "
-            f"{stamp['rows_in']} rows in, {stamp['observations']} observations, "
-            f"{stamp['works']} works, {stamp['experiments']} experiments, "
-            f"queue {stamp['queue']}, {stamp['hard_issues']} hard issues."
-        ),
-    ]
+    if not store_stamp_has_known_revision(stamp):
+        lines = [UNKNOWN_STORE_PROVENANCE_LINE]
+    else:
+        assert stamp is not None
+        lines = [
+            (
+                f"This report measured store `{stamp['revision']}`: "
+                f"{stamp['rows_in']} rows in, {stamp['observations']} observations, "
+                f"{stamp['works']} works, {stamp['experiments']} experiments, "
+                f"queue {stamp['queue']}, {stamp['hard_issues']} hard issues."
+            ),
+        ]
     if mismatch_warning:
         lines.extend(["", f"Warning: {mismatch_warning}"])
     return lines
@@ -2223,9 +2261,7 @@ def render_score_report_from_payloads(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     mismatch_warning: str | None = None,
-    root: Path | None = None,
 ) -> str:
-    stamp = store_stamp if store_stamp is not None else derive_store_stamp(root or REPO_ROOT)
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
@@ -2238,7 +2274,9 @@ def render_score_report_from_payloads(
     ]
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
-    lines.extend(["", *format_store_stamp_report_lines(stamp, mismatch_warning=mismatch_warning)])
+    lines.extend(
+        ["", *format_store_stamp_report_lines(store_stamp, mismatch_warning=mismatch_warning)]
+    )
     lines.extend(
         [
             "",

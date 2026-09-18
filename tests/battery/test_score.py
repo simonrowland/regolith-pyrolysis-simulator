@@ -1029,6 +1029,75 @@ def test_score_report_from_payloads_surfaces_mismatch_warning() -> None:
     assert "Warning:" not in silent
 
 
+def test_unstamped_ledger_report_is_unknown_provenance() -> None:
+    from simulator.battery.score import (
+        render_score_report_from_payloads,
+        store_stamp_mismatch_warning,
+    )
+
+    live = _stamp()
+    warning = store_stamp_mismatch_warning(None, live)
+    report = render_score_report_from_payloads(
+        [],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        store_stamp=None,
+        mismatch_warning=warning,
+    )
+    assert "The measuring store for this ledger is unknown" in report
+    assert "This report measured store" not in report
+    assert "Warning:" in report
+    assert "no store revision" in report
+    assert "aaa111ccc" in report
+    quiet = render_score_report_from_payloads(
+        [],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        store_stamp=None,
+        mismatch_warning=None,
+    )
+    assert "The measuring store for this ledger is unknown" in quiet
+    assert "This report measured store" not in quiet
+
+
+def test_unknown_provenance_mismatch_is_as_loud_as_disagreement() -> None:
+    from simulator.battery.score import (
+        emit_store_stamp_mismatch_warning,
+        store_stamp_mismatch_warning,
+    )
+
+    live = _stamp()
+    unknown = store_stamp_mismatch_warning(None, live)
+    disagreed = store_stamp_mismatch_warning(_stamp(revision="bbb222ddd"), live)
+    assert unknown is not None
+    assert disagreed is not None
+    assert "no store revision" in unknown
+    assert "aaa111ccc" in unknown
+    assert "bbb222ddd" in disagreed
+    assert store_stamp_mismatch_warning(live, live) is None
+    with pytest.warns(UserWarning, match="no store revision"):
+        emitted = emit_store_stamp_mismatch_warning(None, live)
+    assert emitted == unknown
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        assert emit_store_stamp_mismatch_warning(live, live) is None
+        assert caught == []
+
+
+def test_stamp_existing_residuals_refuses_unregenerated_body(tmp_path: Path) -> None:
+    from simulator.battery.score import (
+        UnregeneratedLedgerStampError,
+        stamp_existing_residuals_jsonl,
+    )
+
+    path = tmp_path / "residuals.jsonl"
+    body = '{"key":"existing-row"}\n'
+    path.write_text(body, encoding="utf-8")
+    with pytest.raises(UnregeneratedLedgerStampError, match="not regenerated"):
+        stamp_existing_residuals_jsonl(path, _stamp())
+    assert path.read_text(encoding="utf-8") == body
+
+
 def test_battery_score_script_does_not_take_a_hand_stamp() -> None:
     src = Path("scripts/battery_score.py").read_text(encoding="utf-8")
     tree = ast.parse(src)
@@ -1045,6 +1114,7 @@ def test_battery_score_script_does_not_take_a_hand_stamp() -> None:
     assert "--revision" not in flags
     assert "--store-revision" not in flags
     assert "--stamp" not in flags
+    assert "recorded if recorded is not None else live" not in src
     assert "derive_store_stamp" in src
     from simulator.battery import score as score_mod
 
