@@ -24,6 +24,7 @@ from simulator.battery.polymorph_dictionary import (
     classify_printed_qualifier,
     coerce_polymorph_token,
     printed_qualifier_from_name,
+    unrecognised_polymorph_spelling,
 )
 from simulator.battery.records import Species, State
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
@@ -279,7 +280,27 @@ def test_species_migration_is_byte_identical() -> None:
     assert migrated.polymorph is not None
     assert migrated.polymorph.is_unknown
     assert "not-a-real-form" in (migrated.polymorph.reason or "")
+    assert unrecognised_polymorph_spelling(migrated.polymorph.reason) == "not-a-real-form"
     assert to_plain(migrate_species_payload(to_plain(migrated))) == to_plain(migrated)  # type: ignore[arg-type]
+
+
+def test_unrecognised_polymorph_degrades_rather_than_raises() -> None:
+    species = Species("MgO", Phase.CR, polymorph=State.of("not-a-real-form"))
+    assert species.polymorph is not None
+    assert species.polymorph.is_unknown
+    assert species.polymorph.value is None
+    assert unrecognised_polymorph_spelling(species.polymorph.reason) == "not-a-real-form"
+
+
+def test_known_polymorph_is_still_coerced_strictly() -> None:
+    species = Species("Al2SiO5", Phase.CR, polymorph=State.of("Kyanite"))
+    assert species.polymorph is not None
+    assert species.polymorph.is_value
+    assert species.polymorph.value is Polymorph.KYANITE
+    periclase = Species("MgO", Phase.CR, polymorph=State.of("PERICLASE"))
+    assert periclase.polymorph is not None
+    assert periclase.polymorph.is_value
+    assert periclase.polymorph.value is Polymorph.PERICLASE
 
 
 def test_ion_and_pressure_tables_do_not_stamp_a_crystal_type() -> None:

@@ -674,10 +674,10 @@ def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
         try:
             polymorph_state = _state_from_plain(polymorph, _polymorph_from_plain)
         except ValueError:
+            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+
             raw = polymorph.get("value") if isinstance(polymorph, Mapping) else polymorph
-            polymorph_state = State.unknown(
-                f"legacy free-form polymorph {raw!r} is not a closed Polymorph token"
-            )
+            polymorph_state = State.unknown(unrecognised_polymorph_reason(raw))
     charge_payload = payload.get("charge")
     charge_state: State[int] | None
     if charge_payload is None:
@@ -1223,6 +1223,7 @@ class MigrationResult:
     aliases: dict[str, str] = field(default_factory=dict)
     dedupe_aliases: list[DedupeAlias] = field(default_factory=list)
     evidence_fallthrough: dict[str, int] = field(default_factory=dict)
+    unrecognised_polymorphs: dict[str, int] = field(default_factory=dict)
     validation: ValidationReport | None = None
 
     def add_queue(
@@ -3983,6 +3984,32 @@ class Migrator:
         self._count(source_key).observations_out += 1
         if source_row_index is not None:
             self._obs_row_index[oid] = source_row_index
+        poly = observation.identity.species.polymorph
+        if poly is not None and poly.is_unknown:
+            from simulator.battery.polymorph_dictionary import (
+                unrecognised_polymorph_reason,
+                unrecognised_polymorph_spelling,
+            )
+
+            spelling = unrecognised_polymorph_spelling(poly.reason)
+            if spelling is not None:
+                self.result.unrecognised_polymorphs[spelling] = (
+                    self.result.unrecognised_polymorphs.get(spelling, 0) + 1
+                )
+                exp = self.result.experiments.get(observation.experiment_id)
+                work_id = (
+                    exp.work_id
+                    if exp is not None and exp.work_id
+                    else observation.experiment_id.split("::", 1)[0]
+                )
+                self.result.add_queue(
+                    work_id,
+                    observation.locator,
+                    ["species.polymorph"],
+                    poly.reason or unrecognised_polymorph_reason(spelling),
+                    source=source_key,
+                    observation_id=oid,
+                )
 
     def migrate_extracts(self, directory: Path | None = None) -> None:
         for path in discover_extracts(directory or self.extracts_dir):
@@ -5921,6 +5948,23 @@ def write_report(result: MigrationResult, path: Path) -> None:
             ]
         )
         for token, n in sorted(result.evidence_fallthrough.items(), key=lambda kv: (-kv[1], kv[0])):
+            lines.append(f"| `{token}` | {n} |")
+    unrecognised = result.unrecognised_polymorphs
+    lines.extend(
+        [
+            "",
+            "## Unrecognised polymorph tokens",
+            "",
+            f"degradations: {sum(unrecognised.values())}",
+            "",
+            "Unrecognised printed spellings become State.unknown with the original "
+            "spelling in the reason; they are never dropped and never invented. "
+            "Each degradation is queued on species.polymorph.",
+        ]
+    )
+    if unrecognised:
+        lines.extend(["", "| token | count |", "|---|---:|"])
+        for token, n in sorted(unrecognised.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{token}` | {n} |")
     lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued |", "|---|---:|---:|---:|"])
     queued_by_source: dict[str, int] = defaultdict(int)

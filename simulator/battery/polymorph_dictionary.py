@@ -6,6 +6,7 @@ and pressure qualifiers are classified here and are never crystal tokens.
 
 from __future__ import annotations
 
+import ast
 import re
 from simulator.battery.enums import Polymorph, PrintedQualifierKind, StateTag
 
@@ -243,6 +244,32 @@ def printed_qualifier_from_title(title: str | None) -> str | None:
     left = str(title or "").split("|", 1)[0].strip()
     left = _TRAILING_FORMULA_RE.sub("", left).strip()
     return printed_qualifier_from_name(left)
+
+
+_UNRECOGNISED_POLYMORPH_RE = re.compile(
+    r"^unrecognised polymorph (.+) is not a closed Polymorph token$"
+)
+
+
+def unrecognised_polymorph_reason(spelling: object) -> str:
+    """Reason that preserves the original spelling for a later census."""
+
+    return f"unrecognised polymorph {str(spelling)!r} is not a closed Polymorph token"
+
+
+def unrecognised_polymorph_spelling(reason: str | None) -> str | None:
+    """Original spelling if ``reason`` is an unrecognised-token degradation."""
+
+    if not reason:
+        return None
+    match = _UNRECOGNISED_POLYMORPH_RE.fullmatch(reason)
+    if match is None:
+        return None
+    try:
+        value = ast.literal_eval(match.group(1))
+    except (SyntaxError, ValueError):
+        return None
+    return value if isinstance(value, str) else None
 
 
 def coerce_polymorph_token(value: object) -> Polymorph:

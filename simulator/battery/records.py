@@ -218,7 +218,12 @@ def _coerce_polymorph_state(polymorph: State[object] | None) -> State[Polymorph]
         return None
     if not polymorph.is_value:
         return polymorph  # type: ignore[return-value]
-    token = _coerce_polymorph_value(polymorph.value)
+    try:
+        token = _coerce_polymorph_value(polymorph.value)
+    except ValueError:
+        from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+
+        return State.unknown(unrecognised_polymorph_reason(polymorph.value))
     return State.of(token)
 
 

@@ -17,6 +17,7 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     MethodToken,
     Phase,
+    Polymorph,
     Quantity,
     Rail,
     StateTag,
@@ -490,6 +491,73 @@ def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None
 
 def _phase_state(obs):
     return obs.identity.species.phase
+
+
+def test_unrecognised_polymorph_is_counted_and_queued(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observations = extract["species"]["Na"]["observations"]
+    observations[0]["phase"] = "condensed_solid"
+    observations[0]["condensed_form"] = {"polymorph": "not-a-real-form"}
+    observations[0]["values"]["series"] = [{"T_K": 1200.0, "pressure_atm": 1.0}]
+    observations.append(
+        {
+            "observation_id": "na_kyanite",
+            "type": "psat_series",
+            "locator": {"table": "I", "page": 3},
+            "phase": "condensed_solid",
+            "condensed_form": {"polymorph": "Kyanite"},
+            "regime": "knudsen_effusion",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+                "series": [{"T_K": 1400.0, "pressure_atm": 3.0}],
+            },
+        }
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    unknown_rows = [
+        o
+        for o in result.observations.values()
+        if "na_psat" in o.observation_id
+    ]
+    known_rows = [
+        o
+        for o in result.observations.values()
+        if "na_kyanite" in o.observation_id
+    ]
+    assert unknown_rows
+    assert known_rows
+    for row in unknown_rows:
+        assert row.identity.species.polymorph.is_unknown
+        assert "not-a-real-form" in (row.identity.species.polymorph.reason or "")
+    for row in known_rows:
+        assert row.identity.species.polymorph.is_value
+        assert row.identity.species.polymorph.value is Polymorph.KYANITE
+    assert result.unrecognised_polymorphs == {"not-a-real-form": len(unknown_rows)}
+    queued = [
+        e
+        for e in result.queue
+        if e.observation_id is not None
+        and "na_psat" in e.observation_id
+        and "species.polymorph" in (e.axes or ())
+    ]
+    assert len(queued) == len(unknown_rows)
+    assert all("not-a-real-form" in e.why for e in queued)
+    report = (root / "data" / "battery" / "migration-report.md").read_text(encoding="utf-8")
+    assert "## Unrecognised polymorph tokens" in report
+    assert f"degradations: {len(unknown_rows)}" in report
+    assert "`not-a-real-form`" in report
+    known_queued = [
+        e
+        for e in result.queue
+        if e.observation_id is not None
+        and "na_kyanite" in e.observation_id
+        and "species.polymorph" in (e.axes or ())
+    ]
+    assert known_queued == []
 
 
 def test_g01_blank_phase_is_unknown_not_gas(tmp_path: Path) -> None:
