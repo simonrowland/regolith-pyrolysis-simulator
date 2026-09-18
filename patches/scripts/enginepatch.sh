@@ -10,9 +10,15 @@
 # Exit 0 = match, 1 = drift/failure. Safe to run in CI.
 set -uo pipefail
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# pwd -P is load-bearing. Reached through a symlink (e.g. ~/Repos/<repo> ->
+# a synced folder), bash's logical pwd makes "$PATCHES/../.." resolve to the
+# SYMLINK's parent rather than the real one -- so verify silently inspected a
+# different set of engine checkouts than the engines the code actually loads,
+# reporting drift on trees nothing reads and never checking the ones that
+# produce numbers.
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 PATCHES="$(dirname "$HERE")"
-SIBLINGS="$(cd "$PATCHES/../.." && pwd)"
+SIBLINGS="$(cd "$PATCHES/../.." && pwd -P)"
 
 engine_dir() {  # patch-dir name -> checkout path (siblings by default; sulfliq is non-sibling)
   case "$1" in
