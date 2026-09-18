@@ -433,6 +433,21 @@ def test_neighbour_sign_disabled_on_298k_table() -> None:
     assert "298.15" in generated.report["neighbour_sign"]["reason"]
 
 
+def test_neighbour_sign_report_matches_refuse_branch() -> None:
+    table1 = _generation(TABLE1)
+    assert table1.report["neighbour_sign"]["applied"] is False
+    assert table1.report["neighbour_sign"]["disabled_on_table1_table2"] is True
+    table2 = _generation("robie-hemingway-fisher-1978-usgs-b1452-0002")
+    assert table2.report["neighbour_sign"]["applied"] is False
+    assert table2.report["neighbour_sign"]["disabled_on_table1_table2"] is True
+    ht = _generation(SILVER_HT)
+    assert ht.report["neighbour_sign"]["applied"] is True
+    assert ht.report["neighbour_sign"]["disabled_on_table1_table2"] is False
+    table = _generation(TABLE_298K)
+    assert table.report["neighbour_sign"]["applied"] is False
+    assert table.report["neighbour_sign"]["disabled_on_298k"] is True
+
+
 def test_neighbour_sign_refuses_ht_seeded_dropped_minus() -> None:
     payload = _load(FAYALITE_OXIDES)
     original = payload["rows"][4]["cells"]["formation_enthalpy"]["as_published"]

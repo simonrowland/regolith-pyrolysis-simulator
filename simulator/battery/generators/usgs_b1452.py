@@ -1461,7 +1461,7 @@ def _signed_series(
         list
     )
     for token in tokens:
-        if token.table_kind == "table_298k":
+        if token.table_kind != "ht_grid":
             continue
         if token.row_index is None:
             continue
@@ -1868,7 +1868,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             )
             continue
         if (
-            kind != "table_298k"
+            kind == "ht_grid"
             and isinstance(value, Decimal)
             and token.column not in TEXT_COLUMNS
         ):
@@ -2007,6 +2007,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         "neighbour_sign": {
             "applied": kind == "ht_grid",
             "disabled_on_298k": kind == "table_298k",
+            "disabled_on_table1_table2": kind in {"table1_symbols", "table2_weights"},
             "reason": NEIGHBOUR_SIGN_DISABLED_REASON,
         },
         "merged_cell_splits": {
