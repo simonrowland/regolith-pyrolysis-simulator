@@ -28,20 +28,20 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
 B1452_RAW = 55707
-B1452_STORED = 10456
-B1452_REFUSED = 24417
+B1452_STORED = 10664
+B1452_REFUSED = 24209
 B1452_EXCLUDED = 20834
-B1452_MERGED_PROPOSED = 347
-B1452_MERGED_STORED = 160
-B1452_MERGED_REFUSED = 121
-B1452_MERGED_REFUSED_10X = 113
+B1452_MERGED_PROPOSED = 457
+B1452_MERGED_STORED = 367
+B1452_MERGED_REFUSED = 24
+B1452_MERGED_REFUSED_10X = 4
 B1452_MERGED_EXCLUDED = 66
 B1452_UNGUARDED_MERGED_STORED = 160
 B1452_UNGUARDED_298K_S = 155
 B1452_UNGUARDED_HT_DH = 4
 B1452_UNGUARDED_HT_CP = 1
-B1452_IDENTITY_10X = 315
-B1452_IDENTITY_1X_10X = 8
+B1452_IDENTITY_10X = 205
+B1452_IDENTITY_1X_10X = 9
 HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 219
@@ -358,6 +358,19 @@ def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
     assert splits["refused"] >= 1
     assert splits["refused_10x"] >= 1
     assert splits["stored"] == splits["proposed"] - splits["refused"] - splits["excluded"]
+    identity = [
+        row
+        for row in generated.report["identity_results"]
+        if row.get("identity") == "planck_vs_S_minus_HHT"
+        and row.get("row_index") == 15
+    ]
+    assert identity
+    assert identity[0]["ok"] is False
+    assert identity[0]["printed"] == "2.29.48"
+    assert Decimal(identity[0]["calculated"]) == Decimal("229.482")
+    assert Decimal(identity[0]["absolute_residual"]) > 10 * Decimal(
+        identity[0]["rounding_tolerance"]
+    )
 
 
 def test_unguarded_298k_entropy_splits_are_named() -> None:
@@ -365,9 +378,9 @@ def test_unguarded_298k_entropy_splits_are_named() -> None:
 
     generated = _generation(TABLE_298K)
     splits = generated.report["merged_cell_splits"]
-    assert splits["unguarded_stored"] == splits["stored"]
+    assert splits["unguarded_stored"] < splits["stored"]
     assert splits["unguarded_by_quantity"] == {"S": B1452_UNGUARDED_298K_S}
-    assert "grain rule alone" in splits["unguarded_reason"]
+    assert splits["unguarded_stored"] == B1452_UNGUARDED_298K_S
     assert "(H−H298)/T" in splits["unguarded_reason"]
     silver = _observations_for(
         generated, Quantity.S, temperature="298.15", formula="Ag", row=0
@@ -377,51 +390,95 @@ def test_unguarded_298k_entropy_splits_are_named() -> None:
     assert silver[0].value.point == Decimal("42.55")
 
 
-def test_merged_integer_without_unique_grain_split_is_refused() -> None:
+def test_ag_plus_jammed_gibbs_recovers_via_reconstructed_identity() -> None:
+    """Glued 77077100 is 77077±100 J; identity on the reconstructed value passes."""
+
     generated = _generation(TABLE_298K)
-    ag_plus_h = [
+    results = [
+        row
+        for row in generated.report["identity_results"]
+        if row.get("row_index") == 1 and row.get("identity") == "log10_Kf_from_delta_fG"
+    ]
+    assert len(results) == 1
+    assert results[0]["ok"] is True
+    assert results[0]["reconstructed_gibbs"] == "77077"
+    stored_g = _observations_for(
+        generated, Quantity.DELTA_FG, temperature="298.15", formula="Ag", row=1
+    )
+    stored_k = _observations_for(
+        generated, Quantity.LOG10_KF, temperature="298.15", formula="Ag", row=1
+    )
+    stored_h = _observations_for(
+        generated, Quantity.DELTA_FH, temperature="298.15", formula="Ag", row=1
+    )
+    assert len(stored_g) == 1
+    assert stored_g[0].value.point == Decimal("77.077")
+    assert stored_g[0].value.point != Decimal("77077.100")
+    assert stored_g[0].value.point != Decimal("77077100")
+    assert len(stored_k) == 1
+    assert stored_k[0].value.point == Decimal("-13.504")
+    assert stored_h == []
+    refused_h = [
         row
         for row in generated.report["refusals"]
         if row["as_published"] == "10575085" and row["row_index"] == 1
     ]
-    ag_plus_g = [
-        row
-        for row in generated.report["refusals"]
-        if row["as_published"] == "77077100" and row["row_index"] == 1
-    ]
-    assert ag_plus_h or ag_plus_g
-    stored_h = _observations_for(
-        generated, Quantity.DELTA_FH, temperature="298.15", formula="Ag", row=1
-    )
-    stored_g = _observations_for(
-        generated, Quantity.DELTA_FG, temperature="298.15", formula="Ag", row=1
-    )
-    assert stored_h == []
-    assert stored_g == []
-    for observation in (*stored_h, *stored_g):
-        assert observation.value.point != Decimal("10575.085")
-        assert observation.value.point != Decimal("10575085")
+    assert refused_h
+    assert "unique split" in refused_h[0]["reason"]
+    assert "10×" not in refused_h[0]["reason"]
 
 
-def test_corundum_298k_jammed_formation_refused_by_10x_or_merge() -> None:
+def test_corundum_298k_jammed_gibbs_recovers_via_reconstructed_identity() -> None:
     generated = _generation(TABLE_298K)
-    stored_h = _observations_for(
-        generated, Quantity.DELTA_FH, temperature="298.15", formula="Al2O3", row=261
-    )
     stored_g = _observations_for(
         generated, Quantity.DELTA_FG, temperature="298.15", formula="Al2O3", row=261
     )
+    stored_k = _observations_for(
+        generated, Quantity.LOG10_KF, temperature="298.15", formula="Al2O3", row=261
+    )
+    stored_h = _observations_for(
+        generated, Quantity.DELTA_FH, temperature="298.15", formula="Al2O3", row=261
+    )
+    assert len(stored_g) == 1
+    assert stored_g[0].value.point == Decimal("-1582.228")
+    assert len(stored_k) == 1
+    assert stored_k[0].value.point == Decimal("277.201")
     assert stored_h == []
+    refused_h = [
+        row
+        for row in generated.report["refusals"]
+        if row["row_index"] == 261 and row["column"] == "formation_enthalpy"
+    ]
+    assert refused_h
+    assert "unique split" in refused_h[0]["reason"]
+
+
+def test_hematite_glued_gibbs_without_passing_cut_stays_10x() -> None:
+    generated = _generation(TABLE_298K)
+    stored_g = _observations_for(
+        generated, Quantity.DELTA_FG, temperature="298.15", formula="Fe2O3", row=297
+    )
+    stored_k = _observations_for(
+        generated, Quantity.LOG10_KF, temperature="298.15", formula="Fe2O3", row=297
+    )
     assert stored_g == []
+    assert stored_k == []
     refused = [
         row
         for row in generated.report["refusals"]
-        if row["row_index"] == 261
-        and row["column"] in {"formation_enthalpy", "formation_gibbs_energy", "log_kf"}
+        if row["row_index"] == 297
+        and row["column"] in {"formation_gibbs_energy", "log_kf"}
+        and "10×" in row["reason"]
     ]
-    assert refused
-    reasons = " ".join(row["reason"] for row in refused)
-    assert "10×" in reasons or "merged" in reasons or "identity" in reasons
+    assert {row["column"] for row in refused} >= {"formation_gibbs_energy", "log_kf"}
+    results = [
+        row
+        for row in generated.report["identity_results"]
+        if row.get("row_index") == 297 and row.get("identity") == "log10_Kf_from_delta_fG"
+    ]
+    assert results
+    assert results[0]["ok"] is False
+    assert "reconstructed_gibbs" not in results[0]
 
 
 def test_neighbour_sign_disabled_on_298k_table() -> None:
@@ -679,6 +736,7 @@ def test_full_census_closes() -> None:
     raw = stored = refused = excluded = 0
     merged_proposed = merged_stored = merged_refused = merged_refused_10x = merged_excluded = 0
     unguarded_s = unguarded_dh = unguarded_cp = 0
+    unguarded_total = 0
     identity_10x = 0
     identity_1x_10x = 0
     identity_band = 0
@@ -706,7 +764,8 @@ def test_full_census_closes() -> None:
         unguarded_s += int(unguarded.get("S") or 0)
         unguarded_dh += int(unguarded.get("delta_fH") or 0)
         unguarded_cp += int(unguarded.get("cp") or 0)
-        assert int(splits["unguarded_stored"]) == int(splits["stored"])
+        unguarded_total += int(splits["unguarded_stored"])
+        assert int(splits["unguarded_stored"]) <= int(splits["stored"])
         assert (
             int(splits["proposed"])
             == int(splits["stored"]) + int(splits["refused"]) + int(splits["excluded"])
@@ -762,7 +821,8 @@ def test_full_census_closes() -> None:
     assert merged_refused_10x == B1452_MERGED_REFUSED_10X
     assert merged_excluded == B1452_MERGED_EXCLUDED
     assert merged_proposed == merged_stored + merged_refused + merged_excluded
-    assert merged_stored == B1452_UNGUARDED_MERGED_STORED
+    assert merged_stored != B1452_UNGUARDED_MERGED_STORED
+    assert unguarded_total == B1452_UNGUARDED_MERGED_STORED
     assert unguarded_s == B1452_UNGUARDED_298K_S
     assert unguarded_dh == B1452_UNGUARDED_HT_DH
     assert unguarded_cp == B1452_UNGUARDED_HT_CP
@@ -786,6 +846,7 @@ def test_full_census_closes() -> None:
             "merged_refused": merged_refused,
             "merged_refused_10x": merged_refused_10x,
             "merged_excluded": merged_excluded,
+            "unguarded_stored": unguarded_total,
             "unguarded_298k_S": unguarded_s,
             "unguarded_ht_delta_fH": unguarded_dh,
             "unguarded_ht_cp": unguarded_cp,

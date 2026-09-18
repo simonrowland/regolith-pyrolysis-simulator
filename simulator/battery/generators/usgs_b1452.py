@@ -191,11 +191,15 @@ NEIGHBOUR_SIGN_DISABLED_REASON = (
 )
 MERGED_SPLIT_METHOD = "split_merged_value_uncertainty_by_column_grain"
 UNGUARDED_MERGED_REASON = (
-    "grain-unique two-dot splits that stored have no independent identity net: "
-    "the 298 K table has no (H−H298)/T or −(G−H298)/T, so Gibbs 10× cannot see "
-    "entropy_s298 splits; 10× log Kf marks log_kf, ΔfG, and ΔfH only on that "
-    "table; HT Cp has no identity; HT ΔfH is not a log Kf 10× participant. "
-    "Stored splits rest on the grain rule alone."
+    "a stored merged split is unguarded when its (row, column) did not "
+    "participate in a passing identity (ok or 1×–10× notice). 298 K "
+    "entropy_s298 still has no (H−H298)/T or −(G−H298)/T, so Gibbs 10× "
+    "cannot see those splits; HT Cp has no identity; HT ΔfH is not a "
+    "log Kf 10× participant."
+)
+INTEGER_GLUE_NO_UNIQUE_SPLIT = (
+    "merged value+uncertainty has no unique split at column printed grain; "
+    "not stored as the glued integer"
 )
 FORMULA_UNRESOLVED_REASON_PREFIX = "no page-grounded formula;"
 FORMULA_CONFLICT_REASON_PREFIX = "conflicting page-grounded formulas;"
@@ -456,18 +460,12 @@ def _column_grain_map(
     }
 
 
-def _unique_grain_split(
+def _grain_valid_splits(
     text: str, value_grain: Decimal, unc_grain: Decimal
-) -> tuple[Decimal, Decimal] | None:
-    """Split a glued value+uncertainty only when both halves match printed grain.
-
-    `42.550.21` with entropy grain 0.01 is uniquely 42.55 and 0.21.
-    `10575085` with integer grain 1 has many integer/integer cuts — refuse.
-    """
-
+) -> list[tuple[Decimal, Decimal]]:
     payload = text.strip()
     if not payload:
-        return None
+        return []
     matches: list[tuple[Decimal, Decimal]] = []
     for index in range(1, len(payload)):
         left_text = payload[:index]
@@ -483,7 +481,19 @@ def _unique_grain_split(
         if _value_grain(right) != unc_grain:
             continue
         matches.append((left, right))
-    unique = set(matches)
+    return matches
+
+
+def _unique_grain_split(
+    text: str, value_grain: Decimal, unc_grain: Decimal
+) -> tuple[Decimal, Decimal] | None:
+    """Split a glued value+uncertainty only when both halves match printed grain.
+
+    `42.550.21` with entropy grain 0.01 is uniquely 42.55 and 0.21.
+    `10575085` with integer grain 1 has many integer/integer cuts — refuse.
+    """
+
+    unique = set(_grain_valid_splits(text, value_grain, unc_grain))
     if len(unique) != 1:
         return None
     return next(iter(unique))
@@ -639,6 +649,72 @@ def _identity_token_text(
     if reason is not None or value is None:
         return None
     return format(value, "f")
+
+
+def _merged_split_record(
+    value: Decimal,
+    uncertainty: Decimal,
+    *,
+    evidence: str,
+) -> dict[str, Any]:
+    return {
+        "value": value,
+        "uncertainty": uncertainty,
+        "method_class": MERGED_SPLIT_METHOD,
+        "evidence": evidence,
+    }
+
+
+def _recover_glued_gibbs_via_logk(
+    token: RawToken,
+    grains: Mapping[tuple[str, str | None], Decimal],
+    t_text: str,
+    logk_text: str,
+    gibbs_unit: str,
+) -> tuple[dict[str, Any], Decimal, Decimal, Decimal] | None:
+    """If a jammed integer ΔfG fails 10×, keep the unique grain cut that restores identity.
+
+    Does not widen the 10× band. Ambiguous cuts stay unrecovered.
+    """
+
+    payload = _numeric_payload(token.as_published)
+    if not payload or _published_decimal(payload) is None or payload.count(".") >= 2:
+        return None
+    grain = grains.get((token.column, token.formation_basis))
+    if grain is None:
+        return None
+    passing_1x: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
+    passing_notice: list[tuple[Decimal, Decimal, Decimal, Decimal, Decimal]] = []
+    for value, uncertainty in _grain_valid_splits(payload, grain, grain):
+        checked = _logk_identity(
+            t_text, format(value, "f"), logk_text, gibbs_page_unit=gibbs_unit
+        )
+        if checked is None:
+            continue
+        residual, tolerance, calculated = checked
+        item = (value, uncertainty, residual, tolerance, calculated)
+        if residual <= tolerance:
+            passing_1x.append(item)
+        elif residual <= 10 * tolerance:
+            passing_notice.append(item)
+    chosen: tuple[Decimal, Decimal, Decimal, Decimal, Decimal] | None = None
+    if len(passing_1x) == 1:
+        chosen = passing_1x[0]
+    elif not passing_1x and len(passing_notice) == 1:
+        chosen = passing_notice[0]
+    if chosen is None:
+        return None
+    value, uncertainty, residual, tolerance, calculated = chosen
+    reconstruction = _merged_split_record(
+        value,
+        uncertainty,
+        evidence=(
+            f"merged value+uncertainty {token.as_published!r} has several grain-"
+            f"{grain} cuts; log10_Kf identity uniquely selects {value} ± "
+            f"{uncertainty}"
+        ),
+    )
+    return reconstruction, residual, tolerance, calculated
 
 
 def _logk_identity(
@@ -1639,6 +1715,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     identity_results: list[dict[str, Any]] = []
     identity_fail_10x: set[tuple[int, str]] = set()
     identity_notice: dict[tuple[int, str], tuple[Decimal, Decimal]] = {}
+    identity_guarded: set[tuple[int, str]] = set()
+    guided_recon: dict[tuple[int, str], dict[str, Any]] = {}
+    integer_glue_refuse: dict[tuple[int, str], str] = {}
     rows = payload.get("rows") or []
     if isinstance(rows, list) and kind in {"ht_grid", "table_298k"}:
         for row_index, row in enumerate(rows):
@@ -1688,19 +1767,23 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                         identity_fail_10x.add((row_index, "negative_gibbs_function"))
                         identity_fail_10x.add((row_index, "entropy"))
                         identity_fail_10x.add((row_index, "enthalpy_function"))
-                    elif residual > tolerance:
-                        identity_notice[(row_index, "negative_gibbs_function")] = (
-                            residual,
-                            tolerance,
-                        )
-                        identity_notice[(row_index, "entropy")] = (
-                            residual,
-                            tolerance,
-                        )
-                        identity_notice[(row_index, "enthalpy_function")] = (
-                            residual,
-                            tolerance,
-                        )
+                    else:
+                        identity_guarded.add((row_index, "negative_gibbs_function"))
+                        identity_guarded.add((row_index, "entropy"))
+                        identity_guarded.add((row_index, "enthalpy_function"))
+                        if residual > tolerance:
+                            identity_notice[(row_index, "negative_gibbs_function")] = (
+                                residual,
+                                tolerance,
+                            )
+                            identity_notice[(row_index, "entropy")] = (
+                                residual,
+                                tolerance,
+                            )
+                            identity_notice[(row_index, "enthalpy_function")] = (
+                                residual,
+                                tolerance,
+                            )
                 gibbs_unit = "kJ/mol"
             else:
                 t_text = "298.15"
@@ -1717,35 +1800,59 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             if checked is None:
                 continue
             residual, tolerance, calculated = checked
-            identity_results.append(
-                {
-                    "row_index": row_index,
-                    "temperature_as_published": t_text,
-                    "identity": "log10_Kf_from_delta_fG",
-                    "formation_basis": dg_tok.formation_basis if dg_tok else None,
-                    "printed": logk_tok.as_published if logk_tok else logk_text,
-                    "calculated": str(calculated),
-                    "absolute_residual": str(residual),
-                    "rounding_tolerance": str(tolerance),
-                    "ok": residual <= tolerance,
-                    "gibbs_page_unit": gibbs_unit,
-                }
-            )
+            recovered_gibbs = None
+            if residual > 10 * tolerance and dg_tok is not None:
+                recovered = _recover_glued_gibbs_via_logk(
+                    dg_tok, grains, t_text, logk_text, gibbs_unit
+                )
+                if recovered is not None:
+                    reconstruction, residual, tolerance, calculated = recovered
+                    recovered_gibbs = reconstruction["value"]
+                    guided_recon[(row_index, "formation_gibbs_energy")] = reconstruction
+                    dh_tok = _token_lookup(tokens, row_index, "formation_enthalpy")
+                    if dh_tok is not None:
+                        dh_payload = _numeric_payload(dh_tok.as_published)
+                        dh_grain = grains.get((dh_tok.column, dh_tok.formation_basis))
+                        if (
+                            dh_payload
+                            and _published_decimal(dh_payload) is not None
+                            and dh_payload.count(".") < 2
+                            and dh_grain is not None
+                            and len(_grain_valid_splits(dh_payload, dh_grain, dh_grain))
+                            != 1
+                        ):
+                            integer_glue_refuse[(row_index, "formation_enthalpy")] = (
+                                INTEGER_GLUE_NO_UNIQUE_SPLIT
+                            )
+            result = {
+                "row_index": row_index,
+                "temperature_as_published": t_text,
+                "identity": "log10_Kf_from_delta_fG",
+                "formation_basis": dg_tok.formation_basis if dg_tok else None,
+                "printed": logk_tok.as_published if logk_tok else logk_text,
+                "calculated": str(calculated),
+                "absolute_residual": str(residual),
+                "rounding_tolerance": str(tolerance),
+                "ok": residual <= tolerance,
+                "gibbs_page_unit": gibbs_unit,
+            }
+            if recovered_gibbs is not None:
+                result["reconstructed_gibbs"] = str(recovered_gibbs)
+            identity_results.append(result)
             if residual > 10 * tolerance:
                 identity_fail_10x.add((row_index, "log_kf"))
                 identity_fail_10x.add((row_index, "formation_gibbs_energy"))
                 if kind == "table_298k":
-                    # 298 K jammed integers glue value to uncertainty on every
-                    # formation column of the row (recon: 10575085 / 77077100).
-                    # log Kf identity is the scale detector; ΔfH has no log Kf
-                    # identity of its own and must not store the glued integer.
                     identity_fail_10x.add((row_index, "formation_enthalpy"))
-            elif residual > tolerance:
-                identity_notice[(row_index, "log_kf")] = (residual, tolerance)
-                identity_notice[(row_index, "formation_gibbs_energy")] = (
-                    residual,
-                    tolerance,
-                )
+            else:
+                identity_guarded.add((row_index, "log_kf"))
+                identity_guarded.add((row_index, "formation_gibbs_energy"))
+                if residual > tolerance:
+                    identity_notice[(row_index, "log_kf")] = (residual, tolerance)
+                    identity_notice[(row_index, "formation_gibbs_energy")] = (
+                        residual,
+                        tolerance,
+                    )
 
     formula_by_row: dict[int | None, FormulaResolution] = {}
     record_formula: FormulaResolution | None = None
@@ -1775,6 +1882,8 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     merged_refused = 0
     merged_refused_10x = 0
     merged_excluded = 0
+    unguarded_stored = 0
+    unguarded_by_quantity: Counter[str] = Counter()
     pending_merged = False
     by_column: dict[str, Counter[str]] = defaultdict(Counter)
     by_column_basis: dict[str, Counter[str]] = defaultdict(Counter)
@@ -1851,10 +1960,21 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         ):
             refuse(token, f"row temperature token unusable: {unusable_t[token.row_index]}")
             continue
-        value, reconstruction, refuse_reason = _candidate_value(token, grains)
-        if refuse_reason:
-            refuse(token, refuse_reason)
+        glue_key = (
+            (token.row_index, token.column) if token.row_index is not None else None
+        )
+        if glue_key is not None and glue_key in integer_glue_refuse:
+            refuse(token, integer_glue_refuse[glue_key])
             continue
+        if glue_key is not None and glue_key in guided_recon:
+            reconstruction = guided_recon[glue_key]
+            value = reconstruction["value"]
+            refuse_reason = None
+        else:
+            value, reconstruction, refuse_reason = _candidate_value(token, grains)
+            if refuse_reason:
+                refuse(token, refuse_reason)
+                continue
         pending_merged = bool(
             reconstruction and reconstruction.get("method_class") == MERGED_SPLIT_METHOD
         )
@@ -1967,6 +2087,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         stored += 1
         if pending_merged:
             merged_stored += 1
+            if identity_key not in identity_guarded:
+                unguarded_stored += 1
+                unguarded_by_quantity[quantity.value] += 1
             pending_merged = False
         account(token, "stored")
 
@@ -2016,14 +2139,8 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             "refused": merged_refused,
             "refused_10x": merged_refused_10x,
             "excluded": merged_excluded,
-            "unguarded_stored": merged_stored,
-            "unguarded_by_quantity": dict(
-                Counter(
-                    observation.identity.quantity.value.value
-                    for observation in observations
-                    if observation.evidence.original_method_class == MERGED_SPLIT_METHOD
-                )
-            ),
+            "unguarded_stored": unguarded_stored,
+            "unguarded_by_quantity": dict(sorted(unguarded_by_quantity.items())),
             "unguarded_reason": UNGUARDED_MERGED_REASON,
         },
         "cell_accounting": {
