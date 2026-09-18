@@ -3308,32 +3308,32 @@ def test_f1_store_usgs_reasons_do_not_deny_printed_gibbs() -> None:
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     bad: list[str] = []
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for source_id in _USGS_F1_FAMILIES:
-        path = obs_dir / f"compilations-{source_id}.yaml"
-        if not path.is_file():
-            continue
-        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        paths = iter_observation_store_paths(obs_dir, f"compilations-{source_id}.yaml")
         records_dir = (
             REPO_ROOT / "data" / "literature" / "compilations" / source_id / "records"
         )
-        for obs in stored.get("observations") or []:
-            q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
-            if q != "delta_fG":
-                continue
-            val = obs.get("value") or {}
-            if val.get("kind") != "unavailable":
-                continue
-            reason = str(val.get("unavailable_reason") or "")
-            loc = obs.get("locator") or {}
-            record_id = loc.get("record") or str(obs.get("observation_id") or "").split(":", 1)[-1]
-            rec_path = records_dir / f"{record_id}.json"
-            if not rec_path.is_file():
-                continue
-            doc = json.loads(rec_path.read_text(encoding="utf-8"))
-            if not _record_has_numeric_gibbs(doc):
-                continue
-            if _ABSENT_DELTA_FG_CLAIM.search(reason):
-                bad.append(f"{obs.get('observation_id')} reason={reason!r}")
+        for path in paths:
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+            for obs in stored.get("observations") or []:
+                q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
+                if q != "delta_fG":
+                    continue
+                val = obs.get("value") or {}
+                if val.get("kind") != "unavailable":
+                    continue
+                reason = str(val.get("unavailable_reason") or "")
+                loc = obs.get("locator") or {}
+                record_id = loc.get("record") or str(obs.get("observation_id") or "").split(":", 1)[-1]
+                rec_path = records_dir / f"{record_id}.json"
+                if not rec_path.is_file():
+                    continue
+                doc = json.loads(rec_path.read_text(encoding="utf-8"))
+                if not _record_has_numeric_gibbs(doc):
+                    continue
+                if _ABSENT_DELTA_FG_CLAIM.search(reason):
+                    bad.append(f"{obs.get('observation_id')} reason={reason!r}")
     assert not bad, bad[:12]
 
 
