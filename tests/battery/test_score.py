@@ -758,6 +758,32 @@ def test_non_thermo_quantities_refuse_without_invented_band() -> None:
     assert residual.refusal.detail.get("reason") == "no_sourced_decision_band:p_sat"
 
 
+def test_pyrolysis_yield_does_not_use_robinot_eleven_percent_floor() -> None:
+    """n=2 same-rig O2 scatter is not a sourced yield agreement band."""
+
+    from simulator.battery.score import decision_band_for, populate_numeric
+
+    for quantity in (
+        Quantity.YIELD_FRACTION,
+        Quantity.O2_YIELD,
+        Quantity.MASS_LOSS_FRACTION,
+        Quantity.MASS_LOSS_FRACTION_VS_T,
+        Quantity.EVOLVED_GAS_YIELD,
+    ):
+        assert decision_band_for(quantity, SourceRelation.INDEPENDENT) is None
+        numeric, reason, detail = populate_numeric(
+            quantity=quantity,
+            candidate=Decimal("0.0105"),
+            reference=Decimal("0.0105"),
+            source_relation=SourceRelation.INDEPENDENT,
+        )
+        assert numeric is None
+        assert reason is RefusalReason.DECISION_RULE_MISSING
+        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
+        assert "0.11" not in str(detail)
+        assert "11" not in str(detail.get("reason") or "")
+
+
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 

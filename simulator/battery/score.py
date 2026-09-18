@@ -214,6 +214,10 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 #   error estimate, not an activity agreement band.
 # - evaporation-α envelopes and the Robinot O2 error budget are value
 #   ranges / lab diagnostics, not residual decision bands.
+# - docs/lab-validation-whitepaper.md ~11% exp.1/exp.2 O2 floor
+#   (|1.17−1.05|/1.11) is two runs of one apparatus at different heating
+#   rates, not a sourced agreement band for o2_yield, yield_fraction, or
+#   mass_loss_fraction. Using it would invent a yield tolerance.
 THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
     SourceRelation.INDEPENDENT: DecisionBand(
         Decimal("1.0"),
