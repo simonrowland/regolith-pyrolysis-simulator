@@ -50,7 +50,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -213,7 +217,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -376,7 +384,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -539,7 +551,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -708,7 +724,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -877,7 +897,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN0.465)  |  N0.465V1(cr)' do
+          not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -1045,6 +1069,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -1264,6 +1291,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -1483,6 +1513,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -1702,6 +1735,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -1927,6 +1963,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -2152,6 +2191,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -2368,13 +2410,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -2587,13 +2632,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -2806,13 +2854,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -3025,13 +3076,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -3242,13 +3296,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -3461,13 +3518,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: N+
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -3678,13 +3738,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -3897,13 +3960,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -4116,13 +4182,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -4335,13 +4404,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -4552,13 +4624,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -4771,13 +4846,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: N-
+      formula: N
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -4995,6 +5073,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -5214,6 +5295,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -5433,6 +5517,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -5652,6 +5739,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -5877,6 +5967,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -6102,6 +6195,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -6318,13 +6414,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -6537,13 +6636,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -6756,13 +6858,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -6975,13 +7080,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -7192,13 +7300,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -7411,13 +7522,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: NO+
+      formula: 'NO'
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -7635,6 +7749,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -7854,6 +7971,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -8073,6 +8193,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -8292,6 +8415,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -8517,6 +8643,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -8742,6 +8871,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -8958,13 +9090,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -9177,13 +9312,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -9396,13 +9534,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -9615,13 +9756,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -9832,13 +9976,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -10051,13 +10198,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: ONO-
+      formula: ONO
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -10275,6 +10425,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -10494,6 +10647,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -10713,6 +10869,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -10932,6 +11091,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -11157,6 +11319,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -11382,6 +11547,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -11605,6 +11773,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -11824,6 +11995,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -12043,6 +12217,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -12262,6 +12439,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -12487,6 +12667,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -12712,6 +12895,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -12935,6 +13121,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -13154,6 +13343,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -13373,6 +13565,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -13592,6 +13787,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -13817,6 +14015,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -14042,6 +14243,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -14265,6 +14469,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -14484,6 +14691,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -14703,6 +14913,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -14922,6 +15135,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -15147,6 +15363,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -15372,6 +15591,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -15595,6 +15817,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -15814,6 +16039,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -16033,6 +16261,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -16252,6 +16483,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -16477,6 +16711,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -16702,6 +16939,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -16924,7 +17164,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -17109,7 +17353,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -17294,7 +17542,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -17479,7 +17731,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -17666,7 +17922,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -17853,7 +18113,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Titanium Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -18039,6 +18303,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -18128,6 +18395,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -18311,6 +18581,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -18494,6 +18767,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -18677,6 +18953,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -18858,6 +19137,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -19039,6 +19321,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -19220,6 +19505,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -19309,6 +19597,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: glass-liquid
@@ -19397,7 +19688,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -19557,6 +19852,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -19673,7 +19971,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -19833,6 +20135,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -19949,7 +20254,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -20109,6 +20418,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -20225,7 +20537,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -20389,6 +20705,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -20509,7 +20828,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -20673,6 +20996,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -20793,7 +21119,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Titanium
+          Nitride' and title_as_published 'Titanium Nitride (TiN)  |  N1Ti1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -20955,6 +21285,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -21076,6 +21409,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -21164,7 +21500,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -21327,7 +21667,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -21490,7 +21834,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -21653,7 +22001,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -21822,7 +22174,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -21991,7 +22347,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Vanadium Nitride' and title_as_published 'Vanadium Nitride (VN)  |  N1V1(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -22159,6 +22519,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -22378,6 +22741,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -22597,6 +22963,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -22816,6 +23185,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -23041,6 +23413,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -23266,6 +23641,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -23488,7 +23866,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -23663,7 +24045,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -23838,7 +24224,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -24013,7 +24403,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -24190,7 +24584,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -24367,7 +24765,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Zirconium Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -24543,6 +24945,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -24632,6 +25037,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -24845,6 +25253,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -25058,6 +25469,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -25271,6 +25685,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -25482,6 +25899,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -25693,6 +26113,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -25904,6 +26327,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -25993,6 +26419,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: glass-liquid
@@ -26081,7 +26510,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -26241,6 +26674,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -26387,7 +26823,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -26547,6 +26987,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -26693,7 +27136,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -26853,6 +27300,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -26999,7 +27449,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -27163,6 +27617,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -27313,7 +27770,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -27477,6 +27938,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -27627,7 +28091,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Zirconium
+          Nitride' and title_as_published 'Zirconium Nitride (ZrN)  |  N1Zr1(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -27789,6 +28257,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -27940,6 +28411,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -28029,6 +28503,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -28248,6 +28725,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -28467,6 +28947,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -28686,6 +29169,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -28911,6 +29397,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -29136,6 +29625,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -29359,6 +29851,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -29578,6 +30073,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -29797,6 +30295,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -30016,6 +30517,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -30242,6 +30746,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -30468,6 +30975,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -30687,13 +31197,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -30900,13 +31413,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -31113,13 +31629,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -31326,13 +31845,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -31539,13 +32061,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -31754,13 +32279,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: N2+
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -31967,13 +32495,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -32186,13 +32717,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -32405,13 +32939,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -32624,13 +33161,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -32841,13 +33381,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -33060,13 +33603,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: N2-
+      formula: N2
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: -1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -33284,6 +33830,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -33503,6 +34052,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -33722,6 +34274,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -33941,6 +34496,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -34166,6 +34724,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -34391,6 +34952,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -34607,13 +35171,16 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -34826,13 +35393,16 @@ observations:
       tag: value
       value: S
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -35045,13 +35615,16 @@ observations:
       tag: value
       value: cp
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -35264,13 +35837,16 @@ observations:
       tag: value
       value: delta_fG
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -35481,13 +36057,16 @@ observations:
       tag: value
       value: delta_fH
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -35700,13 +36279,16 @@ observations:
       tag: value
       value: log10_Kf
     species:
-      formula: N2O+
+      formula: N2O
       phase:
         tag: value
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+      charge:
+        tag: value
+        value: 1
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -35924,6 +36506,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -36143,6 +36728,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -36362,6 +36950,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -36581,6 +37172,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -36806,6 +37400,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -37031,6 +37628,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -37253,7 +37853,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -37358,7 +37962,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -37463,7 +38071,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -37568,7 +38180,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -37675,7 +38291,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -37782,7 +38402,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Nitrogen Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr)' do not name
+          a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -37888,6 +38512,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -37977,6 +38604,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -38080,6 +38710,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -38183,6 +38816,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -38286,6 +38922,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -38391,6 +39030,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -38496,6 +39138,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -38601,6 +39246,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -38689,7 +39337,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -38787,6 +39439,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -38885,7 +39540,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -38983,6 +39642,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -39081,7 +39743,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -39179,6 +39845,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -39277,7 +39946,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -39379,6 +40052,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -39481,7 +40157,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -39583,6 +40263,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -39685,7 +40368,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: adjacent JANAF labels do not name a crystal polymorph
+        reason: adjacent JANAF transition labels "CRYSTAL <--> LIQUID" do not name a crystal polymorph; index_entry.name 'Nitrogen
+          Oxide' and title_as_published 'Nitrogen Oxide (N2O4)  |  N2O4(cr,l)' do not name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -39785,6 +40472,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -39888,6 +40578,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: crystal-liquid
@@ -39977,6 +40670,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -40196,6 +40892,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -40415,6 +41114,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -40634,6 +41336,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -40859,6 +41564,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -41084,6 +41792,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -41307,6 +42018,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -41516,6 +42230,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -41725,6 +42442,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -41934,6 +42654,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -42149,6 +42872,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -42364,6 +43090,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -42579,6 +43308,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -42798,6 +43530,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -43017,6 +43752,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -43236,6 +43974,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -43461,6 +44202,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -43686,6 +44430,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -43907,8 +44654,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -44054,8 +44804,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -44201,8 +44954,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -44348,8 +45104,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -44501,8 +45260,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -44654,8 +45416,11 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype
@@ -44808,7 +45573,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
@@ -44925,7 +45694,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile S does not use subtype
@@ -45042,7 +45815,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile cp does not use subtype
@@ -45159,7 +45936,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fG does not use subtype
@@ -45282,7 +46063,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile delta_fH does not use subtype
@@ -45405,7 +46190,11 @@ observations:
         value: cr
       polymorph:
         tag: unknown
-        reason: JANAF index state 'cr' does not state a named polymorph
+        reason: index_entry.name 'Phosphorus Nitride' and title_as_published 'Phosphorus Nitride (P3N5)  |  N5P3(cr)' do not
+          name a crystal polymorph
+      charge:
+        tag: value
+        value: 0
     subtype:
       tag: not_applicable
       reason: profile log10_Kf does not use subtype

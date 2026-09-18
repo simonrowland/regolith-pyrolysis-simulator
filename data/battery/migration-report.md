@@ -55,6 +55,12 @@ hard issues: 1215
 | `proxy` | 1 |
 | `second_law_kems` | 1 |
 
+## Unrecognised polymorph tokens
+
+degradations: 0
+
+Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
+
 ## Per source
 
 | source | rows in | observations out | queued |
