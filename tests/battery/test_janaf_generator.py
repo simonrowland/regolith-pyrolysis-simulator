@@ -26,8 +26,11 @@ from simulator.battery.identity import (
 from simulator.battery.records import Species
 from simulator.reference_data.janaf import (
     GRID_RANGE_REASON,
+    INCONSISTENT_LAYOUT_REASON,
     NON_DATA_MARKER_KIND,
+    STRUCTURED_LAYOUT_REASON,
     TABLES_DIR,
+    TRAILING_EMPTY_LAYOUT_REASON,
     iter_table_paths,
     load_table_document,
     parse_janaf_txt,
@@ -738,6 +741,28 @@ def test_cell_accounting_negative_witness_breaks_generator_accounting(
 
 _DELIMITER_SAMPLE_TABLES = ("Al-006", "Al-001", "O-029")
 _DELIMITER_SAMPLE_TEMPERATURES = ("100", "200", "298.15", "6000")
+_FIELD_COUNT_REASON = "expected 8 tab-separated values; found 7"
+
+
+def _expected_delimiter_reason(table_id: str, temperature: str, tab_index: int) -> str:
+    """Pin the refusal that actually fires, not merely that some refusal fired.
+
+    Al-006 100/200 K rows are content-5 with trailing empties (raw_n=11).
+    Tab 0 concatenates T+Cp and still reaches eight fields via leftover
+    empties (TRAILING_EMPTY_LAYOUT_REASON). Tabs 1–3 drop an interior
+    content delimiter (STRUCTURED_LAYOUT_REASON). Tabs 4–9 drop a trailing
+    empty delimiter so raw_n leaves the modal 11 (INCONSISTENT_LAYOUT_REASON).
+    Full eight-field rows drop raw_n 8→7 (_FIELD_COUNT_REASON). None of
+    these sampled delimiter losses hit GRID_RANGE_REASON.
+    """
+
+    if table_id == "Al-006" and temperature in {"100", "200"}:
+        if tab_index == 0:
+            return TRAILING_EMPTY_LAYOUT_REASON
+        if tab_index <= 3:
+            return STRUCTURED_LAYOUT_REASON
+        return INCONSISTENT_LAYOUT_REASON
+    return _FIELD_COUNT_REASON
 _NON_DATA_MARKER_LINES = (
     ("Ba-001", (11, 16, 22, 36)),
     ("Ba-002", (14, 19)),
@@ -843,6 +868,18 @@ def test_delimiter_loss_is_refused_for_integer_and_decimal_rows() -> None:
                 assert refused, (
                     f"{table_id} {temperature} K tab {tab_index} was accepted"
                 )
+                expected_reason = _expected_delimiter_reason(
+                    table_id, temperature, tab_index
+                )
+                reasons = [row.get("reason") for row in refused]
+                assert expected_reason in reasons, (
+                    f"{table_id} {temperature} K tab {tab_index}: "
+                    f"expected {expected_reason!r}, got {reasons!r}"
+                )
+                assert GRID_RANGE_REASON not in reasons, (
+                    f"{table_id} {temperature} K tab {tab_index} "
+                    f"refused as grid, not layout"
+                )
                 assert any(
                     row.get("raw_text") == lines[line_index]
                     or str(row.get("raw_text", "")).startswith(lines[line_index][:20])
@@ -908,6 +945,54 @@ def test_off_grid_temperature_with_intact_layout_is_refused() -> None:
     temperatures = _cp_temperatures(generated)
     assert "4000" not in temperatures
     assert "3000" not in temperatures
+
+
+def _neuter_printed_set_to_all_grid_like(tokens):
+    """Drop the per-table connected-component filter; keep every grid-like T."""
+
+    from simulator.reference_data import janaf as parser
+
+    values = []
+    for token in tokens:
+        parsed = parser._decimal_temperature_token(str(token))
+        if parsed is not None and parser.is_printed_grid_temperature(parsed):
+            values.append(parsed)
+    return frozenset(values)
+
+
+def test_grid_membership_is_distinct_from_field_count(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.reference_data.janaf.table_printed_temperatures",
+        _neuter_printed_set_to_all_grid_like,
+    )
+    monkeypatch.setattr(generator, "table_printed_temperatures", _neuter_printed_set_to_all_grid_like)
+    table_id = "B-133"
+    payload = _raw_table_path(table_id).read_bytes()
+    text = payload.decode("utf-8")
+    line_index, line = _row_for_temperature(text, "3000")
+    rest = line.split("\t", 1)[1]
+    lines = text.splitlines()
+    lines[line_index] = "4000\t" + rest
+    mutated = ("\n".join(lines) + "\n").encode("utf-8")
+    generated = generator.generate_table(_parse_raw_document(table_id, mutated))
+    assert generated.report["refused_layout_rows"] == []
+    assert "4000" in _cp_temperatures(generated)
+
+    field_payload = _raw_table_path("Al-001").read_bytes()
+    field_text = field_payload.decode("utf-8")
+    line_index, line = _row_for_temperature(field_text, "100")
+    tab_positions = [match.start() for match in re.finditer("\t", line)]
+    field_lines = field_text.splitlines()
+    field_lines[line_index] = line[: tab_positions[0]] + line[tab_positions[0] + 1 :]
+    field_mutated = ("\n".join(field_lines) + "\n").encode("utf-8")
+    field_generated = generator.generate_table(
+        _parse_raw_document("Al-001", field_mutated)
+    )
+    field_reasons = [row.get("reason") for row in field_generated.report["refused_layout_rows"]]
+    assert _FIELD_COUNT_REASON in field_reasons
+    assert "100" not in _cp_temperatures(field_generated)
 
 
 def test_non_data_marker_lines_are_recorded() -> None:
