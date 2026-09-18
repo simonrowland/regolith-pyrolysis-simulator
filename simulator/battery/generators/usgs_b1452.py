@@ -190,6 +190,8 @@ NEIGHBOUR_SIGN_DISABLED_REASON = (
     "high-T T-grids, where the recon found 3 log Kf and 2 ΔfG hits."
 )
 MERGED_SPLIT_METHOD = "split_merged_value_uncertainty_by_column_grain"
+FORMULA_UNRESOLVED_REASON_PREFIX = "no page-grounded formula;"
+FORMULA_CONFLICT_REASON_PREFIX = "conflicting page-grounded formulas;"
 
 _OXIDE_STAR_RE = re.compile(r"\s*\*\s*$")
 _TRAILING_JUNK_RE = re.compile(r"[^0-9eE.+-]+$")
@@ -226,6 +228,14 @@ _OXIDE_BY_CATION = {
 class RecordGeneration:
     observations: tuple[Observation, ...]
     report: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class FormulaResolution:
+    formula: str | None
+    source: str | None
+    consulted: Mapping[str, Any]
+    reason: str | None
 
 
 @dataclass(frozen=True)
@@ -772,8 +782,15 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
         if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
             return formula, charge
     tokens = name.replace("(", " ").replace(")", " ").split()
-    if tokens and _looks_like_formula(tokens[-1]):
-        return tokens[-1], charge
+    if tokens:
+        last = tokens[-1]
+        # Last-token formulas are "Ag" or "Fe2SiO4", not words that happen to
+        # parse as element soup (CUBIC → C,U,B,I,C).
+        if (
+            (any(character.isdigit() for character in last) or re.fullmatch(r"[A-Z][a-z]?", last))
+            and _looks_like_formula(last)
+        ):
+            return last, charge
     return None, charge
 
 
@@ -796,26 +813,84 @@ def _looks_like_formula(text: str) -> bool:
 
 @lru_cache(maxsize=1)
 def _formula_index_from_298k() -> dict[str, str]:
+    """First-word → formula, only when that word is unique among 298 K rows.
+
+    Rows without an extractable formula still veto the key. Otherwise COBALT
+    (metal, no formula on the name line) silently maps to Co3O4 from COBALT
+    SPINEL.
+    """
+
+    formulas: dict[str, set[str]] = defaultdict(set)
+    formula_less: dict[str, int] = defaultdict(int)
+    for name, _fw, formula in _iter_298k_name_rows():
+        key = _name_key(name)
+        if not key:
+            continue
+        if formula:
+            formulas[key].add(formula)
+        else:
+            formula_less[key] += 1
+    return {
+        key: next(iter(forms))
+        for key, forms in formulas.items()
+        if len(forms) == 1 and formula_less.get(key, 0) == 0
+    }
+
+
+@lru_cache(maxsize=1)
+def _formula_weight_index_from_298k() -> dict[str, str]:
+    formulas: dict[str, set[str]] = defaultdict(set)
+    for _name, fw, formula in _iter_298k_name_rows():
+        if fw and formula:
+            formulas[fw].add(formula)
+    return {
+        fw: next(iter(forms)) for fw, forms in formulas.items() if len(forms) == 1
+    }
+
+
+def _iter_298k_name_rows() -> tuple[tuple[str, str | None, str | None], ...]:
     path = RECORDS_DIR / f"{TABLE_298K_RECORD_ID}.json"
     record = json.loads(path.read_text(encoding="utf-8"))
-    counts: dict[str, Counter[str]] = defaultdict(Counter)
+    rows: list[tuple[str, str | None, str | None]] = []
     for row in record.get("rows") or ():
         cells = row.get("cells") if isinstance(row, Mapping) else {}
         parsed = _as_published_cell((cells or {}).get("name_and_formula"))
         if parsed is None:
             continue
-        name = parsed[0]
-        formula, _charge = _formula_from_name(name)
-        if not formula:
-            continue
-        key = _name_key(name)
-        if key:
-            counts[key][formula] += 1
-    return {
-        key: counter.most_common(1)[0][0]
-        for key, counter in counts.items()
-        if len(counter) == 1
-    }
+        fw_parsed = _as_published_cell((cells or {}).get("formula_weight"))
+        fw = fw_parsed[0].strip() if fw_parsed and fw_parsed[0].strip() else None
+        formula, _charge = _formula_from_name(parsed[0])
+        rows.append((parsed[0], fw, formula))
+    return tuple(rows)
+
+
+@lru_cache(maxsize=1)
+def _table2_elements() -> tuple[dict[str, Decimal], dict[str, str]]:
+    path = RECORDS_DIR / f"{TABLE2_RECORD_ID}.json"
+    record = json.loads(path.read_text(encoding="utf-8"))
+    weights: dict[str, Decimal] = {}
+    names: dict[str, str] = {}
+    for row in record.get("rows") or ():
+        cells = row.get("cells") if isinstance(row, Mapping) else {}
+        for name_col, symbol_col, weight_col in (
+            ("element", "symbol", "atomic_weight"),
+            ("element_right", "symbol_right", "atomic_weight_right"),
+        ):
+            name_parsed = _as_published_cell((cells or {}).get(name_col))
+            symbol_parsed = _as_published_cell((cells or {}).get(symbol_col))
+            weight_parsed = _as_published_cell((cells or {}).get(weight_col))
+            if symbol_parsed is None:
+                continue
+            symbol = symbol_parsed[0].strip()
+            if not symbol:
+                continue
+            if weight_parsed is not None:
+                mass = _published_decimal(weight_parsed[0])
+                if mass is not None:
+                    weights[symbol] = mass
+            if name_parsed is not None and name_parsed[0].strip():
+                names[name_parsed[0].strip()] = symbol
+    return weights, names
 
 
 def _name_key(name: str) -> str:
@@ -827,26 +902,202 @@ def _name_key(name: str) -> str:
     return words[0].upper()
 
 
-def _formula_for(
-    record: Mapping[str, Any], *, name: str | None = None
-) -> str:
-    raw = record.get("formula_as_published")
-    if isinstance(raw, str) and raw.strip():
-        compact = re.sub(r"\s+", "", raw)
-        parsed = _parseable_formula(compact)
-        if parsed:
-            return parsed
-    label = name or str(record.get("name_as_published") or "")
-    formula, _charge = _formula_from_name(label)
-    if formula:
+def _formula_weight_as_published(
+    record: Mapping[str, Any], *, row_index: int | None = None
+) -> str | None:
+    kind = _table_kind(record)
+    if kind == "table_298k" and row_index is not None:
+        rows = record.get("rows") or []
+        if isinstance(rows, list) and row_index < len(rows):
+            row = rows[row_index]
+            cells = row.get("cells") if isinstance(row, Mapping) else {}
+            parsed = _as_published_cell((cells or {}).get("formula_weight"))
+            if parsed is not None and parsed[0].strip():
+                return parsed[0].strip()
+        return None
+    parsed = _as_published_cell(record.get("formula_weight"))
+    if parsed is not None and parsed[0].strip():
+        return parsed[0].strip()
+    return None
+
+
+def _formula_mass(formula: str) -> Decimal | None:
+    counts = _parse_counts(formula)
+    if counts is None:
+        return None
+    weights, _names = _table2_elements()
+    total = Decimal("0")
+    for element, amount in counts.items():
+        mass = weights.get(element)
+        if mass is None:
+            return None
+        total += mass * Decimal(amount.numerator) / Decimal(amount.denominator)
+    return total
+
+
+def _mass_matches_formula_weight(formula: str, fw: Decimal) -> bool:
+    mass = _formula_mass(formula)
+    if mass is None:
+        return False
+    grain = max(_value_grain(fw) * 2, Decimal("0.01"))
+    return abs(mass - fw) <= grain
+
+
+def _allotrope_from_weight(name: str, fw: Decimal) -> str | None:
+    weights, names = _table2_elements()
+    hits: set[str] = set()
+    for element_name, symbol in names.items():
+        if not re.search(
+            rf"(?<![A-Za-z]){re.escape(element_name)}(?![A-Za-z])",
+            name,
+            flags=re.IGNORECASE,
+        ):
+            continue
+        aw = weights.get(symbol)
+        if aw is None or aw == 0:
+            continue
+        n = (fw / aw).to_integral_value()
+        if n < 1:
+            continue
+        formula = symbol if n == 1 else f"{symbol}{int(n)}"
+        if _mass_matches_formula_weight(formula, fw):
+            hits.add(formula)
+    if len(hits) == 1:
+        return next(iter(hits))
+    return None
+
+
+def _allotrope_from_printed_element(printed: str, fw: Decimal) -> str | None:
+    counts = _parse_counts(printed)
+    if counts is None or len(counts) != 1:
+        return None
+    symbol = next(iter(counts))
+    weights, _names = _table2_elements()
+    aw = weights.get(symbol)
+    if aw is None or aw == 0:
+        return None
+    n = (fw / aw).to_integral_value()
+    if n < 1:
+        return None
+    formula = symbol if n == 1 else f"{symbol}{int(n)}"
+    if _mass_matches_formula_weight(formula, fw):
         return formula
+    return None
+
+
+def _consulted_formula_reason(
+    consulted: Mapping[str, Any], *, prefix: str, extra: str | None = None
+) -> str:
+    parts = [
+        f"formula_as_published={consulted.get('formula_as_published')!r}",
+        f"name={consulted.get('name')!r}",
+        f"name_key={consulted.get('name_key')!r}",
+        f"formula_weight={consulted.get('formula_weight')!r}",
+        f"name_index={consulted.get('name_index')!r}",
+        f"formula_weight_index={consulted.get('formula_weight_index')!r}",
+    ]
+    mismatch = consulted.get("printed_mass_mismatch")
+    if mismatch:
+        parts.append(f"printed_mass_mismatch={mismatch!r}")
+    if extra:
+        parts.append(extra)
+    return f"{prefix} consulted " + ", ".join(parts)
+
+
+def _resolve_formula(
+    record: Mapping[str, Any],
+    *,
+    name: str | None = None,
+    formula_weight: str | None = None,
+) -> FormulaResolution:
+    """Page-grounded formula or a refusal. Never title-case an OCR'd name."""
+
+    label = name if name is not None else str(record.get("name_as_published") or "")
+    raw = record.get("formula_as_published")
+    printed_raw = raw.strip() if isinstance(raw, str) and raw.strip() else None
+    fw_text = formula_weight if formula_weight is not None else _formula_weight_as_published(record)
     key = _name_key(label)
-    indexed = _formula_index_from_298k().get(key)
+    embedded, _charge = _formula_from_name(label)
+    indexed = _formula_index_from_298k().get(key) if key else None
+    fw_indexed = _formula_weight_index_from_298k().get(fw_text) if fw_text else None
+    consulted: dict[str, Any] = {
+        "formula_as_published": printed_raw,
+        "name": label or None,
+        "name_key": key or None,
+        "formula_weight": fw_text,
+        "name_index": indexed,
+        "formula_weight_index": fw_indexed,
+        "name_embedded": embedded,
+    }
+    candidates: list[tuple[str, str]] = []
+    if embedded:
+        candidates.append((embedded, "name_embedded"))
     if indexed:
-        return indexed
-    if key:
-        return key.title()
-    return str(record.get("record_id") or "unknown")
+        candidates.append((indexed, "name_index"))
+    if fw_indexed:
+        candidates.append((fw_indexed, "formula_weight"))
+    printed = _parseable_formula(re.sub(r"\s+", "", printed_raw)) if printed_raw else None
+    consulted["printed_parsed"] = printed
+    fw_value = _published_decimal(fw_text) if fw_text else None
+    if printed:
+        if fw_value is not None:
+            mass = _formula_mass(printed)
+            if mass is None or _mass_matches_formula_weight(printed, fw_value):
+                candidates.append((printed, "printed_formula"))
+            else:
+                consulted["printed_mass_mismatch"] = (
+                    f"{printed} mass={mass} formula_weight={fw_value}"
+                )
+                allotrope = _allotrope_from_printed_element(printed, fw_value)
+                if allotrope:
+                    candidates.append((allotrope, "formula_weight"))
+        else:
+            candidates.append((printed, "printed_formula"))
+    if fw_value is not None:
+        named_allotrope = _allotrope_from_weight(label, fw_value)
+        if named_allotrope:
+            candidates.append((named_allotrope, "formula_weight"))
+
+    if fw_value is not None:
+        matching = [
+            item
+            for item in candidates
+            if _formula_mass(item[0]) is None or _mass_matches_formula_weight(item[0], fw_value)
+        ]
+        if matching:
+            candidates = matching
+
+    unique = {formula for formula, _source in candidates}
+    if len(unique) == 1:
+        formula = next(iter(unique))
+        sources = sorted({source for value, source in candidates if value == formula})
+        return FormulaResolution(formula, "+".join(sources), consulted, None)
+    if len(unique) > 1:
+        return FormulaResolution(
+            None,
+            None,
+            consulted,
+            _consulted_formula_reason(
+                consulted,
+                prefix=FORMULA_CONFLICT_REASON_PREFIX,
+                extra=f"formulas={sorted(unique)}",
+            ),
+        )
+    return FormulaResolution(
+        None,
+        None,
+        consulted,
+        _consulted_formula_reason(consulted, prefix=FORMULA_UNRESOLVED_REASON_PREFIX),
+    )
+
+
+def _formula_for(
+    record: Mapping[str, Any],
+    *,
+    name: str | None = None,
+    formula_weight: str | None = None,
+) -> str | None:
+    return _resolve_formula(record, name=name, formula_weight=formula_weight).formula
 
 
 def _charge_for_name(name: str) -> int:
@@ -1082,11 +1333,11 @@ def _observation(
     temperature: Decimal,
     notices: tuple[Notice, ...],
     name: str | None,
+    formula: str,
     uncertainty: Uncertainty | None = None,
     reconstruction: Mapping[str, Any] | None = None,
 ) -> Observation:
     record_id = str(record["record_id"])
-    formula = _formula_for(record, name=name)
     phase, polymorph = _phase_state(record, name=name, row_index=token.row_index)
     charge = _charge_for_name(name or str(record.get("name_as_published") or ""))
     species = make_species(formula, phase, polymorph, charge=charge)
@@ -1293,6 +1544,31 @@ def _row_name(record: Mapping[str, Any], row_index: int | None) -> str | None:
     return parsed[0]
 
 
+def _formula_resolution_report(
+    kind: str,
+    record_formula: FormulaResolution | None,
+    formula_by_row: Mapping[int | None, FormulaResolution],
+) -> dict[str, Any]:
+    if kind == "table_298k":
+        resolved = [item for item in formula_by_row.values() if item.formula]
+        unresolved = [item for item in formula_by_row.values() if item.formula is None]
+        return {
+            "rows_resolved": len(resolved),
+            "rows_unresolved": len(unresolved),
+            "unresolved": len(unresolved) > 0,
+            "sources": dict(Counter(item.source or "none" for item in resolved)),
+        }
+    if record_formula is None:
+        return {"unresolved": False, "formula": None, "source": None}
+    return {
+        "formula": record_formula.formula,
+        "source": record_formula.source,
+        "consulted": dict(record_formula.consulted),
+        "reason": record_formula.reason,
+        "unresolved": record_formula.formula is None,
+    }
+
+
 def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     """Transform one committed B1452 JSON record into observations and a report."""
 
@@ -1415,6 +1691,22 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                     residual,
                     tolerance,
                 )
+
+    formula_by_row: dict[int | None, FormulaResolution] = {}
+    record_formula: FormulaResolution | None = None
+    if kind == "table_298k" and isinstance(rows, list):
+        for row_index, row in enumerate(rows):
+            if not isinstance(row, Mapping):
+                continue
+            formula_by_row[row_index] = _resolve_formula(
+                payload,
+                name=_row_name(payload, row_index),
+                formula_weight=_formula_weight_as_published(
+                    payload, row_index=row_index
+                ),
+            )
+    elif kind == "ht_grid":
+        record_formula = _resolve_formula(payload)
 
     observations: list[Observation] = []
     refusals: list[dict[str, Any]] = []
@@ -1551,6 +1843,20 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             continue
         else:
             temperature = usable_t[token.row_index]
+        if kind == "table_298k":
+            resolution = formula_by_row.get(token.row_index)
+        else:
+            resolution = record_formula
+        if resolution is None or resolution.formula is None:
+            refuse(
+                token,
+                (resolution.reason if resolution is not None else None)
+                or _consulted_formula_reason(
+                    {"formula_as_published": payload.get("formula_as_published")},
+                    prefix=FORMULA_UNRESOLVED_REASON_PREFIX,
+                ),
+            )
+            continue
         notices: tuple[Notice, ...] = ()
         if identity_key in identity_notice:
             residual, tolerance = identity_notice[identity_key]
@@ -1584,6 +1890,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                 temperature=temperature,
                 notices=notices,
                 name=_row_name(payload, token.row_index),
+                formula=resolution.formula,
                 uncertainty=uncertainty,
                 reconstruction=reconstruction,
             )
@@ -1641,6 +1948,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         "vocabulary_gaps": vocabulary_gaps,
         "identity_results": identity_results,
         "neighbour_sign_hits": neighbour_hits,
+        "formula_resolution": _formula_resolution_report(
+            kind, record_formula, formula_by_row
+        ),
     }
     return RecordGeneration(tuple(observations), report)
 
@@ -1676,6 +1986,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     identity_fail_counts: Counter[str] = Counter()
     identity_fail_10x = 0
     notice_count = 0
+    formula_unresolved_records = 0
+    formula_unresolved_rows = 0
     started = time.monotonic()
     last_progress = started
     record_count = 0
@@ -1703,6 +2015,11 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
                 if tolerance > 0 and residual > 10 * tolerance:
                     identity_fail_10x += 1
         now = time.monotonic()
+        resolution = generated.report.get("formula_resolution") or {}
+        if generated.report.get("table_kind") == "table_298k":
+            formula_unresolved_rows += int(resolution.get("rows_unresolved") or 0)
+        elif resolution.get("unresolved"):
+            formula_unresolved_records += 1
         if now - last_progress >= 20 or record_count % 50 == 0:
             print(
                 f"B1452 generator: {record_count} records in {now - started:.1f}s "
@@ -1753,6 +2070,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         "identity_failure_counts": dict(sorted(identity_fail_counts.items())),
         "identity_fail_10x": identity_fail_10x,
         "notice_count": notice_count,
+        "formula_unresolved_ht_records": formula_unresolved_records,
+        "formula_unresolved_298k_rows": formula_unresolved_rows,
         "gas_constant_J_per_mol_K": str(B1452_R_J_PER_MOL_K),
         "gas_constant_basis": B1452_R_SOURCE,
         "neighbour_sign_disabled_on": "table_298k",

@@ -27,11 +27,13 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
 B1452_RAW = 55707
-B1452_STORED = 16132
-B1452_REFUSED = 18741
+B1452_STORED = 10456
+B1452_REFUSED = 24417
 B1452_EXCLUDED = 20834
 B1452_MERGED_SPLIT = 347
 B1452_IDENTITY_10X = 315
+B1452_FORMULA_UNRESOLVED_HT = 219
+B1452_FORMULA_UNRESOLVED_298K_ROWS = 273
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -179,6 +181,8 @@ def test_fayalite_298k_joules_match_ht_kilojoules() -> None:
     )
     assert len(from_298k) == 1
     assert len(from_ht) == 1
+    assert from_298k[0].identity.species.formula == "Fe2SiO4"
+    assert from_ht[0].identity.species.formula == "Fe2SiO4"
     assert from_298k[0].value.point == Decimal("-1479.360")
     assert from_ht[0].value.point == Decimal("-1479.360")
     ht_note = from_ht[0].locator.note or ""
@@ -187,6 +191,64 @@ def test_fayalite_298k_joules_match_ht_kilojoules() -> None:
     assert "unit='J/mol'" in table_note
     assert "kj_to_j" in dict(from_ht[0].derivation.parameters)
     assert "j_to_kj" in dict(from_298k[0].derivation.parameters)
+
+
+def test_ocr_name_is_not_a_formula() -> None:
+    fayalite = _generation(FAYALITE_ELEMENTS)
+    resolution = fayalite.report["formula_resolution"]
+    assert resolution["formula"] == "Fe2SiO4"
+    assert resolution["source"] == "formula_weight"
+    assert "title" not in (resolution["source"] or "")
+    formulas = {obs.identity.species.formula for obs in fayalite.observations}
+    assert formulas == {"Fe2SiO4"}
+    assert "Flyau" not in formulas
+
+    forsterite = generator._resolve_formula(_load("robie-hemingway-fisher-1978-usgs-b1452-0337"))
+    assert forsterite.formula == "Mg2SiO4"
+    assert forsterite.source == "formula_weight"
+    assert forsterite.formula != "Pobst"
+
+    sulfur = _generation("robie-hemingway-fisher-1978-usgs-b1452-0069")
+    assert sulfur.report["formula_resolution"]["formula"] == "S8"
+    sulfur_formulas = {obs.identity.species.formula for obs in sulfur.observations}
+    assert sulfur_formulas == {"S8"}
+    assert "S1" not in sulfur_formulas
+
+
+def test_title_case_is_not_a_formula_source() -> None:
+    source = Path(generator.__file__).read_text(encoding="utf-8")
+    assert "key.title()" not in source
+    quartz = generator._resolve_formula(_load("robie-hemingway-fisher-1978-usgs-b1452-0190"))
+    assert quartz.formula is None
+    assert quartz.reason is not None
+    assert generator.FORMULA_UNRESOLVED_REASON_PREFIX in quartz.reason
+    assert "formula_as_published=None" in quartz.reason
+    assert "formula_weight='60.085'" in quartz.reason
+    assert "name_key='QUARTZ'" in quartz.reason
+    generated = _generation("robie-hemingway-fisher-1978-usgs-b1452-0190")
+    assert generated.report["formula_resolution"]["unresolved"] is True
+    assert generated.observations == ()
+    assert "Quartz" not in {
+        obs.identity.species.formula for obs in generated.observations
+    }
+
+
+def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
+    generated = _generation(TABLE_298K)
+    quartz = [
+        row
+        for row in generated.report["refusals"]
+        if row["row_index"] == 401
+        and generator.FORMULA_UNRESOLVED_REASON_PREFIX in row["reason"]
+    ]
+    assert quartz
+    reason = quartz[0]["reason"]
+    assert "formula_weight='60.085'" in reason
+    assert "name_key='QUARTZ'" in reason
+    stored = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
+    )
+    assert stored == []
 
 
 def test_silver_400k_gibbs_function_worked_row() -> None:
@@ -524,6 +586,8 @@ def test_full_census_closes() -> None:
     identity_10x = 0
     identity_fail = 0
     neighbour_298k_hits = 0
+    formula_unresolved_ht = 0
+    formula_unresolved_rows = 0
     quantity_counts: dict[str, int] = {}
     n_records = 0
     for path in sorted(RECORDS_DIR.glob("*.json")):
@@ -536,8 +600,12 @@ def test_full_census_closes() -> None:
         excluded += int(accounting["excluded"])
         merged_split += int(generated.report["merged_cell_splits"]["split"])
         merged_refused += int(generated.report["merged_cell_splits"]["refused"])
+        resolution = generated.report.get("formula_resolution") or {}
         if generated.report["table_kind"] == "table_298k":
             neighbour_298k_hits += len(generated.report["neighbour_sign_hits"])
+            formula_unresolved_rows += int(resolution.get("rows_unresolved") or 0)
+        elif resolution.get("unresolved"):
+            formula_unresolved_ht += 1
         for observation in generated.observations:
             token = quantity_token(observation.identity)
             if token is None:
@@ -576,6 +644,8 @@ def test_full_census_closes() -> None:
     assert neighbour_298k_hits == 0
     assert merged_split == B1452_MERGED_SPLIT
     assert identity_10x == B1452_IDENTITY_10X
+    assert formula_unresolved_ht == B1452_FORMULA_UNRESOLVED_HT
+    assert formula_unresolved_rows == B1452_FORMULA_UNRESOLVED_298K_ROWS
     print(
         "B1452_CENSUS",
         {
@@ -588,6 +658,8 @@ def test_full_census_closes() -> None:
             "merged_refused": merged_refused,
             "identity_fail": identity_fail,
             "identity_10x": identity_10x,
+            "formula_unresolved_ht": formula_unresolved_ht,
+            "formula_unresolved_298k_rows": formula_unresolved_rows,
             "quantities": quantity_counts,
         },
     )
