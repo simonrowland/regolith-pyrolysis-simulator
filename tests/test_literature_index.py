@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import subprocess
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import re
@@ -324,3 +325,302 @@ def test_nasa_cea_private_locator_backlog():
         row = next(row for row in index["sources"] if row["source_id"] == source_id)
         assert row["extracts"][0]["locator_status"] == "private_path"
         assert source_id in index["gaps"]["extracts_with_private_locators"]
+
+
+# ---------------------------------------------------------------------------
+# Generated SOURCE_STATUS.yaml — tags derived from artefacts, never hand-set.
+# ---------------------------------------------------------------------------
+
+COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
+
+
+def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:
+    root = tmp_path / "sim"
+    corpus = tmp_path / "corpus"
+    for path in (
+        root / "data/literature/extracts",
+        root / "data/literature/extracts-v2",
+        root / "data/literature/compilations",
+        root / "data/literature/residuals-v2",
+        corpus / "raw",
+        corpus / "extracts",
+        corpus / "claims",
+        corpus / "ledger",
+        corpus / "text",
+        corpus / "tables",
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus))
+    if git_corpus:
+        subprocess.run(["git", "init", str(corpus)], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(corpus), "config", "user.name", "Test"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(corpus), "config", "user.email", "test@example.org"],
+                       check=True, capture_output=True)
+    return root, corpus
+
+
+def _write_yaml(path: Path, doc: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True))
+
+
+def _extract_v1(source_id: str, **extra) -> dict:
+    doc = {
+        "schema_version": "literature_extract.v1",
+        "source_id": source_id,
+        "source": {"citation": f"{source_id} fixture"},
+        "extraction": {"method": "fixture", "date": "2026-09-01", "worker": "test"},
+        "review_status": "draft",
+        "species": {},
+    }
+    doc.update(extra)
+    return doc
+
+
+def _usable_obs(oid: str = "o1") -> dict:
+    return {
+        "observation_id": oid,
+        "identity": {"quantity": {"tag": "value", "value": "activity"}},
+        "value": {"kind": "point", "point": "0.5"},
+        "evidence": {"class": {"tag": "value", "value": "measured_direct"}},
+    }
+
+
+def _unusable_obs(oid: str = "o2") -> dict:
+    return {
+        "observation_id": oid,
+        "identity": {"quantity": {"tag": "unknown", "reason": "fixture"}},
+        "value": {"kind": "unavailable", "unavailable_reason": "fixture"},
+        "evidence": {"class": {"tag": "value", "value": "model_derived"}},
+    }
+
+
+def _v21(source_id: str, observations: list[dict]) -> dict:
+    return {
+        "schema_version": "battery_observations.v2.1",
+        "observations": [{**row, "source_id": source_id} for row in observations],
+    }
+
+
+def _status_rows(root: Path, **kwargs) -> dict[str, dict]:
+    status = builder.build_source_status(root, **kwargs)
+    return {row["source_id"]: row for row in status["sources"]}, status
+
+
+def test_source_status_stage_moves_when_evidence_mutates(tmp_path, monkeypatch):
+    """Mutate artefacts under one source_id; the derived tag must move with them.
+
+    Reading committed YAML cannot prove derivation. Each assertion is against a
+    freshly computed registry after a single evidence change.
+    """
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    sid = "alpha-2020"
+    raw = corpus / "raw" / sid
+    raw.mkdir(parents=True)
+    _write_yaml(raw / "sidecar.yaml", {"citation": "Alpha (2020)", "stage": "wired"})
+
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "located"
+
+    (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "inbox"
+
+    _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid, stage="wired"))
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "in_progress"
+
+    _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml",
+                _v21(sid, [_usable_obs(), _unusable_obs()]))
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "ingested_partial"
+
+    _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml",
+                _v21(sid, [_usable_obs("a"), _usable_obs("b")]))
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "ingested_complete"
+
+    _write_yaml(root / "data/literature/residuals-v2" / f"{sid}.yaml", {
+        "schema_version": "battery_residuals.v2.1",
+        "residuals": [{"source_id": sid, "status": "match", "numeric": {"value": 0.12, "unit": "log10"}}],
+    })
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "wired"
+
+
+def test_source_status_ignores_handwritten_stage(tmp_path, monkeypatch):
+    """A stage field in extract, sidecar, ledger, or v2.1 YAML is not honoured."""
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    sid = "hand-set-2020"
+    raw = corpus / "raw" / sid
+    raw.mkdir(parents=True)
+    (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(raw / "sidecar.yaml", {"stage": "ingested_complete", "pipeline_stage": "wired"})
+    _write_yaml(corpus / "ledger" / f"{sid}.yaml", {"stage": "wired", "stages": {"scored": {"date": "2026-01-01"}}})
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "inbox"
+    assert rows[sid]["stage"] != "ingested_complete"
+    assert rows[sid]["stage"] != "wired"
+
+
+def test_source_status_compilation_not_inbox_with_control(tmp_path, monkeypatch):
+    """Compilation-path sources are not inbox; a non-compilation control is."""
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    compilation = "fixture-compilation"
+    control = "fixture-paper"
+    for sid in (compilation, control):
+        raw = corpus / "raw" / sid
+        raw.mkdir(parents=True)
+        (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+        _write_yaml(raw / "sidecar.yaml", {"citation": sid, "doi": f"10.9999/{sid}"})
+    _write_yaml(root / "data/literature/compilations" / compilation / "manifest.yaml", {
+        "schema_version": "literature_compilation_manifest.v1",
+        "source_id": compilation,
+        "compilation_role": {"engine_reference_input": True, "validation_measurement": False},
+        "source": {"doi": f"10.9999/{compilation}"},
+    })
+    rows, status = _status_rows(root)
+    assert rows[control]["stage"] == "inbox", "control must be inbox so the exclusion is not vacuous"
+    assert rows[compilation]["stage"] != "inbox"
+    assert rows[compilation]["inbox_exclusion_reason"]
+    assert "compilation" in rows[compilation]["inbox_exclusion_reason"]
+    inbox_ids = [row["source_id"] for row in status["sources"] if row["stage"] == "inbox"]
+    assert control in inbox_ids
+    assert compilation not in inbox_ids
+
+
+def test_source_status_partial_vs_complete_boundary(tmp_path, monkeypatch):
+    """One non-usable row among otherwise usable rows is partial, not complete."""
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    sid = "boundary-2020"
+    raw = corpus / "raw" / sid
+    raw.mkdir(parents=True)
+    (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid))
+    _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml",
+                _v21(sid, [_usable_obs("ok"), _unusable_obs("bad")]))
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "ingested_partial"
+    assert rows[sid]["usable_rows"] == 1
+    assert rows[sid]["total_rows"] == 2
+
+    _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml",
+                _v21(sid, [_usable_obs("ok")]))
+    rows, _ = _status_rows(root)
+    assert rows[sid]["stage"] == "ingested_complete"
+    assert rows[sid]["usable_rows"] == 1
+    assert rows[sid]["total_rows"] == 1
+
+
+def test_source_status_wired_zero_today_and_positive_control(tmp_path, monkeypatch):
+    """Wired is 0 on the real tree (chunk-2 scorer absent) and 1 with a synthetic ledger."""
+    real = builder.build_source_status(REPO_ROOT)
+    assert real["counts"]["by_stage"]["wired"] == 0
+    assert all(row["stage"] != "wired" for row in real["sources"])
+
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    sid = "wired-control-2020"
+    raw = corpus / "raw" / sid
+    raw.mkdir(parents=True)
+    (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid))
+    _write_yaml(root / "data/literature/extracts-v2" / f"{sid}.yaml", _v21(sid, [_usable_obs()]))
+    rows, status = _status_rows(root)
+    assert status["counts"]["by_stage"]["wired"] == 0
+    assert rows[sid]["stage"] != "wired"
+
+    _write_yaml(root / "data/literature/battery_residuals.yaml", {
+        "schema_version": "battery_residuals.v2.1",
+        "residuals": [{"source_id": sid, "status": "mismatch", "numeric": {"value": 1.5, "unit": "kJ/mol"}}],
+    })
+    rows, status = _status_rows(root)
+    assert status["counts"]["by_stage"]["wired"] == 1
+    assert rows[sid]["stage"] == "wired"
+
+
+def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
+    """Each anti-loss check has a non-empty fixture case; a forever-zero check is not a check."""
+    root, corpus = _status_tree(tmp_path, monkeypatch, git_corpus=True)
+    now = datetime(2026, 9, 18, tzinfo=timezone.utc)
+
+    uncommitted = corpus / "raw" / "uncommitted-src" / "note.txt"
+    uncommitted.parent.mkdir(parents=True)
+    uncommitted.write_text("not committed")
+
+    (corpus / "tracked.txt").write_text("tracked")
+    subprocess.run(["git", "-C", str(corpus), "add", "tracked.txt"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(corpus), "commit", "-m", "base"], check=True, capture_output=True)
+    bare = tmp_path / "mirror.git"
+    subprocess.run(["git", "init", "--bare", str(bare)], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(corpus), "remote", "add", "origin", str(bare)],
+                   check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(corpus), "push", "origin", "HEAD:main"],
+                   check=True, capture_output=True)
+    (corpus / "pushed-never.txt").write_text("local only")
+    subprocess.run(["git", "-C", str(corpus), "add", "pushed-never.txt"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(corpus), "commit", "-m", "not on mirror"],
+                   check=True, capture_output=True)
+    unpushed_sha = subprocess.run(["git", "-C", str(corpus), "rev-parse", "HEAD"],
+                                  check=True, capture_output=True, text=True).stdout.strip()
+
+    sim_only = "sim-only-extract"
+    corpus_only = "corpus-only-extract"
+    mismatch = "mismatch-extract"
+    _write_yaml(root / "data/literature/extracts" / f"{sim_only}.yaml", _extract_v1(sim_only))
+    _write_yaml(corpus / "extracts" / f"{corpus_only}.yaml", _extract_v1(corpus_only))
+    _write_yaml(root / "data/literature/extracts" / f"{mismatch}.yaml", _extract_v1(mismatch, review_status="draft"))
+    _write_yaml(corpus / "extracts" / f"{mismatch}.yaml", _extract_v1(mismatch, review_status="reviewed"))
+
+    stale_sid = "stale-inbox-2010"
+    raw = corpus / "raw" / stale_sid
+    raw.mkdir(parents=True)
+    (raw / f"{stale_sid}.pdf").write_bytes(b"%PDF-1.4 stale\n")
+    _write_yaml(raw / "sidecar.yaml", {"retrieved_at": "2026-01-01T00:00:00Z", "citation": "stale"})
+
+    claim_sid = "finished-claim-2020"
+    claim_raw = corpus / "raw" / claim_sid
+    claim_raw.mkdir(parents=True)
+    (claim_raw / f"{claim_sid}.pdf").write_bytes(b"%PDF-1.4 claimed\n")
+    (corpus / "claims" / f"{claim_sid}.claim").write_text("dispatch-done 2026-09-01T00:00:00Z decode\n")
+    text_dir = corpus / "text" / claim_sid
+    text_dir.mkdir(parents=True)
+    (text_dir / "pdftotext-layout.txt").write_text("decoded")
+
+    _, status = _status_rows(root, now=now)
+    anti = status["anti_loss"]
+
+    assert anti["corpus_uncommitted"]["count"] >= 1
+    assert any("uncommitted-src" in item for item in anti["corpus_uncommitted"]["ids"])
+
+    assert anti["corpus_unpushed"]["count"] >= 1
+    assert unpushed_sha in anti["corpus_unpushed"]["ids"]
+
+    parity = anti["extract_mirror_parity"]
+    assert sim_only in parity["simulator_only"]["ids"]
+    assert parity["simulator_only"]["count"] >= 1
+    assert corpus_only in parity["corpus_only"]["ids"]
+    assert parity["corpus_only"]["count"] >= 1
+    assert mismatch in parity["byte_mismatch"]["ids"]
+    assert parity["byte_mismatch"]["count"] >= 1
+
+    assert stale_sid in anti["stale_inbox"]["ids"]
+    assert anti["stale_inbox"]["count"] >= 1
+    assert builder.STALE_INBOX_DAYS == 7
+
+    assert claim_sid in anti["stale_claims"]["ids"]
+    assert anti["stale_claims"]["count"] >= 1
+
+
+def test_source_status_regenerates_byte_identically(tmp_path, monkeypatch):
+    root, corpus = _status_tree(tmp_path, monkeypatch)
+    sid = "alpha-2020"
+    raw = corpus / "raw" / sid
+    raw.mkdir(parents=True)
+    (raw / f"{sid}.pdf").write_bytes(b"%PDF-1.4 fixture\n")
+    _write_yaml(raw / "sidecar.yaml", {"citation": "Alpha (2020)"})
+    _write_yaml(root / "data/literature/extracts" / f"{sid}.yaml", _extract_v1(sid))
+    a, b = tmp_path / "out-a", tmp_path / "out-b"
+    _run_builder(root, a)
+    _run_builder(root, b)
+    assert (a / "SOURCE_STATUS.yaml").is_file()
+    assert (a / "SOURCE_STATUS.yaml").read_bytes() == (b / "SOURCE_STATUS.yaml").read_bytes()
