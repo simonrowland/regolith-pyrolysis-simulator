@@ -1978,6 +1978,57 @@ def _yield_table_items(
     return None, None
 
 
+_VACUUM_PYROLYSIS_SIDECAR_QUANTITY = {
+    "robinot_o2_mass_yield_fraction": Quantity.YIELD_FRACTION,
+    "robinot_feed_oxygen_extraction_fraction": Quantity.O2_YIELD,
+    "pomeroy_non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
+    "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
+    "oxygen_yield_by_mass": Quantity.YIELD_FRACTION,
+}
+_VACUUM_PYROLYSIS_SIDECAR_METHOD = {
+    "robinot_2026_deposit_measurements": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "pomeroy_cardiff_2006_measurements": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
+}
+
+
+def _vacuum_pyrolysis_sidecar_quantity(observable: str) -> Quantity | None:
+    if observable in _VACUUM_PYROLYSIS_SIDECAR_QUANTITY:
+        return _VACUUM_PYROLYSIS_SIDECAR_QUANTITY[observable]
+    lowered = observable.lower()
+    if lowered.endswith("feed_oxygen_extraction_fraction"):
+        return Quantity.O2_YIELD
+    if lowered.endswith("mass_yield_fraction") or lowered.endswith("oxygen_yield_by_mass"):
+        return Quantity.YIELD_FRACTION
+    if lowered.endswith("mass_loss_fraction"):
+        return Quantity.MASS_LOSS_FRACTION
+    return None
+
+
+def _vacuum_pyrolysis_sidecar_method(meas_id: str) -> State[MethodToken]:
+    token = _VACUUM_PYROLYSIS_SIDECAR_METHOD.get(meas_id)
+    if token is not None:
+        return State.of(token)
+    return State.unknown("vacuum pyrolysis sidecar does not state a closed method token")
+
+
+def _vacuum_pyrolysis_sidecar_temperature(meas: Mapping[str, Any]) -> dict[str, Any]:
+    cond = meas.get("conditions_reported")
+    if not isinstance(cond, Mapping):
+        return {}
+    hold = cond.get("peak_hold_temperature_C")
+    if isinstance(hold, Mapping) and hold.get("reported_value") is not None:
+        qualifier = str(hold.get("qualifier") or "")
+        if "approximate" not in qualifier and "about" not in qualifier:
+            return {"Tmax_C": hold.get("reported_value")}
+    temp = cond.get("temperature_C")
+    if isinstance(temp, Mapping) and temp.get("reported_value") is not None:
+        qualifier = str(temp.get("qualifier") or "")
+        if "approximate" in qualifier or "about" in qualifier or "peak" in qualifier:
+            return {}
+        return {"Tmax_C": temp.get("reported_value")}
+    return {}
+
+
 def _measured_oxygen_yield_fields(
     values: Mapping[str, Any],
 ) -> tuple[tuple[Quantity, str], ...] | None:
@@ -2642,6 +2693,7 @@ BOUNDARY_INGEST_CALLERS = frozenset(
         "_migrate_mre",
         "_migrate_langmuir",
         "_migrate_refractory",
+        "_migrate_vacuum_pyrolysis",
         "_migrate_ledger",
         "_migrate_compilation_file",
     }
@@ -4803,6 +4855,7 @@ class Migrator:
         self._migrate_mre(lit / "mre_measurements.yaml")
         self._migrate_langmuir(lit / "langmuir_knudsen_flux_validation.yaml")
         self._migrate_refractory(lit / "refractory_vaporization_validation.yaml")
+        self._migrate_vacuum_pyrolysis(lit / "vacuum_pyrolysis_measurements.yaml")
         self._migrate_ledger(lit / "gibbs_battery_residual_ledger.yaml")
         self._migrate_ledger(lit / "species_rail_differential_ledger.yaml")
 
@@ -5097,6 +5150,96 @@ class Migrator:
                         method=State.unknown("mre method not a closed token"),
                         uncertainty=uncertainty_for(point.get("uncertainty")),
                     )
+
+    def _migrate_vacuum_pyrolysis(self, path: Path) -> None:
+        if not path.is_file():
+            return
+        rel = path.relative_to(self.root).as_posix()
+        count = self._count(rel)
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping):
+            return
+        measurements = doc.get("measurements") or {}
+        if not isinstance(measurements, Mapping):
+            return
+        for meas_id, meas in measurements.items():
+            if not isinstance(meas, Mapping):
+                continue
+            paper = meas.get("paper_citation") if isinstance(meas.get("paper_citation"), Mapping) else {}
+            citation = str(
+                (paper or {}).get("label")
+                or (paper or {}).get("citation_id")
+                or meas_id
+            )
+            doi = extract_doi(meas.get("doi"), (paper or {}).get("doi"), citation)
+            work = self._work_from_citation(citation, doi, str(meas_id))
+            method = _vacuum_pyrolysis_sidecar_method(str(meas_id))
+            t_payload = _vacuum_pyrolysis_sidecar_temperature(meas)
+            evidence_token = (
+                "measured_direct"
+                if meas.get("evidence_class") == "experiment-grade"
+                else meas.get("evidence_class")
+            )
+            evidence, _ev_reason = self._evidence_for(evidence_token)
+            for point in meas.get("comparison_points") or []:
+                if not isinstance(point, Mapping):
+                    continue
+                observable = str(point.get("observable_id") or point.get("observable") or "")
+                quantity = _vacuum_pyrolysis_sidecar_quantity(observable)
+                if quantity is None:
+                    continue
+                require_rail_if_stated(point)
+                count.rows_in += 1
+                loc = locator_from_mapping(
+                    point.get("source_locator"), fallback=observable or str(meas_id)
+                )
+                assert loc is not None
+                payload = dict(point)
+                payload["quantity"] = quantity.value
+                payload.setdefault(quantity.value, point.get("expected_value"))
+                payload.update(t_payload)
+                value_sel = select_declared_source(quantity, point.get("units"), payload)
+                t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, payload)
+                t_state: Decimal | State[Decimal] | None
+                if t_sel.available:
+                    t_state = t_sel.amount
+                elif t_sel.condition_ranges:
+                    name, lo, hi = t_sel.condition_ranges[0]
+                    t_state = State.unknown(
+                        f"source {name} [{lo}, {hi}]; no midpoint invented"
+                    )
+                else:
+                    t_state = State.unknown(
+                        t_sel.reason or "source does not state temperature_K"
+                    )
+                formula = "unknown"
+                cond = meas.get("conditions_reported")
+                if isinstance(cond, Mapping):
+                    feed = cond.get("feedstock")
+                    if isinstance(feed, Mapping) and feed.get("species"):
+                        formula = str(feed.get("species"))
+                material = meas.get("material_context")
+                if formula == "unknown" and isinstance(material, Mapping):
+                    formula = str(
+                        material.get("feedstock_label_reported")
+                        or material.get("feedstock_id")
+                        or "unknown"
+                    )
+                self._generic_obs(
+                    work=work,
+                    source_id=str(meas_id),
+                    source_key=rel,
+                    observation_id=f"{meas_id}:{observable}",
+                    locator=loc,
+                    quantity=quantity,
+                    species=make_species(formula, State.unknown("sidecar does not state phase")),
+                    value=value_sel.value,
+                    evidence=evidence,
+                    temperature_K=t_state,
+                    method=method,
+                    uncertainty=uncertainty_for(point.get("uncertainty")),
+                    value_reason=value_sel.reason,
+                )
 
     def _migrate_langmuir(self, path: Path) -> None:
         if not path.is_file():

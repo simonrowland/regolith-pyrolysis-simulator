@@ -2190,6 +2190,33 @@ def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    (root / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "vacuum_pyrolysis_measurements.v1",
+                "measurements": {
+                    "pomeroy_cardiff_2006_measurements": {
+                        "evidence_class": "experiment-grade",
+                        "paper_citation": {"label": "Pomeroy fixture"},
+                        "conditions_reported": {
+                            "feedstock": {"species": "MLS-1A"},
+                            "peak_hold_temperature_C": {"reported_value": 1400},
+                        },
+                        "comparison_points": [
+                            {
+                                "observable_id": "pomeroy_non_condensed_mass_loss_fraction",
+                                "expected_value": 0.0117,
+                                "units": "mass_fraction",
+                                "source_locator": {"source_location": "results"},
+                            }
+                        ],
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
     (root / "data" / "literature" / "refractory_vaporization_validation.yaml").write_text(
         yaml.safe_dump(
             {
@@ -4028,3 +4055,38 @@ def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:
     reason = obs.identity.temperature_K.reason or ""
     assert "source T_range_K [1473.15, 2073.15]; no midpoint invented" == reason
     assert obs.identity.temperature_K.value is None
+
+
+def test_vacuum_pyrolysis_sidecar_loads_pomeroy_and_robinot_yields(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(tmp_path)
+    sidecar = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    (root / "data" / "literature" / "vacuum_pyrolysis_measurements.yaml").write_text(
+        yaml.safe_dump(sidecar, sort_keys=False),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    pomeroy = result.observations[
+        "pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction"
+    ]
+    assert quantity_token(pomeroy.identity) is Quantity.MASS_LOSS_FRACTION
+    assert pomeroy.value.kind is ValueKind.POINT
+    assert pomeroy.value.point == as_decimal("0.0117")
+    assert float(pomeroy.identity.temperature_K.value) == 1400.0 + 273.15
+    robinot_yield = result.observations[
+        "robinot_2026_deposit_measurements:robinot_o2_mass_yield_fraction"
+    ]
+    assert quantity_token(robinot_yield.identity) is Quantity.YIELD_FRACTION
+    assert robinot_yield.value.point == as_decimal("0.0105")
+    assert robinot_yield.identity.temperature_K.is_unknown
+    robinot_o2 = result.observations[
+        "robinot_2026_deposit_measurements:robinot_feed_oxygen_extraction_fraction"
+    ]
+    assert quantity_token(robinot_o2.identity) is Quantity.O2_YIELD
+    assert robinot_o2.value.point == as_decimal("0.0247")
+    assert "robinot_2026_deposit_measurements:robinot_o2_final_mass_kg" not in result.observations
