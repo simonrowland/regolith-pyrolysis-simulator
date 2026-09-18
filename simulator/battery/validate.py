@@ -36,6 +36,7 @@ Ambiguity resolutions:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, fields, is_dataclass
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -80,6 +81,8 @@ from simulator.battery.records import (
 )
 from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
+
+_PAREN_GROUP_RE = re.compile(r"\(([A-Za-z0-9]+)\)(\d*)")
 
 
 @dataclass(frozen=True)
@@ -305,12 +308,35 @@ def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Noti
     return tuple(found)
 
 
+def _expand_parenthetical_groups(formula: str) -> str:
+    """Expand (OH)4-style groups so JANAF tokenisation can see the atoms.
+
+    B1544 prints hydrated formulas this way. formula_composition returns None
+    for the unexpanded string because the rebuilt token stream cannot match
+    the parentheses; that is not an unbalanced reaction.
+    """
+
+    text = formula
+    while True:
+        match = _PAREN_GROUP_RE.search(text)
+        if match is None:
+            break
+        inner = match.group(1)
+        count = int(match.group(2) or "1")
+        text = text[: match.start()] + inner * count + text[match.end() :]
+    return text
+
+
 def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
     """Net element counts. Empty dict means balanced (within 1e-12)."""
 
     net: dict[str, float] = {}
     for term in reaction.terms:
         parsed = formula_composition(term.species.formula)
+        if parsed is None:
+            expanded = _expand_parenthetical_groups(term.species.formula)
+            if expanded != term.species.formula and "(" not in expanded:
+                parsed = formula_composition(expanded)
         if parsed is None:
             net[f"?{term.species.formula}"] = net.get(f"?{term.species.formula}", 0.0) + float(
                 term.coefficient

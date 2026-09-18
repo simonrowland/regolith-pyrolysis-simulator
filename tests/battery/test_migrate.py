@@ -3275,15 +3275,28 @@ def test_f1_usgs_unavailable_reasons_match_printed_gibbs_cells(tmp_path: Path) -
     assert "formation_gibbs_energy" in ocr_reason
     assert _ABSENT_DELTA_FG_CLAIM.search(ocr_reason) is None, ocr_reason
 
-    b1544 = result.observations[
-        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference"
+    b1544_prefix = (
+        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference:"
+    )
+    b1544 = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(b1544_prefix)
     ]
-    b1544_reason = b1544.value.unavailable_reason or ""
-    assert "formation.from_the_elements.gibbs_energy" in b1544_reason
-    assert "formation.from_the_oxides.gibbs_energy" in b1544_reason
-    assert "kJ/mol" in b1544_reason
-    assert "not imported by the generic migrator" in b1544_reason
-    assert _ABSENT_DELTA_FG_CLAIM.search(b1544_reason) is None, b1544_reason
+    assert b1544
+    assert f"{b1544_prefix.rstrip(':')}" not in result.observations
+    gibbs = [obs for obs in b1544 if quantity_token(obs.identity) is Quantity.DELTA_FG]
+    assert gibbs
+    assert all(obs.value.kind is ValueKind.POINT for obs in gibbs)
+    assert all(obs.identity.species.formula == "Al2SiO5" for obs in gibbs)
+    assert all(
+        "not imported by the generic migrator" not in (obs.value.unavailable_reason or "")
+        for obs in gibbs
+    )
+    assert all(
+        _ABSENT_DELTA_FG_CLAIM.search(obs.value.unavailable_reason or "") is None
+        for obs in gibbs
+    )
 
     ht = result.observations[
         "robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state"
@@ -3375,12 +3388,22 @@ def test_f2_phase_quotes_printed_text_and_keeps_unknown(tmp_path: Path) -> None:
     assert "Face-cente" in (phase.reason or "")
     assert "not in the closed automatic map" in (phase.reason or "")
 
-    b1544 = result.observations[
-        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference"
+    b1544_prefix = (
+        "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference:"
+    )
+    b1544 = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(b1544_prefix)
     ]
-    assert b1544.identity.species.phase.is_unknown
-    assert "Sillimanite" in (b1544.identity.species.phase.reason or "")
-    assert "does not state phase" not in (b1544.identity.species.phase.reason or "")
+    assert b1544
+    phases = [obs.identity.species.phase for obs in b1544]
+    assert all(phase.is_value and phase.value is Phase.CR for phase in phases)
+    assert all(
+        "not in the closed automatic map" not in (phase.reason or "")
+        for phase in phases
+    )
+    assert all(obs.identity.species.formula == "Al2SiO5" for obs in b1544)
 
     silver = result.observations[
         "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"

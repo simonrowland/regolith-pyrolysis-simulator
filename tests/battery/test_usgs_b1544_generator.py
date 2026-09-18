@@ -7,6 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -16,6 +17,7 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
     UncertaintyKind,
+    ValueKind,
 )
 from simulator.battery.generators import usgs_b1544 as generator
 from simulator.battery.identity import (
@@ -23,13 +25,26 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
 )
-from simulator.battery.migrate import make_species
+from simulator.battery.migrate import (
+    iter_observation_store_paths,
+    make_species,
+    observation_from_plain,
+)
+from simulator.battery.validate import reaction_atom_balance
 from simulator.battery.records import State
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
     COMPILATION_ROOT,
 )
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
+ROOT = Path(__file__).resolve().parents[2]
+B1544_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
+B1544_STORE_PATTERN = "compilations-hemingway-haas-robinson-1982-usgs-b1544.yaml"
+B1544_STORED = 3035
+B1544_REFUSED = 99
+B1544_EXCLUDED = 1605
+B1544_RAW = 4739
+JANAF_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 
 
 def _load(record_id: str) -> dict:
@@ -828,3 +843,242 @@ def test_healthy_corundum_accounting_is_not_unexplained() -> None:
     # Walker-level unexplained is test_cell_accounting_mutation_drops_one_token
     # (mutates STORED_GRID_COLUMNS and re-runs generate_record). Mutating a
     # deepcopy of the report dict does not exercise the walker.
+
+
+def _load_yaml(path: Path) -> dict:
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    payload = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+    assert isinstance(payload, dict)
+    return payload
+
+
+def _b1544_store_paths() -> list[Path]:
+    paths = iter_observation_store_paths(B1544_STORE_DIR, B1544_STORE_PATTERN)
+    assert paths, "B1544 observation store is missing"
+    return paths
+
+
+def _load_b1544_store_observations() -> list[dict]:
+    observations: list[dict] = []
+    for path in _b1544_store_paths():
+        payload = _load_yaml(path)
+        observations.extend(payload.get("observations") or [])
+    return observations
+
+
+def test_b1544_lift_is_the_generator() -> None:
+    src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
+    assert "def _lift_b1544_from_generator" in src
+    assert "generate_record" in src
+    assert "def _is_usgs_b1544_record" in src
+
+
+def test_b1544_store_is_record_sharded() -> None:
+    single = B1544_STORE_DIR / "compilations-hemingway-haas-robinson-1982-usgs-b1544.yaml"
+    shard_dir = B1544_STORE_DIR / "compilations-hemingway-haas-robinson-1982-usgs-b1544"
+    assert not single.exists()
+    assert shard_dir.is_dir()
+    paths = _b1544_store_paths()
+    assert all(path.parent == shard_dir for path in paths)
+    assert all(path.name.startswith("usgs-b1544-") and path.name.endswith(".yaml") for path in paths)
+    assert len(paths) == 33
+    n = sum(path.read_text(encoding="utf-8").count("\n- observation_id:") for path in paths)
+    assert n == B1544_STORED
+
+
+def test_b1544_store_census_is_true_of_observations_v2() -> None:
+    """Stored/refused/excluded must hold of observations-v2, not just generate_record."""
+
+    stored_rows = _load_b1544_store_observations()
+    stored_ids = {row["observation_id"] for row in stored_rows}
+    assert len(stored_rows) == B1544_STORED
+    assert len(stored_ids) == B1544_STORED
+    assert all(row.get("value", {}).get("kind") != "unavailable" for row in stored_rows)
+
+    generated_ids: set[str] = set()
+    refused = 0
+    excluded = 0
+    raw = 0
+    refused_as_published: set[str] = set()
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        generated = generator.generate_record(json.loads(path.read_text(encoding="utf-8")))
+        generated_ids.update(obs.observation_id for obs in generated.observations)
+        accounting = generated.report["cell_accounting"]
+        raw += int(accounting["raw_numeric_tokens"])
+        refused += int(accounting["refused"])
+        excluded += int(accounting["excluded"])
+        refused_as_published.update(
+            row["as_published"] for row in generated.report["refusals"]
+        )
+
+    assert raw == B1544_RAW
+    assert refused == B1544_REFUSED
+    assert excluded == B1544_EXCLUDED
+    assert stored_ids == generated_ids
+    assert B1544_STORED + B1544_REFUSED + B1544_EXCLUDED == B1544_RAW
+
+    notes = " ".join(str((row.get("locator") or {}).get("note") or "") for row in stored_rows)
+    for token in ("107.2J", "-1625.31P"):
+        assert token in refused_as_published
+        assert f"as_published='{token}'" not in notes
+
+
+def test_b1544_store_keeps_circularity_and_identity_fields() -> None:
+    rows = _load_b1544_store_observations()
+    warning = generator.CIRCULARITY_WARNING
+    corundum = None
+    quartz_sides: dict[str, dict] = {}
+    for row in rows:
+        relation = (row.get("derivation") or {}).get("relation") or ""
+        assert "scoring_eligible=false" in relation
+        assert warning in relation
+        evidence = (row.get("evidence") or {}).get("class") or {}
+        if ":usgs-b1544-table-1:" in row["observation_id"]:
+            assert evidence.get("value") == "quoted_attributed"
+        else:
+            assert evidence.get("value") == "compilation_assessed"
+        if (
+            row["observation_id"].startswith(
+                "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-corundum:delta_fG:"
+            )
+            and "T=298.15:" in row["observation_id"]
+            and "from_the_elements" in row["observation_id"]
+        ):
+            corundum = row
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz:S:shared:T="
+        ):
+            temp = ((row.get("identity") or {}).get("temperature_K") or {}).get("value")
+            poly = (
+                ((row.get("identity") or {}).get("species") or {}).get("polymorph") or {}
+            ).get("value")
+            if temp in {"700", "900"}:
+                quartz_sides[str(temp)] = {"polymorph": poly, "phase": ((row.get("identity") or {}).get("species") or {}).get("phase")}
+
+    assert corundum is not None
+    species = (corundum.get("identity") or {}).get("species") or {}
+    assert species.get("formula") == "Al2O3"
+    assert species.get("formula") != "usgs-b1544-corundum"
+    assert (species.get("polymorph") or {}).get("value") == "Corundum"
+    assert (species.get("phase") or {}).get("value") == "cr"
+    assert (corundum.get("identity") or {}).get("temperature_K", {}).get("value") == "298.15"
+    assert (corundum.get("identity") or {}).get("reaction", {}).get("tag") == "value"
+    assert corundum.get("value", {}).get("kind") == "point"
+    assert Decimal(str(corundum["value"]["point"])) == Decimal("-1582.242")
+    note = (corundum.get("locator") or {}).get("note") or ""
+    assert "formation_basis=from_the_elements" in note
+
+    assert quartz_sides["700"]["polymorph"] == "alpha"
+    assert quartz_sides["900"]["polymorph"] == "beta"
+
+    kyanite = next(
+        row
+        for row in rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kyanite:delta_fG:from_the_elements:T=298.15:"
+        )
+    )
+    oxides = next(
+        row
+        for row in rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kyanite:delta_fG:from_the_oxides:T=298.15:"
+        )
+    )
+    kya_obs = observation_from_plain(kyanite)
+    ox_obs = observation_from_plain(oxides)
+    cross = identity_equal(kya_obs.identity, ox_obs.identity)
+    assert cross.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "reaction" in cross.fields
+
+    reconstructed = [
+        row
+        for row in rows
+        if "as_published='199.3R'" in str((row.get("locator") or {}).get("note") or "")
+    ]
+    assert reconstructed
+    assert Decimal(str(reconstructed[0]["value"]["point"])) == Decimal("199.38")
+
+    hydrated = next(
+        row
+        for row in rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-alooh-reference:delta_fG:from_the_elements:T=298.15:"
+        )
+    )
+    assert reaction_atom_balance(observation_from_plain(hydrated).identity.reaction.value) == {}
+
+
+def test_store_identity_gap_vs_janaf_overlapping_species() -> None:
+    """Probe, not a unification: identity_equal cannot cross-check JANAF vs B1544."""
+
+    b1544_rows = _load_b1544_store_observations()
+    corundum = next(
+        row
+        for row in b1544_rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-corundum:delta_fG:from_the_elements:T=298.15:"
+        )
+    )
+    quartz = next(
+        row
+        for row in b1544_rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz:delta_fG:from_the_elements:T=298.15:"
+        )
+        and ((row.get("identity") or {}).get("species") or {}).get("polymorph", {}).get("value")
+        == "alpha"
+    )
+
+    janaf_al = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-Al.yaml")
+    janaf_o = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-O.yaml")
+    al096 = next(
+        row
+        for row in janaf_al["observations"]
+        if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:segment-0"
+    )
+    o037 = next(
+        row
+        for row in janaf_o["observations"]
+        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:segment-0"
+    )
+
+    b1544_al = observation_from_plain(corundum)
+    b1544_qz = observation_from_plain(quartz)
+    janaf_al2o3 = observation_from_plain(al096)
+    janaf_sio2 = observation_from_plain(o037)
+
+    al_gap = identity_equal(janaf_al2o3.identity, b1544_al.identity)
+    sio2_gap = identity_equal(janaf_sio2.identity, b1544_qz.identity)
+    assert al_gap.kind is not IdentityEqualKind.EQUAL
+    assert sio2_gap.kind is not IdentityEqualKind.EQUAL
+
+    # First blocking axis is polymorph. identity_equal short-circuits there,
+    # so T and reaction never get compared.
+    # Al2O3: JANAF unknown (index state 'cr' only, despite title
+    # "Aluminum Oxide, Alpha") vs B1544 named "Corundum" → IDENTITY_UNKNOWN.
+    # SiO2: JANAF named 'i' from the printed "I <--> II" label vs B1544
+    # "alpha" from the quartz phase split → IDENTITY_MISMATCH on the token.
+    assert "species.polymorph" in al_gap.fields
+    assert al_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "species.polymorph" in sio2_gap.fields
+    assert sio2_gap.kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+    # What each side would need before a follow-up can even reach T / reaction:
+    # JANAF Al-096: read the printed title polymorph into species.polymorph.
+    # JANAF O-037: map 'i'/'ii' onto the same token B1544 uses ('alpha'/'beta'),
+    # or the reverse. B1544 already names the bulletin mineral/phase.
+    # Then T: JANAF series with unknown identity.temperature_K vs B1544 point
+    # at 298.15 K — identity_equal has no series-vs-point comparison.
+    # Then reaction: JANAF unknown prose vs B1544 filled Formation Reaction.
+    assert janaf_al2o3.value.kind is ValueKind.SERIES
+    assert b1544_al.value.kind is ValueKind.POINT
+    assert janaf_al2o3.identity.temperature_K.is_unknown
+    assert b1544_al.identity.temperature_K.is_value
+    assert janaf_al2o3.identity.reaction.is_unknown
+    assert b1544_al.identity.reaction.is_value
+    assert janaf_al2o3.identity.species.polymorph.is_unknown
+    assert b1544_al.identity.species.polymorph.value == "Corundum"
+    assert janaf_sio2.identity.species.formula == b1544_qz.identity.species.formula == "SiO2"
+    assert janaf_sio2.identity.species.polymorph.value == "i"
+    assert b1544_qz.identity.species.polymorph.value == "alpha"

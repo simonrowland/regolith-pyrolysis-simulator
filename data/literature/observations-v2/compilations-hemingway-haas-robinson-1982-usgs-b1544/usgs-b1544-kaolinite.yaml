@@ -1,0 +1,6109 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+observations:
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:S:shared:T=1000:row=7:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '588.88'
+  uncertainty:
+    kind: printed
+    verbatim: '1.02'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='588.88'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:S:shared:T=298.15:row=0:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '204.97'
+  uncertainty:
+    kind: printed
+    verbatim: '1.02'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='204.97'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); temperature_reconstructed=298.15 method_class=reconstructed_from_heading_and_logkf_identity;
+      evidence=Kaolinite p.59 first row under heading 'Crystals 298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches
+      ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679); the 335.94 identity delta is the T error of reading :198.15
+      as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; row temperature reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:S:shared:T=500:row=2:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '351.94'
+  uncertainty:
+    kind: printed
+    verbatim: '1.02'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='351.94'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:S:shared:T=600:row=3:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '411.38'
+  uncertainty:
+    kind: printed
+    verbatim: '1.02'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='411.38'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:S:shared:T=900:row=6:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '551.63'
+  uncertainty:
+    kind: printed
+    verbatim: '1.02'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='551.63'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:cp:shared:T=1000:row=7:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '353.45'
+  uncertainty:
+    kind: printed
+    verbatim: '0.77'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='353.45'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:cp:shared:T=298.15:row=0:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '246.14'
+  uncertainty:
+    kind: printed
+    verbatim: '0.77'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='246.14'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); temperature_reconstructed=298.15 method_class=reconstructed_from_heading_and_logkf_identity;
+      evidence=Kaolinite p.59 first row under heading 'Crystals 298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches
+      ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679); the 335.94 identity delta is the T error of reading :198.15
+      as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; row temperature reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:cp:shared:T=500:row=2:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '317.2'
+  uncertainty:
+    kind: printed
+    verbatim: '0.77'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='317.20'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:cp:shared:T=600:row=3:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '334.09'
+  uncertainty:
+    kind: printed
+    verbatim: '0.77'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='334.09'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:cp:shared:T=900:row=6:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '353.18'
+  uncertainty:
+    kind: printed
+    verbatim: '0.77'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='353.18'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_elements:T=1000:row=7:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3047.479'
+  uncertainty:
+    kind: printed
+    verbatim: (0.982)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-3047.479'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_elements:T=298.15:row=0:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3799.611'
+  uncertainty:
+    kind: printed
+    verbatim: (0.982)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-3799.611'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_elements:T=500:row=2:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3582.177'
+  uncertainty:
+    kind: printed
+    verbatim: (0.982)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-3582.177'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_elements:T=600:row=3:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3474.764'
+  uncertainty:
+    kind: printed
+    verbatim: (0.982)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-3474.764'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_elements:T=900:row=6:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-3154.98'
+  uncertainty:
+    kind: printed
+    verbatim: (0.982)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-3154.980'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_oxides:T=1000:row=7:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '158.885'
+  uncertainty:
+    kind: printed
+    verbatim: '0.982'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='158.885'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_oxides:T=298.15:row=0:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-30.571'
+  uncertainty:
+    kind: printed
+    verbatim: '0.982'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-30.571'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_oxides:T=500:row=2:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '13.35'
+  uncertainty:
+    kind: printed
+    verbatim: '0.982'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='13.350'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_oxides:T=600:row=3:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '42.862'
+  uncertainty:
+    kind: printed
+    verbatim: '0.982'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='42.862'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fG:from_the_oxides:T=900:row=6:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '129.974'
+  uncertainty:
+    kind: printed
+    verbatim: '0.982'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='129.974'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_elements:T=1000:row=7:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4129.37'
+  uncertainty:
+    kind: printed
+    verbatim: (1.065)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-4129.370'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_elements:T=298.15:row=0:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4119.78'
+  uncertainty:
+    kind: printed
+    verbatim: (1.065)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-4119.780'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_elements:T=500:row=2:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4120.173'
+  uncertainty:
+    kind: printed
+    verbatim: (1.065)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-4120.173'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_elements:T=600:row=3:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4117.887'
+  uncertainty:
+    kind: printed
+    verbatim: (1.065)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-4117.887'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_elements:T=900:row=6:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4109.855'
+  uncertainty:
+    kind: printed
+    verbatim: (1.065)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='-4109.855'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_oxides:T=1000:row=7:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-129.698'
+  uncertainty:
+    kind: printed
+    verbatim: '1.065'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-129.698'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_oxides:T=298.15:row=0:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-51.055'
+  uncertainty:
+    kind: printed
+    verbatim: '1.065'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-51.055'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_oxides:T=500:row=2:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-135.216'
+  uncertainty:
+    kind: printed
+    verbatim: '1.065'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-135.216'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_oxides:T=600:row=3:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-133.059'
+  uncertainty:
+    kind: printed
+    verbatim: '1.065'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-133.059'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:delta_fH:from_the_oxides:T=900:row=6:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-130.802'
+  uncertainty:
+    kind: printed
+    verbatim: '1.065'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-130.802'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_elements:T=1000:row=7:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '159.185'
+  uncertainty:
+    kind: printed
+    verbatim: (0.172)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='159.185'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '665.679'
+  uncertainty:
+    kind: printed
+    verbatim: (0.172)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='665.679'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_elements:T=500:row=2:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '374.229'
+  uncertainty:
+    kind: printed
+    verbatim: (0.172)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='374.229'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_elements:T=600:row=3:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '302.506'
+  uncertainty:
+    kind: printed
+    verbatim: (0.172)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='302.506'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_elements:T=900:row=6:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-2'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -9/2
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '183.111'
+  uncertainty:
+    kind: printed
+    verbatim: (0.172)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='183.111'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_oxides:T=1000:row=7:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-8.299'
+  uncertainty:
+    kind: printed
+    verbatim: '0.172'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-8.299'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_oxides:T=298.15:row=0:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '5.356'
+  uncertainty:
+    kind: printed
+    verbatim: '0.172'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: reconstructed_from_heading_and_logkf_identity
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='5.356'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides; temperature_reconstructed=298.15
+      method_class=reconstructed_from_heading_and_logkf_identity; evidence=Kaolinite p.59 first row under heading 'Crystals
+      298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679);
+      the 335.94 identity delta is the T error of reading :198.15 as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention; row temperature
+      reconstructed from ':198.15' via reconstructed_from_heading_and_logkf_identity
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_oxides:T=500:row=2:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-1.395'
+  uncertainty:
+    kind: printed
+    verbatim: '0.172'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-1.395'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_oxides:T=600:row=3:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-3.731'
+  uncertainty:
+    kind: printed
+    verbatim: '0.172'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-3.731'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:log10_Kf:from_the_oxides:T=900:row=6:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Al2Si2O5(OH)4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Kaolinite
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Al2Si2O5(OH)4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Kaolinite
+          coefficient: '1'
+        - species:
+            formula: Al2O3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: corundum
+          coefficient: '-1'
+        - species:
+            formula: SiO2
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: quartz
+          coefficient: '-2'
+        - species:
+            formula: H2O
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-7.544'
+  uncertainty:
+    kind: printed
+    verbatim: '0.172'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 60
+    pdf_page_index: 66
+    table: usgs-b1544-kaolinite
+    note: as_published='-7.544'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_oxides
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE OXIDES (even
+      continuation pages; asterisks on ΔfH and ΔfG); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless

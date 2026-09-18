@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -161,6 +161,24 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
         dest.write_bytes(source.read_bytes())
     result = migrate(root, write=False)
     for family, record, column in witnesses:
+        if record == "usgs-b1544-table-1":
+            prefix = f"{family}:{record}:"
+            table1 = [
+                obs
+                for oid, obs in result.observations.items()
+                if oid.startswith(prefix)
+            ]
+            assert table1
+            assert f"{family}:{record}" not in result.observations
+            assert all(obs.value.kind is ValueKind.POINT for obs in table1)
+            assert all(
+                obs.evidence.class_.is_value
+                and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+                for obs in table1
+            )
+            formulas = {obs.identity.species.formula for obs in table1}
+            assert "Al2O3" in formulas and "SiO2" in formulas
+            continue
         obs = result.observations[f"{family}:{record}"]
         assert obs.value.kind is ValueKind.UNAVAILABLE
         reason = obs.value.unavailable_reason
@@ -171,11 +189,6 @@ def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):
         if record == "atomic-weight-001":
             assert "scalar-only atomic_weight: 1 numeric cells and no coordinate" in reason
             assert obs.identity.quantity.is_unknown
-        elif record == "usgs-b1544-table-1":
-            phase = obs.identity.species.phase
-            assert phase.is_unknown
-            assert "multi-phase table" in phase.reason
-            assert "Corundum Al2O3" in phase.reason and "Quartz SiO2" in phase.reason
         else:
             assert "temperature grid" in obs.identity.temperature_K.reason
         if record == "high-temperature-p253":
@@ -428,7 +441,6 @@ _COUNT_SKIP_KEYS = {
     "ocr_reasons",
 }
 _EXPECTED_COUNT_CLAIMS = {
-    "compilations-hemingway-haas-robinson-1982-usgs-b1544.yaml": 41,
     "compilations-kelley-1960-usbm-b584.yaml": 2679,
     "compilations-kelley-king-1961-usbm-b592.yaml": 16231,
     "compilations-pankratz-1984-usbm-b677.yaml": 9235,
@@ -603,7 +615,7 @@ def test_h5_whole_store_numeric_cell_claims_match_sources(path):
 
 
 def test_h5_numeric_cell_claim_inventory_and_mutation():
-    assert sum(_EXPECTED_COUNT_CLAIMS.values()) == 36646
+    assert sum(_EXPECTED_COUNT_CLAIMS.values()) == 36605
     path = (
         REPO_ROOT
         / "data/literature/observations-v2/compilations-pankratz-1984-usbm-b677.yaml"

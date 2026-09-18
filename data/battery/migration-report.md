@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
 rows in: 45736
-records out (observations): 58693
+records out (observations): 61695
 works: 165
-experiments: 5881
-queue size: 111652
+experiments: 5913
+queue size: 114587
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 167
@@ -6954,39 +6954,39 @@ hard issues: 1215
 | `data/literature/compilations/burcat/records/BU-3446.json` | 1 | 1 | 2 |
 | `data/literature/compilations/burcat/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/manifest.yaml` | 0 | 0 | 0 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-al2sio5-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-alooh-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-andalusite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-anorthite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-boehmite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca-al-pyroxene.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca3sio5-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-casio3-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-corundum.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-cyclowollastonite-pseudowollastonite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-dickite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gehlenite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gibbsite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-grossulsr.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-h2o-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-halloysite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kyanite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite-reference.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-lime.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-margarite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-prehnite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-pyrophyllite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-quartz.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-rankinite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-sillimanite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-table-1.json` | 1 | 1 | 4 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-wollastonite.json` | 1 | 1 | 3 |
-| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-zoisite.json` | 1 | 1 | 3 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-al2sio5-reference.json` | 1 | 160 | 160 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-alooh-reference.json` | 1 | 35 | 35 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-andalusite.json` | 1 | 127 | 127 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-anorthite.json` | 1 | 128 | 128 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-boehmite.json` | 1 | 30 | 30 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca-al-pyroxene.json` | 1 | 128 | 128 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca3sio5-reference.json` | 1 | 120 | 120 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine-reference.json` | 1 | 159 | 159 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine.json` | 1 | 80 | 80 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-casio3-reference.json` | 1 | 135 | 135 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-corundum.json` | 1 | 79 | 79 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-cyclowollastonite-pseudowollastonite.json` | 1 | 128 | 128 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json` | 1 | 19 | 19 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-dickite.json` | 1 | 56 | 56 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gehlenite.json` | 1 | 128 | 128 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gibbsite.json` | 1 | 30 | 30 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-grossulsr.json` | 1 | 96 | 96 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-h2o-reference.json` | 1 | 84 | 84 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-halloysite.json` | 1 | 56 | 56 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json` | 1 | 40 | 40 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kyanite.json` | 1 | 111 | 111 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite-reference.json` | 1 | 160 | 160 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite.json` | 1 | 72 | 72 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-lime.json` | 1 | 80 | 80 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-margarite.json` | 1 | 80 | 80 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-prehnite.json` | 1 | 80 | 80 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-pyrophyllite.json` | 1 | 80 | 80 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-quartz.json` | 1 | 90 | 90 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-rankinite.json` | 1 | 95 | 95 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-sillimanite.json` | 1 | 127 | 127 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-table-1.json` | 1 | 82 | 82 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-wollastonite.json` | 1 | 104 | 104 |
+| `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-zoisite.json` | 1 | 56 | 56 |
 | `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/janaf/html-era-txt-divergence.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/janaf/manifest.yaml` | 0 | 0 | 0 |
@@ -18161,8 +18161,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 135913
+advisory issues: 135753
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 135913 |
+| `identity_incomplete` | 135753 |

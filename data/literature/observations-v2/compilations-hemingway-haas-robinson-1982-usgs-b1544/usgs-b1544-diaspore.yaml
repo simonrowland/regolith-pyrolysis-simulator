@@ -1,0 +1,2560 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+observations:
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=400:row=1:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '52.81'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='52.81'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=600:row=3:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '82.53'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='82.53'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:S:shared:T=700:row=4:col=entropy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '95.35'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='95.35'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=400:row=1:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '65.57'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='65.57'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=500:row=2:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '74.16'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='74.16'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=600:row=3:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '80.6'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='80.60'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:cp:shared:T=700:row=4:col=heat_capacity:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '85.66'
+  uncertainty:
+    kind: printed
+    verbatim: '0.09'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='85.66'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=400:row=1:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-893.875'
+  uncertainty:
+    kind: printed
+    verbatim: (0.362)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-893.875'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=500:row=2:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-867.21'
+  uncertainty:
+    kind: printed
+    verbatim: (0.362)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-867.210'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=600:row=3:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-840.569'
+  uncertainty:
+    kind: printed
+    verbatim: (0.362)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-840.569'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fG:from_the_elements:T=700:row=4:col=formation_gibbs_energy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-814.029'
+  uncertainty:
+    kind: printed
+    verbatim: (0.362)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-814.029'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=400:row=1:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1000.425'
+  uncertainty:
+    kind: printed
+    verbatim: (0.366)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-1000.425'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=500:row=2:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1000.561'
+  uncertainty:
+    kind: printed
+    verbatim: (0.366)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-1000.561'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=600:row=3:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1000.167'
+  uncertainty:
+    kind: printed
+    verbatim: (0.366)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-1000.167'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:delta_fH:from_the_elements:T=700:row=4:col=formation_enthalpy:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-999.422'
+  uncertainty:
+    kind: printed
+    verbatim: (0.366)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='-999.422'; unit='kJ/mol' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 15
+          pdf_page_index: 21
+          note: 'PDF page 21 (printed p. 15) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=400:row=1:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '116.729'
+  uncertainty:
+    kind: printed
+    verbatim: (0.063)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='116.729'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=500:row=2:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '90.597'
+  uncertainty:
+    kind: printed
+    verbatim: (0.063)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='90.597'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=600:row=3:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '73.178'
+  uncertainty:
+    kind: printed
+    verbatim: (0.063)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='73.178'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless
+- observation_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:log10_Kf:from_the_elements:T=700:row=4:col=log_kf:src=grid
+  experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: Diaspore
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: Diaspore
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '60.7114'
+  uncertainty:
+    kind: printed
+    verbatim: (0.063)
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: hemingway-haas-robinson-1982-usgs-b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='60.7114'; unit='dimensionless' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+  read_from: unknown:hemingway-haas-robinson-1982-usgs-b1544
+  derivation:
+    relation: Direct B1544 T-grid tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1544 heading FORMATION FROM THE ELEMENTS
+      (odd pages; unit row PDF p. 21 / printed p. 15); schema v2.1 has no closed token for this convention
+    inputs:
+    - unknown:hemingway-haas-robinson-1982-usgs-b1544
+    parameters: []
+    output_unit: dimensionless

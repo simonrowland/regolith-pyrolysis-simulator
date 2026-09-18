@@ -20,7 +20,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.3133/b1544
 experiments:
-- experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference:tabulation
   kind: literature
   method:
     tag: value
@@ -46,5 +46,1069 @@ experiments:
         reason: source does not state pressure
   work_id: 10.3133/b1544
   locator:
-    note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[29, 30]; printed_pages=[23, 24]
+    published_page: 23
+    pdf_page_index: 29
+    table: usgs-b1544-al2sio5-reference
+    note: as_published='84.47'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
     source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-al2sio5-reference.json
+    record: usgs-b1544-al2sio5-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-alooh-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 16
+    pdf_page_index: 22
+    table: usgs-b1544-alooh-reference
+    note: as_published='35.34'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-alooh-reference.json
+    record: usgs-b1544-alooh-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-andalusite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 27
+    pdf_page_index: 33
+    table: usgs-b1544-andalusite
+    note: as_published='93.77'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-andalusite.json
+    record: usgs-b1544-andalusite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-anorthite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 57
+    pdf_page_index: 63
+    table: usgs-b1544-anorthite
+    note: as_published='199.29'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-anorthite.json
+    record: usgs-b1544-anorthite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-boehmite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 18
+    pdf_page_index: 24
+    table: usgs-b1544-boehmite
+    note: as_published='48.43'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-boehmite.json
+    record: usgs-b1544-boehmite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-ca-al-pyroxene:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 55
+    pdf_page_index: 61
+    table: usgs-b1544-ca-al-pyroxene
+    note: as_published='141.61'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca-al-pyroxene.json
+    record: usgs-b1544-ca-al-pyroxene
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-ca3sio5-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 31
+    pdf_page_index: 37
+    table: usgs-b1544-ca3sio5-reference
+    note: as_published='168.60'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-ca3sio5-reference.json
+    record: usgs-b1544-ca3sio5-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-calcium-olivine-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 37
+    pdf_page_index: 43
+    table: usgs-b1544-calcium-olivine-reference
+    note: as_published='120.50'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine-reference.json
+    record: usgs-b1544-calcium-olivine-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-calcium-olivine:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 39
+    pdf_page_index: 45
+    table: usgs-b1544-calcium-olivine
+    note: as_published='120.50'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-calcium-olivine.json
+    record: usgs-b1544-calcium-olivine
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-casio3-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 49
+    pdf_page_index: 55
+    table: usgs-b1544-casio3-reference
+    note: as_published='81.03'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-casio3-reference.json
+    record: usgs-b1544-casio3-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-corundum:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 15
+    pdf_page_index: 21
+    table: usgs-b1544-corundum
+    note: as_published='50.92'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-corundum.json
+    record: usgs-b1544-corundum
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-cyclowollastonite-pseudowollastonite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 53
+    pdf_page_index: 59
+    table: usgs-b1544-cyclowollastonite-pseudowollastonite
+    note: as_published='87.24'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-cyclowollastonite-pseudowollastonite.json
+    record: usgs-b1544-cyclowollastonite-pseudowollastonite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-diaspore:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 17
+    pdf_page_index: 23
+    table: usgs-b1544-diaspore
+    note: as_published='52.81'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-diaspore.json
+    record: usgs-b1544-diaspore
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-dickite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 61
+    pdf_page_index: 67
+    table: usgs-b1544-dickite
+    note: as_published='197.06'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-dickite.json
+    record: usgs-b1544-dickite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-gehlenite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 43
+    pdf_page_index: 49
+    table: usgs-b1544-gehlenite
+    note: as_published='209.89'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gehlenite.json
+    record: usgs-b1544-gehlenite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-gibbsite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 19
+    pdf_page_index: 25
+    table: usgs-b1544-gibbsite
+    note: as_published='68.44'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-gibbsite.json
+    record: usgs-b1544-gibbsite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-grossulsr:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    table: usgs-b1544-grossulsr
+    note: as_published='255.97'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-grossulsr.json
+    record: usgs-b1544-grossulsr
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-h2o-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 21
+    pdf_page_index: 27
+    table: usgs-b1544-h2o-reference
+    note: as_published='69.92'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-h2o-reference.json
+    record: usgs-b1544-h2o-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-halloysite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 63
+    pdf_page_index: 69
+    table: usgs-b1544-halloysite
+    note: as_published='203.33'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-halloysite.json
+    record: usgs-b1544-halloysite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kaolinite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 59
+    pdf_page_index: 65
+    table: usgs-b1544-kaolinite
+    note: as_published='204.97'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); temperature_reconstructed=298.15 method_class=reconstructed_from_heading_and_logkf_identity;
+      evidence=Kaolinite p.59 first row under heading 'Crystals 298.15 to 1000 K'; (H−H298)/T=0.000; log Kf 665.679 matches
+      ΔfG −3799.611 at 298.15 with R=8.3143 (predicted 665.679); the 335.94 identity delta is the T error of reading :198.15
+      as 198.15. Reconstruct 298.15.
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kaolinite.json
+    record: usgs-b1544-kaolinite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-kyanite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 25
+    pdf_page_index: 31
+    table: usgs-b1544-kyanite
+    note: as_published='84.47'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-kyanite.json
+    record: usgs-b1544-kyanite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-larnite-reference:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 33
+    pdf_page_index: 39
+    table: usgs-b1544-larnite-reference
+    note: as_published='126.72'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite-reference.json
+    record: usgs-b1544-larnite-reference
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-larnite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 35
+    pdf_page_index: 41
+    table: usgs-b1544-larnite
+    note: as_published='126.72'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-larnite.json
+    record: usgs-b1544-larnite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-lime:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 20
+    pdf_page_index: 26
+    table: usgs-b1544-lime
+    note: as_published='38.10'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-lime.json
+    record: usgs-b1544-lime
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-margarite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 67
+    pdf_page_index: 73
+    table: usgs-b1544-margarite
+    note: as_published='263.64'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-margarite.json
+    record: usgs-b1544-margarite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-prehnite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 69
+    pdf_page_index: 75
+    table: usgs-b1544-prehnite
+    note: as_published='292.74'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-prehnite.json
+    record: usgs-b1544-prehnite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-pyrophyllite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 65
+    pdf_page_index: 71
+    table: usgs-b1544-pyrophyllite
+    note: as_published='239.42'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-pyrophyllite.json
+    record: usgs-b1544-pyrophyllite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 22
+    pdf_page_index: 28
+    table: usgs-b1544-quartz
+    note: as_published='41.46'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-quartz.json
+    record: usgs-b1544-quartz
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-rankinite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 41
+    pdf_page_index: 47
+    table: usgs-b1544-rankinite
+    note: as_published='210.60'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-rankinite.json
+    record: usgs-b1544-rankinite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-sillimanite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 29
+    pdf_page_index: 35
+    table: usgs-b1544-sillimanite
+    note: as_published='96.09'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-sillimanite.json
+    record: usgs-b1544-sillimanite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-table-1:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 9
+    pdf_page_index: 15
+    table: TABLE 1
+    note: as_published='-1675.711'; unit='kJ/mol at 298.15 K' quoted from TABLE 1 header PDF p. 15 / printed p. 9; standard_pressure=1
+      bar from title (298.15 K and 1 Bar (10^5 Pascals) Pressure); formation_basis=from_the_elements; literature_source=haas_1979
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-table-1.json
+    record: usgs-b1544-table-1
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-wollastonite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 51
+    pdf_page_index: 57
+    table: usgs-b1544-wollastonite
+    note: as_published='81.03'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar from
+      title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-wollastonite.json
+    record: usgs-b1544-wollastonite
+- experiment_id: hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-zoisite:tabulation
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    published_page: 47
+    pdf_page_index: 53
+    table: usgs-b1544-zoisite
+    note: as_published='295.88'; unit='J/mol·K' quoted from PDF page 21 (printed p. 15) unit row; standard_pressure=1 bar
+      from title (298.15 K and 1 Bar (10^5 Pascals) Pressure)
+    source_path: data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-zoisite.json
+    record: usgs-b1544-zoisite
