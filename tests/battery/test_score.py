@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import warnings
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -865,3 +866,192 @@ def test_missing_live_result_is_coverage_failure() -> None:
     failures = pin_failures([], [record])
     assert failures
     assert failures[0]["reason"] == "coverage_failure"
+
+
+def _stamp(**overrides) -> dict:
+    payload = {
+        "kind": "battery_store_stamp",
+        "revision": "aaa111ccc",
+        "rows_in": 10,
+        "observations": 20,
+        "works": 2,
+        "experiments": 3,
+        "queue": 4,
+        "hard_issues": 5,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_store_stamp_mismatch_warns() -> None:
+    from simulator.battery.score import store_stamp_mismatch_warning
+
+    live = _stamp()
+    recorded = _stamp(revision="bbb222ddd")
+    warning = store_stamp_mismatch_warning(recorded, live)
+    assert warning is not None
+    assert "bbb222ddd" in warning
+    assert "aaa111ccc" in warning
+
+
+def test_store_stamp_match_is_silent() -> None:
+    from simulator.battery.score import store_stamp_mismatch_warning
+
+    live = _stamp()
+    assert store_stamp_mismatch_warning(live, live) is None
+    assert store_stamp_mismatch_warning(_stamp(), _stamp()) is None
+
+
+def test_unstamped_residuals_warn() -> None:
+    from simulator.battery.score import store_stamp_mismatch_warning
+
+    live = _stamp()
+    warning = store_stamp_mismatch_warning(None, live)
+    assert warning is not None
+    assert "no store revision" in warning
+    assert "aaa111ccc" in warning
+
+
+def test_emit_store_stamp_mismatch_is_reachable() -> None:
+    from simulator.battery.score import emit_store_stamp_mismatch_warning
+
+    live = _stamp()
+    with pytest.warns(UserWarning, match="recorded store `bbb222ddd`"):
+        warning = emit_store_stamp_mismatch_warning(_stamp(revision="bbb222ddd"), live)
+    assert warning is not None
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        assert emit_store_stamp_mismatch_warning(live, live) is None
+        assert caught == []
+
+
+def test_write_residuals_stamps_derived_store_and_load_skips_it(tmp_path: Path) -> None:
+    import json
+
+    from simulator.battery.score import (
+        STORE_STAMP_KIND,
+        derive_store_stamp,
+        load_residuals_jsonl,
+        load_residuals_stamp,
+        write_residuals_jsonl,
+    )
+
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    residual, candidate = _compile(
+        F.observation(
+            "o2-ref",
+            exp.experiment_id,
+            ident,
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        exp,
+        _predict(Decimal("0"), ident),
+    )
+    path = tmp_path / "residuals.jsonl"
+    candidates = {}
+    if candidate is not None:
+        candidates[candidate.observation_id] = candidate
+    write_residuals_jsonl((residual,), candidates, path)
+    live = derive_store_stamp()
+    stamp = load_residuals_stamp(path)
+    assert stamp is not None
+    assert stamp["kind"] == STORE_STAMP_KIND
+    assert stamp["revision"] == live["revision"]
+    assert stamp["observations"] == live["observations"]
+    first = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    assert first["kind"] == STORE_STAMP_KIND
+    rows = load_residuals_jsonl(path)
+    assert len(rows) == 1
+    assert rows[0]["key"] == residual.key
+    assert "kind" not in rows[0] or rows[0].get("kind") != STORE_STAMP_KIND
+
+
+def test_score_report_names_the_measured_store() -> None:
+    from simulator.battery.score import derive_store_stamp, render_score_report
+
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    residual, _ = _compile(
+        F.observation(
+            "o2-ref",
+            exp.experiment_id,
+            ident,
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="work-1",
+        ),
+        exp,
+        _predict(Decimal("0"), ident),
+    )
+    ctx = _context(F.work(), exp)
+    report = render_score_report((residual,), context=ctx, engines=(Engine.INTERNAL_ANALYTICAL,))
+    stamp = derive_store_stamp()
+    assert f"This report measured store `{stamp['revision']}`" in report
+    assert f"{stamp['rows_in']} rows in" in report
+    assert f"{stamp['observations']} observations" in report
+    assert f"{stamp['works']} works" in report
+    assert f"{stamp['experiments']} experiments" in report
+    assert f"queue {stamp['queue']}" in report
+    assert f"{stamp['hard_issues']} hard issues" in report
+    assert "Warning:" not in report
+
+
+def test_score_report_from_payloads_surfaces_mismatch_warning() -> None:
+    from simulator.battery.score import render_score_report_from_payloads
+
+    live = _stamp()
+    recorded = _stamp(revision="bbb222ddd")
+    from simulator.battery.score import store_stamp_mismatch_warning
+
+    warning = store_stamp_mismatch_warning(recorded, live)
+    report = render_score_report_from_payloads(
+        [],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        store_stamp=recorded,
+        mismatch_warning=warning,
+    )
+    assert "This report measured store `bbb222ddd`" in report
+    assert "Warning:" in report
+    assert "bbb222ddd" in report
+    assert "aaa111ccc" in report
+    silent = render_score_report_from_payloads(
+        [],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        hostname="test",
+        store_stamp=live,
+        mismatch_warning=None,
+    )
+    assert "This report measured store `aaa111ccc`" in silent
+    assert "Warning:" not in silent
+
+
+def test_battery_score_script_does_not_take_a_hand_stamp() -> None:
+    src = Path("scripts/battery_score.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    flags = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not isinstance(func, ast.Attribute) or func.attr != "add_argument":
+            continue
+        for arg in node.args:
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                flags.append(arg.value)
+    assert "--revision" not in flags
+    assert "--store-revision" not in flags
+    assert "--stamp" not in flags
+    assert "derive_store_stamp" in src
+    from simulator.battery import score as score_mod
+
+    tree = ast.parse(inspect.getsource(score_mod.write_residuals_jsonl))
+    called = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert "derive_store_stamp" in called

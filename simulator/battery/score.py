@@ -11,8 +11,11 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import socket
+import subprocess
 import time
+import warnings
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -129,6 +132,23 @@ COMPILATION_SOURCE_MARKERS: frozenset[str] = frozenset(
     }
 )
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
+
+STORE_STAMP_KIND = "battery_store_stamp"
+STORE_REVISION_PATHS: tuple[str, ...] = (
+    "data/literature/observations-v2",
+    "data/literature/extracts-v2",
+    "data/literature/works",
+    "data/battery/migration-report.md",
+    "data/battery/migration-queue.yaml",
+)
+_MIGRATION_HEADLINE_FIELDS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("rows_in", re.compile(r"^rows in: (\d+)\s*$", re.M)),
+    ("observations", re.compile(r"^records out \(observations\): (\d+)\s*$", re.M)),
+    ("works", re.compile(r"^works: (\d+)\s*$", re.M)),
+    ("experiments", re.compile(r"^experiments: (\d+)\s*$", re.M)),
+    ("queue", re.compile(r"^queue size: (\d+)\s*$", re.M)),
+    ("hard_issues", re.compile(r"^hard issues: (\d+)\s*$", re.M)),
+)
 
 REVIEW_PERMITS_USE: frozenset[str | None] = frozenset(
     {None, "draft", "reviewed", "adopted", "accepted"}
@@ -1663,16 +1683,135 @@ def dumps_residual_line(
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
+def parse_migration_headline(text: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for key, pattern in _MIGRATION_HEADLINE_FIELDS:
+        match = pattern.search(text)
+        if match is None:
+            raise ValueError(f"migration report missing {key} headline")
+        counts[key] = int(match.group(1))
+    return counts
+
+
+def store_git_revision(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(root), "log", "-1", "--format=%h", "--", *STORE_REVISION_PATHS],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    revision = result.stdout.strip()
+    if result.returncode != 0 or not revision:
+        detail = (result.stderr or result.stdout or "git log failed").strip()
+        raise RuntimeError(f"could not derive store revision: {detail}")
+    return revision
+
+
+def derive_store_stamp(root: Path | None = None) -> dict[str, object]:
+    """Git revision + migration headline. Never a hand-set identity."""
+
+    root = root or REPO_ROOT
+    headline = parse_migration_headline(
+        (root / "data" / "battery" / "migration-report.md").read_text(encoding="utf-8")
+    )
+    return {
+        "kind": STORE_STAMP_KIND,
+        "revision": store_git_revision(root),
+        **headline,
+    }
+
+
+def dumps_store_stamp(stamp: Mapping[str, object]) -> str:
+    payload = {
+        "kind": STORE_STAMP_KIND,
+        "revision": str(stamp["revision"]),
+        "rows_in": int(stamp["rows_in"]),
+        "observations": int(stamp["observations"]),
+        "works": int(stamp["works"]),
+        "experiments": int(stamp["experiments"]),
+        "queue": int(stamp["queue"]),
+        "hard_issues": int(stamp["hard_issues"]),
+    }
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+
+
+def is_store_stamp_payload(payload: object) -> bool:
+    return isinstance(payload, Mapping) and payload.get("kind") == STORE_STAMP_KIND
+
+
+def load_residuals_stamp(path: Path) -> dict[str, object] | None:
+    if not path.is_file():
+        return None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        payload = json.loads(line)
+        if is_store_stamp_payload(payload):
+            return dict(payload)
+        return None
+    return None
+
+
+def store_stamp_mismatch_warning(
+    recorded: Mapping[str, object] | None,
+    live: Mapping[str, object],
+) -> str | None:
+    live_rev = str(live.get("revision") or "")
+    if not recorded or not recorded.get("revision"):
+        return (
+            f"residuals ledger has no store revision; live store is `{live_rev}`"
+        )
+    recorded_rev = str(recorded["revision"])
+    if recorded_rev != live_rev:
+        return (
+            f"residuals ledger recorded store `{recorded_rev}` "
+            f"but the live store is `{live_rev}`"
+        )
+    return None
+
+
+def emit_store_stamp_mismatch_warning(
+    recorded: Mapping[str, object] | None,
+    live: Mapping[str, object],
+) -> str | None:
+    warning = store_stamp_mismatch_warning(recorded, live)
+    if warning:
+        warnings.warn(warning, UserWarning, stacklevel=2)
+    return warning
+
+
+def format_store_stamp_report_lines(
+    stamp: Mapping[str, object],
+    *,
+    mismatch_warning: str | None = None,
+) -> list[str]:
+    lines = [
+        (
+            f"This report measured store `{stamp['revision']}`: "
+            f"{stamp['rows_in']} rows in, {stamp['observations']} observations, "
+            f"{stamp['works']} works, {stamp['experiments']} experiments, "
+            f"queue {stamp['queue']}, {stamp['hard_issues']} hard issues."
+        ),
+    ]
+    if mismatch_warning:
+        lines.extend(["", f"Warning: {mismatch_warning}"])
+    return lines
+
+
 def write_residuals_jsonl(
     residuals: Sequence[Residual],
     candidates: Mapping[str, Observation],
     path: Path,
+    *,
+    root: Path | None = None,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [
+    stamp = derive_store_stamp(root or REPO_ROOT)
+    lines = [dumps_store_stamp(stamp)]
+    lines.extend(
         dumps_residual_line(residual, candidates.get(residual.candidate or ""))
         for residual in residuals
-    ]
+    )
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
@@ -1684,7 +1823,7 @@ def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
         if not line.strip():
             continue
         payload = json.loads(line)
-        if isinstance(payload, dict):
+        if isinstance(payload, dict) and not is_store_stamp_payload(payload):
             rows.append(payload)
     return tuple(rows)
 
@@ -1863,7 +2002,9 @@ def render_score_report(
     status_diff: Sequence[Mapping[str, object]] = (),
     unmapped_legacy_keys: Sequence[str] = (),
     studio_hostname: str | None = None,
+    root: Path | None = None,
 ) -> str:
+    stamp = derive_store_stamp(root or REPO_ROOT)
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
@@ -1876,6 +2017,7 @@ def render_score_report(
     ]
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
+    lines.extend(["", *format_store_stamp_report_lines(stamp)])
     lines.extend(
         [
             "",
@@ -2079,7 +2221,11 @@ def render_score_report_from_payloads(
     status_diff: Sequence[Mapping[str, object]] = (),
     unmapped_legacy_keys: Sequence[str] = (),
     studio_hostname: str | None = None,
+    store_stamp: Mapping[str, object] | None = None,
+    mismatch_warning: str | None = None,
+    root: Path | None = None,
 ) -> str:
+    stamp = store_stamp if store_stamp is not None else derive_store_stamp(root or REPO_ROOT)
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
@@ -2092,6 +2238,7 @@ def render_score_report_from_payloads(
     ]
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
+    lines.extend(["", *format_store_stamp_report_lines(stamp, mismatch_warning=mismatch_warning)])
     lines.extend(
         [
             "",

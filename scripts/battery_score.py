@@ -28,8 +28,11 @@ from simulator.battery.pins import (  # noqa: E402
 )
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    derive_store_stamp,
+    emit_store_stamp_mismatch_warning,
     engines_from_names,
     load_legacy_score_rows,
+    load_residuals_stamp,
     load_score_context,
     render_score_report,
     residual_to_plain,
@@ -179,6 +182,10 @@ def main(argv: list[str] | None = None) -> int:
         )
 
         payloads = load_residuals_jsonl(residuals_path)
+        recorded = load_residuals_stamp(residuals_path)
+        live = derive_store_stamp(args.root)
+        mismatch = emit_store_stamp_mismatch_warning(recorded, live)
+        stamp = recorded if recorded is not None else live
         failures: list[dict] = []
         unmapped: list[str] = []
         diffs: list[dict] = []
@@ -215,6 +222,9 @@ def main(argv: list[str] | None = None) -> int:
             pin_failures=failures,
             status_diff=diffs,
             unmapped_legacy_keys=unmapped,
+            store_stamp=stamp,
+            mismatch_warning=mismatch,
+            root=args.root,
         )
         report_path.write_text(report, encoding="utf-8")
         print(f"report-only residuals={len(payloads)} pin_failures={len(failures)}")
@@ -245,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     residuals_path = args.root / "data" / "battery" / "residuals.jsonl"
     report_path = args.root / "data" / "battery" / "score-report.md"
-    write_residuals_jsonl(residuals, candidates, residuals_path)
+    write_residuals_jsonl(residuals, candidates, residuals_path, root=args.root)
 
     failures: list[dict] = []
     unmapped: list[str] = []
@@ -270,6 +280,7 @@ def main(argv: list[str] | None = None) -> int:
         status_diff=diffs,
         unmapped_legacy_keys=unmapped,
         studio_hostname=studio_hostname,
+        root=args.root,
     )
     report_path.write_text(report, encoding="utf-8")
     print(

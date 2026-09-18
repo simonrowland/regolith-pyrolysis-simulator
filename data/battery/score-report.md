@@ -7,6 +7,8 @@ a rail with zero eligible references is reported as zero.
 
 Hostname: `Simon-MacBookPro-M5.local`.
 
+This report measured store `7c1a4b458`: 45736 rows in, 61695 observations, 165 works, 5913 experiments, queue 114587, 1215 hard issues.
+
 Engines: vaporock, imcc_sf04, imcc_sf04_ext, internal-analytical.
 
 ## Per rail × engine headline
