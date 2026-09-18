@@ -215,6 +215,20 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.IMCC_SF04_EXT: ("imcc-sf04-ext-v4",),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
+# Engine-facing aliases → work/source/table identities in the v2.1 store.
+# Unmapped aliases (MELTS calibration DBs) stay incomplete; do not invent
+# a work. VapoRock/Ellingham consume JANAF; Antoine sidecar is NIST WebBook;
+# IMCC consumes the SF04 magma companion workbook.
+COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
+    "vaporock": ("janaf-4th",),
+    "antoine_sidecar": ("nist-webbook",),
+    "ellingham": ("janaf-4th",),
+    "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
+    "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
+}
+_ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
+    alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
+)
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -552,6 +566,45 @@ def blocking_qualifications(
                 found.append(notice)
         return tuple(found)
     return ()
+
+
+def expand_coefficient_sources(sources: Sequence[str]) -> tuple[str, ...]:
+    """Map engine coefficient aliases onto store work/source/table ids."""
+
+    out: list[str] = []
+    for src in sources:
+        mapped = COEFFICIENT_SOURCE_STORE_IDS.get(src)
+        if mapped is None:
+            out.append(src)
+        else:
+            out.extend(mapped)
+    return tuple(out)
+
+
+def lineage_complete_for(
+    sources: Sequence[str],
+    *,
+    works: Mapping[str, Work] | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    experiments: Mapping[str, Experiment] | None = None,
+) -> bool:
+    """True when every engine alias is mapped and store ids resolve.
+
+    Without a store, completeness is the mapping itself: unmapped MELTS
+    aliases stay incomplete. With a store, ``_resolve_coefficient_sources``
+    must return a set (unknown strings are not independence).
+    """
+
+    for src in sources:
+        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
+            return False
+    expanded = expand_coefficient_sources(sources)
+    if works is None or observations is None:
+        return True
+    return (
+        _resolve_coefficient_sources(expanded, observations, works, experiments)
+        is not None
+    )
 
 
 def resolve_source_relation(
@@ -1103,6 +1156,7 @@ def predict_with_engine(
     cell_authority = getattr(cell, "authority", None)
     if cell_authority == "extrapolated":
         authority = Authority.EXTRAPOLATED
+    expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -1111,8 +1165,8 @@ def predict_with_engine(
         unit=unit,
         authority=authority,
         notices=notices,
-        coefficient_sources=sources,
-        lineage_complete=False,
+        coefficient_sources=expanded,
+        lineage_complete=lineage_complete_for(sources),
         certified_band=certified_band,
         identity=identity,
         requested_composition=requested,
@@ -1283,6 +1337,18 @@ def compile_residual(
         prediction = predictor(engine, reference, handles=handles)
 
     notices = union_notices(notices, prediction.notices)
+    expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
+    lineage_complete = lineage_complete_for(
+        prediction.coefficient_sources,
+        works=context.works,
+        observations=context.observations,
+        experiments=context.experiments,
+    )
+    prediction = replace(
+        prediction,
+        coefficient_sources=expanded_sources,
+        lineage_complete=lineage_complete,
+    )
     source_relation = resolve_source_relation(
         reference,
         prediction.coefficient_sources,

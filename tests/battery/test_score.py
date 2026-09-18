@@ -57,6 +57,7 @@ from simulator.battery.score import (
     dumps_residual_line,
     engines_from_names,
     parse_species_formula,
+    resolve_source_relation,
     score_eligible_from_conjuncts,
 )
 from simulator.battery.validate import validate_corpus
@@ -291,7 +292,16 @@ def test_compile_mutates_each_conjunct_off() -> None:
     residual, _ = _compile(compiled, exp, _predict(Decimal("0"), ident))
     assert residual.score_eligible is False
 
-    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident, lineage_complete=False))
+    residual, _ = _compile(
+        ref,
+        exp,
+        _predict(
+            Decimal("0"),
+            ident,
+            coefficient_sources=("unregistered-coefficient-source",),
+            lineage_complete=False,
+        ),
+    )
     assert residual.score_eligible is False
 
     residual, _ = _compile(
@@ -609,6 +619,100 @@ def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
     )
     outcome = run_validity_gates(complete, ref)
     assert outcome.passed is True
+
+
+def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
+    from simulator.battery import score as score_mod
+
+    tree = ast.parse(inspect.getsource(score_mod.predict_with_engine))
+    produced_with_value = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not isinstance(func, ast.Name) or func.id != "EnginePrediction":
+            continue
+        kws = {k.arg: k.value for k in node.keywords if k.arg}
+        if "value" not in kws:
+            continue
+        value_node = kws["value"]
+        if isinstance(value_node, ast.Constant) and value_node.value is None:
+            continue
+        produced_with_value += 1
+        flag = kws.get("lineage_complete")
+        hardcoded_false = isinstance(flag, ast.Constant) and flag.value is False
+        assert not hardcoded_false, "production success path hard-codes lineage_complete=False"
+    assert produced_with_value >= 1
+
+
+def test_mapped_coefficient_sources_decide_circularity() -> None:
+    from simulator.battery.score import (
+        ENGINE_COEFFICIENT_SOURCES,
+        expand_coefficient_sources,
+        lineage_complete_for,
+    )
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "o2-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="janaf-4th",
+    )
+    observations = {ref.observation_id: ref}
+    experiments = {exp.experiment_id: exp}
+    works = {w.work_id: w}
+    vaporock_sources = expand_coefficient_sources(
+        ENGINE_COEFFICIENT_SOURCES[Engine.VAPOROCK]
+    )
+    assert "janaf-4th" in vaporock_sources
+    assert lineage_complete_for(
+        vaporock_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    ) is True
+    same = resolve_source_relation(
+        ref,
+        vaporock_sources,
+        True,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+    )
+    assert same is SourceRelation.SAME_INPUT
+
+    independent_work = replace(F.work("kems-work"), source_ids=("kems-work",))
+    independent_exp = F.tabulation_experiment(
+        experiment_id="kems-exp", work_id="kems-work"
+    )
+    independent_ref = F.observation(
+        "kems-ref",
+        independent_exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-work",
+    )
+    independent = resolve_source_relation(
+        independent_ref,
+        vaporock_sources,
+        True,
+        works={"kems-work": independent_work, w.work_id: w},
+        observations={
+            independent_ref.observation_id: independent_ref,
+            ref.observation_id: ref,
+        },
+        experiments={
+            independent_exp.experiment_id: independent_exp,
+            exp.experiment_id: exp,
+        },
+    )
+    assert independent is SourceRelation.INDEPENDENT
 
 
 def test_missing_live_result_is_coverage_failure() -> None:
