@@ -14,6 +14,15 @@ import yaml
 
 SCHEMA = "literature_index.v1"
 STATUS_SCHEMA = "literature_source_status.v1"
+STORE_SUMMARY_SCHEMA = "literature_observation_store_summary.v1"
+OBSERVATION_ID_MARKER = b"\n- observation_id:"
+# Generated INDEX/SOURCE_STATUS plus the 14 MB species-rail ledger (2 ids, neither an
+# extract/pdf row). Parsing it is not a consumer scan; it is a timeout.
+CONSUMER_SKIP_NAMES = frozenset({
+    "INDEX.yaml",
+    "SOURCE_STATUS.yaml",
+    "species_rail_differential_ledger.yaml",
+})
 SIDECAR_FIELDS = ("citation", "doi", "license_or_oa_basis", "sha256", "retrieved_date", "retrieval_url")
 ID_KEYS = ("source_id", "paper_id", "paper_citation_id", "citation_id")
 OA_HOSTS = ("jstage.jst.go.jp", "ntrs.nasa.gov", "nist.gov", "aanda.org", "arxiv.org", "janaf.nist.gov", "webbook.nist.gov")
@@ -250,8 +259,105 @@ def parse_sidecar(path: Path) -> dict:
     fields["missing_fields"] = [key for key in SIDECAR_FIELDS if not fields[key]]
     return fields
 
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
 def load_yaml(path: Path):
-    return yaml.safe_load(path.read_text()) or {}
+    with path.open("r", encoding="utf-8") as handle:
+        return yaml.load(handle, Loader=_YAML_LOADER) or {}
+
+
+def count_observation_ids(path: Path) -> int:
+    """Index total_rows for a compilation shard: marker count, not a YAML parse."""
+    return path.read_bytes().count(OBSERVATION_ID_MARKER)
+
+
+def compilation_manifest_identity(
+    path: Path, *, scan_raw: bool = True
+) -> tuple[str | None, str | None, tuple[str, ...]]:
+    """source_id, doi, raw/<id>/ names from a compilation manifest without YAML-loading it.
+
+    Manifests are multi-MB harvested records. The index only needs the header identity
+    and any corpus raw/ path mention. Header fields are read from the first 8 KiB;
+    raw/ paths are a byte-scan of the whole file.
+    """
+    header = path.read_bytes()[:8192].decode("utf-8", "replace")
+    sid = None
+    match = re.search(r"^source_id:\s*(.+)$", header, re.M)
+    if match:
+        value = match.group(1).strip().strip("'\"")
+        if value.lower() not in {"", "null", "none", "~"}:
+            sid = value
+    doi = None
+    for field in re.finditer(r"^\s*doi:\s*(.+)$", header, re.M | re.I):
+        found = DOI_RE.search(field.group(1))
+        if found:
+            doi = found.group(0).rstrip(".")
+            break
+    if not scan_raw:
+        return sid, doi, ()
+    raw_ids = tuple(dict.fromkeys(
+        re.findall(r"raw/([A-Za-z0-9_.-]+)/", path.read_text(encoding="utf-8", errors="replace"))
+    ))
+    return sid, doi, raw_ids
+
+
+def observation_store_summary_path(root: Path) -> Path:
+    return root / "data/literature/observation_store_summary.yaml"
+
+
+def build_observation_store_summary(root: Path) -> dict:
+    """Per-shard size + observation_id count. Derived; regenerate, never hand-edit."""
+    root = root.resolve()
+    obs_dir = root / "data/literature/observations-v2"
+    shards = {}
+    if obs_dir.is_dir():
+        for path in iter_observation_store_paths(obs_dir):
+            if path.name.startswith("_") or "ledger" in path.name or "differential" in path.name:
+                continue
+            if compilation_family_from_store_path(path) is None:
+                continue
+            shards[posix(path.relative_to(obs_dir))] = {
+                "size": path.stat().st_size,
+                "observation_id_count": count_observation_ids(path),
+            }
+    return {
+        "schema_version": STORE_SUMMARY_SCHEMA,
+        "generated_by": "data/literature/build_index.py",
+        "shards": shards,
+    }
+
+
+def write_observation_store_summary(summary: dict, out_dir: Path) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "observation_store_summary.yaml").write_text(
+        yaml.safe_dump(summary, sort_keys=False, allow_unicode=True, width=100, default_flow_style=False)
+    )
+
+
+def load_observation_store_summary(root: Path) -> dict[str, dict]:
+    path = observation_store_summary_path(root)
+    if not path.is_file():
+        return {}
+    try:
+        doc = load_yaml(path)
+    except yaml.YAMLError:
+        return {}
+    if not isinstance(doc, dict) or doc.get("schema_version") != STORE_SUMMARY_SCHEMA:
+        return {}
+    shards = doc.get("shards")
+    if not isinstance(shards, dict):
+        return {}
+    out = {}
+    for key, body in shards.items():
+        if not isinstance(key, str) or not isinstance(body, dict):
+            continue
+        size = body.get("size")
+        count = body.get("observation_id_count")
+        if isinstance(size, int) and isinstance(count, int) and count >= 0:
+            out[key] = {"size": size, "observation_id_count": count}
+    return out
+
 
 def collect_ids_and_dois(obj, ids: set[str], id_dois: dict[str, set[str]], nearby_doi: str | None = None) -> None:
     if isinstance(obj, dict):
@@ -346,7 +452,10 @@ def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
     raw_sha = sha256_file(raw) if raw.is_file() else None
     ledger_error = None
     try:
-        loaded = load_yaml(ledger) if ledger.is_file() else {}
+        # SafeLoader (not CSafeLoader): INDEX.yaml stores the error string, and
+        # libyaml's problem text differs ("did not find expected key" vs
+        # "expected <block end>, but found '-'") for the same invalid ledger.
+        loaded = (yaml.safe_load(ledger.read_text(encoding="utf-8")) or {}) if ledger.is_file() else {}
     except yaml.YAMLError as exc:
         loaded = {}
         ledger_error = f"Invalid YAML: {exc.problem} at line {exc.problem_mark.line + 1}"
@@ -400,7 +509,7 @@ def load_consumers(root: Path) -> tuple[list[dict], list[dict]]:
             out.append({"path": posix(path.relative_to(root)), "ids": ids, "id_dois": id_dois})
         return out
     lit = root / "data/literature"
-    measurements = recs(p for p in sorted(lit.glob("*.yaml")) if p.name != "INDEX.yaml") if lit.is_dir() else []
+    measurements = recs(p for p in sorted(lit.glob("*.yaml")) if p.name not in CONSUMER_SKIP_NAMES) if lit.is_dir() else []
     presets_dir = root / "data/presets"
     presets = recs(sorted(presets_dir.rglob("*.yaml"))) if presets_dir.is_dir() else []
     return measurements, presets
@@ -812,18 +921,11 @@ def load_compilation_identities(root: Path) -> tuple[set[str], dict[str, str], s
             manifest = path / "manifest.yaml"
             sid = path.name
             if manifest.is_file():
-                try:
-                    doc = load_yaml(manifest)
-                except yaml.YAMLError:
-                    doc = {}
-                if isinstance(doc, dict):
-                    sid = str(doc.get("source_id") or path.name)
-                    remember(sid)
-                    src = doc.get("source") if isinstance(doc.get("source"), dict) else {}
-                    remember(sid, doi_of(src or {}))
-                    blob = yaml.safe_dump(doc)
-                    for match in re.finditer(r"raw/([A-Za-z0-9_.-]+)/", blob):
-                        remember(match.group(1))
+                man_sid, man_doi, raw_ids = compilation_manifest_identity(manifest)
+                sid = man_sid or path.name
+                remember(sid, man_doi)
+                for raw_id in raw_ids:
+                    remember(raw_id)
             sidecar = path / "source" / "sidecar.yaml"
             if sidecar.is_file():
                 try:
@@ -927,29 +1029,37 @@ def load_v21_store(root: Path) -> dict[str, dict]:
             observations = doc.get("observations") if isinstance(doc, dict) else None
             add(path.stem, path, observations if isinstance(observations, list) else [])
     obs_dir = root / "data/literature/observations-v2"
+    shard_summary = load_observation_store_summary(root)
+    family_targets: dict[str, set[str]] = {}
     if obs_dir.is_dir():
         for path in iter_observation_store_paths(obs_dir):
             # Pin ledgers migrated as observation payloads are not per-source ingest.
             if path.name.startswith("_") or "ledger" in path.name or "differential" in path.name:
                 continue
             # Compilation payloads are assessed functions, not measured evidence
-            # (data/literature/compilations/README.md). Loading the multi-MB YAML
-            # tree would not find battery-usable rows; store membership is the file
-            # itself and total_rows is the observation_id count.
+            # (data/literature/compilations/README.md). Do not YAML-load them or their
+            # multi-MB manifests: store membership is the file itself and total_rows
+            # is the observation_id marker count (cached in observation_store_summary.yaml
+            # when size matches; otherwise recounted).
             family = compilation_family_from_store_path(path)
             if family is not None:
-                targets = {family}
-                manifest = root / "data/literature/compilations" / family / "manifest.yaml"
-                if manifest.is_file():
-                    try:
-                        man = load_yaml(manifest)
-                    except yaml.YAMLError:
-                        man = {}
-                    if isinstance(man, dict) and man.get("source_id"):
-                        targets.add(str(man["source_id"]))
-                total = path.read_text(errors="replace").count("\n- observation_id:")
+                if family not in family_targets:
+                    targets = {family}
+                    manifest = root / "data/literature/compilations" / family / "manifest.yaml"
+                    if manifest.is_file():
+                        man_sid, _, _ = compilation_manifest_identity(manifest, scan_raw=False)
+                        if man_sid:
+                            targets.add(man_sid)
+                    family_targets[family] = targets
+                rel = posix(path.relative_to(obs_dir))
+                cached = shard_summary.get(rel)
+                size = path.stat().st_size
+                if cached is not None and cached["size"] == size:
+                    total = cached["observation_id_count"]
+                else:
+                    total = count_observation_ids(path)
                 artefact = posix(path.relative_to(root))
-                for sid in sorted(targets):
+                for sid in sorted(family_targets[family]):
                     current = store.get(sid)
                     artefacts = list(current["artefacts"]) if current else []
                     if artefact not in artefacts:
@@ -1340,9 +1450,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out-dir", type=Path, default=None)
     parser.add_argument("--private-root", action="append", default=[], type=Path)
     parser.add_argument("--hunt-json", type=Path, default=None)
+    parser.add_argument(
+        "--write-store-summary",
+        action="store_true",
+        help="Regenerate data/literature/observation_store_summary.yaml (derived shard counts).",
+    )
     args = parser.parse_args(argv)
     root = args.root or Path(__file__).resolve().parents[2]
     out_dir = args.out_dir or (root / "data/literature")
+    if args.write_store_summary:
+        write_observation_store_summary(build_observation_store_summary(root), out_dir)
+        return 0
     write_index(build_index(root, private_roots=list(args.private_root), hunt_json=args.hunt_json, root_label="."),
                 out_dir)
     write_source_status(build_source_status(root, root_label="."), out_dir)

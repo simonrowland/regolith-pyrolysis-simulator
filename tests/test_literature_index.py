@@ -513,10 +513,17 @@ def test_source_status_partial_vs_complete_boundary(tmp_path, monkeypatch):
 
 
 def test_source_status_wired_zero_today_and_positive_control(tmp_path, monkeypatch):
-    """Wired is 0 on the real tree (chunk-2 scorer absent) and 1 with a synthetic ledger."""
-    real = builder.build_source_status(REPO_ROOT)
-    assert real["counts"]["by_stage"]["wired"] == 0
-    assert all(row["stage"] != "wired" for row in real["sources"])
+    """Wired is 0 on the real tree (chunk-2 scorer absent) and 1 with a synthetic ledger.
+
+    Wired is a residual-ledger fact (load_scored_residuals). Scanning the v2.1
+    store does not change it; the synthetic tree is the stage-machine proof.
+    """
+    assert builder.load_scored_residuals(REPO_ROOT) == {}
+    assert not (REPO_ROOT / "data/literature/battery_residuals.yaml").is_file()
+    residuals_dir = REPO_ROOT / "data/literature/residuals-v2"
+    assert not residuals_dir.is_dir() or not any(
+        path.is_file() and not path.name.startswith("_") for path in residuals_dir.glob("*.yaml")
+    )
 
     root, corpus = _status_tree(tmp_path, monkeypatch)
     sid = "wired-control-2020"
@@ -609,6 +616,84 @@ def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
 
     assert claim_sid in anti["stale_claims"]["ids"]
     assert anti["stale_claims"]["count"] >= 1
+
+
+def test_observation_store_summary_matches_full_scan():
+    """Committed per-shard counts equal a live observation_id marker scan."""
+    live = builder.build_observation_store_summary(REPO_ROOT)
+    committed_path = builder.observation_store_summary_path(REPO_ROOT)
+    assert committed_path.is_file()
+    committed = builder.load_yaml(committed_path)
+    assert committed["schema_version"] == builder.STORE_SUMMARY_SCHEMA
+    assert live["shards"] == committed["shards"]
+    obs_dir = REPO_ROOT / "data/literature/observations-v2"
+    assert live["shards"], "compilation observation shards must exist to prove the summary"
+    for rel, body in live["shards"].items():
+        path = obs_dir / rel
+        assert path.is_file(), rel
+        assert path.stat().st_size == body["size"]
+        assert builder.count_observation_ids(path) == body["observation_id_count"]
+
+
+def test_load_v21_store_uses_summary_without_rereading_payloads(monkeypatch):
+    """Matching size in the derived summary must not open compilation payloads."""
+    calls: list[Path] = []
+
+    def forbid(path: Path) -> int:
+        calls.append(path)
+        raise AssertionError(f"compilation payload reread: {path}")
+
+    monkeypatch.setattr(builder, "count_observation_ids", forbid)
+    store = builder.load_v21_store(REPO_ROOT)
+    assert calls == []
+    assert "janaf" in store
+    assert "nist-janaf-4th" in store
+    assert store["janaf"]["total_rows"] == store["nist-janaf-4th"]["total_rows"]
+    assert store["janaf"]["total_rows"] > 0
+    assert store["janaf"]["usable_rows"] == 0
+
+
+def test_compilation_manifest_identity_matches_yaml():
+    """Text-scan of each real manifest equals YAML source_id, source.doi, and raw/ paths."""
+    compilations = REPO_ROOT / "data/literature/compilations"
+    families = list(builder._iter_named_dirs(compilations))
+    assert families
+    for family in families:
+        manifest = family / "manifest.yaml"
+        if not manifest.is_file():
+            continue
+        sid, doi, raw_ids = builder.compilation_manifest_identity(manifest)
+        doc = builder.load_yaml(manifest)
+        assert isinstance(doc, dict), family.name
+        expected_sid = str(doc["source_id"]).strip() if doc.get("source_id") else None
+        assert sid == expected_sid, family.name
+        src = doc.get("source") if isinstance(doc.get("source"), dict) else {}
+        assert doi == builder.doi_of(src or {}), family.name
+        text_raw = tuple(dict.fromkeys(re.findall(
+            r"raw/([A-Za-z0-9_.-]+)/", manifest.read_text(encoding="utf-8", errors="replace")
+        )))
+        assert raw_ids == text_raw, family.name
+
+
+def test_compilation_manifest_identity_header_fixture(tmp_path):
+    path = tmp_path / "manifest.yaml"
+    path.write_text(
+        "\n".join([
+            "schema_version: literature_compilation_manifest.v1",
+            "source_id: fixture-compilation",
+            "source:",
+            "  doi: 10.9999/fixture-compilation",
+            "records:",
+            "- path: raw/fixture-compilation/fixture-compilation.pdf",
+            "",
+        ])
+    )
+    sid, doi, raw_ids = builder.compilation_manifest_identity(path)
+    assert sid == "fixture-compilation"
+    assert doi == "10.9999/fixture-compilation"
+    assert raw_ids == ("fixture-compilation",)
+    sid_only, doi_only, raw_only = builder.compilation_manifest_identity(path, scan_raw=False)
+    assert (sid_only, doi_only, raw_only) == ("fixture-compilation", "10.9999/fixture-compilation", ())
 
 
 def test_source_status_regenerates_byte_identically(tmp_path, monkeypatch):
