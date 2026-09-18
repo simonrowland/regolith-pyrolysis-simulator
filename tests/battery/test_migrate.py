@@ -31,10 +31,12 @@ from simulator.battery.migrate import (
     canonicalize_doi,
     canonicalize_rail,
     citation_hash,
+    compilation_family_from_store_path,
     convert_area_to_m2,
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
+    iter_observation_store_paths,
     map_phase,
     map_quantity,
     compilation_quantity_from_record,
@@ -3011,12 +3013,43 @@ def test_l05g0_store_atomic_weight_is_not_delta_fg() -> None:
     assert q.get("value") != "delta_fG"
 
 
+def test_observation_store_reader_unions_file_and_shard_directory(tmp_path: Path) -> None:
+    obs_dir = tmp_path / "observations-v2"
+    obs_dir.mkdir()
+    (obs_dir / "compilations-janaf.yaml").write_text("schema_version: battery_observations.v2.1\n", encoding="utf-8")
+    shard_dir = obs_dir / "compilations-janaf"
+    shard_dir.mkdir()
+    (shard_dir / "janaf-Al.yaml").write_text("schema_version: battery_observations.v2.1\n", encoding="utf-8")
+    (obs_dir / "compilations-janaf-reports").mkdir()
+    (obs_dir / "compilations-janaf-reports" / "janaf-Al.yaml").write_text("audit: true\n", encoding="utf-8")
+    (obs_dir / "kems_measurements.yaml").write_text("schema_version: battery_observations.v2.1\n", encoding="utf-8")
+    names = {path.name for path in iter_observation_store_paths(obs_dir)}
+    assert names == {"compilations-janaf.yaml", "janaf-Al.yaml", "kems_measurements.yaml"}
+    janaf = iter_observation_store_paths(obs_dir, "compilations-janaf.yaml")
+    assert {path.name for path in janaf} == {"compilations-janaf.yaml", "janaf-Al.yaml"}
+    families = {compilation_family_from_store_path(path) for path in janaf}
+    assert families == {"janaf"}
+    assert compilation_family_from_store_path(obs_dir / "kems_measurements.yaml") is None
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "literature_index", REPO_ROOT / "data" / "literature" / "build_index.py"
+    )
+    builder = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(builder)
+    assert builder.iter_observation_store_paths(obs_dir) == iter_observation_store_paths(obs_dir)
+    assert builder.compilation_family_from_store_path(janaf[0]) == compilation_family_from_store_path(
+        janaf[0]
+    )
+
+
 def test_l04_store_never_lifts_log10_psat_as_pressure() -> None:
     obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     bad = []
-    for path in sorted(obs_dir.glob("*.yaml")):
+    for path in iter_observation_store_paths(obs_dir):
         stored = yaml.safe_load(path.read_text(encoding="utf-8"))
         for obs in stored.get("observations") or []:
             oid = str(obs.get("observation_id") or "")
@@ -3036,9 +3069,10 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     if not roots[0].is_dir():
         pytest.skip("migrated store not generated yet")
     bad = []
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for folder in roots:
-        for path in sorted(folder.glob("*.yaml")):
-            stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for path in iter_observation_store_paths(folder):
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
             for obs in stored.get("observations") or []:
                 q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
                 if q != "evaporation_coefficient_alpha":
@@ -3075,9 +3109,10 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
             by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
     missing = []
     scanned = 0
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for folder in roots:
-        for path in sorted(folder.glob("*.yaml")):
-            stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for path in iter_observation_store_paths(folder):
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
             for obs in stored.get("observations") or []:
                 val = obs.get("value") or {}
                 if val.get("kind") != "unavailable":
@@ -3383,8 +3418,9 @@ def test_f3_store_every_compilation_observation_has_existing_source_path() -> No
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     missing: list[str] = []
-    for path in sorted(obs_dir.glob("compilations-*.yaml")):
-        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    for path in iter_observation_store_paths(obs_dir, "compilations-*.yaml"):
+        stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
         for obs in stored.get("observations") or []:
             loc = obs.get("locator") or {}
             rel = loc.get("source_path")

@@ -17,6 +17,7 @@ import yaml
 
 from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity
 from simulator.battery.generators import janaf as generator
+from simulator.battery.migrate import iter_observation_store_paths
 from simulator.battery.identity import (
     Identity,
     log10K_from_delta_fG_kJ_mol,
@@ -39,9 +40,8 @@ from simulator.reference_data.janaf import (
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW_FIXTURES = ROOT / "tests" / "fixtures" / "janaf"
-CURRENT_STORE = (
-    ROOT / "data" / "literature" / "observations-v2" / "compilations-janaf.yaml"
-)
+CURRENT_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
+CURRENT_STORE_PATTERN = "compilations-janaf.yaml"
 FIXTURE_IDS = (
     "Al-001",
     "Al-006",
@@ -1160,11 +1160,20 @@ def test_concatenated_labelled_row_requires_a_concatenated_transition_companion(
     assert len(generated.report["refused_concatenated_rows"]) == 2
 
 
-def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
+def _load_janaf_store_observations() -> list[dict]:
     loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
-    current = yaml.load(CURRENT_STORE.read_text(encoding="utf-8"), Loader=loader)
+    observations: list[dict] = []
+    paths = iter_observation_store_paths(CURRENT_STORE_DIR, CURRENT_STORE_PATTERN)
+    assert paths, "JANAF observation store is missing"
+    for path in paths:
+        payload = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+        observations.extend(payload.get("observations") or [])
+    return observations
+
+
+def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     expected: dict[tuple[str, Quantity], list[tuple[Decimal, Decimal]]] = {}
-    for observation in current["observations"]:
+    for observation in _load_janaf_store_observations():
         quantity_text = observation["identity"]["quantity"]["value"]
         if quantity_text not in {Quantity.DELTA_FG.value, Quantity.LOG10_KF.value}:
             continue

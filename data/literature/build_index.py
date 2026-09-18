@@ -6,7 +6,7 @@ from artefacts; never hand-set.
 """
 from __future__ import annotations
 
-import argparse, hashlib, json, os, re, subprocess, sys
+import argparse, fnmatch, hashlib, json, os, re, subprocess, sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -48,6 +48,37 @@ CLAIM_STAGE_RANK = {
     "score": 6, "scored": 6, "wired": 6,
 }
 YEAR_RE = re.compile(r"(19\d{2}|20\d{2})")
+
+
+def iter_observation_store_paths(directory: Path, pattern: str = "*.yaml") -> list[Path]:
+    """Observation YAML files, including compilation shard directories.
+
+    Keep in lockstep with simulator.battery.migrate.iter_observation_store_paths.
+    A family may live as compilations-janaf.yaml or compilations-janaf/janaf-Al.yaml.
+    """
+
+    if not directory.is_dir():
+        return []
+    paths = [path for path in sorted(directory.glob(pattern)) if path.is_file()]
+    dir_pattern = pattern[: -len(".yaml")] if pattern.endswith(".yaml") else pattern
+    for child in sorted(directory.iterdir()):
+        if not child.is_dir():
+            continue
+        if child.name.startswith((".", "_")) or child.name.endswith("-reports"):
+            continue
+        if not fnmatch.fnmatch(child.name, dir_pattern):
+            continue
+        paths.extend(path for path in sorted(child.glob("*.yaml")) if path.is_file())
+    return paths
+
+
+def compilation_family_from_store_path(path: Path) -> str | None:
+    if path.name.startswith("compilations-") and path.suffix in {".yaml", ".yml"}:
+        return path.stem.removeprefix("compilations-")
+    parent = path.parent.name
+    if parent.startswith("compilations-") and not parent.endswith("-reports"):
+        return parent.removeprefix("compilations-")
+    return None
 DOI_RE = re.compile(r"10\.\d{4,9}/[^\s,;]+")
 PDF_PATH_RE = re.compile(r"docs/references/pdfs/[^\s\"'<>]+/([A-Za-z0-9_.-]+)\.pdf")
 HUNT_RES = (
@@ -820,8 +851,10 @@ def load_compilation_identities(root: Path) -> tuple[set[str], dict[str, str], s
                         remember(match.group(1).removesuffix(".yaml"))
     obs_dir = root / "data/literature/observations-v2"
     if obs_dir.is_dir():
-        for path in sorted(obs_dir.glob("compilations-*.yaml")):
-            remember(path.stem.removeprefix("compilations-"))
+        for path in iter_observation_store_paths(obs_dir, "compilations-*.yaml"):
+            family = compilation_family_from_store_path(path)
+            if family:
+                remember(family)
     return canonical, dois, match_ids
 
 
@@ -895,7 +928,7 @@ def load_v21_store(root: Path) -> dict[str, dict]:
             add(path.stem, path, observations if isinstance(observations, list) else [])
     obs_dir = root / "data/literature/observations-v2"
     if obs_dir.is_dir():
-        for path in sorted(obs_dir.glob("*.yaml")):
+        for path in iter_observation_store_paths(obs_dir):
             # Pin ledgers migrated as observation payloads are not per-source ingest.
             if path.name.startswith("_") or "ledger" in path.name or "differential" in path.name:
                 continue
@@ -903,10 +936,10 @@ def load_v21_store(root: Path) -> dict[str, dict]:
             # (data/literature/compilations/README.md). Loading the multi-MB YAML
             # tree would not find battery-usable rows; store membership is the file
             # itself and total_rows is the observation_id count.
-            if path.name.startswith("compilations-"):
-                stem = path.stem.removeprefix("compilations-")
-                targets = {stem}
-                manifest = root / "data/literature/compilations" / stem / "manifest.yaml"
+            family = compilation_family_from_store_path(path)
+            if family is not None:
+                targets = {family}
+                manifest = root / "data/literature/compilations" / family / "manifest.yaml"
                 if manifest.is_file():
                     try:
                         man = load_yaml(manifest)

@@ -31,6 +31,7 @@ and queued; they are never stored as gas.
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import inspect
 import json
@@ -132,6 +133,43 @@ REVIEWED_ALIASES: dict[str, str] = {
 EXTRACTS_V2_DIR = LITERATURE / "extracts-v2"
 OBSERVATIONS_V2_DIR = LITERATURE / "observations-v2"
 BATTERY_DIR = REPO_ROOT / "data" / "battery"
+
+
+def iter_observation_store_paths(
+    directory: Path,
+    pattern: str = "*.yaml",
+) -> list[Path]:
+    """Observation YAML files, including compilation shard directories.
+
+    A family may live as ``compilations-janaf.yaml`` or as
+    ``compilations-janaf/janaf-Al.yaml``. Both are loaded when both exist.
+    Directories named ``*-reports`` are audit output, not observation payloads.
+    """
+
+    if not directory.is_dir():
+        return []
+    paths = [path for path in sorted(directory.glob(pattern)) if path.is_file()]
+    dir_pattern = pattern[: -len(".yaml")] if pattern.endswith(".yaml") else pattern
+    for child in sorted(directory.iterdir()):
+        if not child.is_dir():
+            continue
+        if child.name.startswith((".", "_")) or child.name.endswith("-reports"):
+            continue
+        if not fnmatch.fnmatch(child.name, dir_pattern):
+            continue
+        paths.extend(path for path in sorted(child.glob("*.yaml")) if path.is_file())
+    return paths
+
+
+def compilation_family_from_store_path(path: Path) -> str | None:
+    """Return the compilation family stem, or None when path is not a compilation payload."""
+
+    if path.name.startswith("compilations-") and path.suffix in {".yaml", ".yml"}:
+        return path.stem.removeprefix("compilations-")
+    parent = path.parent.name
+    if parent.startswith("compilations-") and not parent.endswith("-reports"):
+        return parent.removeprefix("compilations-")
+    return None
 QUEUE_PATH = BATTERY_DIR / "migration-queue.yaml"
 REPORT_PATH = BATTERY_DIR / "migration-report.md"
 
@@ -1048,7 +1086,7 @@ def load_migrated_store(
     ):
         if not directory.is_dir():
             continue
-        for path in sorted(directory.glob("*.yaml")):
+        for path in iter_observation_store_paths(directory):
             doc = load_yaml(path)
             if not isinstance(doc, Mapping):
                 continue
@@ -5602,8 +5640,16 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         sources.append(src)
 
     if observations_v2.exists():
-        for stale in observations_v2.glob("*.yaml"):
+        for stale in iter_observation_store_paths(observations_v2):
             stale.unlink()
+        for child in observations_v2.iterdir():
+            if (
+                child.is_dir()
+                and child.name.startswith("compilations-")
+                and not child.name.endswith("-reports")
+                and not any(child.iterdir())
+            ):
+                child.rmdir()
     for _, (dest, observations, sources) in sorted(family_groups.items()):
         payload = {
             "schema_version": "battery_observations.v2.1",

@@ -11,7 +11,14 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.identity import quantity_token
-from simulator.battery.migrate import REPO_ROOT, map_quantity, migrate, select_declared_source
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    compilation_family_from_store_path,
+    iter_observation_store_paths,
+    map_quantity,
+    migrate,
+    select_declared_source,
+)
 from simulator.battery.records import State
 from tests.battery.test_migrate import (
     _copy_compilation_record, _copy_extract, _extract_observation, _write_min_tree,
@@ -299,9 +306,19 @@ def _nonempty_printed_paths(value, prefix=""):
     ]
 
 
+def _store_kind(path: Path) -> str | None:
+    parts = path.parts
+    if "extracts-v2" in parts:
+        return "extracts-v2"
+    if "observations-v2" in parts:
+        return "observations-v2"
+    return None
+
+
 STORE_PATHS = sorted(
-    path for directory in ("observations-v2", "extracts-v2")
-    for path in (REPO_ROOT / "data/literature" / directory).glob("*.yaml")
+    path
+    for directory in ("observations-v2", "extracts-v2")
+    for path in iter_observation_store_paths(REPO_ROOT / "data/literature" / directory)
 )
 
 
@@ -309,7 +326,7 @@ def absence_audit(paths=STORE_PATHS):
     """Independent source lookup; never calls migration's inference/census helpers."""
     judged, bad = Counter(), []
     for directory in ("observations-v2", "extracts-v2"):
-        for path in (p for p in paths if p.parent.name == directory):
+        for path in (p for p in paths if _store_kind(p) == directory):
             store = yaml.load(path.read_text(), Loader=yaml.CSafeLoader)
             legacy = {}
             if directory == "extracts-v2":
@@ -395,7 +412,7 @@ def absence_audit(paths=STORE_PATHS):
 @pytest.mark.parametrize("path", STORE_PATHS, ids=lambda p: p.name)
 def test_g1_whole_store_absence_claims_match_sources(path):
     judged, bad = absence_audit([path])
-    if path.parent.name == "extracts-v2" or path.name.startswith("compilations-"):
+    if _store_kind(path) == "extracts-v2" or compilation_family_from_store_path(path):
         assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
 
@@ -420,8 +437,8 @@ _EXPECTED_COUNT_CLAIMS = {
     "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml": 503,
     "compilations-robie-waldbaum-1968-usgs-b1259.yaml": 512,
 }
-_COMPILATION_STORE_PATHS = sorted(
-    (REPO_ROOT / "data/literature/observations-v2").glob("compilations-*.yaml")
+_COMPILATION_STORE_PATHS = iter_observation_store_paths(
+    REPO_ROOT / "data/literature/observations-v2", "compilations-*.yaml"
 )
 
 
