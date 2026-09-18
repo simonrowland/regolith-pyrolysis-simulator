@@ -42,12 +42,11 @@ from simulator.reference_data.janaf import (
     GRID_RANGE_REASON,
     NON_DATA_MARKER_KIND,
     NON_DATA_MARKER_REASON,
-    PRINTED_GRID_T_MAX,
-    PRINTED_GRID_T_MIN,
     REFUSED_LAYOUT_KIND,
     SIDECAR_PATH,
     formula_composition,
     load_table_document,
+    table_printed_temperatures,
 )
 from tools.harvest_janaf_compilation import parse_table
 
@@ -854,15 +853,14 @@ def _stored_pair_identity_failures_from_observations(
 def _corroborate_structured_rows(
     rows: list[_Row], _table_id: str
 ) -> tuple[list[_Row], list[dict[str, Any]]]:
-    """Refuse structured rows whose temperature is off the printed grid."""
+    """Refuse structured rows whose T is not in this table's printed T set."""
 
     ordered = sorted(rows, key=lambda row: row.order)
+    printed = table_printed_temperatures(row.temperature_token for row in ordered)
     kept: list[_Row] = []
     refused: list[dict[str, Any]] = []
-    grid_min = Decimal(str(PRINTED_GRID_T_MIN))
-    grid_max = Decimal(str(PRINTED_GRID_T_MAX))
     for row in ordered:
-        if row.temperature < grid_min or row.temperature > grid_max:
+        if row.temperature not in printed:
             refused.append(
                 {
                     "line_number": row.line_number,

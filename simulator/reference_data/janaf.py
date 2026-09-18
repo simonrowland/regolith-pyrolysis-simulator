@@ -16,6 +16,7 @@ import json
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -60,10 +61,6 @@ VALUE_COLUMNS = (
 )
 HEADER_ALIASES = ("T/K", "T(K)")
 NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
-# JANAF 4th-edition tables print T in [0, 6000] K; the 1,655-file corpus
-# has min 0 and max 6000, and no structured-row temperature decrease.
-PRINTED_GRID_T_MIN = 0.0
-PRINTED_GRID_T_MAX = 6000.0
 # After taking the first eight column positions and stripping trailing
 # empty fields, numeric-first structured rows in this corpus have one of
 # these content counts (1=T-only placeholder, 2=T+Cp only, 5=empty
@@ -83,8 +80,18 @@ STRUCTURED_LAYOUT_REASON = (
 INCONSISTENT_LAYOUT_REASON = (
     "raw field count does not match the table's printed layout for this row shape"
 )
+# 10 K is gcd(20, 50, 100): H-063 prints 20 K inserts (280–480), many
+# tables print 250/350/450, and the 100 K ladder is universal. Structured
+# rows never print a non-integer T other than the 298.15 K reference.
+PRINTED_GRID_QUANTUM_K = Decimal("10")
+REFERENCE_TEMPERATURE_K = Decimal("298.15")
+# Max consecutive 100 K-ladder gap in the 1,655-table corpus is 400 K
+# (Ta-003/Ta-004: 5600 → 6000). 616 tables skip 200 K around a labelled
+# transition; five skip 300 K; two skip 400 K. A jump larger than 400 K
+# is not a printed structured spacing of any table.
+PRINTED_GRID_MAX_STEP_K = Decimal("400")
 GRID_RANGE_REASON = (
-    "temperature is outside the table's printed 0-6000 K grid"
+    "temperature is not in this table's printed temperature set"
 )
 GRID_ORDER_REASON = (
     "temperature is not ordered within the printed table grid"
@@ -321,21 +328,92 @@ def _line_candidate(line_number: int, line: str) -> _LineCandidate:
     )
 
 
+def is_printed_grid_temperature(temperature: Decimal) -> bool:
+    """True for 298.15 K or an integer-valued multiple of 10 K."""
+
+    if temperature == REFERENCE_TEMPERATURE_K:
+        return True
+    if temperature < 0:
+        return False
+    return (
+        temperature == temperature.to_integral_value()
+        and temperature % PRINTED_GRID_QUANTUM_K == 0
+    )
+
+
+def _decimal_temperature_token(token: str) -> Decimal | None:
+    cleaned = token.strip()
+    if NUMBER_RE.fullmatch(cleaned) is None:
+        return None
+    try:
+        return Decimal(cleaned)
+    except InvalidOperation:
+        return None
+
+
+def table_printed_temperatures(tokens: Iterable[str]) -> frozenset[Decimal]:
+    """Printed T set of THIS table, from its own structured-row T tokens.
+
+    Grid-like T (298.15 K or an integer-valued multiple of 10 K) are
+    connected when consecutive unique values differ by at most
+    ``PRINTED_GRID_MAX_STEP_K``. The printed set is the largest connected
+    component. A 4000 K row in B-133 (printed max 3000 K) is a 1000 K jump
+    and does not join. This is membership in the table's printed T set,
+    not a global [0, 6000] K range.
+    """
+
+    values: list[Decimal] = []
+    for token in tokens:
+        parsed = _decimal_temperature_token(str(token))
+        if parsed is None or not is_printed_grid_temperature(parsed):
+            continue
+        values.append(parsed)
+    unique = sorted(set(values))
+    if not unique:
+        return frozenset()
+    parent = {item: item for item in unique}
+
+    def find(item: Decimal) -> Decimal:
+        while parent[item] != item:
+            parent[item] = parent[parent[item]]
+            item = parent[item]
+        return item
+
+    def union(left: Decimal, right: Decimal) -> None:
+        root_left, root_right = find(left), find(right)
+        if root_left != root_right:
+            parent[root_right] = root_left
+
+    for left, right in zip(unique, unique[1:]):
+        if right - left <= PRINTED_GRID_MAX_STEP_K:
+            union(left, right)
+    components: dict[Decimal, set[Decimal]] = defaultdict(set)
+    for item in unique:
+        components[find(item)].add(item)
+    largest = max(components.values(), key=lambda group: (len(group), -min(group)))
+    return frozenset(largest)
+
+
+def _candidate_temperature_decimal(candidate: _LineCandidate) -> Decimal | None:
+    if not candidate.content:
+        return None
+    return _decimal_temperature_token(candidate.content[0])
+
+
 def _refuse_uncorroborated_temperatures(
     rows: list[_LineCandidate],
 ) -> tuple[list[_LineCandidate], list[_LineCandidate], list[str]]:
-    """Keep rows whose T is inside 0-6000 K and non-decreasing in file order."""
+    """Keep rows whose T is in this table's printed T set and non-decreasing."""
 
+    printed = table_printed_temperatures(
+        candidate.content[0] for candidate in rows if candidate.content
+    )
     kept: list[_LineCandidate] = []
     refused: list[_LineCandidate] = []
     reasons: list[str] = []
-    pending = list(rows)
-    for candidate in pending:
-        if candidate.temperature is None:
-            refused.append(candidate)
-            reasons.append(GRID_RANGE_REASON)
-            continue
-        if candidate.temperature < PRINTED_GRID_T_MIN or candidate.temperature > PRINTED_GRID_T_MAX:
+    for candidate in rows:
+        parsed = _candidate_temperature_decimal(candidate)
+        if parsed is None or parsed not in printed:
             refused.append(candidate)
             reasons.append(GRID_RANGE_REASON)
             continue
@@ -344,16 +422,18 @@ def _refuse_uncorroborated_temperatures(
     while changed:
         changed = False
         for index in range(len(kept) - 1):
-            current = kept[index]
-            following = kept[index + 1]
-            if current.temperature is None or following.temperature is None:
+            current_t = _candidate_temperature_decimal(kept[index])
+            following_t = _candidate_temperature_decimal(kept[index + 1])
+            if current_t is None or following_t is None:
                 continue
-            if current.temperature <= following.temperature:
+            if current_t <= following_t:
                 continue
-            previous_t = kept[index - 1].temperature if index else None
+            previous_t = (
+                _candidate_temperature_decimal(kept[index - 1]) if index else None
+            )
             drop_index = (
                 index
-                if previous_t is None or previous_t <= following.temperature
+                if previous_t is None or previous_t <= following_t
                 else index + 1
             )
             refused.append(kept[drop_index])

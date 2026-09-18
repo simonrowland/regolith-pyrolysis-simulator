@@ -25,11 +25,13 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import Species
 from simulator.reference_data.janaf import (
+    GRID_RANGE_REASON,
     NON_DATA_MARKER_KIND,
     TABLES_DIR,
     iter_table_paths,
     load_table_document,
     parse_janaf_txt,
+    table_printed_temperatures,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -854,6 +856,58 @@ def test_delimiter_loss_is_refused_for_integer_and_decimal_rows() -> None:
                         f"{'trailing-empty row' if trailing_empty else 'full row'}"
                     )
     assert red_before_fix
+
+
+def test_printed_temperature_set_is_per_table() -> None:
+    b133 = [str(temperature) for temperature in range(0, 3001, 100)] + [
+        "298.15",
+        "4000",
+    ]
+    printed = table_printed_temperatures(b133)
+    assert Decimal("3000") in printed
+    assert Decimal("298.15") in printed
+    assert Decimal("4000") not in printed
+    ta003 = [str(temperature) for temperature in range(0, 5601, 100)] + [
+        "298.15",
+        "6000",
+    ]
+    assert Decimal("6000") in table_printed_temperatures(ta003)
+    with_50k = [str(temperature) for temperature in range(0, 1001, 100)] + [
+        "250",
+        "350",
+        "450",
+        "298.15",
+    ]
+    fifty = table_printed_temperatures(with_50k)
+    assert Decimal("250") in fifty
+    assert Decimal("450") in fifty
+
+
+def test_off_grid_temperature_with_intact_layout_is_refused() -> None:
+    table_id = "B-133"
+    payload = _raw_table_path(table_id).read_bytes()
+    control = generator.generate_table(_parse_raw_document(table_id, payload))
+    assert control.report["refused_layout_rows"] == []
+    assert "3000" in _cp_temperatures(control)
+    text = payload.decode("utf-8")
+    line_index, line = _row_for_temperature(text, "3000")
+    rest = line.split("\t", 1)[1]
+    lines = text.splitlines()
+    lines[line_index] = "4000\t" + rest
+    mutated = ("\n".join(lines) + "\n").encode("utf-8")
+    generated = generator.generate_table(_parse_raw_document(table_id, mutated))
+    refused = generated.report["refused_layout_rows"]
+    assert refused
+    assert any(
+        row.get("reason") == GRID_RANGE_REASON
+        and str(row.get("temperature_as_published") or row.get("raw_text", "")).startswith(
+            "4000"
+        )
+        for row in refused
+    )
+    temperatures = _cp_temperatures(generated)
+    assert "4000" not in temperatures
+    assert "3000" not in temperatures
 
 
 def test_non_data_marker_lines_are_recorded() -> None:
