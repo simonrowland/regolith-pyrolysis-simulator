@@ -807,6 +807,54 @@ def _logk_identity_failure(
     }
 
 
+def _stored_pair_identity_denominator(
+    observations: Sequence[Observation],
+    failures: Sequence[Mapping[str, str]],
+) -> dict[str, int]:
+    """Eligible / checked / passed for stored-pair identity.
+
+    Eligible is every emitted T>0 point of delta_fG or log10_Kf. Checked is
+    the T>0 intersection of those series in the same segment. A high pass
+    rate cannot hide a small denominator: checked can be smaller than
+    either eligible count when one member is missing.
+    """
+
+    by_segment: dict[str, dict[Quantity, Observation]] = defaultdict(dict)
+    for observation in observations:
+        quantity = observation.identity.quantity.value
+        if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+            by_segment[observation.observation_id.rsplit(":", 1)[-1]][quantity] = (
+                observation
+            )
+    eligible_delta_fG = 0
+    eligible_log10_Kf = 0
+    checked = 0
+    for quantity_map in by_segment.values():
+        delta_g = quantity_map.get(Quantity.DELTA_FG)
+        log_k = quantity_map.get(Quantity.LOG10_KF)
+        delta_g_temperatures = (
+            {point[0] for point in (delta_g.value.series or ()) if point[0] > 0}
+            if delta_g is not None
+            else set()
+        )
+        log_k_temperatures = (
+            {point[0] for point in (log_k.value.series or ()) if point[0] > 0}
+            if log_k is not None
+            else set()
+        )
+        eligible_delta_fG += len(delta_g_temperatures)
+        eligible_log10_Kf += len(log_k_temperatures)
+        checked += len(delta_g_temperatures & log_k_temperatures)
+    failed = len(failures)
+    return {
+        "eligible_delta_fG_T_gt_0": eligible_delta_fG,
+        "eligible_log10_Kf_T_gt_0": eligible_log10_Kf,
+        "checked_intersection": checked,
+        "passed": checked - failed,
+        "failed": failed,
+    }
+
+
 def _stored_pair_identity_failures_from_observations(
     observations: Sequence[Observation],
     table_id: str,
@@ -1418,23 +1466,10 @@ def generate_table(
     stored_pair_failures = _stored_pair_identity_failures_from_observations(
         observations, table_id
     )
-    stored_pair_count = 0
-    by_segment: dict[str, dict[Quantity, Observation]] = defaultdict(dict)
-    for observation in observations:
-        quantity = observation.identity.quantity.value
-        if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
-            by_segment[observation.observation_id.rsplit(":", 1)[-1]][quantity] = (
-                observation
-            )
-    for quantity_map in by_segment.values():
-        delta_g = quantity_map.get(Quantity.DELTA_FG)
-        log_k = quantity_map.get(Quantity.LOG10_KF)
-        if delta_g is None or log_k is None:
-            continue
-        delta_g_temperatures = {point[0] for point in (delta_g.value.series or ()) if point[0] > 0}
-        log_k_temperatures = {point[0] for point in (log_k.value.series or ()) if point[0] > 0}
-        stored_pair_count += len(delta_g_temperatures & log_k_temperatures)
-    checks["log10_Kf_from_delta_fG"] = stored_pair_count
+    stored_pair_denominator = _stored_pair_identity_denominator(
+        observations, stored_pair_failures
+    )
+    checks["log10_Kf_from_delta_fG"] = stored_pair_denominator["checked_intersection"]
     failures.extend(stored_pair_failures)
 
     plain_accounting: dict[str, Any] = {}
@@ -1489,6 +1524,7 @@ def generate_table(
         "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
         "transcription_identity_failures": failures,
         "stored_pair_identity_failures": stored_pair_failures,
+        "stored_pair_identity_denominator": stored_pair_denominator,
         "refused_merged_pair_checks": refused_merged_pair_checks,
         "refused_merged_pair_identity_failures": refused_merged_pair_failures,
         "transition_rows": transition_rows,
@@ -1612,6 +1648,7 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     transcription_checks: Counter[str] = Counter()
     failure_counts: Counter[str] = Counter()
     stored_pair_identity_failure_count = 0
+    stored_pair_identity_denominator: Counter[str] = Counter()
     refused_merged_pair_check_count = 0
     refused_merged_pair_identity_failure_count = 0
     raw_numeric_accounting: Counter[str] = Counter()
@@ -1667,6 +1704,9 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
             failure_counts[str(failure["identity"])] += 1
         stored_pair_identity_failure_count += len(
             generated.report["stored_pair_identity_failures"]
+        )
+        stored_pair_identity_denominator.update(
+            generated.report.get("stored_pair_identity_denominator") or {}
         )
         refused_merged_pair_check_count += int(
             generated.report["refused_merged_pair_checks"]
@@ -1738,6 +1778,9 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         "transcription_identity_failure_counts": dict(sorted(failure_counts.items())),
         "transcription_gas_constant_J_per_mol_K": str(JANAF_R_J_PER_MOL_K),
         "stored_pair_identity_failure_count": stored_pair_identity_failure_count,
+        "stored_pair_identity_denominator": dict(
+            sorted(stored_pair_identity_denominator.items())
+        ),
         "refused_merged_pair_check_count": refused_merged_pair_check_count,
         "refused_merged_pair_identity_failure_count": (
             refused_merged_pair_identity_failure_count

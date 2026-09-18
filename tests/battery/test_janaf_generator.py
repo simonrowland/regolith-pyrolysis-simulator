@@ -1020,6 +1020,25 @@ def test_non_data_marker_lines_are_recorded() -> None:
     assert len(observed) == 29
 
 
+def test_stored_pair_identity_reports_its_denominator() -> None:
+    al006 = _generation("Al-006")
+    assert al006.report["stored_pair_identity_denominator"] == {
+        "eligible_delta_fG_T_gt_0": 61,
+        "eligible_log10_Kf_T_gt_0": 61,
+        "checked_intersection": 61,
+        "passed": 61,
+        "failed": 0,
+    }
+    b133 = _generation("B-133")
+    assert b133.report["stored_pair_identity_denominator"] == {
+        "eligible_delta_fG_T_gt_0": 28,
+        "eligible_log10_Kf_T_gt_0": 28,
+        "checked_intersection": 28,
+        "passed": 27,
+        "failed": 1,
+    }
+
+
 def test_stored_pair_identity_reads_the_emitted_series() -> None:
     generated = _generation("Al-006")
     assert generated.report["stored_pair_identity_failures"] == []
@@ -1099,6 +1118,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     refused_merged_pair_violations: list[tuple[str, str]] = []
     reported_stored_pair_violations: list[tuple[str, str]] = []
     reported_refused_pair_violations: list[tuple[str, str]] = []
+    stored_pair_denominator: Counter[str] = Counter()
     stored_nonzero_merged_cells = 0
     merged_disposition_mismatches = 0
     segment_control_mismatches = 0
@@ -1194,6 +1214,9 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 if actual_disposition != expected_disposition:
                     merged_disposition_mismatches += 1
 
+        stored_pair_denominator.update(
+            generated.report.get("stored_pair_identity_denominator") or {}
+        )
         reported_stored_pair_violations.extend(
             (row["table_id"], row["temperature_as_published"])
             for row in generated.report.get("stored_pair_identity_failures", [])
@@ -1348,6 +1371,13 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert transcription_checks == {
         "negative_gibbs_enthalpy_function": 76293,
         "log10_Kf_from_delta_fG": 73668,
+    }
+    assert dict(stored_pair_denominator) == {
+        "eligible_delta_fG_T_gt_0": 73668,
+        "eligible_log10_Kf_T_gt_0": 73668,
+        "checked_intersection": 73668,
+        "passed": 73667,
+        "failed": 1,
     }
     assert refused_merged_pair_checks == 437
     assert stored_cell_errata == 1
