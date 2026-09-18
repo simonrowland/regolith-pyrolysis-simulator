@@ -904,6 +904,35 @@ layered:
    totals are reported in [`docs/model-limitations.md`](model-limitations.md) rather than duplicated
    here, because they move with every corpus addition.
 
+### Gas-constant policy (transcription vs cross-source)
+
+The empirical battery uses two different values of R, on purpose. Unifying
+them onto modern CODATA is a defect, not a cleanup.
+
+- **To reproduce a source's own printed column**, use the constant that
+  source's era and publisher used. That is a transcription check against
+  the page. The constant lives on the generator, with its page locus, and
+  is passed explicitly into `log10K_from_delta_fG_kJ_mol`.
+  - NIST-JANAF 4th edition: `JANAF_R_J_PER_MOL_K = 8.31441` J/(mol·K),
+    Chase 1998, J. Phys. Chem. Ref. Data Monograph 9, printed p. 10 §3.4
+    table "Fundamental constants" (`R = 8.314 41(26)`, Cohen & Taylor
+    1973 / CODATA 1973). Official intro PDF:
+    `https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-1Vol1-Intro.pdf`.
+  - USGS Bulletin 1544: `B1544_R_J_PER_MOL_K = 8.3143` J/(mol·K). B1544
+    prints no gas constant; the value is inherited from the parent
+    compilation USGS B1452 Table 1 (PDF p. 9 / printed p. 3).
+- **To do cross-source physics** — identity between observations from
+  different sources — use CODATA / SI 2019 `R = N_A k_B` from
+  `simulator.physical_constants.GAS_CONSTANT`
+  (`simulator/battery/identity.py::R_J_PER_MOL_K`). Engine code that is
+  not reproducing a printed column should import that leaf;
+  `simulator.state` still carries a six-significant-figure truncation
+  and must not be silently unified.
+
+A new source's transcription constant is declared next to that source's
+generator (or loader). It does not go into `identity.py`, and it is never
+replaced by CODATA to make a residual look smaller.
+
 The trust tiers used throughout this page are the ones defined in
 [`docs/citation-policy.md`](citation-policy.md): **CITED** (traceable to a primary source, applied on a
 consistent basis — the only tier permitted to back a certification claim), **ASSUMED** (a stated

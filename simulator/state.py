@@ -110,7 +110,11 @@ for _oxide, (_metal, _n_met, _n_oxy) in OXIDE_TO_METAL.items():
     _kg_O2 = (_n_oxy * MOLAR_MASS['O'] ) / _M_oxide  # mass of O atoms
     STOICH_RATIOS[_oxide] = (_kg_metal, _kg_O2)
 
-# Physical constants
+# Physical constants. GAS_CONSTANT and FARADAY here are six-significant-
+# figure truncations of the CODATA / SI 2019 values in
+# simulator.physical_constants. Do not silently re-export the leaf: a
+# 3e-7 relative shift in R moves pinned evaporation-flux heads (see
+# tests/test_capacity_coupling.py::test_default_off_preserves_hot_fe_redox_split_head_result).
 BOLTZMANN = 1.380649e-23      # J/K
 FARADAY = 96485.3321          # C/mol (for electrolysis)
 GAS_CONSTANT = 8.31446        # J/(mol·K)

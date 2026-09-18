@@ -1,5 +1,41 @@
 """Identity + identity_equal (v2.1 §Exact equality and observable profiles).
 
+Gas-constant policy (b-511)
+---------------------------
+Two different jobs, two different R values. Do not unify them.
+
+1. **Transcription of a source's own printed column** uses the constant
+   that source's era and publisher used. That is a check against the
+   page, not a modern-physics evaluation. Per-source constants live on
+   the generator that reads that source, never here:
+
+   - NIST-JANAF 4th ed. (Chase 1998, Monograph 9, p. 10 §3.4 table):
+     ``JANAF_R_J_PER_MOL_K = 8.31441`` J/(mol·K). The printed
+     "Fundamental constants" table lists the molar gas constant as
+     ``8.314 41(26)``, Cohen & Taylor 1973 / CODATA 1973. A new JANAF
+     table's log Kf identity uses that value.
+   - USGS B1544 (Hemingway, Haas & Robinson 1982):
+     ``B1544_R_J_PER_MOL_K = 8.3143`` J/(mol·K). B1544 prints no R;
+     the value is inherited from the parent compilation USGS B1452
+     Table 1 (PDF p. 9 / printed p. 3).
+
+   A new source's transcription constant is declared next to that
+   source's generator (or loader), with the page locus, and is passed
+   explicitly into ``log10K_from_delta_fG_kJ_mol``. It does not belong
+   in this module.
+
+2. **Cross-source physics** — identity between observations from
+   different sources — uses CODATA / SI 2019 ``R = N_A k_B`` from
+   ``simulator.physical_constants.GAS_CONSTANT``. That is
+   ``R_J_PER_MOL_K`` below. Engine modules that are not doing a
+   page-transcription check should import that leaf; ``simulator.state``
+   still carries a six-significant-figure truncation and must not be
+   silently unified (it moves pinned flux heads).
+
+Unifying (1) onto (2) is a defect: B1544 corundum at 298.15 K
+reproduces printed log Kf 277.203 only with R = 8.3143; CODATA
+gives 277.1968 and does not round to the printed value.
+
 Compared axes are quantity-class profiles, never "every field present on
 either side". Annotations, engine versions, fO2 channel and buffer labels
 never enter equality. fO2 *value* is identity; channel is provenance.
@@ -97,7 +133,10 @@ PA_PER_BAR_DEC = Decimal(str(int(PA_PER_BAR))) if PA_PER_BAR == 1e5 else Decimal
 PA_PER_ATM_DEC = Decimal(str(int(STANDARD_ATMOSPHERE_PA)))
 CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
-# R as used for ΔfG ↔ log10 Kf. CODATA 2018 / SI 2019 R = 8.314462618… J/(mol·K).
+# R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019
+# R = N_A k_B = 8.314462618… J/(mol·K) from physical_constants.GAS_CONSTANT.
+# Source-era transcription constants (JANAF 8.31441, B1544 8.3143) stay on
+# their generators; see this module's Gas-constant policy docstring.
 # Algebra: log10 Kf = −ΔfG / (R T ln 10), ΔfG in J/mol, T in K.
 # Unit check: J/mol / (J/(mol·K) · K) is dimensionless.
 # Sanity: ΔfG = 0 → log10 Kf = 0; at 298.15 K, 1 kJ/mol ≈ 0.1752 dex.

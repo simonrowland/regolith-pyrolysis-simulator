@@ -61,6 +61,12 @@ SOURCE_ID = "nist-janaf-4th"
 TABLE_SOURCE_PREFIX = "data/literature/compilations/janaf/tables"
 STANDARD_STATE = "p° = 0.1 MPa (as published by JANAF)"
 STANDARD_PRESSURE_PA = Decimal("100000")
+# Chase 1998, NIST-JANAF 4th ed., Monograph 9, printed p. 10 §3.4
+# "Fundamental constants" table: molar gas constant R = 8.314 41(26)
+# J mol^-1 K^-1 (Cohen & Taylor 1973 / CODATA 1973). The same page's
+# right-hand column notes that tables issued since the Third Edition
+# use 1986 CODATA; the printed constants table, and the log Kf column
+# identity against it, keep 8.31441. Do not substitute CODATA 2018.
 JANAF_R_J_PER_MOL_K = Decimal("8.31441")
 FORMATION_BASIS_REASON = (
     "JANAF formation from the elements in their reference states, as defined in "
@@ -905,9 +911,9 @@ def _logk_identity_failure(
 ) -> dict[str, str] | None:
     if temperature <= 0:
         return None
-    # Premise: the JANAF 4th-edition introduction tabulates
-    # R = 8.31441 J/(mol K), so this source-level transcription check must
-    # use that printed constant rather than the helper's modern default.
+    # Premise: Chase 1998 Monograph 9 p. 10 §3.4 prints
+    # R = 8.314 41(26) J/(mol K), so this source-level transcription check
+    # must use that printed constant rather than the helper's modern default.
     # Algebra: log10(Kf) = -1000*delta_fG/(R*T*ln(10)). Unit check:
     # (kJ/mol)*1000 J/kJ / ((J/(mol K))*K) is dimensionless. Worked row:
     # B-132 at 298.15 K with delta_fG=-5582.653 kJ/mol gives about
