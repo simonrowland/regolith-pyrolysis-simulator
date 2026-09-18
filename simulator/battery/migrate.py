@@ -4624,6 +4624,29 @@ class Migrator:
                     t_is_point=t_sel.available,
                     parent_admission=admission,
                 )
+                point_notices: tuple[Notice, ...] = ()
+                disagreement = _cardiff_matchett_disagreement_reason(values)
+                test_id = str(item.get("test") or "")
+                if disagreement and test_id in {"2b", "3"}:
+                    q_token = (
+                        yield_quantity.value
+                        if isinstance(yield_quantity, State) and yield_quantity.is_value
+                        else (
+                            yield_quantity
+                            if isinstance(yield_quantity, Quantity)
+                            else Quantity.MASS_LOSS_FRACTION
+                        )
+                    )
+                    point_notices = (
+                        Notice(
+                            kind=NoticeKind.SOURCE_DISAGREEMENT,
+                            affected_quantities=(q_token,),
+                            reason=disagreement,
+                            origin=f"{obs_id}::point:{index}",
+                            source="cardiff-2007-vacuum-pyrolysis-gsfc",
+                            destination="kems-038-matchett-2006",
+                        ),
+                    )
                 self._emit_exploded_point(
                     parent_id=obs_id,
                     item={"index": index, "item": item, "units": obs.get("units")},
@@ -4639,6 +4662,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    notices=point_notices,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -4740,6 +4764,7 @@ class Migrator:
         units: str,
         read_from: str,
         derived_from: tuple[str, ...] | None = None,
+        notices: tuple[Notice, ...] = (),
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -4872,7 +4897,7 @@ class Migrator:
             uncertainty=unc,
             evidence=evidence,
             admission=admission,
-            notices=(),
+            notices=notices,
             source_id=source_id,
             locator=point_locator,
             read_from=read_from,

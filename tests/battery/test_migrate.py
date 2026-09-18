@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     IdentityEqualKind,
     MethodToken,
+    NoticeKind,
     Phase,
     Polymorph,
     Quantity,
@@ -3949,6 +3950,9 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
     disagreed = by_value[0.37]
     assert disagreed.admission.status is AdmissionStatus.PENDING
     assert "16.00/37.00" in disagreed.admission.reason
+    assert any(n.kind is NoticeKind.SOURCE_DISAGREEMENT for n in disagreed.notices)
+    assert any(n.kind is NoticeKind.SOURCE_DISAGREEMENT for n in bound.notices)
+    assert not any(n.kind is NoticeKind.SOURCE_DISAGREEMENT for n in mls.notices)
 
 
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
