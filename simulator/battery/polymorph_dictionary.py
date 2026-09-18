@@ -196,6 +196,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "cyclowollastonite": Polymorph.CYCLOWOLLASTONITE,
     "cyclowollastonite (pseudowollastonite)": Polymorph.CYCLOWOLLASTONITE,
     "lime": Polymorph.LIME,
+    "periclase": Polymorph.PERICLASE,
     "dickite": Polymorph.DICKITE,
     "halloysite": Polymorph.HALLOYSITE,
     "larnite": Polymorph.LARNITE,

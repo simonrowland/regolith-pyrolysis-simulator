@@ -22,6 +22,7 @@ from simulator.battery.polymorph_dictionary import (
     JANAF_CRYSTAL_TABLE_IDS,
     canonicalize_janaf_transition,
     classify_printed_qualifier,
+    coerce_polymorph_token,
     printed_qualifier_from_name,
 )
 from simulator.battery.records import Species, State
@@ -224,6 +225,13 @@ def test_dictionary_covers_every_census_crystal_and_not_qualifier_alone() -> Non
     assert JANAF_CRYSTAL_DICTIONARY[("Al2O3", "Alpha")] is not JANAF_CRYSTAL_DICTIONARY[
         ("Na3AlF6", "Alpha")
     ]
+
+
+def test_periclase_is_a_closed_mgo_token() -> None:
+    assert Polymorph.PERICLASE.value == "periclase"
+    assert coerce_polymorph_token("periclase") is Polymorph.PERICLASE
+    assert coerce_polymorph_token("PERICLASE") is Polymorph.PERICLASE
+    assert coerce_polymorph_token("Periclase") is Polymorph.PERICLASE
 
 
 def test_neutral_charge_is_zero_value_not_unknown() -> None:

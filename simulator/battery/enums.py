@@ -220,6 +220,7 @@ class Polymorph(StrEnum):
     WOLLASTONITE = "wollastonite"
     CYCLOWOLLASTONITE = "cyclowollastonite"
     LIME = "lime"
+    PERICLASE = "periclase"
     DICKITE = "dickite"
     HALLOYSITE = "halloysite"
     LARNITE = "larnite"
