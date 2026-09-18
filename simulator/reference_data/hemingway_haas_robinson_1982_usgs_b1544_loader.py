@@ -11,9 +11,11 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
+import tempfile
 import xml.etree.ElementTree as ET
 from collections import Counter
 from decimal import Decimal, InvalidOperation
@@ -358,11 +360,33 @@ def extract_bbox_words(pdf: Path, page: int, cache_dir: Path) -> list[dict[str, 
     cache_dir.mkdir(parents=True, exist_ok=True)
     xml_path = cache_dir / f"page-{page:03d}.xml"
     if not xml_path.is_file():
-        subprocess.run(
-            ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(pdf), str(xml_path)],
-            check=True,
-            capture_output=True,
-        )
+        # Render to a private temp file, then rename into place.
+        #
+        # The is_file() check and the write are not atomic together, and this cache
+        # is shared across processes. Under xdist every worker that needs the same
+        # page sees the file missing in the same instant and runs pdftotext against
+        # the same target path, so their renders land in one file and the cache ends
+        # up holding one <html> document per racing worker. ET.parse then dies on the
+        # second root element ("not well-formed (invalid token)").
+        #
+        # Measured 2026-09-18 on this file: the parallel run left a cache with 5
+        # </html> closings and failed exactly the 5 tests that read page 21, while
+        # the same tests with -n 0 passed 17/17 and left a 1-closing cache.
+        #
+        # os.replace is atomic within a filesystem, so a racing worker sees either no
+        # file (and renders its own complete copy) or a whole one -- never a partial
+        # or concatenated document. Duplicate renders are wasted work, not corruption.
+        with tempfile.NamedTemporaryFile(dir=cache_dir, suffix=".xml", delete=False) as handle:
+            tmp_path = Path(handle.name)
+        try:
+            subprocess.run(
+                ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(pdf), str(tmp_path)],
+                check=True,
+                capture_output=True,
+            )
+            os.replace(tmp_path, xml_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
     tree = ET.parse(xml_path)
     words: list[dict[str, Any]] = []
     for el in tree.iter():

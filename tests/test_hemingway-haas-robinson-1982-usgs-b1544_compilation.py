@@ -18,6 +18,7 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
     AmbiguousPrintedTemperature,
     TemperatureNotOnPrintedGrid,
     census_from_records,
+    extract_bbox_words,
     feedstock_coverage,
     load_records,
     lookup,
@@ -361,3 +362,38 @@ def json_blob(record):
     import json
 
     return json.dumps(record)
+
+
+@pytest.mark.skipif(
+    not PDF.is_file(), reason="regolith-corpus checkout with the B1544 source PDF is absent"
+)
+def test_bbox_cache_write_is_atomic_under_concurrency(tmp_path):
+    """Concurrent renders of one page must leave a single whole XML document.
+
+    The cache write used to be "if not xml_path.is_file(): pdftotext -> xml_path",
+    which is a check and a write that are not atomic together. Every caller that
+    found the file missing rendered to the same path, so their outputs concatenated
+    and ET.parse died on the second root element.
+
+    Measured 2026-09-18 before the fix: a parallel run of this module left a cache
+    with five </html> closings and failed exactly the five tests that read page 21,
+    while the same tests run serially passed 17/17 and left one closing. So the
+    closing count is the direct witness and is what this asserts.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    cache_dir = tmp_path / "bbox"
+    page = 21
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        futures = [pool.submit(extract_bbox_words, PDF, page, cache_dir) for _ in range(5)]
+        results = [f.result() for f in futures]
+
+    text = (cache_dir / f"page-{page:03d}.xml").read_text()
+    assert text.count("</html>") == 1, (
+        f"cache holds {text.count('</html>')} concatenated documents; the write is not atomic"
+    )
+    # No leftover temp renders: os.replace consumes the winner, the losers unlink theirs.
+    assert sorted(q.name for q in cache_dir.iterdir()) == [f"page-{page:03d}.xml"]
+    # Every caller must observe the same words; a torn read would not.
+    assert results[0], "page 21 yielded no words, so the assertions above are vacuous"
+    assert all(r == results[0] for r in results)
