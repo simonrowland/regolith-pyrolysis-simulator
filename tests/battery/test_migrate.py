@@ -3838,9 +3838,11 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert sio2.value.kind is ValueKind.POINT
     assert sio2.value.point == as_decimal("0.011")
     assert float(sio2.identity.temperature_K.value) == 1673.15
+    assert sio2.admission.status is AdmissionStatus.ADMITTED
     ms2 = by_formula["MS2"]
     assert ms2.value.point == as_decimal("0.032")
     assert float(ms2.identity.temperature_K.value) == 1836.15
+    assert ms2.admission.status is AdmissionStatus.ADMITTED
 
 
 def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
@@ -3878,6 +3880,7 @@ def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
         assert obs.identity.temperature_K.is_unknown
         assert "no midpoint invented" in (obs.identity.temperature_K.reason or "")
         assert "1473.15" in (obs.identity.temperature_K.reason or "")
+        assert obs.admission.status is AdmissionStatus.ADMITTED
 
 
 def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None:
@@ -3887,6 +3890,10 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
         values={
             "quantity": "vacuum_pyrolysis_experiment_summary",
             "method_class": "measured_direct",
+            "contradiction_vs_matchett_2006_table3": {
+                "test_2b_mass_loss": {"cardiff_table1": "16.00%", "matchett_table3": "0.16%"},
+                "resolution": "none_both_printed_this_extract_keeps_cardiff_as_printed",
+            },
             "tests": [
                 {
                     "test": "2b",
@@ -3894,6 +3901,12 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
                     "Tmax_C": None,
                     "Tmax_C_as_printed": ">800",
                     "mass_loss_pct": 16.0,
+                },
+                {
+                    "test": 3,
+                    "sample": "FeTiO3",
+                    "Tmax_C": 700.0,
+                    "mass_loss_pct": 37.0,
                 },
                 {
                     "test": 11,
@@ -3923,18 +3936,19 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
         for o in result.observations.values()
         if quantity_token(o.identity) is Quantity.MASS_LOSS_FRACTION
     ]
-    assert len(points) == 2
-    by_formula = {o.identity.species.formula: o for o in points}
-    mls = by_formula["MLS-1a"]
-    assert mls.value.point == as_decimal("0.101")
+    assert len(points) == 3
+    by_value = {float(o.value.point): o for o in points}
+    mls = by_value[0.101]
+    assert mls.identity.species.formula == "MLS-1a"
     assert float(mls.identity.temperature_K.value) == 1474.0 + 273.15
-    fetio3 = by_formula["FeTiO3"]
-    assert fetio3.value.point == as_decimal("0.16")
-    assert fetio3.identity.temperature_K.is_unknown
-    assert "no midpoint invented" in (fetio3.identity.temperature_K.reason or "") or (
-        "not numeric" in (fetio3.identity.temperature_K.reason or "")
-        or "T_range_K" in (fetio3.identity.temperature_K.reason or "")
-    )
+    assert mls.admission.status is AdmissionStatus.ADMITTED
+    bound = by_value[0.16]
+    assert bound.identity.species.formula == "FeTiO3"
+    assert bound.identity.temperature_K.is_unknown
+    assert bound.admission.status is AdmissionStatus.PENDING
+    disagreed = by_value[0.37]
+    assert disagreed.admission.status is AdmissionStatus.PENDING
+    assert "16.00/37.00" in disagreed.admission.reason
 
 
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
@@ -4078,6 +4092,8 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_and_robinot_yields(
     assert pomeroy.value.kind is ValueKind.POINT
     assert pomeroy.value.point == as_decimal("0.0117")
     assert float(pomeroy.identity.temperature_K.value) == 1400.0 + 273.15
+    assert pomeroy.admission.status is AdmissionStatus.PENDING
+    assert "sample mass" in pomeroy.admission.reason or "not reported" in pomeroy.admission.reason or pomeroy.admission.reason.startswith("no observation admission_status")
     robinot_yield = result.observations[
         "robinot_2026_deposit_measurements:robinot_o2_mass_yield_fraction"
     ]

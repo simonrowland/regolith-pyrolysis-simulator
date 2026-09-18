@@ -2464,6 +2464,64 @@ def admission_for(
     )
 
 
+def _locator_is_page_grounded(locator: Locator | None) -> bool:
+    if locator is None:
+        return False
+    return any(
+        getattr(locator, key) not in (None, "")
+        for key in ("page", "published_page", "table", "pdf_page_index")
+    )
+
+
+def _cardiff_matchett_disagreement_reason(parent_values: Mapping[str, Any]) -> str | None:
+    if any(str(key).startswith("contradiction_vs_") for key in parent_values):
+        return (
+            "Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints "
+            "0.16/0.37; both left as printed"
+        )
+    return None
+
+
+def _yield_point_admission(
+    *,
+    item: Mapping[str, Any],
+    parent_values: Mapping[str, Any],
+    evidence: Evidence,
+    locator: Locator | None,
+    extraction: Mapping[str, Any] | None,
+    t_is_point: bool,
+    parent_admission: Admission,
+) -> Admission:
+    if parent_admission.status is AdmissionStatus.SUPERSEDED:
+        return parent_admission
+    test_id = str(item.get("test") or "")
+    if test_id in {"2b", "3"}:
+        disagreement = _cardiff_matchett_disagreement_reason(parent_values)
+        if disagreement:
+            return Admission(
+                status=AdmissionStatus.PENDING,
+                reason=disagreement,
+            )
+    measured = (
+        evidence.class_.is_value
+        and evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    if not measured or not t_is_point or not _locator_is_page_grounded(locator):
+        return parent_admission
+    decided = None
+    if isinstance(extraction, Mapping) and locator is not None:
+        decided = AdmissionDecision(
+            worker=str(extraction.get("worker") or "extract"),
+            date=str(extraction.get("date") or "unspecified"),
+            evidence=locator,
+        )
+    return Admission(
+        status=AdmissionStatus.ADMITTED,
+        reason="printed numeric mass-loss cell with page locator",
+        decided_by=decided,
+    )
+
+
 def uncertainty_for(raw: object) -> Uncertainty:
     if raw is None or raw == "":
         return Uncertainty(kind=UncertaintyKind.NONE)
@@ -4234,6 +4292,12 @@ class Migrator:
             for child_quantity, field in oxygen_fields:
                 child_values = dict(values)
                 child_values["quantity"] = child_quantity.value
+                if (
+                    field in {"mass_yield_percent", "fraction_of_feedstock_oxygen_percent"}
+                    and "comparable" not in raw_obs_id.lower()
+                    and "1p17" not in raw_obs_id.lower()
+                ):
+                    child_values["admission_status"] = "admitted"
                 child_obs = dict(obs)
                 child_obs["observation_id"] = f"{raw_obs_id}::{field}"
                 child_obs["values"] = child_values
@@ -4542,6 +4606,24 @@ class Migrator:
             for index, item in enumerate(yield_items):
                 if not isinstance(item, Mapping) or _item_mass_loss_field(item) is None:
                     continue
+                point_locator = locator
+                if item.get("locator"):
+                    point_locator = (
+                        locator_from_mapping(
+                            item.get("locator"), fallback=f"{obs_id}:point:{index}"
+                        )
+                        or locator
+                    )
+                t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, item)
+                point_admission = _yield_point_admission(
+                    item=item,
+                    parent_values=values,
+                    evidence=evidence,
+                    locator=point_locator,
+                    extraction=extraction,
+                    t_is_point=t_sel.available,
+                    parent_admission=admission,
+                )
                 self._emit_exploded_point(
                     parent_id=obs_id,
                     item={"index": index, "item": item, "units": obs.get("units")},
@@ -4552,7 +4634,7 @@ class Migrator:
                     locator=locator,
                     identity_base=(yield_quantity, species, ident_kwargs),
                     evidence=evidence,
-                    admission=admission,
+                    admission=point_admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
