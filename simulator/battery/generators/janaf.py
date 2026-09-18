@@ -20,12 +20,19 @@ from simulator.battery.enums import (
     EvidenceClass,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
+    StateTag,
     UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
+from simulator.battery.polymorph_dictionary import (
+    JANAF_TRANSITION_POLYMORPHS,
+    canonicalize_janaf_transition,
+    resolve_janaf_polymorph,
+)
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -201,15 +208,7 @@ _PHASE_SIDE = {
     "IDEAL GAS": Phase.G,
     "REAL GAS": Phase.G,
 }
-_CRYSTAL_POLYMORPHS = {
-    "ALPHA": "alpha",
-    "BETA": "beta",
-    "GAMMA": "gamma",
-    "DELTA": "delta",
-    "I": "i",
-    "II": "ii",
-    "III": "iii",
-}
+_CRYSTAL_POLYMORPHS = JANAF_TRANSITION_POLYMORPHS
 _PHASE_CHANGE_RE = re.compile(r"^\s*(.+?)\s*<-->\s*(.+?)\s*$")
 _CONDITION_RE = re.compile(
     r"^\s*(FUGACITY|PRESSURE)\s*=\s*"
@@ -264,7 +263,7 @@ class _Boundary:
 class _Segment:
     index: int
     phase: State[Phase]
-    polymorph: State[str]
+    polymorph: State[Polymorph]
     phase_basis: str
     lower_K: Decimal | None
     upper_K: Decimal | None
@@ -337,8 +336,7 @@ def _validate_table(table: Mapping[str, Any]) -> tuple[str, str, int, str]:
     state = str(entry.get("state") or "")
     if state not in {*_SINGLE_PHASES, "fl", *_COMBINED_STATES}:
         raise ValueError(f"{table_id}: unsupported JANAF state {state!r}")
-    charged_formula = formula + ("+" if charge == 1 else "-" if charge == -1 else "")
-    return table_id, charged_formula, charge, state
+    return table_id, formula, charge, state
 
 
 def _structured_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
@@ -584,31 +582,50 @@ def _side_phase(side: str) -> Phase | None:
     return _PHASE_SIDE.get(canonical)
 
 
-def _side_polymorph(side: str) -> str | None:
-    return _CRYSTAL_POLYMORPHS.get(" ".join(side.upper().split()))
+def _side_polymorph(side: str, formula: str = "") -> Polymorph | None:
+    token = _CRYSTAL_POLYMORPHS.get(" ".join(side.upper().split()))
+    if token is None:
+        return None
+    return canonicalize_janaf_transition(formula, token) if formula else token
 
 
 def _phase_state(phase: Phase | None, reason: str) -> State[Phase]:
     return State.of(phase) if phase is not None else State.unknown(reason)
 
 
+def _polymorph_from_resolve(
+    tag: StateTag, value: Polymorph | None, reason: str
+) -> State[Polymorph]:
+    if tag is StateTag.VALUE:
+        if value is None:
+            raise ValueError("resolved polymorph value is missing")
+        return State.of(value)
+    if tag is StateTag.NOT_APPLICABLE:
+        return State.not_applicable(reason)
+    return State.unknown(reason)
+
+
 def _segments(
     state: str,
     formula: str,
     boundaries: Sequence[_Boundary],
+    *,
+    name: str = "",
+    title: str = "",
 ) -> tuple[_Segment, ...]:
     if state in _SINGLE_PHASES and not (state == "cr" and boundaries):
         phase = _SINGLE_PHASES[state]
-        polymorph = (
-            State.unknown("JANAF index state 'cr' does not state a named polymorph")
-            if phase is Phase.CR
-            else State.not_applicable("not crystal")
+        tag, token, reason = resolve_janaf_polymorph(
+            formula=formula,
+            phase_is_crystal=phase is Phase.CR,
+            name=name,
+            title=title,
         )
         return (
             _Segment(
                 0,
                 State.of(phase),
-                polymorph,
+                _polymorph_from_resolve(tag, token, reason),
                 f"phase declared by JANAF index state {state!r}",
                 None,
                 None,
@@ -617,11 +634,17 @@ def _segments(
         )
     if state == "fl":
         reason = "JANAF state 'fl' is not a schema v2.1 Phase token"
+        tag, token, poly_reason = resolve_janaf_polymorph(
+            formula=formula,
+            phase_is_crystal=False,
+            name=name,
+            title=title,
+        )
         return (
             _Segment(
                 0,
                 State.unknown(reason),
-                State.unknown("phase unknown; polymorph unresolved"),
+                _polymorph_from_resolve(tag, token, poly_reason),
                 reason,
                 None,
                 None,
@@ -639,18 +662,17 @@ def _segments(
             if phase is not None
             else f"{convention} does not name a phase for {formula}"
         )
-        polymorph = (
-            State.unknown("JANAF reference convention does not state a named polymorph")
-            if phase is Phase.CR
-            else State.not_applicable("not crystal")
-            if phase is not None
-            else State.unknown("phase unknown; polymorph unresolved")
+        tag, token, poly_reason = resolve_janaf_polymorph(
+            formula=formula,
+            phase_is_crystal=phase is Phase.CR,
+            name=name,
+            title=title,
         )
         return (
             _Segment(
                 0,
                 _phase_state(phase, reason),
-                polymorph,
+                _polymorph_from_resolve(tag, token, poly_reason),
                 reason,
                 None,
                 None,
@@ -669,7 +691,7 @@ def _segments(
                     prior.label,
                     prior.right,
                     _side_phase(prior.right),
-                    _side_polymorph(prior.right),
+                    _side_polymorph(prior.right, formula),
                 )
             )
         if index < len(boundaries):
@@ -679,7 +701,7 @@ def _segments(
                     following.label,
                     following.left,
                     _side_phase(following.left),
-                    _side_polymorph(following.left),
+                    _side_polymorph(following.left, formula),
                 )
             )
         phases = {phase for _label, _side, phase, _polymorph in adjacent if phase is not None}
@@ -708,19 +730,44 @@ def _segments(
             }
             if len(polymorphs) > 1:
                 polymorph_state = State.unknown(
-                    "conflicting adjacent JANAF polymorph labels: "
-                    + ", ".join(sorted(polymorphs))
+                    "conflicting adjacent JANAF transition labels "
+                    + ", ".join(sorted(p.value for p in polymorphs))
+                    + f"; also consulted index_entry.name {name!r} and "
+                    f"title_as_published {title!r}"
                 )
             elif polymorphs:
                 polymorph_state = State.of(next(iter(polymorphs)))
             else:
-                polymorph_state = State.unknown(
-                    "adjacent JANAF labels do not name a crystal polymorph"
+                tag, token, poly_reason = resolve_janaf_polymorph(
+                    formula=formula,
+                    phase_is_crystal=True,
+                    name=name,
+                    title=title,
                 )
+                if tag is StateTag.VALUE:
+                    polymorph_state = _polymorph_from_resolve(tag, token, poly_reason)
+                else:
+                    quoted = "; ".join(
+                        f'"{label}"' for label, _side, _phase, _polymorph in adjacent
+                    )
+                    polymorph_state = State.unknown(
+                        "adjacent JANAF transition labels "
+                        f"{quoted} do not name a crystal polymorph; {poly_reason}"
+                    )
         elif phase_state.is_value:
-            polymorph_state = State.not_applicable("not crystal")
+            tag, token, poly_reason = resolve_janaf_polymorph(
+                formula=formula,
+                phase_is_crystal=False,
+                name=name,
+                title=title,
+            )
+            polymorph_state = _polymorph_from_resolve(tag, token, poly_reason)
         else:
-            polymorph_state = State.unknown("phase unknown; polymorph unresolved")
+            polymorph_state = State.unknown(
+                "phase unknown; polymorph unresolved after consulting adjacent "
+                f"JANAF transition labels, index_entry.name {name!r}, and "
+                f"title_as_published {title!r}"
+            )
         result.append(
             _Segment(
                 index=index,
@@ -1157,7 +1204,8 @@ def _observation(
     table_id: str,
     formula: str,
     phase: State[Phase],
-    polymorph: State[str] | None,
+    polymorph: State[Polymorph] | None,
+    charge: State[int] | int | None = None,
     quantity: Quantity,
     value: Value,
     source_path: str,
@@ -1169,7 +1217,7 @@ def _observation(
     transition_pressure_Pa: Decimal | None = None,
     transition_pressure_basis: str | None = None,
 ) -> Observation:
-    species = make_species(formula, phase, polymorph)
+    species = make_species(formula, phase, polymorph, charge=charge)
     known: dict[str, Any] = {}
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         known["subtype"] = State.of(subtype or "phase-transition")
@@ -1255,7 +1303,10 @@ def generate_table(
     """Purely transform one parsed JANAF table payload into observations and audit data."""
 
     table = _unwrap_table(payload)
-    table_id, formula, _charge, state = _validate_table(table)
+    table_id, formula, charge, state = _validate_table(table)
+    index_entry = table.get("index_entry") if isinstance(table.get("index_entry"), Mapping) else {}
+    printed_name = str(index_entry.get("name") or "")
+    printed_title = str(table.get("title_as_published") or "")
     source_path = source_path or f"{TABLE_SOURCE_PREFIX}/{table_id}.yaml"
     download_url = str(table.get("download_url") or "")
     if not download_url:
@@ -1294,7 +1345,13 @@ def generate_table(
                 _Boundary(row.temperature, row.label or "", parts[0], parts[1], row.order)
             )
     boundary_rows.sort(key=lambda item: item.row_order)
-    segments = _segments(state, formula.rstrip("+-"), boundary_rows)
+    segments = _segments(
+        state,
+        formula,
+        boundary_rows,
+        name=printed_name,
+        title=printed_title,
+    )
 
     def segment_index(row: _Row) -> int:
         if len(segments) == 1:
@@ -1479,6 +1536,7 @@ def generate_table(
                 formula=formula,
                 phase=segment.phase,
                 polymorph=segment.polymorph,
+                charge=charge,
                 quantity=quantity,
                 value=value,
                 source_path=source_path,
@@ -1571,6 +1629,7 @@ def generate_table(
                 formula=formula,
                 phase=State.unknown(f'transition spans phases named by "{row.label}"'),
                 polymorph=None,
+                charge=charge,
                 quantity=Quantity.TRANSITION_TEMPERATURE,
                 value=Value.point_of(row.temperature),
                 source_path=source_path,

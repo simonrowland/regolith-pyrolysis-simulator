@@ -58,6 +58,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     Rail,
     ReferenceStateConvention,
@@ -635,16 +636,59 @@ def _located_from_plain(payload: object, cast) -> Located:
     )
 
 
+def _polymorph_from_plain(value: object) -> Polymorph:
+    from simulator.battery.polymorph_dictionary import coerce_polymorph_token
+
+    return coerce_polymorph_token(value)
+
+
+def _charge_from_plain(value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return int(str(value))
+    return value
+
+
 def _species_from_plain(payload: object) -> Species:
     if not isinstance(payload, Mapping):
         raise TypeError(f"species payload must be a mapping, not {payload!r}")
+    return migrate_species_payload(payload)
+
+
+def migrate_species_payload(payload: Mapping[str, Any]) -> Species:
+    """Lift a stored Species: closed polymorph token + charge axis.
+
+    Legacy free-form polymorph strings are aliased to the closed enum when
+    they match a known token or printed name. Unrecognised strings become
+    unknown, never a second free-form axis. Charge is read from the stored
+    axis, else from a trailing ``+/-`` on formula, else 0 (neutral as a
+    value). Two consecutive dumps of the result are byte-identical.
+    """
+
     polymorph = payload.get("polymorph")
+    polymorph_state: State[Polymorph] | None
+    if polymorph is None:
+        polymorph_state = None
+    elif isinstance(polymorph, Mapping) and str(polymorph.get("tag") or "") != "value":
+        polymorph_state = _state_from_plain(polymorph, _polymorph_from_plain)
+    else:
+        try:
+            polymorph_state = _state_from_plain(polymorph, _polymorph_from_plain)
+        except ValueError:
+            raw = polymorph.get("value") if isinstance(polymorph, Mapping) else polymorph
+            polymorph_state = State.unknown(
+                f"legacy free-form polymorph {raw!r} is not a closed Polymorph token"
+            )
+    charge_payload = payload.get("charge")
+    charge_state: State[int] | None
+    if charge_payload is None:
+        charge_state = None
+    else:
+        charge_state = _state_from_plain(charge_payload, _charge_from_plain)
     return Species(
         str(payload.get("formula") or "unknown"),
         _state_from_plain(payload.get("phase"), lambda v: Phase(str(v))),
-        polymorph=None
-        if polymorph is None
-        else _state_from_plain(polymorph, str),
+        polymorph=polymorph_state,
+        charge=charge_state,
     )
 
 
@@ -2310,7 +2354,8 @@ def uncertainty_for(raw: object) -> Uncertainty:
 def make_species(
     formula: str,
     phase: Phase | State[Phase],
-    polymorph: State[str] | None = None,
+    polymorph: State[Polymorph] | State[str] | None = None,
+    charge: State[int] | int | None = None,
 ) -> Species:
     phase_state = phase if isinstance(phase, State) else State.of(phase)
     token = phase_state.value if phase_state.is_value else None
@@ -2321,7 +2366,12 @@ def make_species(
             polymorph = State.unknown("phase unknown; polymorph unresolved")
         else:
             polymorph = State.not_applicable("not crystal")
-    return Species(formula=formula, phase=phase_state, polymorph=polymorph)
+    return Species(
+        formula=formula,
+        phase=phase_state,
+        polymorph=polymorph,
+        charge=charge,
+    )
 
 
 def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:

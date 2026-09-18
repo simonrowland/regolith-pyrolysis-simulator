@@ -21,6 +21,7 @@ Ambiguity resolutions:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
@@ -40,6 +41,7 @@ from simulator.battery.enums import (
     MetricOperation,
     NoticeKind,
     Phase,
+    Polymorph,
     Quantity,
     Rail,
     ReferenceStateConvention,
@@ -190,15 +192,75 @@ class Located(Generic[T]):
     inference: Derivation | None = None
 
 
+_CHARGE_SUFFIX_RE = re.compile(r"([+-])$")
+
+
+def split_formula_charge(formula: str) -> tuple[str, int]:
+    """Strip a trailing ``+`` / ``-`` marker. Neutral is charge 0 as a value."""
+
+    text = str(formula or "")
+    match = _CHARGE_SUFFIX_RE.search(text)
+    if match is None:
+        return text, 0
+    return text[: match.start()], 1 if match.group(1) == "+" else -1
+
+
+def _coerce_polymorph_value(value: object) -> Polymorph:
+    if isinstance(value, Polymorph):
+        return value
+    from simulator.battery.polymorph_dictionary import coerce_polymorph_token
+
+    return coerce_polymorph_token(value)
+
+
+def _coerce_polymorph_state(polymorph: State[object] | None) -> State[Polymorph] | None:
+    if polymorph is None:
+        return None
+    if not polymorph.is_value:
+        return polymorph  # type: ignore[return-value]
+    token = _coerce_polymorph_value(polymorph.value)
+    return State.of(token)
+
+
+def _coerce_charge_state(charge: State[object] | int | None, inferred: int) -> State[int]:
+    if charge is None:
+        return State.of(inferred)
+    if isinstance(charge, int) and not isinstance(charge, bool):
+        return State.of(charge)
+    if not isinstance(charge, State):
+        raise ValueError(
+            f"Species.charge must be an int or State[int], not {charge!r}"
+        )
+    if charge.is_value:
+        raw = charge.value
+        if isinstance(raw, bool) or not isinstance(raw, int):
+            try:
+                raw = int(str(raw))
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Species.charge value is not an integer: {raw!r}") from exc
+            charge = State.of(raw)
+        if inferred != 0 and raw != inferred:
+            raise ValueError(
+                f"formula charge marker {inferred} disagrees with Species.charge {raw}"
+            )
+        return charge
+    return charge  # type: ignore[return-value]
+
+
 @dataclass(frozen=True)
 class Species:
     formula: str
     phase: State[Phase] | Phase
-    polymorph: State[str] | None = None
+    polymorph: State[Polymorph] | State[str] | None = None
+    charge: State[int] | int | None = None
 
     def __post_init__(self) -> None:
         if not self.formula:
             raise ValueError("Species.formula is required")
+        stripped, inferred = split_formula_charge(self.formula)
+        if stripped != self.formula:
+            object.__setattr__(self, "formula", stripped)
+        object.__setattr__(self, "charge", _coerce_charge_state(self.charge, inferred))
         phase = self.phase
         if isinstance(phase, Phase):
             object.__setattr__(self, "phase", State.of(phase))
@@ -211,6 +273,7 @@ class Species:
             raise ValueError(
                 f"Species.phase must be a closed Phase token, not {phase.value!r}"
             )
+        object.__setattr__(self, "polymorph", _coerce_polymorph_state(self.polymorph))
 
 
 def phase_token(species: Species) -> Phase | None:
@@ -221,6 +284,32 @@ def phase_token(species: Species) -> Phase | None:
         return phase
     if isinstance(phase, State) and phase.is_value:
         return phase.value
+    return None
+
+
+def polymorph_token(species: Species) -> Polymorph | None:
+    """Closed Polymorph token when the axis is a value; None for unknown / n/a."""
+
+    poly = species.polymorph
+    if poly is None:
+        return None
+    if isinstance(poly, State) and poly.is_value:
+        value = poly.value
+        return value if isinstance(value, Polymorph) else None
+    return None
+
+
+def charge_value(species: Species) -> int | None:
+    """Integer charge when the axis is a value; None for unknown / n/a."""
+
+    charge = species.charge
+    if charge is None:
+        return None
+    if isinstance(charge, int) and not isinstance(charge, bool):
+        return charge
+    if isinstance(charge, State) and charge.is_value:
+        value = charge.value
+        return value if isinstance(value, int) and not isinstance(value, bool) else None
     return None
 
 

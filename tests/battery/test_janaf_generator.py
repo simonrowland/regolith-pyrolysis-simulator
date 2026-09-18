@@ -317,7 +317,8 @@ def test_segmentation_witnesses_and_transition_row_assignment() -> None:
     assert _phase_values(water) == ["l", "g"]
     charged = _generation("Al-006")
     assert _phase_values(charged) == ["g"]
-    assert {obs.identity.species.formula for obs in charged.observations} == {"Al+"}
+    assert {obs.identity.species.formula for obs in charged.observations} == {"Al"}
+    assert {obs.identity.species.charge.value for obs in charged.observations} == {1}
     oxygen = _generation("O-029")
     assert _phase_values(oxygen) == ["g"]
 
@@ -1460,15 +1461,40 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     }
     assert phases == {"cr": 794, "l": 444, "g": 874, "unknown": 5}
     assert polymorphs == {
-        "unknown": 457,
-        "not_applicable": 1318,
-        "alpha": 92,
-        "beta": 94,
-        "gamma": 21,
-        "delta": 9,
-        "i": 55,
-        "ii": 54,
-        "iii": 17,
+        "unknown": 417,
+        "not_applicable": 1320,
+        "alpha": 99,
+        "beta": 99,
+        "gamma": 22,
+        "delta": 11,
+        "i": 54,
+        "ii": 52,
+        "iii": 18,
+        "iv": 1,
+        "v": 1,
+        "kappa": 1,
+        "corundum": 1,
+        "andalusite": 1,
+        "kyanite": 1,
+        "sillimanite": 1,
+        "mullite": 1,
+        "beta_rhombohedral": 1,
+        "wustite": 1,
+        "marcasite": 1,
+        "pyrite": 1,
+        "magnetite": 1,
+        "cristobalite_high": 1,
+        "cristobalite_low": 1,
+        "anatase": 1,
+        "rutile": 1,
+        "red_iv": 1,
+        "red_v": 1,
+        "black": 1,
+        "monohydrate": 1,
+        "dihydrate": 1,
+        "trihydrate": 1,
+        "tetrahydrate": 1,
+        "hemihexahydrate": 1,
     }
     assert transcription_checks == {
         "negative_gibbs_enthalpy_function": 76293,

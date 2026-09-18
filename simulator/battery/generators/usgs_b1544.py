@@ -20,11 +20,13 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     UncertaintyKind,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
+from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
 from simulator.battery.records import (
     Admission,
     Derivation,
@@ -256,15 +258,29 @@ _REFERENCE_NAME_SUFFIXES = (" - Reference", " Reference", " - reference", " refe
 
 
 def _crystal(formula: str, polymorph: str) -> Species:
-    return Species(formula, Phase.CR, polymorph=State.of(polymorph))
+    token = resolve_printed_name_polymorph(polymorph)
+    if token is None:
+        raise ValueError(f"unrecognised B1544 polymorph {polymorph!r}")
+    return Species(formula, Phase.CR, polymorph=State.of(token), charge=0)
 
 
 def _gas(formula: str) -> Species:
-    return Species(formula, Phase.G, polymorph=State.not_applicable("not crystal"))
+    return Species(
+        formula, Phase.G, polymorph=State.not_applicable("not crystal"), charge=0
+    )
 
 
 def _liquid(formula: str) -> Species:
-    return Species(formula, Phase.L, polymorph=State.not_applicable("not crystal"))
+    return Species(
+        formula, Phase.L, polymorph=State.not_applicable("not crystal"), charge=0
+    )
+
+
+def _polymorph_from_printed_name(name: str, missing_reason: str) -> State[Polymorph]:
+    token = resolve_printed_name_polymorph(name)
+    if token is None:
+        return State.unknown(missing_reason)
+    return State.of(token)
 
 
 # Printed under TRANSITIONS IN REFERENCE STATE ELEMENTS, e.g. Sillimanite
@@ -829,7 +845,7 @@ def _page_for(
 
 def _phase_state(
     record: Mapping[str, Any], row_index: int | None, table1_phase: str | None
-) -> tuple[State[Phase], State[str]]:
+) -> tuple[State[Phase], State[Polymorph]]:
     record_id = str(record.get("record_id") or "")
     if record_id == "usgs-b1544-table-1":
         label = (table1_phase or "").lower()
@@ -837,7 +853,14 @@ def _phase_state(
             return State.of(Phase.L), State.not_applicable("not crystal")
         name = _table1_mineral_name(table1_phase or "")
         if name:
-            return State.of(Phase.CR), State.of(name)
+            return (
+                State.of(Phase.CR),
+                _polymorph_from_printed_name(
+                    name,
+                    f"name_as_published / TABLE 1 phase_as_published {table1_phase!r} "
+                    "is not a closed Polymorph token",
+                ),
+            )
         return (
             State.of(Phase.CR),
             State.unknown("TABLE 1 row is missing the mineral name"),
@@ -850,7 +873,10 @@ def _phase_state(
             State.not_applicable("not crystal")
             if phase is not Phase.CR
             else (
-                State.of(polymorph)
+                _polymorph_from_printed_name(
+                    str(polymorph),
+                    "B1544 phase line does not name a polymorph token",
+                )
                 if polymorph
                 else State.unknown("B1544 phase line does not name a polymorph token")
             )
@@ -866,16 +892,25 @@ def _phase_state(
             State.of(Phase.CR),
             State.unknown(
                 "B1544 table documents more than one product phase; "
-                "the table title is not a resolved polymorph"
+                "name_as_published is not a resolved polymorph"
             ),
         )
     name = _record_mineral_name(record)
     formula = str(record.get("formula_as_published") or "")
     if name and not _name_is_formula_like(name, formula):
-        return State.of(Phase.CR), State.of(name)
+        return (
+            State.of(Phase.CR),
+            _polymorph_from_printed_name(
+                name,
+                f"name_as_published {name!r} is not a closed Polymorph token",
+            ),
+        )
     return (
         State.of(Phase.CR),
-        State.unknown("B1544 phase line names crystals but not a polymorph token"),
+        State.unknown(
+            "name_as_published and phase_as_published name crystals but not a "
+            "polymorph token"
+        ),
     )
 
 

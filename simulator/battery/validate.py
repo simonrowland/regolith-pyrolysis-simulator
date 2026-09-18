@@ -74,6 +74,7 @@ from simulator.battery.records import (
     Reaction,
     Residual,
     Species,
+    State,
     Work,
     as_decimal,
     phase_token,
@@ -368,13 +369,30 @@ def _check_species(path: str, species: Species, issues: list[ValidationIssue]) -
                 )
             )
     elif token is None:
-        return
+        pass
     elif species.polymorph is not None and species.polymorph.is_value:
         issues.append(
             _issue(
                 f"{path}.polymorph",
                 RefusalReason.INAPPLICABLE_AXIS,
                 "non-crystal species cannot carry a polymorph value",
+            )
+        )
+    charge = species.charge
+    if charge is None:
+        issues.append(
+            _issue(
+                f"{path}.charge",
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "Species.charge is required; absence is not a measured zero",
+            )
+        )
+    elif isinstance(charge, State) and charge.is_not_applicable:
+        issues.append(
+            _issue(
+                f"{path}.charge",
+                RefusalReason.INAPPLICABLE_AXIS,
+                "charge is always applicable; not_applicable is invalid",
             )
         )
 

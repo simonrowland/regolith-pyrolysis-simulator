@@ -249,9 +249,9 @@ def test_al2sio5_polymorphs_are_compared_identity_values() -> None:
     assert kyanite.identity.species.formula == "Al2SiO5"
     assert andalusite.identity.species.formula == "Al2SiO5"
     assert sillimanite.identity.species.formula == "Al2SiO5"
-    assert kyanite.identity.species.polymorph.value == "Kyanite"
-    assert andalusite.identity.species.polymorph.value == "Andalusite"
-    assert sillimanite.identity.species.polymorph.value == "Sillimanite"
+    assert kyanite.identity.species.polymorph.value == "kyanite"
+    assert andalusite.identity.species.polymorph.value == "andalusite"
+    assert sillimanite.identity.species.polymorph.value == "sillimanite"
     kya_and = identity_equal(kyanite.identity, andalusite.identity)
     kya_sil = identity_equal(kyanite.identity, sillimanite.identity)
     and_sil = identity_equal(andalusite.identity, sillimanite.identity)
@@ -272,12 +272,12 @@ def test_table1_alooh_polymorphs_are_compared_identity_values() -> None:
         if polymorph is None or not polymorph.is_value:
             continue
         by_name.setdefault(str(polymorph.value), observation)
-    assert "Diaspore" in by_name
-    assert "Boehmite" in by_name
-    cross = identity_equal(by_name["Diaspore"].identity, by_name["Boehmite"].identity)
+    assert "diaspore" in by_name
+    assert "boehmite" in by_name
+    cross = identity_equal(by_name["diaspore"].identity, by_name["boehmite"].identity)
     assert cross.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert "species.polymorph" in cross.fields
-    same = identity_equal(by_name["Diaspore"].identity, by_name["Diaspore"].identity)
+    same = identity_equal(by_name["diaspore"].identity, by_name["diaspore"].identity)
     assert same.kind is IdentityEqualKind.EQUAL
 
 

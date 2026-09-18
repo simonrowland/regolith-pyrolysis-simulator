@@ -642,6 +642,15 @@ def _phase_state(species: Species) -> State[Phase]:
     return State.of(phase)
 
 
+def _charge_state(species: Species) -> State[int]:
+    charge = species.charge
+    if isinstance(charge, State):
+        return charge
+    if isinstance(charge, int) and not isinstance(charge, bool):
+        return State.of(charge)
+    return State.of(0)
+
+
 def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
     fields: list[str] = []
     unknown: list[str] = []
@@ -656,6 +665,15 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
         fields.append("species.phase")
     elif phase_cmp.kind is IdentityEqualKind.INVALID_IDENTITY:
         return phase_cmp
+    charge_cmp = _state_compare(
+        "species.charge", _charge_state(a), _charge_state(b), required=True
+    )
+    if charge_cmp.kind is IdentityEqualKind.IDENTITY_UNKNOWN:
+        unknown.append("species.charge")
+    elif charge_cmp.kind is IdentityEqualKind.IDENTITY_MISMATCH:
+        fields.append("species.charge")
+    elif charge_cmp.kind is IdentityEqualKind.INVALID_IDENTITY:
+        return charge_cmp
     a_token = phase_token(a)
     poly = _state_compare(
         "species.polymorph",
