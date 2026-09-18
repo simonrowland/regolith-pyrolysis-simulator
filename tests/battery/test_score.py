@@ -621,6 +621,60 @@ def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
     assert outcome.passed is True
 
 
+def test_non_thermo_quantities_refuse_without_invented_band() -> None:
+    """Vapour / activity / alpha / yield have no sourced agreement band."""
+
+    from simulator.battery.score import populate_numeric
+
+    for quantity in (
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        Quantity.YIELD_FRACTION,
+        Quantity.MASS_LOSS_FRACTION,
+        Quantity.O2_YIELD,
+    ):
+        numeric, reason, detail = populate_numeric(
+            quantity=quantity,
+            candidate=Decimal("1"),
+            reference=Decimal("1"),
+            source_relation=SourceRelation.INDEPENDENT,
+        )
+        assert numeric is None
+        assert reason is RefusalReason.DECISION_RULE_MISSING
+        assert detail.get("reason") == f"no_sourced_decision_band:{quantity.value}"
+        assert detail.get("quantity") == quantity.value
+
+    thermo, reason, _ = populate_numeric(
+        quantity=Quantity.DELTA_FG,
+        candidate=Decimal("0"),
+        reference=Decimal("0"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert reason is None
+    assert thermo is not None
+    assert thermo.decision_band.rule.startswith("gibbs_battery_residual_ledger.yaml")
+
+    exp = F.tabulation_experiment()
+    ident = F.psat_identity("Na")
+    ref = F.observation(
+        "na-psat-perfect",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.1"), ident))
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail.get("reason") == "no_sourced_decision_band:p_sat"
+
+
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 

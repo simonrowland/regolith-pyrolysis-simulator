@@ -179,6 +179,18 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 
 # Sourced decision bands (not pins). Gibbs agreement_bands_kJ_mol from the
 # residual ledger headers. Missing band → decision_rule_missing refusal.
+# Searched and not used as decision bands (do not invent a tolerance):
+# - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
+#   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
+#   agreement threshold.
+# - validation-data/vapour_rail_sf04_high_t_DECISION.md 0.5 dex is an SF04
+#   high-T species-disagreement check, "NOT evidence for a physical or
+#   numerical ceiling".
+# - docs/imcc-sf04-spec.md ±0.01 dex vs JANAF is an IMCC own-input pin.
+# - engines/builtin/melt_effect_adjustment.py ±0.3 dex is a mixed-matte
+#   error estimate, not an activity agreement band.
+# - evaporation-α envelopes and the Robinot O2 error budget are value
+#   ranges / lab diagnostics, not residual decision bands.
 THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
     SourceRelation.INDEPENDENT: DecisionBand(
         Decimal("1.0"),
@@ -736,6 +748,7 @@ def populate_numeric(
     band = decision_band_for(quantity, source_relation)
     if band is None:
         return None, RefusalReason.DECISION_RULE_MISSING, {
+            "reason": f"no_sourced_decision_band:{quantity.value}",
             "quantity": quantity.value,
             "operation": operation.value,
         }
