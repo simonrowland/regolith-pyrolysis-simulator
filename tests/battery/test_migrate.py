@@ -4007,6 +4007,12 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         and o.value.kind is ValueKind.POINT
     ]
     assert {float(o.value.point) for o in sauerborn} >= {0.011, 0.026, 0.032, 0.029}
+    assert all(
+        o.evidence.class_.is_value
+        and o.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        for o in sauerborn
+        if o.admission.status is not AdmissionStatus.SUPERSEDED
+    )
     cardiff = [
         o
         for o in result.observations.values()
