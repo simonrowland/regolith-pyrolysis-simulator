@@ -1,0 +1,2650 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/janaf/tables/Ne-001.yaml
+- data/literature/compilations/janaf/tables/Ne-002.yaml
+observations:
+- observation_id: nist-janaf-4th:Ne-001:H_minus_H298:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: H(T)-H(298.15 K)
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '-6.197'
+    - - '100'
+      - '-4.119'
+    - - '200'
+      - '-2.04'
+    - - '250'
+      - '-1.001'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0.038'
+    - - '350'
+      - '1.078'
+    - - '400'
+      - '2.117'
+    - - '450'
+      - '3.156'
+    - - '500'
+      - '4.196'
+    - - '600'
+      - '6.274'
+    - - '700'
+      - '8.353'
+    - - '800'
+      - '10.431'
+    - - '900'
+      - '12.51'
+    - - '1000'
+      - '14.589'
+    - - '1100'
+      - '16.667'
+    - - '1200'
+      - '18.746'
+    - - '1300'
+      - '20.824'
+    - - '1400'
+      - '22.903'
+    - - '1500'
+      - '24.982'
+    - - '1600'
+      - '27.06'
+    - - '1700'
+      - '29.139'
+    - - '1800'
+      - '31.217'
+    - - '1900'
+      - '33.296'
+    - - '2000'
+      - '35.375'
+    - - '2100'
+      - '37.453'
+    - - '2200'
+      - '39.532'
+    - - '2300'
+      - '41.61'
+    - - '2400'
+      - '43.689'
+    - - '2500'
+      - '45.768'
+    - - '2600'
+      - '47.846'
+    - - '2700'
+      - '49.925'
+    - - '2800'
+      - '52.004'
+    - - '2900'
+      - '54.082'
+    - - '3000'
+      - '56.161'
+    - - '3100'
+      - '58.239'
+    - - '3200'
+      - '60.318'
+    - - '3300'
+      - '62.397'
+    - - '3400'
+      - '64.475'
+    - - '3500'
+      - '66.554'
+    - - '3600'
+      - '68.632'
+    - - '3700'
+      - '70.711'
+    - - '3800'
+      - '72.79'
+    - - '3900'
+      - '74.868'
+    - - '4000'
+      - '76.947'
+    - - '4100'
+      - '79.025'
+    - - '4200'
+      - '81.104'
+    - - '4300'
+      - '83.183'
+    - - '4400'
+      - '85.261'
+    - - '4500'
+      - '87.34'
+    - - '4600'
+      - '89.418'
+    - - '4700'
+      - '91.497'
+    - - '4800'
+      - '93.576'
+    - - '4900'
+      - '95.654'
+    - - '5000'
+      - '97.733'
+    - - '5100'
+      - '99.811'
+    - - '5200'
+      - '101.89'
+    - - '5300'
+      - '103.969'
+    - - '5400'
+      - '106.047'
+    - - '5500'
+      - '108.126'
+    - - '5600'
+      - '110.204'
+    - - '5700'
+      - '112.283'
+    - - '5800'
+      - '114.362'
+    - - '5900'
+      - '116.44'
+    - - '6000'
+      - '118.519'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=JANAF documented reference-phase
+      convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-001:S:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '123.62'
+    - - '200'
+      - '138.028'
+    - - '250'
+      - '142.666'
+    - - '298.15'
+      - '146.327'
+    - - '300'
+      - '146.456'
+    - - '350'
+      - '149.66'
+    - - '400'
+      - '152.436'
+    - - '450'
+      - '154.884'
+    - - '500'
+      - '157.074'
+    - - '600'
+      - '160.864'
+    - - '700'
+      - '164.068'
+    - - '800'
+      - '166.843'
+    - - '900'
+      - '169.292'
+    - - '1000'
+      - '171.482'
+    - - '1100'
+      - '173.463'
+    - - '1200'
+      - '175.271'
+    - - '1300'
+      - '176.935'
+    - - '1400'
+      - '178.476'
+    - - '1500'
+      - '179.91'
+    - - '1600'
+      - '181.251'
+    - - '1700'
+      - '182.511'
+    - - '1800'
+      - '183.699'
+    - - '1900'
+      - '184.823'
+    - - '2000'
+      - '185.889'
+    - - '2100'
+      - '186.904'
+    - - '2200'
+      - '187.871'
+    - - '2300'
+      - '188.795'
+    - - '2400'
+      - '189.679'
+    - - '2500'
+      - '190.528'
+    - - '2600'
+      - '191.343'
+    - - '2700'
+      - '192.127'
+    - - '2800'
+      - '192.883'
+    - - '2900'
+      - '193.613'
+    - - '3000'
+      - '194.317'
+    - - '3100'
+      - '194.999'
+    - - '3200'
+      - '195.659'
+    - - '3300'
+      - '196.299'
+    - - '3400'
+      - '196.919'
+    - - '3500'
+      - '197.522'
+    - - '3600'
+      - '198.107'
+    - - '3700'
+      - '198.677'
+    - - '3800'
+      - '199.231'
+    - - '3900'
+      - '199.771'
+    - - '4000'
+      - '200.297'
+    - - '4100'
+      - '200.811'
+    - - '4200'
+      - '201.311'
+    - - '4300'
+      - '201.801'
+    - - '4400'
+      - '202.278'
+    - - '4500'
+      - '202.745'
+    - - '4600'
+      - '203.202'
+    - - '4700'
+      - '203.649'
+    - - '4800'
+      - '204.087'
+    - - '4900'
+      - '204.516'
+    - - '5000'
+      - '204.936'
+    - - '5100'
+      - '205.347'
+    - - '5200'
+      - '205.751'
+    - - '5300'
+      - '206.147'
+    - - '5400'
+      - '206.535'
+    - - '5500'
+      - '206.917'
+    - - '5600'
+      - '207.291'
+    - - '5700'
+      - '207.659'
+    - - '5800'
+      - '208.021'
+    - - '5900'
+      - '208.376'
+    - - '6000'
+      - '208.725'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=JANAF documented reference-phase
+      convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: nist-janaf-4th:Ne-001:cp:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '20.786'
+    - - '200'
+      - '20.786'
+    - - '250'
+      - '20.786'
+    - - '298.15'
+      - '20.786'
+    - - '300'
+      - '20.786'
+    - - '350'
+      - '20.786'
+    - - '400'
+      - '20.786'
+    - - '450'
+      - '20.786'
+    - - '500'
+      - '20.786'
+    - - '600'
+      - '20.786'
+    - - '700'
+      - '20.786'
+    - - '800'
+      - '20.786'
+    - - '900'
+      - '20.786'
+    - - '1000'
+      - '20.786'
+    - - '1100'
+      - '20.786'
+    - - '1200'
+      - '20.786'
+    - - '1300'
+      - '20.786'
+    - - '1400'
+      - '20.786'
+    - - '1500'
+      - '20.786'
+    - - '1600'
+      - '20.786'
+    - - '1700'
+      - '20.786'
+    - - '1800'
+      - '20.786'
+    - - '1900'
+      - '20.786'
+    - - '2000'
+      - '20.786'
+    - - '2100'
+      - '20.786'
+    - - '2200'
+      - '20.786'
+    - - '2300'
+      - '20.786'
+    - - '2400'
+      - '20.786'
+    - - '2500'
+      - '20.786'
+    - - '2600'
+      - '20.786'
+    - - '2700'
+      - '20.786'
+    - - '2800'
+      - '20.786'
+    - - '2900'
+      - '20.786'
+    - - '3000'
+      - '20.786'
+    - - '3100'
+      - '20.786'
+    - - '3200'
+      - '20.786'
+    - - '3300'
+      - '20.786'
+    - - '3400'
+      - '20.786'
+    - - '3500'
+      - '20.786'
+    - - '3600'
+      - '20.786'
+    - - '3700'
+      - '20.786'
+    - - '3800'
+      - '20.786'
+    - - '3900'
+      - '20.786'
+    - - '4000'
+      - '20.786'
+    - - '4100'
+      - '20.786'
+    - - '4200'
+      - '20.786'
+    - - '4300'
+      - '20.786'
+    - - '4400'
+      - '20.786'
+    - - '4500'
+      - '20.786'
+    - - '4600'
+      - '20.786'
+    - - '4700'
+      - '20.786'
+    - - '4800'
+      - '20.786'
+    - - '4900'
+      - '20.786'
+    - - '5000'
+      - '20.786'
+    - - '5100'
+      - '20.786'
+    - - '5200'
+      - '20.786'
+    - - '5300'
+      - '20.786'
+    - - '5400'
+      - '20.786'
+    - - '5500'
+      - '20.786'
+    - - '5600'
+      - '20.786'
+    - - '5700'
+      - '20.786'
+    - - '5800'
+      - '20.786'
+    - - '5900'
+      - '20.786'
+    - - '6000'
+      - '20.786'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=JANAF documented reference-phase
+      convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: nist-janaf-4th:Ne-001:delta_fG:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    - - '1700'
+      - '0'
+    - - '1800'
+      - '0'
+    - - '1900'
+      - '0'
+    - - '2000'
+      - '0'
+    - - '2100'
+      - '0'
+    - - '2200'
+      - '0'
+    - - '2300'
+      - '0'
+    - - '2400'
+      - '0'
+    - - '2500'
+      - '0'
+    - - '2600'
+      - '0'
+    - - '2700'
+      - '0'
+    - - '2800'
+      - '0'
+    - - '2900'
+      - '0'
+    - - '3000'
+      - '0'
+    - - '3100'
+      - '0'
+    - - '3200'
+      - '0'
+    - - '3300'
+      - '0'
+    - - '3400'
+      - '0'
+    - - '3500'
+      - '0'
+    - - '3600'
+      - '0'
+    - - '3700'
+      - '0'
+    - - '3800'
+      - '0'
+    - - '3900'
+      - '0'
+    - - '4000'
+      - '0'
+    - - '4100'
+      - '0'
+    - - '4200'
+      - '0'
+    - - '4300'
+      - '0'
+    - - '4400'
+      - '0'
+    - - '4500'
+      - '0'
+    - - '4600'
+      - '0'
+    - - '4700'
+      - '0'
+    - - '4800'
+      - '0'
+    - - '4900'
+      - '0'
+    - - '5000'
+      - '0'
+    - - '5100'
+      - '0'
+    - - '5200'
+      - '0'
+    - - '5300'
+      - '0'
+    - - '5400'
+      - '0'
+    - - '5500'
+      - '0'
+    - - '5600'
+      - '0'
+    - - '5700'
+      - '0'
+    - - '5800'
+      - '0'
+    - - '5900'
+      - '0'
+    - - '6000'
+      - '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
+      O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-001:delta_fH:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    - - '1700'
+      - '0'
+    - - '1800'
+      - '0'
+    - - '1900'
+      - '0'
+    - - '2000'
+      - '0'
+    - - '2100'
+      - '0'
+    - - '2200'
+      - '0'
+    - - '2300'
+      - '0'
+    - - '2400'
+      - '0'
+    - - '2500'
+      - '0'
+    - - '2600'
+      - '0'
+    - - '2700'
+      - '0'
+    - - '2800'
+      - '0'
+    - - '2900'
+      - '0'
+    - - '3000'
+      - '0'
+    - - '3100'
+      - '0'
+    - - '3200'
+      - '0'
+    - - '3300'
+      - '0'
+    - - '3400'
+      - '0'
+    - - '3500'
+      - '0'
+    - - '3600'
+      - '0'
+    - - '3700'
+      - '0'
+    - - '3800'
+      - '0'
+    - - '3900'
+      - '0'
+    - - '4000'
+      - '0'
+    - - '4100'
+      - '0'
+    - - '4200'
+      - '0'
+    - - '4300'
+      - '0'
+    - - '4400'
+      - '0'
+    - - '4500'
+      - '0'
+    - - '4600'
+      - '0'
+    - - '4700'
+      - '0'
+    - - '4800'
+      - '0'
+    - - '4900'
+      - '0'
+    - - '5000'
+      - '0'
+    - - '5100'
+      - '0'
+    - - '5200'
+      - '0'
+    - - '5300'
+      - '0'
+    - - '5400'
+      - '0'
+    - - '5500'
+      - '0'
+    - - '5600'
+      - '0'
+    - - '5700'
+      - '0'
+    - - '5800'
+      - '0'
+    - - '5900'
+      - '0'
+    - - '6000'
+      - '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
+      O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-001:log10_Kf:segment-0
+  experiment_id: nist-janaf-4th:Ne-001:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Ne
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '0'
+    - - '200'
+      - '0'
+    - - '250'
+      - '0'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0'
+    - - '350'
+      - '0'
+    - - '400'
+      - '0'
+    - - '450'
+      - '0'
+    - - '500'
+      - '0'
+    - - '600'
+      - '0'
+    - - '700'
+      - '0'
+    - - '800'
+      - '0'
+    - - '900'
+      - '0'
+    - - '1000'
+      - '0'
+    - - '1100'
+      - '0'
+    - - '1200'
+      - '0'
+    - - '1300'
+      - '0'
+    - - '1400'
+      - '0'
+    - - '1500'
+      - '0'
+    - - '1600'
+      - '0'
+    - - '1700'
+      - '0'
+    - - '1800'
+      - '0'
+    - - '1900'
+      - '0'
+    - - '2000'
+      - '0'
+    - - '2100'
+      - '0'
+    - - '2200'
+      - '0'
+    - - '2300'
+      - '0'
+    - - '2400'
+      - '0'
+    - - '2500'
+      - '0'
+    - - '2600'
+      - '0'
+    - - '2700'
+      - '0'
+    - - '2800'
+      - '0'
+    - - '2900'
+      - '0'
+    - - '3000'
+      - '0'
+    - - '3100'
+      - '0'
+    - - '3200'
+      - '0'
+    - - '3300'
+      - '0'
+    - - '3400'
+      - '0'
+    - - '3500'
+      - '0'
+    - - '3600'
+      - '0'
+    - - '3700'
+      - '0'
+    - - '3800'
+      - '0'
+    - - '3900'
+      - '0'
+    - - '4000'
+      - '0'
+    - - '4100'
+      - '0'
+    - - '4200'
+      - '0'
+    - - '4300'
+      - '0'
+    - - '4400'
+      - '0'
+    - - '4500'
+      - '0'
+    - - '4600'
+      - '0'
+    - - '4700'
+      - '0'
+    - - '4800'
+      - '0'
+    - - '4900'
+      - '0'
+    - - '5000'
+      - '0'
+    - - '5100'
+      - '0'
+    - - '5200'
+      - '0'
+    - - '5300'
+      - '0'
+    - - '5400'
+      - '0'
+    - - '5500'
+      - '0'
+    - - '5600'
+      - '0'
+    - - '5700'
+      - '0'
+    - - '5800'
+      - '0'
+    - - '5900'
+      - '0'
+    - - '6000'
+      - '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-001
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-001.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-001.yaml
+    record: Ne-001
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
+      O)
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless
+- observation_id: nist-janaf-4th:Ne-002:H_minus_H298:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: H(T)-H(298.15 K)
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '-6.304'
+    - - '100'
+      - '-4.225'
+    - - '200'
+      - '-2.13'
+    - - '250'
+      - '-1.056'
+    - - '298.15'
+      - '0'
+    - - '300'
+      - '0.041'
+    - - '350'
+      - '1.156'
+    - - '400'
+      - '2.284'
+    - - '450'
+      - '3.419'
+    - - '500'
+      - '4.558'
+    - - '600'
+      - '6.835'
+    - - '700'
+      - '9.099'
+    - - '800'
+      - '11.346'
+    - - '900'
+      - '13.576'
+    - - '1000'
+      - '15.788'
+    - - '1100'
+      - '17.986'
+    - - '1200'
+      - '20.17'
+    - - '1300'
+      - '22.343'
+    - - '1400'
+      - '24.506'
+    - - '1500'
+      - '26.661'
+    - - '1600'
+      - '28.808'
+    - - '1700'
+      - '30.949'
+    - - '1800'
+      - '33.084'
+    - - '1900'
+      - '35.214'
+    - - '2000'
+      - '37.34'
+    - - '2100'
+      - '39.462'
+    - - '2200'
+      - '41.58'
+    - - '2300'
+      - '43.696'
+    - - '2400'
+      - '45.809'
+    - - '2500'
+      - '47.919'
+    - - '2600'
+      - '50.028'
+    - - '2700'
+      - '52.134'
+    - - '2800'
+      - '54.239'
+    - - '2900'
+      - '56.341'
+    - - '3000'
+      - '58.443'
+    - - '3100'
+      - '60.543'
+    - - '3200'
+      - '62.642'
+    - - '3300'
+      - '64.74'
+    - - '3400'
+      - '66.836'
+    - - '3500'
+      - '68.932'
+    - - '3600'
+      - '71.027'
+    - - '3700'
+      - '73.121'
+    - - '3800'
+      - '75.215'
+    - - '3900'
+      - '77.307'
+    - - '4000'
+      - '79.399'
+    - - '4100'
+      - '81.49'
+    - - '4200'
+      - '83.581'
+    - - '4300'
+      - '85.671'
+    - - '4400'
+      - '87.761'
+    - - '4500'
+      - '89.85'
+    - - '4600'
+      - '91.939'
+    - - '4700'
+      - '94.028'
+    - - '4800'
+      - '96.116'
+    - - '4900'
+      - '98.203'
+    - - '5000'
+      - '100.291'
+    - - '5100'
+      - '102.378'
+    - - '5200'
+      - '104.464'
+    - - '5300'
+      - '106.551'
+    - - '5400'
+      - '108.637'
+    - - '5500'
+      - '110.723'
+    - - '5600'
+      - '112.808'
+    - - '5700'
+      - '114.894'
+    - - '5800'
+      - '116.979'
+    - - '5900'
+      - '119.064'
+    - - '6000'
+      - '121.149'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
+      index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-002:S:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '135.147'
+    - - '200'
+      - '149.654'
+    - - '250'
+      - '154.447'
+    - - '298.15'
+      - '158.307'
+    - - '300'
+      - '158.444'
+    - - '350'
+      - '161.881'
+    - - '400'
+      - '164.893'
+    - - '450'
+      - '167.567'
+    - - '500'
+      - '169.967'
+    - - '600'
+      - '174.118'
+    - - '700'
+      - '177.609'
+    - - '800'
+      - '180.61'
+    - - '900'
+      - '183.236'
+    - - '1000'
+      - '185.567'
+    - - '1100'
+      - '187.662'
+    - - '1200'
+      - '189.562'
+    - - '1300'
+      - '191.302'
+    - - '1400'
+      - '192.905'
+    - - '1500'
+      - '194.391'
+    - - '1600'
+      - '195.777'
+    - - '1700'
+      - '197.075'
+    - - '1800'
+      - '198.295'
+    - - '1900'
+      - '199.447'
+    - - '2000'
+      - '200.537'
+    - - '2100'
+      - '201.573'
+    - - '2200'
+      - '202.558'
+    - - '2300'
+      - '203.499'
+    - - '2400'
+      - '204.398'
+    - - '2500'
+      - '205.26'
+    - - '2600'
+      - '206.086'
+    - - '2700'
+      - '206.881'
+    - - '2800'
+      - '207.647'
+    - - '2900'
+      - '208.385'
+    - - '3000'
+      - '209.097'
+    - - '3100'
+      - '209.786'
+    - - '3200'
+      - '210.452'
+    - - '3300'
+      - '211.098'
+    - - '3400'
+      - '211.724'
+    - - '3500'
+      - '212.331'
+    - - '3600'
+      - '212.921'
+    - - '3700'
+      - '213.495'
+    - - '3800'
+      - '214.053'
+    - - '3900'
+      - '214.597'
+    - - '4000'
+      - '215.126'
+    - - '4100'
+      - '215.643'
+    - - '4200'
+      - '216.147'
+    - - '4300'
+      - '216.639'
+    - - '4400'
+      - '217.119'
+    - - '4500'
+      - '217.589'
+    - - '4600'
+      - '218.048'
+    - - '4700'
+      - '218.497'
+    - - '4800'
+      - '218.936'
+    - - '4900'
+      - '219.367'
+    - - '5000'
+      - '219.789'
+    - - '5100'
+      - '220.202'
+    - - '5200'
+      - '220.607'
+    - - '5300'
+      - '221.004'
+    - - '5400'
+      - '221.394'
+    - - '5500'
+      - '221.777'
+    - - '5600'
+      - '222.153'
+    - - '5700'
+      - '222.522'
+    - - '5800'
+      - '222.885'
+    - - '5900'
+      - '223.241'
+    - - '6000'
+      - '223.591'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
+      index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: nist-janaf-4th:Ne-002:cp:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '0'
+    - - '100'
+      - '20.793'
+    - - '200'
+      - '21.262'
+    - - '250'
+      - '21.715'
+    - - '298.15'
+      - '22.119'
+    - - '300'
+      - '22.133'
+    - - '350'
+      - '22.448'
+    - - '400'
+      - '22.65'
+    - - '450'
+      - '22.755'
+    - - '500'
+      - '22.788'
+    - - '600'
+      - '22.718'
+    - - '700'
+      - '22.562'
+    - - '800'
+      - '22.382'
+    - - '900'
+      - '22.207'
+    - - '1000'
+      - '22.048'
+    - - '1100'
+      - '21.907'
+    - - '1200'
+      - '21.784'
+    - - '1300'
+      - '21.678'
+    - - '1400'
+      - '21.586'
+    - - '1500'
+      - '21.507'
+    - - '1600'
+      - '21.438'
+    - - '1700'
+      - '21.378'
+    - - '1800'
+      - '21.325'
+    - - '1900'
+      - '21.279'
+    - - '2000'
+      - '21.239'
+    - - '2100'
+      - '21.203'
+    - - '2200'
+      - '21.171'
+    - - '2300'
+      - '21.142'
+    - - '2400'
+      - '21.117'
+    - - '2500'
+      - '21.094'
+    - - '2600'
+      - '21.073'
+    - - '2700'
+      - '21.054'
+    - - '2800'
+      - '21.037'
+    - - '2900'
+      - '21.022'
+    - - '3000'
+      - '21.008'
+    - - '3100'
+      - '20.995'
+    - - '3200'
+      - '20.983'
+    - - '3300'
+      - '20.972'
+    - - '3400'
+      - '20.962'
+    - - '3500'
+      - '20.953'
+    - - '3600'
+      - '20.945'
+    - - '3700'
+      - '20.937'
+    - - '3800'
+      - '20.93'
+    - - '3900'
+      - '20.923'
+    - - '4000'
+      - '20.916'
+    - - '4100'
+      - '20.91'
+    - - '4200'
+      - '20.905'
+    - - '4300'
+      - '20.9'
+    - - '4400'
+      - '20.895'
+    - - '4500'
+      - '20.89'
+    - - '4600'
+      - '20.886'
+    - - '4700'
+      - '20.882'
+    - - '4800'
+      - '20.878'
+    - - '4900'
+      - '20.875'
+    - - '5000'
+      - '20.872'
+    - - '5100'
+      - '20.868'
+    - - '5200'
+      - '20.865'
+    - - '5300'
+      - '20.863'
+    - - '5400'
+      - '20.86'
+    - - '5500'
+      - '20.857'
+    - - '5600'
+      - '20.855'
+    - - '5700'
+      - '20.853'
+    - - '5800'
+      - '20.85'
+    - - '5900'
+      - '20.848'
+    - - '6000'
+      - '20.846'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
+      index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: nist-janaf-4th:Ne-002:delta_fG:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: series
+    series:
+    - - '298.15'
+      - '2077.139'
+    - - '300'
+      - '2077.078'
+    - - '350'
+      - '2075.336'
+    - - '400'
+      - '2073.432'
+    - - '450'
+      - '2071.387'
+    - - '500'
+      - '2069.215'
+    - - '600'
+      - '2064.539'
+    - - '700'
+      - '2059.483'
+    - - '800'
+      - '2054.103'
+    - - '900'
+      - '2048.443'
+    - - '1000'
+      - '2042.536'
+    - - '1100'
+      - '2036.408'
+    - - '1200'
+      - '2030.08'
+    - - '1300'
+      - '2023.57'
+    - - '1400'
+      - '2016.894'
+    - - '1500'
+      - '2010.063'
+    - - '1600'
+      - '2003.089'
+    - - '1700'
+      - '1995.98'
+    - - '1800'
+      - '1988.746'
+    - - '1900'
+      - '1981.393'
+    - - '2000'
+      - '1973.928'
+    - - '2100'
+      - '1966.357'
+    - - '2200'
+      - '1958.685'
+    - - '2300'
+      - '1950.917'
+    - - '2400'
+      - '1943.057'
+    - - '2500'
+      - '1935.108'
+    - - '2600'
+      - '1927.076'
+    - - '2700'
+      - '1918.962'
+    - - '2800'
+      - '1910.77'
+    - - '2900'
+      - '1902.503'
+    - - '3000'
+      - '1894.164'
+    - - '3100'
+      - '1885.754'
+    - - '3200'
+      - '1877.277'
+    - - '3300'
+      - '1868.734'
+    - - '3400'
+      - '1860.128'
+    - - '3500'
+      - '1851.46'
+    - - '3600'
+      - '1842.732'
+    - - '3700'
+      - '1833.946'
+    - - '3800'
+      - '1825.103'
+    - - '3900'
+      - '1816.206'
+    - - '4000'
+      - '1807.254'
+    - - '4100'
+      - '1798.25'
+    - - '4200'
+      - '1789.196'
+    - - '4300'
+      - '1780.091'
+    - - '4400'
+      - '1770.938'
+    - - '4500'
+      - '1761.737'
+    - - '4600'
+      - '1752.49'
+    - - '4700'
+      - '1743.198'
+    - - '4800'
+      - '1733.861'
+    - - '4900'
+      - '1724.481'
+    - - '5000'
+      - '1715.058'
+    - - '5100'
+      - '1705.593'
+    - - '5200'
+      - '1696.087'
+    - - '5300'
+      - '1686.542'
+    - - '5400'
+      - '1676.957'
+    - - '5500'
+      - '1667.333'
+    - - '5600'
+      - '1657.671'
+    - - '5700'
+      - '1647.972'
+    - - '5800'
+      - '1638.237'
+    - - '5900'
+      - '1628.465'
+    - - '6000'
+      - '1618.658'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=phase declared by JANAF index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-002:delta_fH:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: series
+    series:
+    - - '0'
+      - '2080.662'
+    - - '298.15'
+      - '2086.966'
+    - - '300'
+      - '2087.007'
+    - - '350'
+      - '2088.122'
+    - - '400'
+      - '2089.25'
+    - - '450'
+      - '2090.385'
+    - - '500'
+      - '2091.524'
+    - - '600'
+      - '2093.801'
+    - - '700'
+      - '2096.065'
+    - - '800'
+      - '2098.312'
+    - - '900'
+      - '2100.542'
+    - - '1000'
+      - '2102.754'
+    - - '1100'
+      - '2104.952'
+    - - '1200'
+      - '2107.136'
+    - - '1300'
+      - '2109.309'
+    - - '1400'
+      - '2111.472'
+    - - '1500'
+      - '2113.627'
+    - - '1600'
+      - '2115.774'
+    - - '1700'
+      - '2117.915'
+    - - '1800'
+      - '2120.05'
+    - - '1900'
+      - '2122.18'
+    - - '2000'
+      - '2124.306'
+    - - '2100'
+      - '2126.428'
+    - - '2200'
+      - '2128.546'
+    - - '2300'
+      - '2130.662'
+    - - '2400'
+      - '2132.775'
+    - - '2500'
+      - '2134.885'
+    - - '2600'
+      - '2136.994'
+    - - '2700'
+      - '2139.1'
+    - - '2800'
+      - '2141.205'
+    - - '2900'
+      - '2143.307'
+    - - '3000'
+      - '2145.409'
+    - - '3100'
+      - '2147.509'
+    - - '3200'
+      - '2149.608'
+    - - '3300'
+      - '2151.706'
+    - - '3400'
+      - '2153.802'
+    - - '3500'
+      - '2155.898'
+    - - '3600'
+      - '2157.993'
+    - - '3700'
+      - '2160.087'
+    - - '3800'
+      - '2162.181'
+    - - '3900'
+      - '2164.273'
+    - - '4000'
+      - '2166.365'
+    - - '4100'
+      - '2168.456'
+    - - '4200'
+      - '2170.547'
+    - - '4300'
+      - '2172.637'
+    - - '4400'
+      - '2174.727'
+    - - '4500'
+      - '2176.816'
+    - - '4600'
+      - '2178.905'
+    - - '4700'
+      - '2180.994'
+    - - '4800'
+      - '2183.082'
+    - - '4900'
+      - '2185.169'
+    - - '5000'
+      - '2187.257'
+    - - '5100'
+      - '2189.344'
+    - - '5200'
+      - '2191.43'
+    - - '5300'
+      - '2193.517'
+    - - '5400'
+      - '2195.603'
+    - - '5500'
+      - '2197.689'
+    - - '5600'
+      - '2199.774'
+    - - '5700'
+      - '2201.86'
+    - - '5800'
+      - '2203.945'
+    - - '5900'
+      - '2206.03'
+    - - '6000'
+      - '2208.115'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=phase declared by JANAF index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: nist-janaf-4th:Ne-002:log10_Kf:segment-0
+  experiment_id: nist-janaf-4th:Ne-002:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Ne+
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: unknown
+      reason: temperature varies along the series and is stored as the T_K coordinate
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    formation_elements:
+      tag: unknown
+      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
+        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
+        formation reaction
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: series
+    series:
+    - - '298.15'
+      - '-363.906'
+    - - '300'
+      - '-361.651'
+    - - '350'
+      - '-309.727'
+    - - '400'
+      - '-270.762'
+    - - '450'
+      - '-240.44'
+    - - '500'
+      - '-216.169'
+    - - '600'
+      - '-179.734'
+    - - '700'
+      - '-153.681'
+    - - '800'
+      - '-134.119'
+    - - '900'
+      - '-118.889'
+    - - '1000'
+      - '-106.691'
+    - - '1100'
+      - '-96.701'
+    - - '1200'
+      - '-88.367'
+    - - '1300'
+      - '-81.308'
+    - - '1400'
+      - '-75.251'
+    - - '1500'
+      - '-69.997'
+    - - '1600'
+      - '-65.394'
+    - - '1700'
+      - '-61.329'
+    - - '1800'
+      - '-57.712'
+    - - '1900'
+      - '-54.472'
+    - - '2000'
+      - '-51.554'
+    - - '2100'
+      - '-48.91'
+    - - '2200'
+      - '-46.505'
+    - - '2300'
+      - '-44.307'
+    - - '2400'
+      - '-42.29'
+    - - '2500'
+      - '-40.432'
+    - - '2600'
+      - '-38.715'
+    - - '2700'
+      - '-37.125'
+    - - '2800'
+      - '-35.646'
+    - - '2900'
+      - '-34.268'
+    - - '3000'
+      - '-32.98'
+    - - '3100'
+      - '-31.775'
+    - - '3200'
+      - '-30.643'
+    - - '3300'
+      - '-29.58'
+    - - '3400'
+      - '-28.577'
+    - - '3500'
+      - '-27.632'
+    - - '3600'
+      - '-26.737'
+    - - '3700'
+      - '-25.891'
+    - - '3800'
+      - '-25.088'
+    - - '3900'
+      - '-24.325'
+    - - '4000'
+      - '-23.6'
+    - - '4100'
+      - '-22.91'
+    - - '4200'
+      - '-22.252'
+    - - '4300'
+      - '-21.624'
+    - - '4400'
+      - '-21.024'
+    - - '4500'
+      - '-20.45'
+    - - '4600'
+      - '-19.9'
+    - - '4700'
+      - '-19.373'
+    - - '4800'
+      - '-18.868'
+    - - '4900'
+      - '-18.383'
+    - - '5000'
+      - '-17.917'
+    - - '5100'
+      - '-17.469'
+    - - '5200'
+      - '-17.037'
+    - - '5300'
+      - '-16.622'
+    - - '5400'
+      - '-16.221'
+    - - '5500'
+      - '-15.835'
+    - - '5600'
+      - '-15.462'
+    - - '5700'
+      - '-15.102'
+    - - '5800'
+      - '-14.754'
+    - - '5900'
+      - '-14.417'
+    - - '6000'
+      - '-14.092'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-janaf-4th
+  locator:
+    table: Ne-002
+    note: 'NIST download_url: https://janaf.nist.gov/tables/Ne-002.txt'
+    source_path: data/literature/compilations/janaf/tables/Ne-002.yaml
+    record: Ne-002
+  read_from: unknown:nist-janaf-4th
+  derivation:
+    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
+      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
+      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
+      phase_basis=phase declared by JANAF index state 'g'
+    inputs:
+    - unknown:nist-janaf-4th
+    parameters: []
+    output_unit: dimensionless

@@ -1096,8 +1096,11 @@ def load_migrated_store(
     return works, experiments, observations
 
 
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
 def load_yaml(path: Path) -> object:
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+    return yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
 
 
 def load_json(path: Path) -> object:
@@ -2510,7 +2513,6 @@ BOUNDARY_INGEST_CALLERS = frozenset(
         "_migrate_refractory",
         "_migrate_ledger",
         "_migrate_compilation_file",
-        "_lift_janaf_table",
     }
 )
 
@@ -3654,6 +3656,19 @@ def iter_extract_observations(
             for obs in body.get("observations") or []:
                 if isinstance(obs, Mapping):
                     yield str(formula), dict(obs)
+
+
+def _is_nist_janaf_table(path: Path, doc: Mapping[str, Any]) -> bool:
+    if not isinstance(doc.get("table"), Mapping):
+        return False
+    if str(doc.get("source_id") or "") == "nist-janaf-4th":
+        return True
+    parts = path.parts
+    try:
+        index = parts.index("compilations")
+    except ValueError:
+        return False
+    return index + 1 < len(parts) and parts[index + 1] == "janaf"
 
 
 def _is_compilation_metadata(path: Path) -> bool:
@@ -5258,8 +5273,15 @@ class Migrator:
         require_rail_if_stated(doc)
         table = doc.get("table") if isinstance(doc.get("table"), Mapping) else None
         if table is not None:
-            self._lift_janaf_table(work, source_id, rel, count, table, evidence, doc)
-            return
+            require_rail_if_stated(table)
+            rows = table.get("values") or []
+            if isinstance(rows, list):
+                for row in rows:
+                    if isinstance(row, Mapping):
+                        require_rail_if_stated(row)
+            if _is_nist_janaf_table(path, doc):
+                self._lift_janaf_from_generator(work, source_id, rel, count, doc)
+                return
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(doc.get("formula") or record_id)
@@ -5336,91 +5358,83 @@ class Migrator:
             method=State.of(MethodToken.TABULATION),
         )
 
-    def _lift_janaf_table(
+    def _lift_janaf_from_generator(
         self,
         work: Work,
         source_id: str,
         rel: str,
         count: SourceCount,
-        table: Mapping[str, Any],
-        evidence: Evidence,
         doc: Mapping[str, Any],
     ) -> None:
-        require_rail_if_stated(table)
-        table_id = str(table.get("table_id") or "table")
-        index_entry = table.get("index_entry") if isinstance(table.get("index_entry"), Mapping) else {}
-        formula = str((index_entry or {}).get("formula") or table_id)
-        state_token = str((index_entry or {}).get("state") or "")
-        phase, _unmapped = map_phase(state_token or None)
-        rows = table.get("values") or []
+        from simulator.battery.generators.janaf import generate_table
+
+        generated = generate_table(doc, source_path=rel)
         count.rows_in += 1
-        dg_items: list[dict[str, Any]] = []
-        log_items: list[dict[str, Any]] = []
-        if isinstance(rows, list):
-            for row in rows:
-                if not isinstance(row, Mapping):
-                    continue
-                require_rail_if_stated(row)
-                item: dict[str, Any] = dict(row)
-                t_payload = row.get("temperature")
-                if isinstance(t_payload, Mapping) and t_payload.get("value") is not None:
-                    item["T_K"] = t_payload.get("value")
-                dg_items.append(item)
-                log_items.append(item)
-        loc = Locator(table=table_id, source_path=rel, record=table_id)
-        std = str(table.get("standard_state_as_published") or "")
-        p_payload: dict[str, Any] = {}
-        if "0.1 MPa" in std or "1 bar" in std:
-            p_payload["P_bar"] = 1
-        p_sel = select_declared_source(AXIS_STANDARD_PRESSURE_PA, None, p_payload)
-        p_std = p_sel.amount if p_sel.available else None
-        species = make_species(formula, phase)
-        dg_sel = select_declared_source(Quantity.DELTA_FG, None, {"series": dg_items})
-        log_sel = select_declared_source(Quantity.LOG10_KF, None, {"series": log_items})
-        if dg_sel.available:
-            self._generic_obs(
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                observation_id=f"{source_id}:{table_id}:delta_fG",
-                locator=loc,
-                quantity=Quantity.DELTA_FG,
-                species=species,
-                value=dg_sel.value,
-                evidence=evidence,
-                temperature_K=_compilation_temperature_state({"rows": rows}),
-                standard_pressure_Pa=p_std,
+        for observation in generated.observations:
+            read_from = choose_read_from(work, observation.locator)
+            updates: dict[str, Any] = {}
+            if read_from != observation.read_from:
+                updates["read_from"] = read_from
+            if observation.derivation is not None and observation.derivation.inputs != (
+                read_from,
+            ):
+                # Generator staging records the table path. The store requires
+                # derivation.inputs to resolve as a Work asset or observation id.
+                updates["derivation"] = replace(
+                    observation.derivation, inputs=(read_from,)
+                )
+            if updates:
+                observation = replace(observation, **updates)
+            self._ensure_experiment(
+                work_id=work.work_id,
+                experiment_id=observation.experiment_id,
+                locator=observation.locator,
                 method=State.of(MethodToken.TABULATION),
+                equipment=None,
+                observation_id=observation.observation_id,
+                source=rel,
             )
-        if log_sel.available:
-            self._generic_obs(
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                observation_id=f"{source_id}:{table_id}:log10_Kf",
-                locator=loc,
-                quantity=Quantity.LOG10_KF,
-                species=species,
-                value=log_sel.value,
-                evidence=evidence,
-                temperature_K=_compilation_temperature_state({"rows": rows}),
-                standard_pressure_Pa=p_std,
-                method=State.of(MethodToken.TABULATION),
+            if observation.identity.species.phase.is_unknown:
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["phase"],
+                    observation.identity.species.phase.reason or "missing phase",
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            if observation.value.kind is ValueKind.UNAVAILABLE:
+                q_label = (
+                    observation.identity.quantity.value
+                    if observation.identity.quantity.is_value
+                    else "unknown"
+                )
+                why = observation.value.unavailable_reason or (
+                    f"{q_label} value is unavailable"
+                )
+                if str(q_label) not in why:
+                    why = f"{q_label}: {why}"
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["value"],
+                    why,
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            unmatched = unmatched_read_from_reason(
+                observation.locator, observation.read_from
             )
-        if not dg_sel.available and not log_sel.available:
-            self._generic_obs(
-                work=work,
-                source_id=source_id,
-                source_key=rel,
-                observation_id=f"{source_id}:{table_id}",
-                locator=loc,
-                quantity=Quantity.DELTA_FG,
-                species=species,
-                value=dg_sel.value,
-                evidence=evidence,
-                standard_pressure_Pa=p_std,
-                method=State.of(MethodToken.TABULATION),
-            )
+            if unmatched:
+                self.result.add_queue(
+                    work.work_id,
+                    observation.locator,
+                    ["read_from"],
+                    unmatched,
+                    source=rel,
+                    observation_id=observation.observation_id,
+                )
+            self._add_observation(observation, rel)
 
     def migrate_index_only_sources(self) -> None:
         rel = "data/literature/INDEX.yaml"
@@ -5628,8 +5642,13 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         elif src.startswith("data/literature/compilations/"):
             parts = src_path.parts
             family = parts[3] if len(parts) > 3 else src_path.stem
-            dest = observations_v2 / f"compilations-{family}.yaml"
-            key = f"compilation:{family}"
+            if family == "janaf":
+                element = src_path.stem.split("-", 1)[0]
+                dest = observations_v2 / "compilations-janaf" / f"janaf-{element}.yaml"
+                key = f"compilation:janaf:{element}"
+            else:
+                dest = observations_v2 / f"compilations-{family}.yaml"
+                key = f"compilation:{family}"
         else:
             dest = observations_v2 / f"{src_path.stem}.yaml"
             key = f"named:{src_path.stem}"

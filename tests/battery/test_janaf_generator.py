@@ -1177,10 +1177,11 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         quantity_text = observation["identity"]["quantity"]["value"]
         if quantity_text not in {Quantity.DELTA_FG.value, Quantity.LOG10_KF.value}:
             continue
-        expected[(observation["locator"]["table"], Quantity(quantity_text))] = [
-            (Decimal(temperature), Decimal(value))
-            for temperature, value in observation["value"]["series"]
-        ]
+        key = (observation["locator"]["table"], Quantity(quantity_text))
+        series = (observation.get("value") or {}).get("series") or ()
+        expected.setdefault(key, []).extend(
+            (Decimal(temperature), Decimal(value)) for temperature, value in series
+        )
 
     points = Counter()
     observations = Counter()
@@ -1205,9 +1206,11 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     reported_refused_pair_violations: list[tuple[str, str]] = []
     stored_pair_denominator: Counter[str] = Counter()
     stored_nonzero_merged_cells = 0
+    stored_zero_merged_cells = 0
+    refused_merged_cells = 0
     merged_disposition_mismatches = 0
     segment_control_mismatches = 0
-    legacy_superset_mismatches = 0
+    store_series_mismatches = 0
     seen_control: set[tuple[str, Quantity]] = set()
     started = time.monotonic()
     paths = list(iter_table_paths())
@@ -1298,6 +1301,10 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 )
                 if actual_disposition != expected_disposition:
                     merged_disposition_mismatches += 1
+                if actual_disposition == "stored_zero":
+                    stored_zero_merged_cells += 1
+                elif actual_disposition == "refused":
+                    refused_merged_cells += 1
 
         stored_pair_denominator.update(
             generated.report.get("stored_pair_identity_denominator") or {}
@@ -1337,10 +1344,9 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                         == segment["phase"]["value"]
                     )
             actual = Counter(_series(generated, quantity))
-            legacy = Counter(expected[key])
-            assert not legacy - actual
-            if actual - legacy != expected_merged:
-                legacy_superset_mismatches += 1
+            stored = Counter(expected.get(key, ()))
+            if actual != stored:
+                store_series_mismatches += 1
             merged_extras[quantity.value] += sum(expected_merged.values())
             seen_control.add(key)
         merged_rows += len(generated.report["merged_formation_rows"])
@@ -1409,7 +1415,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert reported_refused_pair_violations == refused_merged_pair_violations
     assert merged_disposition_mismatches == 0
     assert segment_control_mismatches == 0
-    assert legacy_superset_mismatches == 0
+    assert store_series_mismatches == 0
     assert seen_control == set(expected)
     assert points[Quantity.CP.value] == 77542
     assert points[Quantity.S.value] == 77540
@@ -1433,6 +1439,16 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert cells["formation_enthalpy"]["excluded_numeric_total"] == 438
     assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 437
     assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 437
+    # 508 merged rows × 3 formation columns = 1524 cells.
+    # 438 + 437 + 437 = 1312 sign-ambiguous nonzero tokens stay refused.
+    # 1524 − 1312 = 212 exact zeros stay stored.
+    assert (
+        cells["formation_enthalpy"]["excluded_numeric_total"]
+        + cells["formation_gibbs_energy"]["excluded_numeric_total"]
+        + cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"]
+    ) == 1312
+    assert stored_zero_merged_cells == 212
+    assert refused_merged_cells == 1312
     assert observations == {
         "cp": 2117,
         "S": 2117,
@@ -1483,3 +1499,40 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         "negative_gibbs_enthalpy_function": 18,
         "log10_Kf_from_delta_fG": 1,
     }
+
+
+def test_janaf_lift_is_the_generator() -> None:
+    src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
+    assert "def _lift_janaf_table" not in src
+    assert "def _lift_janaf_from_generator" in src
+    assert "generate_table" in src
+
+
+def test_janaf_store_is_element_sharded() -> None:
+    single = CURRENT_STORE_DIR / "compilations-janaf.yaml"
+    shard_dir = CURRENT_STORE_DIR / "compilations-janaf"
+    assert not single.exists()
+    assert shard_dir.is_dir()
+    paths = iter_observation_store_paths(CURRENT_STORE_DIR, CURRENT_STORE_PATTERN)
+    assert paths
+    assert all(path.parent.name == "compilations-janaf" for path in paths)
+    assert all(
+        path.name.startswith("janaf-") and path.name.endswith(".yaml") for path in paths
+    )
+    # 2117 segments × 6 tabulated quantities + 979 transitions = 13681
+    n = sum(
+        path.read_text(encoding="utf-8").count("\n- observation_id:") for path in paths
+    )
+    assert n == 13681
+
+
+def test_janaf_store_keeps_circularity_and_compilation_class() -> None:
+    observations = _load_janaf_store_observations()
+    assert len(observations) == 13681
+    warning = generator.CIRCULARITY_WARNING
+    for observation in observations:
+        evidence = (observation.get("evidence") or {}).get("class") or {}
+        assert evidence.get("value") == "compilation_assessed"
+        relation = (observation.get("derivation") or {}).get("relation") or ""
+        assert "scoring_eligible=false" in relation
+        assert warning in relation
