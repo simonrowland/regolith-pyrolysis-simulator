@@ -10,6 +10,7 @@ from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
     IdentityEqualKind,
+    NoticeKind,
     Phase,
     Quantity,
     UncertaintyKind,
@@ -40,6 +41,8 @@ B1452_UNGUARDED_298K_S = 155
 B1452_UNGUARDED_HT_DH = 4
 B1452_UNGUARDED_HT_CP = 1
 B1452_IDENTITY_10X = 315
+B1452_IDENTITY_1X_10X = 8
+HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 219
 B1452_FORMULA_UNRESOLVED_298K_ROWS = 273
@@ -455,6 +458,25 @@ def test_neighbour_sign_refuses_ht_seeded_dropped_minus() -> None:
     assert stored
 
 
+def test_identity_1x_10x_rows_are_listed_independently() -> None:
+    generated = _generation(HOLMIUM_HT_PHASE_02)
+    band = generated.report["identity_notice_1x_10x"]
+    assert len(band) == 1
+    assert band[0]["identity"] == "planck_vs_S_minus_HHT"
+    assert band[0]["row_index"] == 0
+    assert Decimal(band[0]["absolute_residual"]) <= 10 * Decimal(
+        band[0]["rounding_tolerance"]
+    )
+    assert Decimal(band[0]["absolute_residual"]) > Decimal(
+        band[0]["rounding_tolerance"]
+    )
+    entropy = _observations_for(generated, Quantity.S, temperature="1701")
+    assert len(entropy) == 1
+    assert entropy[0].notices
+    assert entropy[0].notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert entropy[0].observation_id in band[0]["stored_with_notice"]
+
+
 def test_10x_planck_refuses_participating_cells_before_vocab_exclusion() -> None:
     payload = _load(SILVER_HT)
     payload["rows"][1]["cells"]["negative_gibbs_function"]["as_published"] = "435.5"
@@ -643,6 +665,8 @@ def test_full_census_closes() -> None:
     merged_proposed = merged_stored = merged_refused = merged_refused_10x = merged_excluded = 0
     unguarded_s = unguarded_dh = unguarded_cp = 0
     identity_10x = 0
+    identity_1x_10x = 0
+    identity_band = 0
     identity_fail = 0
     neighbour_298k_hits = 0
     formula_unresolved_ht = 0
@@ -706,6 +730,9 @@ def test_full_census_closes() -> None:
                             column,
                             result.get("identity"),
                         )
+                elif tolerance > 0 and residual > tolerance:
+                    identity_1x_10x += 1
+        identity_band += len(generated.report.get("identity_notice_1x_10x") or [])
     assert n_records == 606
     assert stored + refused + excluded == raw
     assert raw == B1452_RAW
@@ -726,6 +753,9 @@ def test_full_census_closes() -> None:
     assert unguarded_cp == B1452_UNGUARDED_HT_CP
     assert unguarded_s + unguarded_dh + unguarded_cp == B1452_UNGUARDED_MERGED_STORED
     assert identity_10x == B1452_IDENTITY_10X
+    assert identity_1x_10x == B1452_IDENTITY_1X_10X
+    assert identity_band == B1452_IDENTITY_1X_10X
+    assert identity_band == identity_1x_10x
     assert formula_unresolved_ht == B1452_FORMULA_UNRESOLVED_HT
     assert formula_unresolved_rows == B1452_FORMULA_UNRESOLVED_298K_ROWS
     print(
@@ -746,6 +776,8 @@ def test_full_census_closes() -> None:
             "unguarded_ht_cp": unguarded_cp,
             "identity_fail": identity_fail,
             "identity_10x": identity_10x,
+            "identity_1x_10x": identity_1x_10x,
+            "identity_notice_1x_10x": identity_band,
             "formula_unresolved_ht": formula_unresolved_ht,
             "formula_unresolved_298k_rows": formula_unresolved_rows,
             "quantities": quantity_counts,

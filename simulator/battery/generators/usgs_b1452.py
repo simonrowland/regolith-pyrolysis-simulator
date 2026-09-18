@@ -1551,6 +1551,46 @@ def _row_name(record: Mapping[str, Any], row_index: int | None) -> str | None:
     return parsed[0]
 
 
+def _identity_band_1x_10x(
+    record_id: str,
+    identity_results: Sequence[Mapping[str, Any]],
+    observations: Sequence[Observation],
+) -> list[dict[str, Any]]:
+    """List every 1× < residual ≤ 10× identity fail, stored or not."""
+
+    noticed_ids = {
+        observation.observation_id
+        for observation in observations
+        if observation.notices
+    }
+    rows: list[dict[str, Any]] = []
+    for result in identity_results:
+        if result.get("ok") is not False:
+            continue
+        residual = Decimal(str(result.get("absolute_residual") or "0"))
+        tolerance = Decimal(str(result.get("rounding_tolerance") or "0"))
+        if not (tolerance > 0 and residual > tolerance and residual <= 10 * tolerance):
+            continue
+        row_index = result.get("row_index")
+        stored_with_notice = sorted(
+            observation_id
+            for observation_id in noticed_ids
+            if f":row={row_index}:" in observation_id
+        )
+        rows.append(
+            {
+                "record_id": record_id,
+                "row_index": row_index,
+                "temperature_as_published": result.get("temperature_as_published"),
+                "identity": result.get("identity"),
+                "absolute_residual": result.get("absolute_residual"),
+                "rounding_tolerance": result.get("rounding_tolerance"),
+                "stored_with_notice": stored_with_notice,
+            }
+        )
+    return rows
+
+
 def _formula_resolution_report(
     kind: str,
     record_formula: FormulaResolution | None,
@@ -1650,6 +1690,14 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                         identity_fail_10x.add((row_index, "enthalpy_function"))
                     elif residual > tolerance:
                         identity_notice[(row_index, "negative_gibbs_function")] = (
+                            residual,
+                            tolerance,
+                        )
+                        identity_notice[(row_index, "entropy")] = (
+                            residual,
+                            tolerance,
+                        )
+                        identity_notice[(row_index, "enthalpy_function")] = (
                             residual,
                             tolerance,
                         )
@@ -1934,6 +1982,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             f"{record_id}: merged splits do not close: proposed={merged_proposed} "
             f"stored={merged_stored} refused={merged_refused} excluded={merged_excluded}"
         )
+    identity_band_1x_10x = _identity_band_1x_10x(
+        record_id, identity_results, observations
+    )
 
     report = {
         "record_id": record_id,
@@ -1989,6 +2040,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         "exclusions": exclusions,
         "vocabulary_gaps": vocabulary_gaps,
         "identity_results": identity_results,
+        "identity_notice_1x_10x": identity_band_1x_10x,
         "neighbour_sign_hits": neighbour_hits,
         "formula_resolution": _formula_resolution_report(
             kind, record_formula, formula_by_row
@@ -2031,6 +2083,7 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     unguarded_by_quantity: Counter[str] = Counter()
     identity_fail_counts: Counter[str] = Counter()
     identity_fail_10x = 0
+    identity_band_1x_10x: list[object] = []
     notice_count = 0
     formula_unresolved_records = 0
     formula_unresolved_rows = 0
@@ -2065,6 +2118,7 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
                 tolerance = Decimal(str(result.get("rounding_tolerance") or "0"))
                 if tolerance > 0 and residual > 10 * tolerance:
                     identity_fail_10x += 1
+        identity_band_1x_10x.extend(generated.report.get("identity_notice_1x_10x") or [])
         now = time.monotonic()
         resolution = generated.report.get("formula_resolution") or {}
         if generated.report.get("table_kind") == "table_298k":
@@ -2126,6 +2180,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         },
         "identity_failure_counts": dict(sorted(identity_fail_counts.items())),
         "identity_fail_10x": identity_fail_10x,
+        "identity_notice_1x_10x": identity_band_1x_10x,
+        "identity_notice_1x_10x_count": len(identity_band_1x_10x),
         "notice_count": notice_count,
         "formula_unresolved_ht_records": formula_unresolved_records,
         "formula_unresolved_298k_rows": formula_unresolved_rows,
