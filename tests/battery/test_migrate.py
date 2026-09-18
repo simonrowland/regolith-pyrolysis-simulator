@@ -3049,8 +3049,12 @@ def test_l04_store_never_lifts_log10_psat_as_pressure() -> None:
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     bad = []
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for path in iter_observation_store_paths(obs_dir):
-        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        if "log10_Psat_over_P0" not in text:
+            continue
+        stored = yaml.load(text, Loader=loader)
         for obs in stored.get("observations") or []:
             oid = str(obs.get("observation_id") or "")
             if "log10_Psat_over_P0" not in oid:
