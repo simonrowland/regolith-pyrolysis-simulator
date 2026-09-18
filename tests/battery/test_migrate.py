@@ -3997,3 +3997,34 @@ def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -
         }
     }
     assert not forbidden
+
+
+def test_robinot_peak_about_is_not_invented_as_point_t(tmp_path: Path) -> None:
+    """Robinot prints 'around 1800 °C' as a punctual pyrometer peak, not a hold."""
+
+    extract = _scalar_extract(
+        quantity="yield_fraction",
+        units="percent",
+        values={
+            "quantity": "yield_fraction",
+            "method_class": "measured_direct",
+            "mass_yield_percent": 1.05,
+            "peak_T_C_about": 1800,
+            "peak_T_K_converted": 2073.15,
+        },
+        obs_type="rate_series",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["T_range_K"] = [1473.15, 2073.15]
+    row["phase"] = "g"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(
+        o
+        for o in result.observations.values()
+        if quantity_token(o.identity) is Quantity.YIELD_FRACTION
+    )
+    assert obs.identity.temperature_K.is_unknown
+    reason = obs.identity.temperature_K.reason or ""
+    assert "source T_range_K [1473.15, 2073.15]; no midpoint invented" == reason
+    assert obs.identity.temperature_K.value is None
