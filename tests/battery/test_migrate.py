@@ -1619,6 +1619,8 @@ _CENSUS_QUANTITY_ALIASES = {
     "evaporation_coefficient_alpha": "evaporation_coefficient_alpha",
     "o2_yield": "o2_yield",
     "mass_loss_fraction": "mass_loss_fraction",
+    "bulk_mass_loss_wt_pct": "mass_loss_fraction",
+    "non_condensed_mass_loss_fraction": "mass_loss_fraction",
     "ion_current_ratio": "ion_intensity_ratio",
     "ion_intensity_ratio": "ion_intensity_ratio",
 }
@@ -3706,3 +3708,292 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
         and o.evidence.class_.value is not EvidenceClass.MEASURED_TABULATED
         for o in sf04_rows
     )
+
+
+def test_pyrolysis_yield_quantities_are_not_collapsed() -> None:
+    """O2/feedstock, O2/sample, and bulk mass loss stay distinct closed tokens."""
+
+    bulk, _reason = map_quantity(
+        "rate_series",
+        {"quantity": "bulk_mass_loss_wt_pct", "mass_loss_wt_pct": 1.1},
+        units="wt_percent",
+    )
+    assert bulk.is_value and bulk.value is Quantity.MASS_LOSS_FRACTION
+
+    sidecar, _reason = map_quantity(
+        "rate_series",
+        {
+            "quantity": "non_condensed_mass_loss_fraction",
+            "non_condensed_mass_loss_fraction": 0.0117,
+        },
+        units="mass_fraction",
+    )
+    assert sidecar.is_value and sidecar.value is Quantity.MASS_LOSS_FRACTION
+
+    mixed, reason = map_quantity(
+        "rate_series",
+        {
+            "quantity": "measured_oxygen_yield",
+            "oxygen_mass_mg": 35,
+            "mass_yield_percent": 1.05,
+            "fraction_of_feedstock_oxygen_percent": 2.47,
+        },
+        units="as published",
+    )
+    assert not mixed.is_value
+    assert reason and "measured_oxygen_yield" in reason
+
+    outgassing, reason = map_quantity(
+        "rate_series",
+        {"quantity": "total_mass_loss", "total_mass_loss_wt_pct": 0.40},
+        units="wt_percent",
+    )
+    assert not outgassing.is_value
+    assert reason and "total_mass_loss" in reason
+
+    summary, reason = map_quantity(
+        "rate_series",
+        {"quantity": "vacuum_pyrolysis_experiment_summary", "tests": []},
+        units="as_published",
+    )
+    assert not summary.is_value
+    assert reason and "vacuum_pyrolysis_experiment_summary" in reason
+
+    model, reason = map_quantity(
+        "rate_series",
+        {"quantity": "oxygen_yield_wt_pct", "O2_yield_pct_of_oxide": 19.3},
+        units="wt_percent",
+    )
+    assert not model.is_value
+
+
+def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="bulk_mass_loss_wt_pct",
+        units="wt_percent",
+        values={
+            "quantity": "bulk_mass_loss_wt_pct",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "id": "SiO2",
+                    "mass_loss_wt_pct": 1.1,
+                    "Tmax_C": 1400,
+                    "Tmax_K": 1673.15,
+                    "mass_g": 0.6719,
+                    "locator": {"page": 76},
+                },
+                {
+                    "id": "MS2",
+                    "mass_loss_wt_pct": 3.2,
+                    "Tmax_C": 1563,
+                    "Tmax_K": 1836.15,
+                    "mass_g": 0.991,
+                    "locator": {"page": 88},
+                },
+            ],
+        },
+        obs_type="rate_series",
+    )
+    extract["species"]["Na"]["observations"][0]["regime"] = "solar_vacuum_pyrolysis"
+    extract["species"]["Na"]["observations"][0]["phase"] = "l"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    points = [
+        o
+        for o in result.observations.values()
+        if "::point:" in o.observation_id
+    ]
+    assert len(points) == 2
+    by_formula = {o.identity.species.formula: o for o in points}
+    sio2 = by_formula["SiO2"]
+    assert quantity_token(sio2.identity) is Quantity.MASS_LOSS_FRACTION
+    assert sio2.value.kind is ValueKind.POINT
+    assert sio2.value.point == as_decimal("0.011")
+    assert float(sio2.identity.temperature_K.value) == 1673.15
+    ms2 = by_formula["MS2"]
+    assert ms2.value.point == as_decimal("0.032")
+    assert float(ms2.identity.temperature_K.value) == 1836.15
+
+
+def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="measured_oxygen_yield",
+        units="percent",
+        values={
+            "quantity": "measured_oxygen_yield",
+            "method_class": "measured_direct",
+            "oxygen_mass_mg": 35,
+            "mass_yield_percent": 1.05,
+            "fraction_of_feedstock_oxygen_percent": 2.47,
+        },
+        obs_type="rate_series",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["T_range_K"] = [1473.15, 2073.15]
+    row["regime"] = "solar_vacuum_pyrolysis_free_evaporation"
+    row["phase"] = "g"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    rows = list(result.observations.values())
+    tokens = {quantity_token(o.identity): o for o in rows}
+    assert Quantity.YIELD_FRACTION in tokens
+    assert Quantity.O2_YIELD in tokens
+    assert Quantity.MASS_LOSS_FRACTION not in tokens
+    yield_frac = tokens[Quantity.YIELD_FRACTION]
+    assert yield_frac.value.kind is ValueKind.POINT
+    assert yield_frac.value.point == as_decimal("0.0105")
+    o2_yield = tokens[Quantity.O2_YIELD]
+    assert o2_yield.value.point == as_decimal("0.0247")
+    for obs in (yield_frac, o2_yield):
+        assert obs.identity.temperature_K.is_unknown
+        assert "no midpoint invented" in (obs.identity.temperature_K.reason or "")
+        assert "1473.15" in (obs.identity.temperature_K.reason or "")
+
+
+def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="vacuum_pyrolysis_experiment_summary",
+        units="as_published",
+        values={
+            "quantity": "vacuum_pyrolysis_experiment_summary",
+            "method_class": "measured_direct",
+            "tests": [
+                {
+                    "test": "2b",
+                    "sample": "FeTiO3",
+                    "Tmax_C": None,
+                    "Tmax_C_as_printed": ">800",
+                    "mass_loss_pct": 16.0,
+                },
+                {
+                    "test": 11,
+                    "sample": "MLS-1a",
+                    "Tmax_C": 1474.0,
+                    "mass_loss_pct": 10.1,
+                },
+                {
+                    "test": 12,
+                    "sample": "MLS-1a",
+                    "Tmax_C": 684.0,
+                    "mass_loss_pct": None,
+                    "mass_loss_as_printed": "-",
+                },
+            ],
+        },
+        obs_type="rate_series",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["T_range_K"] = [821.15, 2140.15]
+    row["regime"] = "solar_fresnel_continuously_pumped_vacuum_pyrolysis"
+    row["phase"] = "l"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    points = [
+        o
+        for o in result.observations.values()
+        if quantity_token(o.identity) is Quantity.MASS_LOSS_FRACTION
+    ]
+    assert len(points) == 2
+    by_formula = {o.identity.species.formula: o for o in points}
+    mls = by_formula["MLS-1a"]
+    assert mls.value.point == as_decimal("0.101")
+    assert float(mls.identity.temperature_K.value) == 1474.0 + 273.15
+    fetio3 = by_formula["FeTiO3"]
+    assert fetio3.value.point == as_decimal("0.16")
+    assert fetio3.identity.temperature_K.is_unknown
+    assert "no midpoint invented" in (fetio3.identity.temperature_K.reason or "") or (
+        "not numeric" in (fetio3.identity.temperature_K.reason or "")
+        or "T_range_K" in (fetio3.identity.temperature_K.reason or "")
+    )
+
+
+def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
+    extracts_src = REPO_ROOT / "data" / "literature" / "extracts"
+    names = [
+        "kems-044-robinot-2026.yaml",
+        "kems-035-sauerborn-2005.yaml",
+        "cardiff-2007-vacuum-pyrolysis-gsfc.yaml",
+        "kems-038-matchett-2006.yaml",
+        "wilkerson-2023-jsc1a-outgassing.yaml",
+        "steurer-1985-vapor-phase-pyrolysis.yaml",
+    ]
+    dest = tmp_path / "data" / "literature" / "extracts"
+    dest.mkdir(parents=True)
+    (tmp_path / "data" / "literature" / "compilations").mkdir(parents=True)
+    sources = []
+    for name in names:
+        src = extracts_src / name
+        (dest / name).write_bytes(src.read_bytes())
+        sources.append({"source_id": src.stem, "citation": src.stem})
+    (tmp_path / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_index.v1",
+                "scan": {"corpus_root": "regolith-corpus"},
+                "sources": sources,
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(tmp_path, write=False)
+    robinot = [
+        o
+        for o in result.observations.values()
+        if o.source_id == "kems-044-robinot-2026"
+        and quantity_token(o.identity) in {Quantity.YIELD_FRACTION, Quantity.O2_YIELD}
+    ]
+    tokens = {quantity_token(o.identity) for o in robinot}
+    assert Quantity.YIELD_FRACTION in tokens
+    assert Quantity.O2_YIELD in tokens
+    assert all(
+        o.identity.temperature_K.is_unknown
+        and "no midpoint invented" in (o.identity.temperature_K.reason or "")
+        for o in robinot
+    )
+    sauerborn = [
+        o
+        for o in result.observations.values()
+        if o.source_id == "kems-035-sauerborn-2005"
+        and quantity_token(o.identity) is Quantity.MASS_LOSS_FRACTION
+        and o.value.kind is ValueKind.POINT
+    ]
+    assert {float(o.value.point) for o in sauerborn} >= {0.011, 0.026, 0.032, 0.029}
+    cardiff = [
+        o
+        for o in result.observations.values()
+        if o.source_id == "cardiff-2007-vacuum-pyrolysis-gsfc"
+        and quantity_token(o.identity) is Quantity.MASS_LOSS_FRACTION
+        and o.value.kind is ValueKind.POINT
+    ]
+    cardiff_vals = {float(o.value.point) for o in cardiff}
+    assert 0.101 in cardiff_vals
+    assert 0.16 in cardiff_vals
+    assert 0.37 in cardiff_vals
+    matchett = [
+        o
+        for o in result.observations.values()
+        if o.source_id == "kems-038-matchett-2006"
+        and quantity_token(o.identity) is Quantity.MASS_LOSS_FRACTION
+        and o.value.kind is ValueKind.POINT
+    ]
+    matchett_vals = {float(o.value.point) for o in matchett}
+    assert 0.101 in matchett_vals
+    assert 0.0016 in matchett_vals
+    assert 0.0037 in matchett_vals
+    forbidden = {
+        o.source_id
+        for o in result.observations.values()
+        if o.source_id
+        in {"wilkerson-2023-jsc1a-outgassing", "steurer-1985-vapor-phase-pyrolysis"}
+        and quantity_token(o.identity)
+        in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.YIELD_FRACTION,
+            Quantity.O2_YIELD,
+        }
+    }
+    assert not forbidden

@@ -338,6 +338,8 @@ QUANTITY_ALIASES = {
     "evaporation_coefficient_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
+    "bulk_mass_loss_wt_pct": Quantity.MASS_LOSS_FRACTION,
+    "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "ion_current_ratio": Quantity.ION_INTENSITY_RATIO,
     "ion_intensity_ratio": Quantity.ION_INTENSITY_RATIO,
 }
@@ -376,6 +378,10 @@ REGIME_TO_METHOD = {
     "dta_dsc": MethodToken.DTA_DSC,
     "evolved_gas_ms": MethodToken.EVOLVED_GAS_MS,
     "solar_furnace_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+    "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
     "vacuum_chamber_pyrolysis": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
     "emf_cell": MethodToken.EMF_CELL,
     "quench_equilibration": MethodToken.QUENCH_EQUILIBRATION,
@@ -1417,6 +1423,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "mm2_to_m2": (Decimal("1000000"), "A_m2 = A_mm2 / 1e6", "m2", "mm2"),
     "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
+    "percent_to_fraction": (
+        Decimal("100"),
+        "x = pct / 100",
+        "dimensionless",
+        "percent",
+    ),
 }
 
 
@@ -1919,6 +1931,63 @@ def parse_quantity_suffix(suffix: str | None) -> tuple[str | None, str | None, s
     elif derivation is None and rest:
         reference = rest
     return formula, derivation, reference
+
+
+_PERCENT_FRACTION_UNITS = frozenset(
+    {"percent", "pct", "wt_percent", "wt%", "wt_pct", "%"}
+)
+_MASS_LOSS_YIELD_FIELDS = (
+    "mass_loss_wt_pct",
+    "mass_loss_pct",
+    "mass_loss_fraction",
+    "non_condensed_mass_loss_fraction",
+)
+_MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
+    ("mass_yield_percent", Quantity.YIELD_FRACTION),
+    ("fraction_of_feedstock_oxygen_percent", Quantity.O2_YIELD),
+)
+
+
+def _percent_named_fraction_field(key: str, units: str | None) -> bool:
+    lowered = str(key or "").strip().lower()
+    if lowered.endswith(("_pct", "_percent", "_wt_pct")):
+        return True
+    unit = str(units or "").strip().lower().replace(" ", "")
+    return unit in _PERCENT_FRACTION_UNITS
+
+
+def _item_mass_loss_field(item: Mapping[str, Any]) -> str | None:
+    for key in _MASS_LOSS_YIELD_FIELDS:
+        if key in item and _numeric_field(item, key) is not None:
+            return key
+    return None
+
+
+def _yield_table_items(
+    values: Mapping[str, Any],
+) -> tuple[str, list[Any]] | tuple[None, None]:
+    for key in ("points", "tests"):
+        items = values.get(key)
+        if not isinstance(items, list) or not items:
+            continue
+        if any(
+            isinstance(item, Mapping) and _item_mass_loss_field(item)
+            for item in items
+        ):
+            return key, items
+    return None, None
+
+
+def _measured_oxygen_yield_fields(
+    values: Mapping[str, Any],
+) -> tuple[tuple[Quantity, str], ...] | None:
+    if values.get("quantity") != "measured_oxygen_yield":
+        return None
+    found: list[tuple[Quantity, str]] = []
+    for field, quantity in _MEASURED_OXYGEN_YIELD_FIELDS:
+        if _numeric_field(values, field) is not None:
+            found.append((quantity, field))
+    return tuple(found) or None
 
 
 def _is_pressure_point_list(items: object) -> bool:
@@ -2498,9 +2567,20 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
-    Quantity.O2_YIELD: ("o2_yield",),
-    Quantity.MASS_LOSS_FRACTION: ("mass_loss_fraction",),
-    Quantity.YIELD_FRACTION: ("yield_fraction",),
+    Quantity.O2_YIELD: (
+        "o2_yield",
+        "fraction_of_feedstock_oxygen_percent",
+    ),
+    Quantity.MASS_LOSS_FRACTION: (
+        "mass_loss_fraction",
+        "non_condensed_mass_loss_fraction",
+        "mass_loss_wt_pct",
+        "mass_loss_pct",
+    ),
+    Quantity.YIELD_FRACTION: (
+        "yield_fraction",
+        "mass_yield_percent",
+    ),
     Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
     Quantity.TRANSITION_TEMPERATURE: (
         "value_K",
@@ -2972,6 +3052,14 @@ def _selection_from_named_field(
         trail = "as_published"
         if q_token is Quantity.LOG10_KF and key == "value":
             trail = "identity"
+        if q_token in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.MASS_LOSS_FRACTION_VS_T,
+            Quantity.YIELD_FRACTION,
+            Quantity.O2_YIELD,
+        } and _percent_named_fraction_field(key, units):
+            amount = amount / Decimal("100")
+            trail = "percent_to_fraction"
         return _point_selection(amount, key, trail, payload, condition_ranges)
     range_key = None
     raw_range = None
@@ -3054,7 +3142,9 @@ def select_declared_source(
             ("T_K", "K"),
             ("T_K_as_published", "K"),
             ("temperature_K", "K"),
+            ("Tmax_K", "K"),
             ("T_C", "C"),
+            ("Tmax_C", "C"),
         ):
             if key not in payload:
                 continue
@@ -4087,6 +4177,24 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        oxygen_fields = _measured_oxygen_yield_fields(values)
+        if oxygen_fields:
+            for child_quantity, field in oxygen_fields:
+                child_values = dict(values)
+                child_values["quantity"] = child_quantity.value
+                child_obs = dict(obs)
+                child_obs["observation_id"] = f"{raw_obs_id}::{field}"
+                child_obs["values"] = child_values
+                self._migrate_extract_observation(
+                    formula=formula,
+                    obs=child_obs,
+                    work=work,
+                    source_id=source_id,
+                    source_key=source_key,
+                    extraction=extraction,
+                    local_ids=local_ids,
+                )
+            return
         locator = locator_from_mapping(
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
@@ -4373,6 +4481,33 @@ class Migrator:
         derived_from = lineage_parents_from_source(
             obs, values, source_id, local_ids
         ) or None
+        yield_key, yield_items = _yield_table_items(values)
+        if yield_items:
+            yield_quantity: Quantity | State[Quantity] = (
+                quantity.value if quantity.is_value else Quantity.MASS_LOSS_FRACTION
+            )
+            before = self._count(source_key).observations_out
+            for index, item in enumerate(yield_items):
+                if not isinstance(item, Mapping) or _item_mass_loss_field(item) is None:
+                    continue
+                self._emit_exploded_point(
+                    parent_id=obs_id,
+                    item={"index": index, "item": item, "units": obs.get("units")},
+                    work=work,
+                    source_id=source_id,
+                    source_key=source_key,
+                    experiment_id=experiment_id,
+                    locator=locator,
+                    identity_base=(yield_quantity, species, ident_kwargs),
+                    evidence=evidence,
+                    admission=admission,
+                    uncertainty=uncertainty_for(obs.get("uncertainty")),
+                    units=str(obs.get("units") or ""),
+                    read_from=read_from,
+                    derived_from=derived_from,
+                )
+            if self._count(source_key).observations_out > before:
+                return
         if exploded and isinstance(values.get("series"), list):
             before = self._count(source_key).observations_out
             for item in exploded:
@@ -4484,6 +4619,14 @@ class Migrator:
         t_original: object = None
         value_sel: SourceSelection | None = None
         if isinstance(raw_item, Mapping):
+            sample = raw_item.get("sample") or raw_item.get("id")
+            if isinstance(sample, str) and sample.strip():
+                species = make_species(
+                    sample.strip(),
+                    species.phase,
+                    polymorph=species.polymorph,
+                    charge=species.charge,
+                )
             if raw_item.get("locator"):
                 point_locator = (
                     locator_from_mapping(
@@ -4540,7 +4683,10 @@ class Migrator:
         identity = fill_identity(quantity, species, **ident_kwargs)
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
-            converted = conversion_derivation(trail, None, point_locator)
+            original_raw = None
+            if isinstance(raw_item, Mapping) and value_sel.field_name:
+                original_raw = raw_item.get(value_sel.field_name)
+            converted = conversion_derivation(trail, original_raw, point_locator)
             derivation = Derivation(
                 relation=trail if converted is None else converted.relation,
                 inputs=(read_from,),
