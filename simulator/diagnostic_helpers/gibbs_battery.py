@@ -921,6 +921,33 @@ def comparable_scores(scores: Sequence[GibbsPointScore]) -> list[GibbsPointScore
     return [s for s in scores if s.status in {"match", "mismatch"}]
 
 
+def view_over_residuals(
+    scores: Sequence[GibbsPointScore],
+    residuals_path: Path | None = None,
+    pins_path: Path | None = None,
+) -> dict[str, Any]:
+    """Read residuals.jsonl as a view. Keep this ledger until every key maps."""
+
+    residuals_path = residuals_path or (REPO_ROOT / "data" / "battery" / "residuals.jsonl")
+    pins_path = pins_path or (REPO_ROOT / "data" / "battery" / "pins.yaml")
+    if not residuals_path.is_file():
+        return {"unmapped": [s.key for s in scores], "diffs": [], "retained": True}
+    from simulator.battery.score import load_residuals_jsonl, status_diff_rows
+
+    key_map: dict[str, str] = {}
+    if pins_path.is_file():
+        doc = yaml.safe_load(pins_path.read_text(encoding="utf-8")) or {}
+        key_map = dict(doc.get("key_map") or {})
+    old_rows = [asdict(s) for s in scores]
+    new_rows = list(load_residuals_jsonl(residuals_path))
+    diffs, unmapped = status_diff_rows(old_rows=old_rows, new_rows=new_rows, key_map=key_map)
+    return {
+        "unmapped": unmapped,
+        "diffs": diffs,
+        "retained": bool(unmapped),
+    }
+
+
 def disagreement_scores(scores: Sequence[GibbsPointScore]) -> list[GibbsPointScore]:
     return [
         s

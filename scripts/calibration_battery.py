@@ -961,8 +961,45 @@ def write_report(out, rows, receipts, manifest):
     for r in receipts:
         lines.append(f"| {r['name']} | {r['exit_code']} | {r['wall_seconds']:.3f} | {r['cpu_user_seconds']:.3f} | {r['cpu_system_seconds']:.3f} |")
     lines.extend(["", "Exact commands, errors and raw log paths are in report.json/executions. Failed harness diagnostics never become experimental zeroes. Synthetic bench test fixtures are verification only."])
+    v21 = v21_view_section(rows)
+    if v21:
+        lines.extend(["", v21])
     (out / "REPORT.md").write_text("\n".join(lines)+"\n")
     return report
+
+
+def v21_view_section(old_rows):
+    """View over data/battery/residuals.jsonl. Old path stays until every key maps."""
+
+    residuals_path = ROOT / "data" / "battery" / "residuals.jsonl"
+    pins_path = ROOT / "data" / "battery" / "pins.yaml"
+    if not residuals_path.is_file():
+        return None
+    from simulator.battery.score import load_residuals_jsonl, status_diff_rows
+
+    new_rows = list(load_residuals_jsonl(residuals_path))
+    key_map = {}
+    if pins_path.is_file():
+        import yaml
+        doc = yaml.safe_load(pins_path.read_text()) or {}
+        key_map = dict(doc.get("key_map") or {})
+    diffs, unmapped = status_diff_rows(old_rows=old_rows, new_rows=new_rows, key_map=key_map)
+    lines = ["## status_diff (v2.1 residuals.jsonl view)", ""]
+    if unmapped:
+        lines.append(
+            f"Unmapped legacy keys: {len(unmapped)}. Old calibration battery path retained."
+        )
+    else:
+        lines.append("All old keys mapped; residual file is the scoring view.")
+    if diffs:
+        lines.extend(["", "| old key | old | new | axis |", "|---|---|---|---|"])
+        for row in diffs[:200]:
+            lines.append(
+                f"| `{row['old_key']}` | {row['old']} | {row['new']} | {row['axis']} |"
+            )
+    else:
+        lines.append("No scored/refused/excluded or match/mismatch changes on mapped keys.")
+    return "\n".join(lines)
 
 
 def main(argv=None):
