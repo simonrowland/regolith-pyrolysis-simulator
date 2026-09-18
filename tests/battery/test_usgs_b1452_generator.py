@@ -35,6 +35,10 @@ B1452_MERGED_STORED = 160
 B1452_MERGED_REFUSED = 121
 B1452_MERGED_REFUSED_10X = 113
 B1452_MERGED_EXCLUDED = 66
+B1452_UNGUARDED_MERGED_STORED = 160
+B1452_UNGUARDED_298K_S = 155
+B1452_UNGUARDED_HT_DH = 4
+B1452_UNGUARDED_HT_CP = 1
 B1452_IDENTITY_10X = 315
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 219
@@ -353,6 +357,23 @@ def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
     assert splits["stored"] == splits["proposed"] - splits["refused"] - splits["excluded"]
 
 
+def test_unguarded_298k_entropy_splits_are_named() -> None:
+    """298 K S two-dot splits have no Gibbs 10× net. Name the population."""
+
+    generated = _generation(TABLE_298K)
+    splits = generated.report["merged_cell_splits"]
+    assert splits["unguarded_stored"] == splits["stored"]
+    assert splits["unguarded_by_quantity"] == {"S": B1452_UNGUARDED_298K_S}
+    assert "grain rule alone" in splits["unguarded_reason"]
+    assert "(H−H298)/T" in splits["unguarded_reason"]
+    silver = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="Ag", row=0
+    )
+    assert len(silver) == 1
+    assert silver[0].evidence.original_method_class == generator.MERGED_SPLIT_METHOD
+    assert silver[0].value.point == Decimal("42.55")
+
+
 def test_merged_integer_without_unique_grain_split_is_refused() -> None:
     generated = _generation(TABLE_298K)
     ag_plus_h = [
@@ -620,6 +641,7 @@ def test_migrate_is_not_wired() -> None:
 def test_full_census_closes() -> None:
     raw = stored = refused = excluded = 0
     merged_proposed = merged_stored = merged_refused = merged_refused_10x = merged_excluded = 0
+    unguarded_s = unguarded_dh = unguarded_cp = 0
     identity_10x = 0
     identity_fail = 0
     neighbour_298k_hits = 0
@@ -641,6 +663,11 @@ def test_full_census_closes() -> None:
         merged_refused += int(splits["refused"])
         merged_refused_10x += int(splits["refused_10x"])
         merged_excluded += int(splits["excluded"])
+        unguarded = splits.get("unguarded_by_quantity") or {}
+        unguarded_s += int(unguarded.get("S") or 0)
+        unguarded_dh += int(unguarded.get("delta_fH") or 0)
+        unguarded_cp += int(unguarded.get("cp") or 0)
+        assert int(splits["unguarded_stored"]) == int(splits["stored"])
         assert (
             int(splits["proposed"])
             == int(splits["stored"]) + int(splits["refused"]) + int(splits["excluded"])
@@ -693,6 +720,11 @@ def test_full_census_closes() -> None:
     assert merged_refused_10x == B1452_MERGED_REFUSED_10X
     assert merged_excluded == B1452_MERGED_EXCLUDED
     assert merged_proposed == merged_stored + merged_refused + merged_excluded
+    assert merged_stored == B1452_UNGUARDED_MERGED_STORED
+    assert unguarded_s == B1452_UNGUARDED_298K_S
+    assert unguarded_dh == B1452_UNGUARDED_HT_DH
+    assert unguarded_cp == B1452_UNGUARDED_HT_CP
+    assert unguarded_s + unguarded_dh + unguarded_cp == B1452_UNGUARDED_MERGED_STORED
     assert identity_10x == B1452_IDENTITY_10X
     assert formula_unresolved_ht == B1452_FORMULA_UNRESOLVED_HT
     assert formula_unresolved_rows == B1452_FORMULA_UNRESOLVED_298K_ROWS
@@ -709,6 +741,9 @@ def test_full_census_closes() -> None:
             "merged_refused": merged_refused,
             "merged_refused_10x": merged_refused_10x,
             "merged_excluded": merged_excluded,
+            "unguarded_298k_S": unguarded_s,
+            "unguarded_ht_delta_fH": unguarded_dh,
+            "unguarded_ht_cp": unguarded_cp,
             "identity_fail": identity_fail,
             "identity_10x": identity_10x,
             "formula_unresolved_ht": formula_unresolved_ht,

@@ -190,6 +190,13 @@ NEIGHBOUR_SIGN_DISABLED_REASON = (
     "high-T T-grids, where the recon found 3 log Kf and 2 ΔfG hits."
 )
 MERGED_SPLIT_METHOD = "split_merged_value_uncertainty_by_column_grain"
+UNGUARDED_MERGED_REASON = (
+    "grain-unique two-dot splits that stored have no independent identity net: "
+    "the 298 K table has no (H−H298)/T or −(G−H298)/T, so Gibbs 10× cannot see "
+    "entropy_s298 splits; 10× log Kf marks log_kf, ΔfG, and ΔfH only on that "
+    "table; HT Cp has no identity; HT ΔfH is not a log Kf 10× participant. "
+    "Stored splits rest on the grain rule alone."
+)
 FORMULA_UNRESOLVED_REASON_PREFIX = "no page-grounded formula;"
 FORMULA_CONFLICT_REASON_PREFIX = "conflicting page-grounded formulas;"
 
@@ -1957,6 +1964,15 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             "refused": merged_refused,
             "refused_10x": merged_refused_10x,
             "excluded": merged_excluded,
+            "unguarded_stored": merged_stored,
+            "unguarded_by_quantity": dict(
+                Counter(
+                    observation.identity.quantity.value.value
+                    for observation in observations
+                    if observation.evidence.original_method_class == MERGED_SPLIT_METHOD
+                )
+            ),
+            "unguarded_reason": UNGUARDED_MERGED_REASON,
         },
         "cell_accounting": {
             "raw_numeric_tokens": len(tokens),
@@ -2012,6 +2028,7 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     merged_refused_total = 0
     merged_refused_10x_total = 0
     merged_excluded_total = 0
+    unguarded_by_quantity: Counter[str] = Counter()
     identity_fail_counts: Counter[str] = Counter()
     identity_fail_10x = 0
     notice_count = 0
@@ -2039,6 +2056,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         merged_refused_total += int(merged["refused"])
         merged_refused_10x_total += int(merged["refused_10x"])
         merged_excluded_total += int(merged["excluded"])
+        for quantity, count in (merged.get("unguarded_by_quantity") or {}).items():
+            unguarded_by_quantity[str(quantity)] += int(count)
         for result in generated.report["identity_results"]:
             if result.get("ok") is False:
                 identity_fail_counts[str(result.get("identity"))] += 1
@@ -2101,6 +2120,9 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
             "refused": merged_refused_total,
             "refused_10x": merged_refused_10x_total,
             "excluded": merged_excluded_total,
+            "unguarded_stored": merged_stored_total,
+            "unguarded_by_quantity": dict(sorted(unguarded_by_quantity.items())),
+            "unguarded_reason": UNGUARDED_MERGED_REASON,
         },
         "identity_failure_counts": dict(sorted(identity_fail_counts.items())),
         "identity_fail_10x": identity_fail_10x,
