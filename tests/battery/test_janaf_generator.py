@@ -543,10 +543,9 @@ def test_printed_rounding_checks_flag_broken_rows_without_dropping_points() -> N
         if row["temperature"]["as_published"] == "298.15"
     )
     row["negative_gibbs_enthalpy_function"].update(as_published="999.999", value=999.999)
-    row["log10_formation_equilibrium_constant"].update(as_published="999.999", value=999.999)
     broken = generator.generate_table(broken_doc)
     kinds = {row["identity"] for row in broken.report["transcription_identity_failures"]}
-    assert kinds == {"negative_gibbs_enthalpy_function", "log10_Kf_from_delta_fG"}
+    assert kinds == {"negative_gibbs_enthalpy_function"}
     for quantity in Quantity.CP, Quantity.S, Quantity.H_MINUS_H298, Quantity.LOG10_KF:
         assert len(_series(broken, quantity)) == len(_series(healthy, quantity))
 
@@ -1070,6 +1069,65 @@ def test_stored_pair_identity_reads_the_emitted_series() -> None:
     )
 
 
+def _al006_logk_298_document(mutate):
+    document = deepcopy(load_table_document(TABLES_DIR / "Al-006.yaml"))
+    for row in document["table"]["values"]:
+        if row["temperature"]["as_published"] != "298.15":
+            continue
+        cell = row["log10_formation_equilibrium_constant"]
+        original = Decimal(cell["as_published"])
+        mutated = mutate(original)
+        cell["as_published"] = format(mutated, "f")
+        cell["value"] = float(mutated)
+        return document, original, mutated
+    raise AssertionError("Al-006 298.15 K log Kf cell missing")
+
+
+def _series_has_temperature(generated: generator.TableGeneration, quantity: Quantity, temperature: str) -> bool:
+    target = Decimal(temperature)
+    return any(point[0] == target for point in _series(generated, quantity))
+
+
+def test_seeded_10x_residual_is_refused_and_unmutated_control_stores() -> None:
+    control = _generation("Al-006")
+    assert _series_has_temperature(control, Quantity.LOG10_KF, "298.15")
+    assert _series_has_temperature(control, Quantity.DELTA_FG, "298.15")
+    assert control.report["scale_error_refusals"] == []
+    document, original, mutated = _al006_logk_298_document(lambda value: value * 10)
+    assert mutated == original * 10
+    generated = generator.generate_table(document)
+    assert generated.report["scale_error_refusals"]
+    assert all(
+        row["reason"] == generator.SCALE_ERROR_REFUSAL_REASON
+        for row in generated.report["scale_error_refusals"]
+    )
+    assert any(
+        row["temperature_as_published"] in {"298.15", "298.150"}
+        for row in generated.report["scale_error_refusals"]
+    )
+    assert not _series_has_temperature(generated, Quantity.LOG10_KF, "298.15")
+    assert not _series_has_temperature(generated, Quantity.DELTA_FG, "298.15")
+    assert _series_has_temperature(generated, Quantity.DELTA_FH, "298.15")
+
+
+def test_seeded_dropped_minus_is_refused_and_unmutated_control_stores() -> None:
+    control = _generation("Al-006")
+    assert _series_has_temperature(control, Quantity.LOG10_KF, "298.15")
+    document, original, mutated = _al006_logk_298_document(lambda value: -value)
+    assert mutated == -original
+    generated = generator.generate_table(document)
+    assert generated.report["scale_error_refusals"]
+    assert all(
+        row["reason"] == generator.SCALE_ERROR_REFUSAL_REASON
+        for row in generated.report["scale_error_refusals"]
+    )
+    assert not _series_has_temperature(generated, Quantity.LOG10_KF, "298.15")
+    assert not _series_has_temperature(generated, Quantity.DELTA_FG, "298.15")
+    assert control.report["neighbour_sign_scan"]["status"] == "advisory-only"
+    assert "SCALE_ERROR_REFUSAL_REASON" in control.report["neighbour_sign_scan"]["caught_by"]
+    assert control.report["gibbs_identity_scan"]["status"] == "advisory-only"
+
+
 def test_concatenated_labelled_row_requires_a_concatenated_transition_companion() -> None:
     document = load_table_document(TABLES_DIR / "C-083.yaml")
     companion = next(
@@ -1111,6 +1169,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     recovered_concatenated_rows = 0
     refused_concatenated_rows = 0
     refused_layout_rows = 0
+    scale_error_refusals = 0
     non_data_marker_lines = 0
     merged_rows = 0
     merged_extras = Counter()
@@ -1300,6 +1359,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
             generated.report["refused_concatenated_rows"]
         )
         refused_layout_rows += len(generated.report.get("refused_layout_rows") or ())
+        scale_error_refusals += len(generated.report.get("scale_error_refusals") or ())
         non_data_marker_lines += len(
             generated.report.get("non_data_marker_lines") or ()
         )
@@ -1391,6 +1451,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert recovered_concatenated_rows == 4
     assert refused_concatenated_rows == 0
     assert refused_layout_rows == 0
+    assert scale_error_refusals == 0
     assert non_data_marker_lines == 29
     assert failures == {
         "negative_gibbs_enthalpy_function": 18,

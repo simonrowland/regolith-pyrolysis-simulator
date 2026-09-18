@@ -89,6 +89,29 @@ CONCATENATED_ROW_REFUSAL_REASON = (
     "temperature with exactly three decimals and an immediately following "
     "TRANSITION row with the same temperature"
 )
+# A rounding-only residual is O(1)×tolerance. A decade scale error or a
+# dropped minus produces residuals ≫ 10×tolerance (Al-006 298.15 log Kf
+# ×10: residual/tolerance ≈ 4.4e5; sign flip ≈ 9.7e4). B-133 at 300 K is
+# a source-copy residual ≈ 4×tolerance and must still store.
+SCALE_ERROR_FACTOR = Decimal("10")
+SCALE_ERROR_REFUSAL_REASON = (
+    "log10_Kf disagrees with delta_fG by more than ten times the "
+    "printed-rounding tolerance"
+)
+# Neighbour-sign reports a value whose sign is opposite both nearest
+# nonzero neighbours in the same segment. It is advisory-only: I-013 at
+# 5000 K is a real reference-state zero-crossing, not a dropped minus.
+# Dropped-minus on a (delta_fG, log10_Kf) pair is refused by the 10×
+# stored-pair identity check, not by this scan.
+NEIGHBOUR_SIGN_SCAN_STATUS = "advisory-only"
+NEIGHBOUR_SIGN_SCAN_CATCHES = (
+    "dropped-minus on a stored (delta_fG, log10_Kf) pair is refused by "
+    "SCALE_ERROR_REFUSAL_REASON (residual > 10× printed-rounding tolerance)"
+)
+# Gibbs-function identity reports and does not refuse S or H-H(Tr). phi is
+# never stored. Corpus 10× Gibbs residuals (B-133 600 K; Hf-004 2500 K,
+# already a named enthalpy erratum) stay disclosed, not a store refusal.
+GIBBS_IDENTITY_SCAN_STATUS = "advisory-only"
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
 
 _UNITS = {
@@ -118,6 +141,10 @@ _SHORT_ROW_COLUMNS = (
 )
 _FORMATION_TAIL_COLUMNS = (
     "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log10_formation_equilibrium_constant",
+)
+_FORMATION_PAIR_COLUMNS = (
     "formation_gibbs_energy",
     "log10_formation_equilibrium_constant",
 )
@@ -807,6 +834,80 @@ def _logk_identity_failure(
     }
 
 
+def _scale_error_identity_failure(row: _Row, table_id: str) -> dict[str, str] | None:
+    """Refuse a stored pair whose identity residual exceeds 10× rounding tolerance."""
+
+    if row.numeric_tail is not None:
+        return None
+    delta_g = row.cells.get("formation_gibbs_energy")
+    log_k = row.cells.get("log10_formation_equilibrium_constant")
+    if (
+        delta_g is None
+        or log_k is None
+        or delta_g.value is None
+        or log_k.value is None
+    ):
+        return None
+    failure = _logk_identity_failure(
+        table_id=table_id,
+        temperature=row.temperature,
+        temperature_token=row.temperature_token,
+        delta_fG=delta_g.value,
+        delta_fG_token=delta_g.token,
+        log10_Kf=log_k.value,
+        log10_Kf_token=log_k.token,
+    )
+    if failure is None:
+        return None
+    residual = Decimal(failure["absolute_residual"])
+    tolerance = Decimal(failure["rounding_tolerance"])
+    if residual > SCALE_ERROR_FACTOR * tolerance:
+        return failure
+    return None
+
+
+def _neighbour_sign_hits(observations: Sequence[Observation]) -> list[dict[str, str]]:
+    """Advisory scan: a stored value whose sign opposes both nearest neighbours."""
+
+    hits: list[dict[str, str]] = []
+    for observation in observations:
+        series = list(observation.value.series or ())
+        if len(series) < 3:
+            continue
+        quantity = observation.identity.quantity.value.value
+        for index, (temperature, value) in enumerate(series):
+            if value == 0:
+                continue
+            left = None
+            right = None
+            for previous in reversed(series[:index]):
+                if previous[1] != 0:
+                    left = previous[1]
+                    break
+            for following in series[index + 1 :]:
+                if following[1] != 0:
+                    right = following[1]
+                    break
+            if left is None or right is None:
+                continue
+            opposite_both = (value > 0 > left and right < 0) or (
+                value < 0 < left and right > 0
+            )
+            if not opposite_both:
+                continue
+            hits.append(
+                {
+                    "quantity": quantity,
+                    "temperature_as_published": str(temperature),
+                    "value": str(value),
+                    "left_neighbour": str(left),
+                    "right_neighbour": str(right),
+                    "status": NEIGHBOUR_SIGN_SCAN_STATUS,
+                }
+            )
+    return hits
+
+
 def _stored_pair_identity_denominator(
     observations: Sequence[Observation],
     failures: Sequence[Mapping[str, str]],
@@ -1162,6 +1263,12 @@ def generate_table(
     }
     nulls: dict[tuple[int, str], int] = Counter()
     applied_cell_errata: list[dict[str, Any]] = []
+    scale_error_by_order = {
+        row.order: failure
+        for row in structured
+        if (failure := _scale_error_identity_failure(row, table_id)) is not None
+    }
+    scale_error_refusals: list[dict[str, Any]] = []
     for row in structured:
         seg = segment_index(row)
         for column, cell in row.cells.items():
@@ -1173,6 +1280,18 @@ def generate_table(
             else:
                 accounting[column]["structured_numeric"] += 1
                 accounting[column]["numeric_source_cells"] += 1
+                if column in _FORMATION_PAIR_COLUMNS and row.order in scale_error_by_order:
+                    accounting[column]["excluded_numeric"][
+                        SCALE_ERROR_REFUSAL_REASON
+                    ] += 1
+        if row.order in scale_error_by_order:
+            scale_error_refusals.append(
+                {
+                    **scale_error_by_order[row.order],
+                    "reason": SCALE_ERROR_REFUSAL_REASON,
+                    "line_number": row.line_number,
+                }
+            )
     for row in short:
         seg = segment_index(row)
         for column, cell in row.cells.items():
@@ -1257,6 +1376,11 @@ def generate_table(
                     row.numeric_tail is not None
                     and column in _FORMATION_TAIL_COLUMNS
                     and cell.value != 0
+                ):
+                    continue
+                if (
+                    column in _FORMATION_PAIR_COLUMNS
+                    and row.order in scale_error_by_order
                 ):
                     continue
                 points[(seg, column)].append((row.temperature, cell.value, row.order))
@@ -1463,6 +1587,7 @@ def generate_table(
             for failure in _identity_failure(row, table_id):
                 if failure["identity"] == "negative_gibbs_enthalpy_function":
                     failures.append(failure)
+    neighbour_sign_hits = _neighbour_sign_hits(observations)
     stored_pair_failures = _stored_pair_identity_failures_from_observations(
         observations, table_id
     )
@@ -1525,6 +1650,15 @@ def generate_table(
         "transcription_identity_failures": failures,
         "stored_pair_identity_failures": stored_pair_failures,
         "stored_pair_identity_denominator": stored_pair_denominator,
+        "scale_error_refusals": scale_error_refusals,
+        "neighbour_sign_hits": neighbour_sign_hits,
+        "neighbour_sign_scan": {
+            "status": NEIGHBOUR_SIGN_SCAN_STATUS,
+            "caught_by": NEIGHBOUR_SIGN_SCAN_CATCHES,
+        },
+        "gibbs_identity_scan": {
+            "status": GIBBS_IDENTITY_SCAN_STATUS,
+        },
         "refused_merged_pair_checks": refused_merged_pair_checks,
         "refused_merged_pair_identity_failures": refused_merged_pair_failures,
         "transition_rows": transition_rows,
