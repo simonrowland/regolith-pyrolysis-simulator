@@ -30,7 +30,7 @@ formula_normalised_rule: formula_normalised is formula_as_published with trailin
 summary:
   table_count: 1655
   thermodynamic_row_count: 76549
-  parse_ambiguity_count: 2229
+  parse_ambiguity_count: 2258
   formula_count: 985
 non_stoichiometric_formulas:
 - table_id: C-001
@@ -6503,11 +6503,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ba-001.html
   download_url: https://janaf.nist.gov/tables/Ba-001.txt
   row_count: 52
-  ambiguity_count: 8
+  ambiguity_count: 12
   parse_ambiguities:
   - line_number: 10
     raw_line: "582.530\t54.400\t87.232\t68.471\t10.929\tALPHA <--> BETA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 11
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
@@ -6523,6 +6530,13 @@ entries:
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
   - line_number: 17
     raw_line: "768.130\t39.066\t98.274\t74.313\t18.406\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -6535,6 +6549,13 @@ entries:
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 22
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
   - line_number: 23
     raw_line: "1000.000\t43.304\t116.592\t81.116\t35.476\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -6544,6 +6565,13 @@ entries:
   - line_number: 35
     raw_line: "2118.599\t40.692\t146.618\t108.863\t79.987\tLIQUID <--> IDEAL GAS"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 36
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
@@ -6566,11 +6594,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ba-002.html
   download_url: https://janaf.nist.gov/tables/Ba-002.txt
   row_count: 19
-  ambiguity_count: 6
+  ambiguity_count: 8
   parse_ambiguities:
   - line_number: 13
     raw_line: "582.530\t54.400\t87.232\t68.471\t10.929\tALPHA <--> BETA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-002
+      url: https://janaf.nist.gov/tables/Ba-002.html
+  - line_number: 14
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-002
       url: https://janaf.nist.gov/tables/Ba-002.html
@@ -6583,6 +6618,13 @@ entries:
   - line_number: 18
     raw_line: "768.130\t48.103\t98.274\t74.313\t18.406\tBETA <--> GAMMA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-002
+      url: https://janaf.nist.gov/tables/Ba-002.html
+  - line_number: 19
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-002
       url: https://janaf.nist.gov/tables/Ba-002.html
@@ -6617,11 +6659,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ba-003.html
   download_url: https://janaf.nist.gov/tables/Ba-003.txt
   row_count: 38
-  ambiguity_count: 6
+  ambiguity_count: 7
   parse_ambiguities:
   - line_number: 13
     raw_line: "580.000\t54.057\t90.849\t72.242\t10.792\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-003
+      url: https://janaf.nist.gov/tables/Ba-003.html
+  - line_number: 14
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-003
       url: https://janaf.nist.gov/tables/Ba-003.html
@@ -6668,11 +6717,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ba-004.html
   download_url: https://janaf.nist.gov/tables/Ba-004.txt
   row_count: 39
-  ambiguity_count: 8
+  ambiguity_count: 11
   parse_ambiguities:
   - line_number: 13
     raw_line: "582.530\t54.400\t87.232\t68.471\t10.929\tALPHA <--> BETA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 14
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html
@@ -6688,6 +6744,13 @@ entries:
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 19
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
   - line_number: 20
     raw_line: "768.130\t39.066\t98.274\t74.313\t18.406\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -6697,6 +6760,13 @@ entries:
   - line_number: 24
     raw_line: "1000.000\t39.066\t108.580\t81.116\t27.464\tGAMMA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 25
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html
@@ -12803,11 +12873,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-010.html
   download_url: https://janaf.nist.gov/tables/Ca-010.txt
   row_count: 31
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 12
     raw_line: "700.000\t79.370\t189.067\t144.970\t30.868\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-010
+      url: https://janaf.nist.gov/tables/Ca-010.html
+  - line_number: 13
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-010
       url: https://janaf.nist.gov/tables/Ca-010.html
@@ -12842,11 +12919,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-011.html
   download_url: https://janaf.nist.gov/tables/Ca-011.txt
   row_count: 32
-  ambiguity_count: 2
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 15
     raw_line: "1045.000\t87.090\t202.837\t145.994\t59.401\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-011
+      url: https://janaf.nist.gov/tables/Ca-011.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-011
       url: https://janaf.nist.gov/tables/Ca-011.html
@@ -12899,11 +12983,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-014.html
   download_url: https://janaf.nist.gov/tables/Ca-014.txt
   row_count: 28
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 19
     raw_line: "1424.000\t104.520\t197.376\t128.975\t97.403\tALPHA <--> BETA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-014
+      url: https://janaf.nist.gov/tables/Ca-014.html
+  - line_number: 20
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-014
       url: https://janaf.nist.gov/tables/Ca-014.html
@@ -12938,11 +13029,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-015.html
   download_url: https://janaf.nist.gov/tables/Ca-015.txt
   row_count: 41
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 15
     raw_line: "1000.000\t90.128\t187.157\t130.981\t56.176\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-015
+      url: https://janaf.nist.gov/tables/Ca-015.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-015
       url: https://janaf.nist.gov/tables/Ca-015.html
@@ -12977,11 +13075,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-016.html
   download_url: https://janaf.nist.gov/tables/Ca-016.txt
   row_count: 42
-  ambiguity_count: 4
+  ambiguity_count: 6
   parse_ambiguities:
   - line_number: 19
     raw_line: "1424.000\t104.520\t197.376\t128.975\t97.403\tALPHA <--> BETA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-016
+      url: https://janaf.nist.gov/tables/Ca-016.html
+  - line_number: 20
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-016
       url: https://janaf.nist.gov/tables/Ca-016.html
@@ -12994,6 +13099,13 @@ entries:
   - line_number: 24
     raw_line: "1691.000\t125.677\t222.077\t142.032\t135.356\tBETA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-016
+      url: https://janaf.nist.gov/tables/Ca-016.html
+  - line_number: 25
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-016
       url: https://janaf.nist.gov/tables/Ca-016.html
@@ -13133,11 +13245,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-024.html
   download_url: https://janaf.nist.gov/tables/Ca-024.txt
   row_count: 26
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 12
     raw_line: "700.000\t85.103\t247.715\t201.136\t32.605\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-024
+      url: https://janaf.nist.gov/tables/Ca-024.html
+  - line_number: 13
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-024
       url: https://janaf.nist.gov/tables/Ca-024.html
@@ -13172,11 +13291,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-025.html
   download_url: https://janaf.nist.gov/tables/Ca-025.txt
   row_count: 27
-  ambiguity_count: 2
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 15
     raw_line: "1052.000\t92.048\t250.043\t189.416\t63.780\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-025
+      url: https://janaf.nist.gov/tables/Ca-025.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-025
       url: https://janaf.nist.gov/tables/Ca-025.html
@@ -13241,11 +13367,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-028.html
   download_url: https://janaf.nist.gov/tables/Ca-028.txt
   row_count: 46
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 26
     raw_line: "2100.000\t58.894\t163.455\t117.109\t97.327\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-028
+      url: https://janaf.nist.gov/tables/Ca-028.html
+  - line_number: 27
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-028
       url: https://janaf.nist.gov/tables/Ca-028.html
@@ -13280,11 +13413,18 @@ entries:
   url: https://janaf.nist.gov/tables/Ca-029.html
   download_url: https://janaf.nist.gov/tables/Ca-029.txt
   row_count: 47
-  ambiguity_count: 2
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 37
     raw_line: "3200.000\t63.434\t165.048\t113.604\t164.621\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ca-029
+      url: https://janaf.nist.gov/tables/Ca-029.html
+  - line_number: 38
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ca-029
       url: https://janaf.nist.gov/tables/Ca-029.html
@@ -18053,11 +18193,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cr-014.html
   download_url: https://janaf.nist.gov/tables/Cr-014.txt
   row_count: 31
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 8
     raw_line: "305.000\t126.775\t83.958\t81.186\t0.845\tCp LAMBDA MAXIMUM"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cr-014
+      url: https://janaf.nist.gov/tables/Cr-014.html
+  - line_number: 9
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cr-014
       url: https://janaf.nist.gov/tables/Cr-014.html
@@ -18092,11 +18239,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cr-015.html
   download_url: https://janaf.nist.gov/tables/Cr-015.txt
   row_count: 46
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 23
     raw_line: "1800.000\t135.457\t344.941\t239.820\t189.217\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cr-015
+      url: https://janaf.nist.gov/tables/Cr-015.html
+  - line_number: 24
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cr-015
       url: https://janaf.nist.gov/tables/Cr-015.html
@@ -18131,11 +18285,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cr-016.html
   download_url: https://janaf.nist.gov/tables/Cr-016.txt
   row_count: 47
-  ambiguity_count: 4
+  ambiguity_count: 6
   parse_ambiguities:
   - line_number: 8
     raw_line: "305.000\t126.775\t83.958\t81.186\t0.845\tCp LAMBDA MAXIMUM"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cr-016
+      url: https://janaf.nist.gov/tables/Cr-016.html
+  - line_number: 9
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cr-016
       url: https://janaf.nist.gov/tables/Cr-016.html
@@ -18148,6 +18309,13 @@ entries:
   - line_number: 34
     raw_line: "2603.000\t143.553\t352.989\t237.037\t301.824\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cr-016
+      url: https://janaf.nist.gov/tables/Cr-016.html
+  - line_number: 35
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cr-016
       url: https://janaf.nist.gov/tables/Cr-016.html
@@ -19130,11 +19298,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cu-011.html
   download_url: https://janaf.nist.gov/tables/Cu-011.txt
   row_count: 26
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 12
     raw_line: "740.000\t85.772\t191.730\t145.386\t34.295\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-011
+      url: https://janaf.nist.gov/tables/Cu-011.html
+  - line_number: 13
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cu-011
       url: https://janaf.nist.gov/tables/Cu-011.html
@@ -19169,11 +19344,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cu-012.html
   download_url: https://janaf.nist.gov/tables/Cu-012.txt
   row_count: 27
-  ambiguity_count: 2
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 16
     raw_line: "1109.000\t91.713\t182.554\t121.991\t67.164\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-012
+      url: https://janaf.nist.gov/tables/Cu-012.html
+  - line_number: 17
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cu-012
       url: https://janaf.nist.gov/tables/Cu-012.html
@@ -19313,11 +19495,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cu-020.html
   download_url: https://janaf.nist.gov/tables/Cu-020.txt
   row_count: 21
-  ambiguity_count: 4
+  ambiguity_count: 5
   parse_ambiguities:
   - line_number: 15
     raw_line: "1000.000\t81.245\t217.203\t165.367\t51.837\tGLASS <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-020
+      url: https://janaf.nist.gov/tables/Cu-020.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cu-020
       url: https://janaf.nist.gov/tables/Cu-020.html
@@ -19352,11 +19541,18 @@ entries:
   url: https://janaf.nist.gov/tables/Cu-021.html
   download_url: https://janaf.nist.gov/tables/Cu-021.txt
   row_count: 22
-  ambiguity_count: 2
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 20
     raw_line: "1516.700\t96.587\t216.118\t151.895\t97.406\tCRYSTAL <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Cu-021
+      url: https://janaf.nist.gov/tables/Cu-021.html
+  - line_number: 21
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Cu-021
       url: https://janaf.nist.gov/tables/Cu-021.html
@@ -37796,8 +37992,15 @@ entries:
   url: https://janaf.nist.gov/tables/S-021.html
   download_url: https://janaf.nist.gov/tables/S-021.txt
   row_count: 65
-  ambiguity_count: 0
-  parse_ambiguities: []
+  ambiguity_count: 1
+  parse_ambiguities:
+  - line_number: 18
+    raw_line: "H\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: S-021
+      url: https://janaf.nist.gov/tables/S-021.html
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/S-021.yaml
   source_sha256: 04431474b38369fe65570344b3c10471a7753f2904ee80f6447bb0e0db7655c8

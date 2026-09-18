@@ -1926,6 +1926,13 @@ table:
     locator:
       table_id: Cu-011
       url: https://janaf.nist.gov/tables/Cu-011.html
+  - line_number: 13
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Cu-011
+      url: https://janaf.nist.gov/tables/Cu-011.html
   - line_number: 14
     raw_line: "740.000\t100.416\t191.730\t145.386\t34.295\tTRANSITION"
     reason: expected 8 tab-separated values; found 6

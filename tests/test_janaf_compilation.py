@@ -177,9 +177,14 @@ def test_source_round_trip_negative_controls(tmp_path, monkeypatch):
 
 
 def test_native_blank_tail_cells_survive():
-    source = LIVE_TXT_SAMPLE + "200\t20.786\t141.651\t151.852\t-2.040\t\t\t\t\t\t\n"
+    zero_row = "0\t0.\t0.\tINFINITE\t-4.539\t0.\t0.\t0.\n"
+    source = LIVE_TXT_SAMPLE.replace(
+        zero_row,
+        zero_row + "200\t20.786\t141.651\t151.852\t-2.040\t\t\t\t\t\t\n",
+        1,
+    )
     parsed = parse_janaf_txt(source, table_id="Al-006", url="u", download_url="d")
-    row = parsed.values[-1]
+    row = parsed.values[1]
     assert len(parsed.values) == 3
     assert row["temperature"]["as_published"] == "200"
     for key in ("formation_enthalpy", "formation_gibbs_energy", "log10_formation_equilibrium_constant"):

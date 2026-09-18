@@ -3798,6 +3798,13 @@ table:
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 11
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
   - line_number: 12
     raw_line: "582.530\t32.468\t87.232\t68.471\t10.929\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -3807,6 +3814,13 @@ table:
   - line_number: 15
     raw_line: "768.130\t48.103\t98.274\t74.313\t18.406\tBETA <--> GAMMA"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
@@ -3822,6 +3836,13 @@ table:
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 22
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
   - line_number: 23
     raw_line: "1000.000\t43.304\t116.592\t81.116\t35.476\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -3831,6 +3852,13 @@ table:
   - line_number: 35
     raw_line: "2118.599\t40.692\t146.618\t108.863\t79.987\tLIQUID <--> IDEAL GAS"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-001
+      url: https://janaf.nist.gov/tables/Ba-001.html
+  - line_number: 36
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-001
       url: https://janaf.nist.gov/tables/Ba-001.html

@@ -38,6 +38,13 @@ from simulator.battery.records import (
 )
 from simulator.reference_data.janaf import (
     ELEMENT_SYMBOLS,
+    GRID_ORDER_REASON,
+    GRID_RANGE_REASON,
+    NON_DATA_MARKER_KIND,
+    NON_DATA_MARKER_REASON,
+    PRINTED_GRID_T_MAX,
+    PRINTED_GRID_T_MIN,
+    REFUSED_LAYOUT_KIND,
     SIDECAR_PATH,
     formula_composition,
     load_table_document,
@@ -361,6 +368,8 @@ def _short_rows(
             continue
         if not isinstance(item, Mapping) or not item.get("raw_line"):
             continue
+        if item.get("kind") in {NON_DATA_MARKER_KIND, REFUSED_LAYOUT_KIND}:
+            continue
         fields = _trimmed_tab_fields(str(item["raw_line"]))
         if (
             len(fields) != 5
@@ -400,24 +409,11 @@ def _short_rows(
             else None
         )
         companion_temperature = (
-            companion_match.group(1)
-            if companion_match is not None
-            else companion_fields[0].strip()
-            if len(companion_fields) == 6
-            and _NUMBER_RE.fullmatch(companion_fields[0].strip())
-            else None
+            companion_match.group(1) if companion_match is not None else None
         )
         fields_are_numeric = all(_NUMBER_RE.fullmatch(field) for field in fields[1:4])
-        companion_fields_are_numeric = (
-            companion_match is not None
-            and all(
-                _NUMBER_RE.fullmatch(field) for field in companion_fields[1:4]
-            )
-        ) or (
-            len(companion_fields) == 6
-            and all(
-                _NUMBER_RE.fullmatch(field) for field in companion_fields[:5]
-            )
+        companion_fields_are_numeric = companion_match is not None and all(
+            _NUMBER_RE.fullmatch(field) for field in companion_fields[1:4]
         )
         valid_pair = (
             transition_match is not None
@@ -460,6 +456,8 @@ def _short_rows(
         if ambiguity_index in refused_indices:
             continue
         if not isinstance(item, Mapping) or not item.get("raw_line"):
+            continue
+        if item.get("kind") in {NON_DATA_MARKER_KIND, REFUSED_LAYOUT_KIND}:
             continue
         line = str(item["raw_line"])
         fields = normalized_fields.get(ambiguity_index, _trimmed_tab_fields(line))
@@ -744,46 +742,195 @@ def _identity_failure(row: _Row, table_id: str) -> list[dict[str, str]]:
         dg = row.numeric_tail.get("formation_gibbs_energy")
         logk = row.numeric_tail.get("log10_formation_equilibrium_constant")
     if dg and logk and dg.value is not None and logk.value is not None:
-        # Premise: the JANAF 4th-edition introduction tabulates
-        # R = 8.31441 J/(mol K), so this source-level transcription check must
-        # use that printed constant rather than the helper's modern default.
-        # Algebra: log10(Kf) = -1000*delta_fG/(R*T*ln(10)). Unit check:
-        # (kJ/mol)*1000 J/kJ / ((J/(mol K))*K) is dimensionless. Worked row:
-        # B-132 at 298.15 K with delta_fG=-5582.653 kJ/mol gives about
-        # 978.04468, compatible with the printed 978.058 after input rounding.
-        calculated = log10K_from_delta_fG_kJ_mol(
-            dg.value,
-            t,
+        failure = _logk_identity_failure(
+            table_id=table_id,
+            temperature=t,
+            temperature_token=row.temperature_token,
+            delta_fG=dg.value,
+            delta_fG_token=dg.token,
+            log10_Kf=logk.value,
+            log10_Kf_token=logk.token,
+        )
+        if failure is not None:
+            failures.append(failure)
+    return failures
+
+
+def _logk_identity_failure(
+    *,
+    table_id: str,
+    temperature: Decimal,
+    temperature_token: str,
+    delta_fG: Decimal,
+    delta_fG_token: str,
+    log10_Kf: Decimal,
+    log10_Kf_token: str,
+) -> dict[str, str] | None:
+    if temperature <= 0:
+        return None
+    # Premise: the JANAF 4th-edition introduction tabulates
+    # R = 8.31441 J/(mol K), so this source-level transcription check must
+    # use that printed constant rather than the helper's modern default.
+    # Algebra: log10(Kf) = -1000*delta_fG/(R*T*ln(10)). Unit check:
+    # (kJ/mol)*1000 J/kJ / ((J/(mol K))*K) is dimensionless. Worked row:
+    # B-132 at 298.15 K with delta_fG=-5582.653 kJ/mol gives about
+    # 978.04468, compatible with the printed 978.058 after input rounding.
+    calculated = log10K_from_delta_fG_kJ_mol(
+        delta_fG,
+        temperature,
+        gas_constant_J_per_mol_K=JANAF_R_J_PER_MOL_K,
+    )
+    e_t = _decimal_grain(temperature_token) / 2
+    denominator = abs(
+        log10K_from_delta_fG_kJ_mol(
+            Decimal("1"),
+            temperature - e_t,
             gas_constant_J_per_mol_K=JANAF_R_J_PER_MOL_K,
         )
-        e_t = _decimal_grain(row.temperature_token) / 2
-        denominator = abs(
-            log10K_from_delta_fG_kJ_mol(
-                Decimal("1"),
-                t - e_t,
-                gas_constant_J_per_mol_K=JANAF_R_J_PER_MOL_K,
+    )
+    temperature_term = abs(calculated) * e_t / (temperature - e_t)
+    tolerance = (
+        _decimal_grain(log10_Kf_token) / 2
+        + _decimal_grain(delta_fG_token) / 2 * denominator
+        + temperature_term
+    )
+    residual = abs(log10_Kf - calculated)
+    if residual <= tolerance:
+        return None
+    return {
+        "table_id": table_id,
+        "temperature_as_published": temperature_token,
+        "identity": "log10_Kf_from_delta_fG",
+        "printed": str(log10_Kf),
+        "calculated": str(calculated),
+        "absolute_residual": str(residual),
+        "rounding_tolerance": str(tolerance),
+    }
+
+
+def _stored_pair_identity_failures_from_observations(
+    observations: Sequence[Observation],
+    table_id: str,
+) -> list[dict[str, str]]:
+    """Judge log Kf against delta_fG from the emitted series, not source tokens."""
+
+    by_segment: dict[str, dict[Quantity, Observation]] = defaultdict(dict)
+    for observation in observations:
+        quantity = observation.identity.quantity.value
+        if quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+            continue
+        segment = observation.observation_id.rsplit(":", 1)[-1]
+        by_segment[segment][quantity] = observation
+    failures: list[dict[str, str]] = []
+    for quantity_map in by_segment.values():
+        delta_g = quantity_map.get(Quantity.DELTA_FG)
+        log_k = quantity_map.get(Quantity.LOG10_KF)
+        if delta_g is None or log_k is None:
+            continue
+        delta_g_points = {
+            temperature: value for temperature, value in (delta_g.value.series or ())
+        }
+        log_k_points = {
+            temperature: value for temperature, value in (log_k.value.series or ())
+        }
+        for temperature, delta_fG in delta_g_points.items():
+            log10_Kf = log_k_points.get(temperature)
+            if log10_Kf is None:
+                continue
+            failure = _logk_identity_failure(
+                table_id=table_id,
+                temperature=temperature,
+                temperature_token=str(temperature),
+                delta_fG=delta_fG,
+                delta_fG_token=str(delta_fG),
+                log10_Kf=log10_Kf,
+                log10_Kf_token=str(log10_Kf),
             )
-        )
-        temperature_term = abs(calculated) * e_t / (t - e_t)
-        tolerance = (
-            _decimal_grain(logk.token) / 2
-            + _decimal_grain(dg.token) / 2 * denominator
-            + temperature_term
-        )
-        residual = abs(logk.value - calculated)
-        if residual > tolerance:
-            failures.append(
+            if failure is not None:
+                failures.append(failure)
+    return failures
+
+
+def _corroborate_structured_rows(
+    rows: list[_Row], _table_id: str
+) -> tuple[list[_Row], list[dict[str, Any]]]:
+    """Refuse structured rows whose temperature is off the printed grid."""
+
+    ordered = sorted(rows, key=lambda row: row.order)
+    kept: list[_Row] = []
+    refused: list[dict[str, Any]] = []
+    grid_min = Decimal(str(PRINTED_GRID_T_MIN))
+    grid_max = Decimal(str(PRINTED_GRID_T_MAX))
+    for row in ordered:
+        if row.temperature < grid_min or row.temperature > grid_max:
+            refused.append(
                 {
-                    "table_id": table_id,
+                    "line_number": row.line_number,
+                    "raw_text": row.raw_line or row.temperature_token,
+                    "reason": GRID_RANGE_REASON,
                     "temperature_as_published": row.temperature_token,
-                    "identity": "log10_Kf_from_delta_fG",
-                    "printed": str(logk.value),
-                    "calculated": str(calculated),
-                    "absolute_residual": str(residual),
-                    "rounding_tolerance": str(tolerance),
                 }
             )
-    return failures
+            continue
+        kept.append(row)
+    changed = True
+    while changed:
+        changed = False
+        for index in range(len(kept) - 1):
+            if kept[index].temperature <= kept[index + 1].temperature:
+                continue
+            previous_t = kept[index - 1].temperature if index else None
+            drop_index = (
+                index
+                if previous_t is None or previous_t <= kept[index + 1].temperature
+                else index + 1
+            )
+            dropped = kept.pop(drop_index)
+            refused.append(
+                {
+                    "line_number": dropped.line_number,
+                    "raw_text": dropped.raw_line or dropped.temperature_token,
+                    "reason": GRID_ORDER_REASON,
+                    "temperature_as_published": dropped.temperature_token,
+                }
+            )
+            changed = True
+            break
+    kept.sort(key=lambda row: row.order)
+    return kept, refused
+
+
+def _leftover_ambiguity_rows(
+    table: Mapping[str, Any],
+    *,
+    used_line_numbers: set[int],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    markers: list[dict[str, Any]] = []
+    refused_layout: list[dict[str, Any]] = []
+    for item in table.get("parse_ambiguities") or ():
+        if not isinstance(item, Mapping) or not item.get("raw_line"):
+            continue
+        line_number = item.get("line_number")
+        if isinstance(line_number, int) and line_number in used_line_numbers:
+            continue
+        raw_text = str(item["raw_line"])
+        record = {
+            "line_number": line_number,
+            "raw_text": raw_text,
+            "reason": str(item.get("reason") or ""),
+        }
+        kind = item.get("kind")
+        if kind == NON_DATA_MARKER_KIND or (
+            _raw_numeric_token_count(raw_text) == 0
+            and not _NUMBER_RE.fullmatch(_trimmed_tab_fields(raw_text)[0] if _trimmed_tab_fields(raw_text) else "")
+        ):
+            record["reason"] = str(item.get("reason") or NON_DATA_MARKER_REASON)
+            markers.append(record)
+        elif kind == REFUSED_LAYOUT_KIND or _raw_numeric_token_count(raw_text) > 0:
+            refused_layout.append(record)
+        else:
+            markers.append(record)
+    return markers, refused_layout
 
 
 def _subtype(left: str, right: str) -> str:
@@ -903,7 +1050,22 @@ def generate_table(
     if not download_url:
         raise ValueError(f"{table_id}: missing NIST download_url")
     structured = _structured_rows(table, table_id)
+    structured, refused_grid_rows = _corroborate_structured_rows(structured, table_id)
     short, refused_concatenated_rows = _short_rows(table, table_id)
+    used_line_numbers = {
+        row.line_number
+        for row in short
+        if isinstance(row.line_number, int)
+    }
+    used_line_numbers.update(
+        int(row["line_number"])
+        for row in refused_concatenated_rows
+        if isinstance(row.get("line_number"), int)
+    )
+    non_data_marker_lines, leftover_layout_rows = _leftover_ambiguity_rows(
+        table, used_line_numbers=used_line_numbers
+    )
+    refused_layout_rows = leftover_layout_rows + refused_grid_rows
     all_rows = structured + short
     boundary_rows: list[_Boundary] = []
     for row in short:
@@ -1016,10 +1178,15 @@ def generate_table(
         _raw_numeric_token_count(str(row["raw_text"]))
         for row in refused_concatenated_rows
     )
+    refused_layout_numeric_tokens = sum(
+        _raw_numeric_token_count(str(row["raw_text"]))
+        for row in refused_layout_rows
+    )
     unexplained_raw_numeric_tokens = (
         raw_numeric_source_tokens
         - accounted_numeric_cells
         - refused_concatenated_numeric_tokens
+        - refused_layout_numeric_tokens
     )
     if unexplained_raw_numeric_tokens:
         raise AssertionError(
@@ -1210,7 +1377,6 @@ def generate_table(
     refused_merged_pair_checks = 0
     for row in all_rows:
         t = row.temperature
-        pair_is_stored = False
         if t > 0:
             if all(
                 row.cells.get(column) is not None
@@ -1236,25 +1402,42 @@ def generate_table(
                 pair_is_stored = row.numeric_tail is None or (
                     dg.value == 0 and logk.value == 0
                 )
-                if pair_is_stored:
-                    checks["log10_Kf_from_delta_fG"] += 1
-                else:
+                if not pair_is_stored:
                     refused_merged_pair_checks += 1
-        for failure in _identity_failure(row, table_id):
-            if failure["identity"] != "log10_Kf_from_delta_fG":
-                failures.append(failure)
-            elif pair_is_stored:
-                failures.append(failure)
-                stored_pair_failures.append(failure)
-            else:
-                refused_merged_pair_failures.append(
-                    {
-                        **failure,
-                        "line_number": row.line_number,
-                        "raw_text": row.tail_text,
-                        "assigned_segment": f"segment-{segment_index(row)}",
-                    }
-                )
+                    for failure in _identity_failure(row, table_id):
+                        if failure["identity"] == "log10_Kf_from_delta_fG":
+                            refused_merged_pair_failures.append(
+                                {
+                                    **failure,
+                                    "line_number": row.line_number,
+                                    "raw_text": row.tail_text,
+                                    "assigned_segment": f"segment-{segment_index(row)}",
+                                }
+                            )
+            for failure in _identity_failure(row, table_id):
+                if failure["identity"] == "negative_gibbs_enthalpy_function":
+                    failures.append(failure)
+    stored_pair_failures = _stored_pair_identity_failures_from_observations(
+        observations, table_id
+    )
+    stored_pair_count = 0
+    by_segment: dict[str, dict[Quantity, Observation]] = defaultdict(dict)
+    for observation in observations:
+        quantity = observation.identity.quantity.value
+        if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+            by_segment[observation.observation_id.rsplit(":", 1)[-1]][quantity] = (
+                observation
+            )
+    for quantity_map in by_segment.values():
+        delta_g = quantity_map.get(Quantity.DELTA_FG)
+        log_k = quantity_map.get(Quantity.LOG10_KF)
+        if delta_g is None or log_k is None:
+            continue
+        delta_g_temperatures = {point[0] for point in (delta_g.value.series or ()) if point[0] > 0}
+        log_k_temperatures = {point[0] for point in (log_k.value.series or ()) if point[0] > 0}
+        stored_pair_count += len(delta_g_temperatures & log_k_temperatures)
+    checks["log10_Kf_from_delta_fG"] = stored_pair_count
+    failures.extend(stored_pair_failures)
 
     plain_accounting: dict[str, Any] = {}
     for column, row in accounting.items():
@@ -1301,6 +1484,7 @@ def generate_table(
             "refused_concatenated_numeric_tokens": (
                 refused_concatenated_numeric_tokens
             ),
+            "refused_layout_numeric_tokens": refused_layout_numeric_tokens,
             "unexplained_numeric_tokens": 0,
         },
         "transcription_checks": dict(checks),
@@ -1326,6 +1510,8 @@ def generate_table(
             if row.recovered_concatenated_temperature_cp
         ],
         "refused_concatenated_rows": refused_concatenated_rows,
+        "refused_layout_rows": refused_layout_rows,
+        "non_data_marker_lines": non_data_marker_lines,
         "stored_cell_errata": applied_cell_errata,
         "merged_formation_rows": [
             {
@@ -1433,6 +1619,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     raw_numeric_accounting: Counter[str] = Counter()
     recovered_concatenated_row_count = 0
     refused_concatenated_row_count = 0
+    refused_layout_row_count = 0
+    non_data_marker_line_count = 0
     adjacent_condition_counts: Counter[str] = Counter()
     merged_formation_row_count = 0
     table_count = 0
@@ -1495,6 +1683,12 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         refused_concatenated_row_count += len(
             generated.report["refused_concatenated_rows"]
         )
+        refused_layout_row_count += len(
+            generated.report.get("refused_layout_rows") or ()
+        )
+        non_data_marker_line_count += len(
+            generated.report.get("non_data_marker_lines") or ()
+        )
         adjacent_condition_counts.update(
             str(row["label"]) for row in generated.report["adjacent_condition_rows"]
         )
@@ -1553,6 +1747,8 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         "raw_numeric_accounting": dict(sorted(raw_numeric_accounting.items())),
         "recovered_concatenated_row_count": recovered_concatenated_row_count,
         "refused_concatenated_row_count": refused_concatenated_row_count,
+        "refused_layout_row_count": refused_layout_row_count,
+        "non_data_marker_line_count": non_data_marker_line_count,
         "merged_formation_row_count": merged_formation_row_count,
         "adjacent_condition_row_counts": dict(sorted(adjacent_condition_counts.items())),
         "sharding": "one observation shard and one report shard per JANAF index element",

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
@@ -60,6 +60,35 @@ VALUE_COLUMNS = (
 )
 HEADER_ALIASES = ("T/K", "T(K)")
 NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
+# JANAF 4th-edition tables print T in [0, 6000] K; the 1,655-file corpus
+# has min 0 and max 6000, and no structured-row temperature decrease.
+PRINTED_GRID_T_MIN = 0.0
+PRINTED_GRID_T_MAX = 6000.0
+# After taking the first eight column positions and stripping trailing
+# empty fields, numeric-first structured rows in this corpus have one of
+# these content counts (1=T-only placeholder, 2=T+Cp only, 5=empty
+# formation tail, 6=partial formation tail, 7=blank log Kf, 8=full row).
+STRUCTURED_CONTENT_COUNTS = frozenset({1, 2, 5, 6, 7, 8})
+NON_DATA_MARKER_KIND = "non_data_marker"
+NON_DATA_MARKER_REASON = (
+    "non-data marker line; no numeric thermochemical token"
+)
+REFUSED_LAYOUT_KIND = "refused_layout"
+TRAILING_EMPTY_LAYOUT_REASON = (
+    "row reaches the expected field count through trailing empty fields alone"
+)
+STRUCTURED_LAYOUT_REASON = (
+    "stripped field count is not a printed structured layout"
+)
+INCONSISTENT_LAYOUT_REASON = (
+    "raw field count does not match the table's printed layout for this row shape"
+)
+GRID_RANGE_REASON = (
+    "temperature is outside the table's printed 0-6000 K grid"
+)
+GRID_ORDER_REASON = (
+    "temperature is not ordered within the printed table grid"
+)
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
 CHARGE_RE = re.compile(r"[+-]$")
@@ -227,6 +256,114 @@ def _looks_like_concatenated_numbers(token: str) -> bool:
     return token.count(".") >= 2 and re.fullmatch(r"[0-9Ee+.-]+", token) is not None
 
 
+def _is_thermo_token(token: str) -> bool:
+    cleaned = token.strip()
+    return cleaned.upper() == "INFINITE" or NUMBER_RE.fullmatch(cleaned) is not None
+
+
+def _strip_trailing_empty(fields: list[str]) -> list[str]:
+    content = list(fields)
+    while content and content[-1] == "":
+        content.pop()
+    return content
+
+
+def _ambiguity_record(
+    *,
+    line_number: int,
+    line: str,
+    reason: str,
+    table_id: str,
+    url: str,
+    kind: str | None = None,
+) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "line_number": line_number,
+        "raw_line": line,
+        "reason": reason,
+        "locator": {"table_id": table_id, "url": url},
+    }
+    if kind is not None:
+        record["kind"] = kind
+    return record
+
+
+@dataclass
+class _LineCandidate:
+    line_number: int
+    line: str
+    raw_n: int
+    content: list[str]
+    first_is_number: bool
+    concatenated: bool
+    all_thermo_tokens: bool
+    temperature: float | None
+
+
+def _line_candidate(line_number: int, line: str) -> _LineCandidate:
+    raw_fields = [field.strip() for field in line.split("\t")]
+    raw_n = len(raw_fields)
+    head = raw_fields[: len(VALUE_COLUMNS)] if raw_n >= len(VALUE_COLUMNS) else raw_fields
+    content = _strip_trailing_empty(head)
+    first = content[0] if content else ""
+    first_is_number = NUMBER_RE.fullmatch(first) is not None
+    concatenated = _looks_like_concatenated_numbers(first)
+    temperature = parse_published_number(first) if first_is_number else None
+    return _LineCandidate(
+        line_number=line_number,
+        line=line,
+        raw_n=raw_n,
+        content=content,
+        first_is_number=first_is_number,
+        concatenated=concatenated,
+        all_thermo_tokens=bool(content) and all(_is_thermo_token(token) for token in content),
+        temperature=temperature,
+    )
+
+
+def _refuse_uncorroborated_temperatures(
+    rows: list[_LineCandidate],
+) -> tuple[list[_LineCandidate], list[_LineCandidate], list[str]]:
+    """Keep rows whose T is inside 0-6000 K and non-decreasing in file order."""
+
+    kept: list[_LineCandidate] = []
+    refused: list[_LineCandidate] = []
+    reasons: list[str] = []
+    pending = list(rows)
+    for candidate in pending:
+        if candidate.temperature is None:
+            refused.append(candidate)
+            reasons.append(GRID_RANGE_REASON)
+            continue
+        if candidate.temperature < PRINTED_GRID_T_MIN or candidate.temperature > PRINTED_GRID_T_MAX:
+            refused.append(candidate)
+            reasons.append(GRID_RANGE_REASON)
+            continue
+        kept.append(candidate)
+    changed = True
+    while changed:
+        changed = False
+        for index in range(len(kept) - 1):
+            current = kept[index]
+            following = kept[index + 1]
+            if current.temperature is None or following.temperature is None:
+                continue
+            if current.temperature <= following.temperature:
+                continue
+            previous_t = kept[index - 1].temperature if index else None
+            drop_index = (
+                index
+                if previous_t is None or previous_t <= following.temperature
+                else index + 1
+            )
+            refused.append(kept[drop_index])
+            reasons.append(GRID_ORDER_REASON)
+            del kept[drop_index]
+            changed = True
+            break
+    return kept, refused, reasons
+
+
 def flatten_subscripts(value: str) -> str:
     value = re.sub(r"_\{([^}]*)\}", r"\1", value)
     return value.replace("{", "").replace("}", "").replace(" ", "")
@@ -312,35 +449,114 @@ def parse_janaf_txt(
         raise JanafParseError(f"{table_id}: expected eight native header columns")
     values: list[dict[str, Any]] = []
     ambiguities: list[dict[str, Any]] = []
+    structured_candidates: list[_LineCandidate] = []
     for line_number, line in enumerate(lines[header_index + 1 :], start=header_index + 2):
         if not line.strip():
             continue
-        fields = [field.strip() for field in line.split("\t")]
-        while len(fields) > len(header_fields) and fields[-1] == "":
-            fields.pop()
-        if not fields:
+        candidate = _line_candidate(line_number, line)
+        if not candidate.content:
             continue
-        first_field_is_number = NUMBER_RE.fullmatch(fields[0]) is not None
-        if not first_field_is_number and not _looks_like_concatenated_numbers(
-            fields[0]
-        ):
+        legacy_fields = [field.strip() for field in line.split("\t")]
+        while len(legacy_fields) > len(header_fields) and legacy_fields[-1] == "":
+            legacy_fields.pop()
+        legacy_n = len(legacy_fields)
+        if not candidate.first_is_number and not candidate.concatenated:
+            ambiguities.append(
+                _ambiguity_record(
+                    line_number=line_number,
+                    line=line,
+                    reason=NON_DATA_MARKER_REASON,
+                    table_id=table_id,
+                    url=url,
+                    kind=NON_DATA_MARKER_KIND,
+                )
+            )
             continue
-        if len(fields) != len(header_fields) or not first_field_is_number:
+        if candidate.concatenated or not candidate.first_is_number:
             reason = (
                 f"expected {len(VALUE_COLUMNS)} tab-separated values; "
-                f"found {len(fields)}"
-                if len(fields) != len(header_fields)
+                f"found {legacy_n}"
+                if legacy_n != len(header_fields)
                 else "first field is not one published number"
             )
             ambiguities.append(
-                {
-                    "line_number": line_number,
-                    "raw_line": line,
-                    "reason": reason,
-                    "locator": {"table_id": table_id, "url": url},
-                }
+                _ambiguity_record(
+                    line_number=line_number,
+                    line=line,
+                    reason=reason,
+                    table_id=table_id,
+                    url=url,
+                )
             )
             continue
+        if (
+            candidate.raw_n >= len(VALUE_COLUMNS)
+            and len(candidate.content) in STRUCTURED_CONTENT_COUNTS
+            and candidate.all_thermo_tokens
+        ):
+            structured_candidates.append(candidate)
+            continue
+        if candidate.all_thermo_tokens and candidate.raw_n > len(VALUE_COLUMNS):
+            reason = TRAILING_EMPTY_LAYOUT_REASON
+            kind: str | None = REFUSED_LAYOUT_KIND
+        else:
+            reason = (
+                f"expected {len(VALUE_COLUMNS)} tab-separated values; "
+                f"found {legacy_n}"
+                if legacy_n != len(header_fields)
+                else STRUCTURED_LAYOUT_REASON
+            )
+            kind = REFUSED_LAYOUT_KIND if candidate.all_thermo_tokens else None
+        ambiguities.append(
+            _ambiguity_record(
+                line_number=line_number,
+                line=line,
+                reason=reason,
+                table_id=table_id,
+                url=url,
+                kind=kind,
+            )
+        )
+
+    by_content: dict[int, list[_LineCandidate]] = defaultdict(list)
+    for candidate in structured_candidates:
+        by_content[len(candidate.content)].append(candidate)
+    layout_consistent: list[_LineCandidate] = []
+    for group in by_content.values():
+        mode_raw_n = Counter(item.raw_n for item in group).most_common(1)[0][0]
+        for candidate in group:
+            if candidate.raw_n != mode_raw_n:
+                ambiguities.append(
+                    _ambiguity_record(
+                        line_number=candidate.line_number,
+                        line=candidate.line,
+                        reason=INCONSISTENT_LAYOUT_REASON,
+                        table_id=table_id,
+                        url=url,
+                        kind=REFUSED_LAYOUT_KIND,
+                    )
+                )
+            else:
+                layout_consistent.append(candidate)
+    layout_consistent.sort(key=lambda item: item.line_number)
+    corroborated, uncorroborated, grid_reasons = _refuse_uncorroborated_temperatures(
+        layout_consistent
+    )
+    for candidate, reason in zip(uncorroborated, grid_reasons, strict=True):
+        ambiguities.append(
+            _ambiguity_record(
+                line_number=candidate.line_number,
+                line=candidate.line,
+                reason=reason,
+                table_id=table_id,
+                url=url,
+                kind=REFUSED_LAYOUT_KIND,
+            )
+        )
+    corroborated.sort(key=lambda item: item.line_number)
+    ambiguities.sort(key=lambda item: (item.get("line_number") is None, item.get("line_number") or 0))
+    for candidate in corroborated:
+        fields = candidate.content + [""] * (len(VALUE_COLUMNS) - len(candidate.content))
         temperature_token = fields[0]
         row: dict[str, Any] = {}
         for index, ((key, default_column), token) in enumerate(

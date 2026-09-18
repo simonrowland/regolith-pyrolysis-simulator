@@ -1998,6 +1998,13 @@ table:
     locator:
       table_id: Ca-025
       url: https://janaf.nist.gov/tables/Ca-025.html
+  - line_number: 16
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ca-025
+      url: https://janaf.nist.gov/tables/Ca-025.html
   - line_number: 17
     raw_line: "1052.000\t103.345\t289.815\t189.416\t105.620\tTRANSITION"
     reason: expected 8 tab-separated values; found 6

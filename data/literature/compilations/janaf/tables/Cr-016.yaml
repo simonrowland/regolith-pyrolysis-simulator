@@ -4299,6 +4299,16 @@
         }
       },
       {
+        "line_number": 9,
+        "raw_line": "+\t",
+        "reason": "non-data marker line; no numeric thermochemical token",
+        "kind": "non_data_marker",
+        "locator": {
+          "table_id": "Cr-016",
+          "url": "https://janaf.nist.gov/tables/Cr-016.html"
+        }
+      },
+      {
         "line_number": 10,
         "raw_line": "305.000\t126.775\t83.958\t81.186\t0.845\tTRANSITION",
         "reason": "expected 8 tab-separated values; found 6",
@@ -4311,6 +4321,16 @@
         "line_number": 34,
         "raw_line": "2603.000\t143.553\t352.989\t237.037\t301.824\tCRYSTAL <--> LIQUID",
         "reason": "expected 8 tab-separated values; found 6",
+        "locator": {
+          "table_id": "Cr-016",
+          "url": "https://janaf.nist.gov/tables/Cr-016.html"
+        }
+      },
+      {
+        "line_number": 35,
+        "raw_line": "+\t",
+        "reason": "non-data marker line; no numeric thermochemical token",
+        "kind": "non_data_marker",
         "locator": {
           "table_id": "Cr-016",
           "url": "https://janaf.nist.gov/tables/Cr-016.html"

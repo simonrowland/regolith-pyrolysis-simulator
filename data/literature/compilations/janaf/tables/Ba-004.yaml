@@ -2862,6 +2862,13 @@ table:
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 14
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
   - line_number: 15
     raw_line: "582.530\t32.468\t87.232\t68.471\t10.929\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -2874,6 +2881,13 @@ table:
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 19
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
   - line_number: 20
     raw_line: "768.130\t39.066\t98.274\t74.313\t18.406\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -2883,6 +2897,13 @@ table:
   - line_number: 24
     raw_line: "1000.000\t39.066\t108.580\t81.116\t27.464\tGAMMA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
+    locator:
+      table_id: Ba-004
+      url: https://janaf.nist.gov/tables/Ba-004.html
+  - line_number: 25
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
     locator:
       table_id: Ba-004
       url: https://janaf.nist.gov/tables/Ba-004.html

@@ -5908,6 +5908,17 @@
         }
       }
     ],
-    "parse_ambiguities": []
+    "parse_ambiguities": [
+      {
+        "line_number": 18,
+        "raw_line": "H\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
+        "reason": "non-data marker line; no numeric thermochemical token",
+        "kind": "non_data_marker",
+        "locator": {
+          "table_id": "S-021",
+          "url": "https://janaf.nist.gov/tables/S-021.html"
+        }
+      }
+    ]
   }
 }

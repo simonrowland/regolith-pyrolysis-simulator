@@ -2790,6 +2790,13 @@ table:
     locator:
       table_id: Ba-003
       url: https://janaf.nist.gov/tables/Ba-003.html
+  - line_number: 14
+    raw_line: "+\t"
+    reason: non-data marker line; no numeric thermochemical token
+    kind: non_data_marker
+    locator:
+      table_id: Ba-003
+      url: https://janaf.nist.gov/tables/Ba-003.html
   - line_number: 15
     raw_line: "580.000\t51.120\t90.849\t72.242\t10.792\tTRANSITION"
     reason: expected 8 tab-separated values; found 6

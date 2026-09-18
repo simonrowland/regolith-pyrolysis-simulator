@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import time
 from collections import Counter, defaultdict
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -23,6 +25,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import Species
 from simulator.reference_data.janaf import (
+    NON_DATA_MARKER_KIND,
     TABLES_DIR,
     iter_table_paths,
     load_table_document,
@@ -731,21 +734,197 @@ def test_cell_accounting_negative_witness_breaks_generator_accounting(
         _generation("Al-001")
 
 
+_DELIMITER_SAMPLE_TABLES = ("Al-006", "Al-001", "O-029")
+_DELIMITER_SAMPLE_TEMPERATURES = ("100", "200", "298.15", "6000")
+_NON_DATA_MARKER_LINES = (
+    ("Ba-001", (11, 16, 22, 36)),
+    ("Ba-002", (14, 19)),
+    ("Ba-003", (14,)),
+    ("Ba-004", (14, 19, 25)),
+    ("Ca-010", (13,)),
+    ("Ca-011", (16,)),
+    ("Ca-014", (20,)),
+    ("Ca-015", (16,)),
+    ("Ca-016", (20, 25)),
+    ("Ca-024", (13,)),
+    ("Ca-025", (16,)),
+    ("Ca-028", (27,)),
+    ("Ca-029", (38,)),
+    ("Cr-014", (9,)),
+    ("Cr-015", (24,)),
+    ("Cr-016", (9, 35)),
+    ("Cu-011", (13,)),
+    ("Cu-012", (17,)),
+    ("Cu-020", (16,)),
+    ("Cu-021", (21,)),
+    ("S-021", (18,)),
+)
+_JANAF_SOURCE_DIR = Path(
+    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
+) / "raw" / "janaf-nist-txt"
+
+
+def _raw_table_path(table_id: str) -> Path:
+    fixture = RAW_FIXTURES / f"{table_id}.txt"
+    return fixture if fixture.is_file() else _JANAF_SOURCE_DIR / f"{table_id}.txt"
+
+
+def _parse_raw_document(table_id: str, payload: bytes):
+    return generator.parse_table(
+        payload,
+        {
+            "table_id": table_id,
+            "url": f"https://janaf.nist.gov/tables/{table_id}.html",
+            "download_url": f"https://janaf.nist.gov/tables/{table_id}.txt",
+        },
+        _raw_table_path(table_id),
+    )
+
+
+def _cp_temperatures(generated: generator.TableGeneration) -> list[str]:
+    return [
+        str(temperature)
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.CP
+        for temperature, _value in (observation.value.series or ())
+    ]
+
+
+def _row_for_temperature(text: str, temperature: str) -> tuple[int, str]:
+    prefix = temperature + "\t"
+    for index, line in enumerate(text.splitlines()):
+        if line.startswith(prefix):
+            return index, line
+    raise AssertionError(f"no {temperature} K row")
+
+
 def test_raw_numeric_census_detects_a_deleted_tab() -> None:
     payload = (RAW_FIXTURES / "Al-006.txt").read_bytes().replace(
         b"298.15\t20.786", b"298.1520.786", 1
     )
-    document = generator.parse_table(
-        payload,
-        {
-            "table_id": "Al-006",
-            "url": "https://janaf.nist.gov/tables/Al-006.html",
-            "download_url": "https://janaf.nist.gov/tables/Al-006.txt",
-        },
-        RAW_FIXTURES / "Al-006.txt",
+    document = _parse_raw_document("Al-006", payload)
+    generated = generator.generate_table(document)
+    refused = generated.report["refused_layout_rows"]
+    assert refused
+    assert any("298.1520.786" in str(row["raw_text"]) for row in refused)
+    assert "298.15" not in _cp_temperatures(generated)
+
+
+def test_delimiter_loss_is_refused_for_integer_and_decimal_rows() -> None:
+    red_before_fix = []
+    for table_id in _DELIMITER_SAMPLE_TABLES:
+        payload = _raw_table_path(table_id).read_bytes()
+        text = payload.decode("utf-8")
+        control = generator.generate_table(_parse_raw_document(table_id, payload))
+        assert control.report["refused_layout_rows"] == []
+        assert all(
+            temperature in _cp_temperatures(control)
+            for temperature in _DELIMITER_SAMPLE_TEMPERATURES
+            if f"{temperature}\t" in text
+        )
+        for temperature in _DELIMITER_SAMPLE_TEMPERATURES:
+            if f"{temperature}\t" not in text:
+                continue
+            line_index, line = _row_for_temperature(text, temperature)
+            tab_positions = [match.start() for match in re.finditer("\t", line)]
+            assert tab_positions
+            trailing_empty = line.endswith("\t") or "\t\t" in line
+            for tab_index, position in enumerate(tab_positions):
+                lines = text.splitlines()
+                lines[line_index] = line[:position] + line[position + 1 :]
+                mutated = ("\n".join(lines) + "\n").encode("utf-8")
+                assert mutated != payload
+                generated = generator.generate_table(
+                    _parse_raw_document(table_id, mutated)
+                )
+                refused = generated.report["refused_layout_rows"]
+                assert refused, (
+                    f"{table_id} {temperature} K tab {tab_index} was accepted"
+                )
+                assert any(
+                    row.get("raw_text") == lines[line_index]
+                    or str(row.get("raw_text", "")).startswith(lines[line_index][:20])
+                    for row in refused
+                )
+                temperatures = _cp_temperatures(generated)
+                assert temperature not in temperatures
+                if table_id == "Al-006" and temperature in {"100", "200"}:
+                    red_before_fix.append(
+                        f"{table_id} {temperature} K tab {tab_index} "
+                        f"{'trailing-empty row' if trailing_empty else 'full row'}"
+                    )
+    assert red_before_fix
+
+
+def test_non_data_marker_lines_are_recorded() -> None:
+    observed: list[tuple[str, int]] = []
+    for table_id, line_numbers in _NON_DATA_MARKER_LINES:
+        parsed = parse_janaf_txt(
+            _raw_table_path(table_id).read_bytes(),
+            table_id=table_id,
+            url=f"https://janaf.nist.gov/tables/{table_id}.html",
+            download_url=f"https://janaf.nist.gov/tables/{table_id}.txt",
+        )
+        markers = [
+            item
+            for item in parsed.parse_ambiguities
+            if item.get("kind") == NON_DATA_MARKER_KIND
+        ]
+        assert [item["line_number"] for item in markers] == list(line_numbers)
+        generated = generator.generate_table(
+            _parse_raw_document(table_id, _raw_table_path(table_id).read_bytes())
+        )
+        reported = generated.report["non_data_marker_lines"]
+        assert [row["line_number"] for row in reported] == list(line_numbers)
+        assert all(row["raw_text"].strip() for row in reported)
+        observed.extend((table_id, line_number) for line_number in line_numbers)
+    assert len(observed) == 29
+
+
+def test_stored_pair_identity_reads_the_emitted_series() -> None:
+    generated = _generation("Al-006")
+    assert generated.report["stored_pair_identity_failures"] == []
+    log_k = _quantity_observations(generated, Quantity.LOG10_KF)[0]
+    series = list(log_k.value.series or ())
+    index, (temperature, value) = next(
+        (i, point)
+        for i, point in enumerate(series)
+        if point[0] == Decimal("298.15")
     )
-    with pytest.raises(AssertionError, match="unexplained raw numeric tokens"):
-        generator.generate_table(document)
+    series[index] = (temperature, -value)
+    mutated = replace(
+        generated,
+        observations=tuple(
+            replace(log_k, value=replace(log_k.value, series=tuple(series)))
+            if observation is log_k
+            else observation
+            for observation in generated.observations
+        ),
+    )
+    failures = generator._stored_pair_identity_failures_from_observations(
+        mutated.observations, "Al-006"
+    )
+    assert failures
+    assert any(
+        row["temperature_as_published"] in {"298.15", "298.150"}
+        and row["printed"].startswith("-") is False
+        for row in failures
+    )
+
+
+def test_concatenated_labelled_row_requires_a_concatenated_transition_companion() -> None:
+    document = load_table_document(TABLES_DIR / "C-083.yaml")
+    companion = next(
+        row
+        for row in document["table"]["parse_ambiguities"]
+        if row.get("line_number") == 9
+    )
+    companion["raw_line"] = (
+        "288.500\t1548.129\t111.063\t118.520\t-2.151\tTRANSITION"
+    )
+    generated = generator.generate_table(document)
+    assert generated.report["recovered_concatenated_rows"] == []
+    assert len(generated.report["refused_concatenated_rows"]) == 2
 
 
 def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
@@ -773,6 +952,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     stored_cell_errata = 0
     recovered_concatenated_rows = 0
     refused_concatenated_rows = 0
+    refused_layout_rows = 0
+    non_data_marker_lines = 0
     merged_rows = 0
     merged_extras = Counter()
     stored_pair_violations: list[tuple[str, str]] = []
@@ -956,6 +1137,10 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         refused_concatenated_rows += len(
             generated.report["refused_concatenated_rows"]
         )
+        refused_layout_rows += len(generated.report.get("refused_layout_rows") or ())
+        non_data_marker_lines += len(
+            generated.report.get("non_data_marker_lines") or ()
+        )
         if index % 100 == 0:
             print(
                 f"JANAF test audit: {index}/1655 tables in "
@@ -1031,10 +1216,13 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         "numeric_source_tokens": 533672,
         "accounted_numeric_cells": 533672,
         "refused_concatenated_numeric_tokens": 0,
+        "refused_layout_numeric_tokens": 0,
         "unexplained_numeric_tokens": 0,
     }
     assert recovered_concatenated_rows == 4
     assert refused_concatenated_rows == 0
+    assert refused_layout_rows == 0
+    assert non_data_marker_lines == 29
     assert failures == {
         "negative_gibbs_enthalpy_function": 18,
         "log10_Kf_from_delta_fG": 1,
