@@ -20,9 +20,11 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    MethodToken,
     MetricOperation,
     NoticeKind,
     Quantity,
+    RefusalReason,
     ResidualStatus,
     SourceRelation,
 )
@@ -34,11 +36,16 @@ from simulator.battery.pins import (
     tombstone_for_changed_identity,
 )
 from simulator.battery.records import (
+    Apparatus,
+    ApparatusGeometry,
     Execution,
+    Located,
     Notice,
     ResidualNumeric,
     DecisionBand,
+    State,
 )
+from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
     SCORE_ENGINE_SET,
@@ -479,6 +486,129 @@ def test_changed_identity_preserves_tombstone() -> None:
     assert tomb.key == "old-key"
     assert tomb.centre == Decimal("0.4")
     assert "old-key" in tomb.aliases
+
+
+def _unknown_method_experiment():
+    return replace(
+        F.tabulation_experiment(),
+        method=State.unknown("source does not state method"),
+    )
+
+
+def test_thermo_unknown_method_is_not_underdetermined_apparatus() -> None:
+    """JANAF melting-point / ΔfG class: schema does not require orifice geometry."""
+
+    exp = _unknown_method_experiment()
+    for quantity in (
+        Quantity.DELTA_FG,
+        Quantity.TRANSITION_TEMPERATURE,
+        Quantity.CP,
+        Quantity.S,
+        Quantity.H_MINUS_H298,
+    ):
+        gate = underdetermined_apparatus(exp, quantity)
+        assert gate.passed is True, (quantity, gate.reason, gate.primary_check)
+        assert gate.reason is None
+
+    ident = F.o2_identity()
+    ref = F.observation(
+        "janaf-4th::Cr_melting_point",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    outcome = run_validity_gates(exp, ref)
+    assert outcome.passed is True
+    residual, _ = _compile(ref, exp, _predict(Decimal("0"), ident))
+    assert residual.refusal is None or residual.refusal.reason is not (
+        RefusalReason.UNDERDETERMINED_APPARATUS
+    )
+    assert residual.score_eligible is True
+
+
+def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
+    exp = _unknown_method_experiment()
+    gate = underdetermined_apparatus(exp, Quantity.P_SAT)
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.METHOD_UNKNOWN
+    assert gate.primary_check == "method"
+    assert gate.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
+
+    ident = F.psat_identity("Na")
+    ref = F.observation(
+        "yakovlev-psat",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    residual, _ = _compile(ref, exp, _predict(Decimal("0.1"), ident))
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
+
+
+def test_richter_langmuir_alpha_still_fails_exposed_area() -> None:
+    geometry = ApparatusGeometry()
+    exp = replace(
+        F.tabulation_experiment(),
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        apparatus=Apparatus(geometry=geometry),
+    )
+    gate = underdetermined_apparatus(exp, Quantity.EVAPORATION_COEFFICIENT_ALPHA)
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "geometry_determinants"
+    missing = next(
+        c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
+    )
+    assert "exposed_area_m2" in missing
+
+    with_area = replace(
+        exp,
+        apparatus=Apparatus(
+            geometry=ApparatusGeometry(exposed_area_m2=Located(State.of(Decimal("1e-4"))))
+        ),
+    )
+    assert underdetermined_apparatus(
+        with_area, Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    ).passed
+
+
+def test_kems_partial_pressure_still_requires_effusion_packet() -> None:
+    incomplete = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    gate = underdetermined_apparatus(incomplete, Quantity.P_PARTIAL)
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "geometry_determinants"
+    missing = next(
+        c.detail["missing"] for c in gate.checks if c.name == "geometry_determinants"
+    )
+    assert "orifice_area_m2" in missing
+    assert "clausing_factor" in missing
+    assert "calibration" in missing
+
+    complete = F.kems_experiment()
+    assert underdetermined_apparatus(complete, Quantity.P_PARTIAL).passed
+    ident = F.psat_identity("Na")
+    ident = replace(ident, quantity=Quantity.P_PARTIAL)
+    ref = F.observation(
+        "kems-pi",
+        complete.experiment_id,
+        ident,
+        Decimal("0.8"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    outcome = run_validity_gates(complete, ref)
+    assert outcome.passed is True
 
 
 def test_missing_live_result_is_coverage_failure() -> None:

@@ -108,6 +108,7 @@ class EvidenceClass(StrEnum):
 class RefusalReason(StrEnum):
     INVALID_SOURCE = "invalid_source"
     UNDERDETERMINED_APPARATUS = "underdetermined_apparatus"
+    METHOD_UNKNOWN = "method_unknown"
     EFFUSION_REGIME_UNVERIFIED = "effusion_regime_unverified"
     BACKGROUND_PRESSURE_HIGH = "background_pressure_high"
     IDENTITY_MISMATCH = "identity_mismatch"

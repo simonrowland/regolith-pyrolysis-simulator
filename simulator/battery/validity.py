@@ -22,7 +22,11 @@ Ambiguity resolutions:
   pressure/alpha requires exposed area. Determinants must be grounded
   VALUES (unknown calibration fails), physically valid (area > 0,
   Clausing in (0, 1]), and present for TGA/solar/vacuum kinetic area.
-  Missing required geometry is ``underdetermined_apparatus``. Archival
+  Missing required geometry is ``underdetermined_apparatus``. Unknown
+  method is ``method_unknown`` when the quantity class is one the schema
+  scopes by method (effusion pressure, Langmuir pressure/alpha,
+  kinetic/yield); thermochemistry at a stated T/reference state is not
+  that class and does not borrow the apparatus token. Archival
   storage of incomplete apparatus is allowed; the gate fails the
   comparison, not the record.
 """
@@ -200,6 +204,35 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
     }
 
 
+# Quantity classes the schema scopes by method. Unknown method on these
+# cannot decide which geometry packet applies; it is not an orifice
+# failure. Thermochemistry is intentionally absent.
+_METHOD_SCOPED_APPARATUS_QUANTITIES = frozenset(
+    {
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.P_REFERENCE,
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.LOG10_KF,
+        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        Quantity.EVAPORATION_RATE,
+        Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_FRACTION,
+        Quantity.MASS_LOSS_FRACTION_VS_T,
+        Quantity.YIELD_FRACTION,
+        Quantity.EVOLVED_GAS_YIELD,
+        Quantity.O2_YIELD,
+        Quantity.CONDENSATE_COMPOSITION,
+        Quantity.WALL_DEPOSIT_MASS,
+    }
+)
+
+
+def _quantity_scopes_apparatus_by_method(quantity: Quantity) -> bool:
+    return quantity in _METHOD_SCOPED_APPARATUS_QUANTITIES
+
+
 def underdetermined_apparatus(
     experiment: Experiment,
     quantity: Quantity,
@@ -209,14 +242,29 @@ def underdetermined_apparatus(
     method_state = experiment.method
     checks: list[GateCheck] = []
     if method_state.tag is not StateTag.VALUE or method_state.value is None:
+        if _quantity_scopes_apparatus_by_method(quantity):
+            checks.append(
+                GateCheck(
+                    "method",
+                    False,
+                    {
+                        "reason": method_state.reason or "method unknown",
+                        "quantity": quantity.value,
+                    },
+                )
+            )
+            return _fail(RefusalReason.METHOD_UNKNOWN, checks, "method")
         checks.append(
             GateCheck(
                 "method",
-                False,
-                {"reason": method_state.reason or "method unknown"},
+                True,
+                {
+                    "reason": "method not required for this quantity class",
+                    "quantity": quantity.value,
+                },
             )
         )
-        return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "method")
+        return _pass(checks)
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
