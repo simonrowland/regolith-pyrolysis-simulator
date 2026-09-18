@@ -30,8 +30,13 @@ B1452_RAW = 55707
 B1452_STORED = 10456
 B1452_REFUSED = 24417
 B1452_EXCLUDED = 20834
-B1452_MERGED_SPLIT = 347
+B1452_MERGED_PROPOSED = 347
+B1452_MERGED_STORED = 160
+B1452_MERGED_REFUSED = 121
+B1452_MERGED_REFUSED_10X = 113
+B1452_MERGED_EXCLUDED = 66
 B1452_IDENTITY_10X = 315
+SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 219
 B1452_FORMULA_UNRESOLVED_298K_ROWS = 273
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
@@ -313,7 +318,39 @@ def test_merged_two_dot_entropy_splits_on_grain() -> None:
     assert silver[0].uncertainty.kind is UncertaintyKind.PRINTED
     assert silver[0].uncertainty.verbatim == "0.21"
     assert silver[0].evidence.original_method_class == generator.MERGED_SPLIT_METHOD
-    assert generated.report["merged_cell_splits"]["split"] >= 1
+    splits = generated.report["merged_cell_splits"]
+    assert splits["proposed"] >= 1
+    assert splits["stored"] >= 1
+    assert splits["proposed"] == splits["stored"] + splits["refused"] + splits["excluded"]
+
+
+def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
+    """Grain uniquely cuts Spinel 1800 K gef 2.29.48; the page is 229.482.
+
+    S 374.85 − (H−H298)/T 145.368 = 229.482. The 10× Gibbs net refuses the
+    wrong cut. That proposal must not count as stored.
+    """
+
+    generated = _generation(SPINEL_HT)
+    splits = generated.report["merged_cell_splits"]
+    gef = [
+        row
+        for row in generated.report["refusals"]
+        if row["as_published"] == "2.29.48" and row["column"] == "negative_gibbs_function"
+    ]
+    assert gef
+    assert "10×" in gef[0]["reason"]
+    stored_merged = [
+        obs
+        for obs in generated.observations
+        if obs.evidence.original_method_class == generator.MERGED_SPLIT_METHOD
+        and "2.29" in (obs.locator.note or "")
+    ]
+    assert stored_merged == []
+    assert splits["proposed"] == splits["stored"] + splits["refused"] + splits["excluded"]
+    assert splits["refused"] >= 1
+    assert splits["refused_10x"] >= 1
+    assert splits["stored"] == splits["proposed"] - splits["refused"] - splits["excluded"]
 
 
 def test_merged_integer_without_unique_grain_split_is_refused() -> None:
@@ -582,7 +619,7 @@ def test_migrate_is_not_wired() -> None:
 
 def test_full_census_closes() -> None:
     raw = stored = refused = excluded = 0
-    merged_split = merged_refused = 0
+    merged_proposed = merged_stored = merged_refused = merged_refused_10x = merged_excluded = 0
     identity_10x = 0
     identity_fail = 0
     neighbour_298k_hits = 0
@@ -598,8 +635,16 @@ def test_full_census_closes() -> None:
         stored += int(accounting["stored"])
         refused += int(accounting["refused"])
         excluded += int(accounting["excluded"])
-        merged_split += int(generated.report["merged_cell_splits"]["split"])
-        merged_refused += int(generated.report["merged_cell_splits"]["refused"])
+        splits = generated.report["merged_cell_splits"]
+        merged_proposed += int(splits["proposed"])
+        merged_stored += int(splits["stored"])
+        merged_refused += int(splits["refused"])
+        merged_refused_10x += int(splits["refused_10x"])
+        merged_excluded += int(splits["excluded"])
+        assert (
+            int(splits["proposed"])
+            == int(splits["stored"]) + int(splits["refused"]) + int(splits["excluded"])
+        )
         resolution = generated.report.get("formula_resolution") or {}
         if generated.report["table_kind"] == "table_298k":
             neighbour_298k_hits += len(generated.report["neighbour_sign_hits"])
@@ -642,7 +687,12 @@ def test_full_census_closes() -> None:
     assert excluded == B1452_EXCLUDED
     assert stored + refused + excluded == B1452_RAW
     assert neighbour_298k_hits == 0
-    assert merged_split == B1452_MERGED_SPLIT
+    assert merged_proposed == B1452_MERGED_PROPOSED
+    assert merged_stored == B1452_MERGED_STORED
+    assert merged_refused == B1452_MERGED_REFUSED
+    assert merged_refused_10x == B1452_MERGED_REFUSED_10X
+    assert merged_excluded == B1452_MERGED_EXCLUDED
+    assert merged_proposed == merged_stored + merged_refused + merged_excluded
     assert identity_10x == B1452_IDENTITY_10X
     assert formula_unresolved_ht == B1452_FORMULA_UNRESOLVED_HT
     assert formula_unresolved_rows == B1452_FORMULA_UNRESOLVED_298K_ROWS
@@ -654,8 +704,11 @@ def test_full_census_closes() -> None:
             "refused": refused,
             "excluded": excluded,
             "unexplained": 0,
-            "merged_split": merged_split,
+            "merged_proposed": merged_proposed,
+            "merged_stored": merged_stored,
             "merged_refused": merged_refused,
+            "merged_refused_10x": merged_refused_10x,
+            "merged_excluded": merged_excluded,
             "identity_fail": identity_fail,
             "identity_10x": identity_10x,
             "formula_unresolved_ht": formula_unresolved_ht,

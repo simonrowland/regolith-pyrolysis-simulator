@@ -1715,8 +1715,12 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     stored = 0
     refused = 0
     excluded = 0
-    merged_split = 0
+    merged_proposed = 0
+    merged_stored = 0
     merged_refused = 0
+    merged_refused_10x = 0
+    merged_excluded = 0
+    pending_merged = False
     by_column: dict[str, Counter[str]] = defaultdict(Counter)
     by_column_basis: dict[str, Counter[str]] = defaultdict(Counter)
 
@@ -1728,10 +1732,13 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         by_column_basis[key]["raw"] += 1
 
     def refuse(token: RawToken, reason: str) -> None:
-        nonlocal refused, merged_refused
+        nonlocal refused, merged_refused, merged_refused_10x, pending_merged
         refused += 1
-        if "merged" in reason:
+        if pending_merged:
             merged_refused += 1
+            if "10×" in reason:
+                merged_refused_10x += 1
+            pending_merged = False
         account(token, "refused")
         refusals.append(
             {
@@ -1746,8 +1753,11 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         )
 
     def exclude(token: RawToken, reason: str, *, vocabulary_gap: bool = False) -> None:
-        nonlocal excluded
+        nonlocal excluded, merged_excluded, pending_merged
         excluded += 1
+        if pending_merged:
+            merged_excluded += 1
+            pending_merged = False
         account(token, "excluded")
         row = {
             "record_id": token.record_id,
@@ -1767,6 +1777,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     stored_columns = STORED_HT_COLUMNS if kind == "ht_grid" else STORED_298K_COLUMNS
 
     for token in tokens:
+        pending_merged = False
         stripped = token.as_published.strip()
         if token.column in TEXT_COLUMNS:
             exclude(token, "printed label / definition; not a numeric quantity cell")
@@ -1789,8 +1800,11 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         if refuse_reason:
             refuse(token, refuse_reason)
             continue
-        if reconstruction and reconstruction.get("method_class") == MERGED_SPLIT_METHOD:
-            merged_split += 1
+        pending_merged = bool(
+            reconstruction and reconstruction.get("method_class") == MERGED_SPLIT_METHOD
+        )
+        if pending_merged:
+            merged_proposed += 1
         identity_key = (token.row_index if token.row_index is not None else -1, token.column)
         if identity_key in identity_fail_10x:
             refuse(
@@ -1896,6 +1910,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             )
         )
         stored += 1
+        if pending_merged:
+            merged_stored += 1
+            pending_merged = False
         account(token, "stored")
 
     unexplained = len(tokens) - stored - refused - excluded
@@ -1903,6 +1920,12 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         raise AssertionError(
             f"{record_id}: unexplained numeric tokens: source={len(tokens)} "
             f"stored={stored} refused={refused} excluded={excluded}"
+        )
+    merged_unexplained = merged_proposed - merged_stored - merged_refused - merged_excluded
+    if merged_unexplained:
+        raise AssertionError(
+            f"{record_id}: merged splits do not close: proposed={merged_proposed} "
+            f"stored={merged_stored} refused={merged_refused} excluded={merged_excluded}"
         )
 
     report = {
@@ -1929,8 +1952,11 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             "reason": NEIGHBOUR_SIGN_DISABLED_REASON,
         },
         "merged_cell_splits": {
-            "split": merged_split,
+            "proposed": merged_proposed,
+            "stored": merged_stored,
             "refused": merged_refused,
+            "refused_10x": merged_refused_10x,
+            "excluded": merged_excluded,
         },
         "cell_accounting": {
             "raw_numeric_tokens": len(tokens),
@@ -1981,8 +2007,11 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
     refused_total = 0
     excluded_total = 0
     raw_total = 0
-    merged_split_total = 0
+    merged_proposed_total = 0
+    merged_stored_total = 0
     merged_refused_total = 0
+    merged_refused_10x_total = 0
+    merged_excluded_total = 0
     identity_fail_counts: Counter[str] = Counter()
     identity_fail_10x = 0
     notice_count = 0
@@ -2005,8 +2034,11 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
         excluded_total += int(accounting["excluded"])
         raw_total += int(accounting["raw_numeric_tokens"])
         merged = generated.report["merged_cell_splits"]
-        merged_split_total += int(merged["split"])
+        merged_proposed_total += int(merged["proposed"])
+        merged_stored_total += int(merged["stored"])
         merged_refused_total += int(merged["refused"])
+        merged_refused_10x_total += int(merged["refused_10x"])
+        merged_excluded_total += int(merged["excluded"])
         for result in generated.report["identity_results"]:
             if result.get("ok") is False:
                 identity_fail_counts[str(result.get("identity"))] += 1
@@ -2064,8 +2096,11 @@ def write_staging(documents: Iterable[Mapping[str, Any]], out: Path) -> Mapping[
             "unexplained": 0,
         },
         "merged_cell_splits": {
-            "split": merged_split_total,
+            "proposed": merged_proposed_total,
+            "stored": merged_stored_total,
             "refused": merged_refused_total,
+            "refused_10x": merged_refused_10x_total,
+            "excluded": merged_excluded_total,
         },
         "identity_failure_counts": dict(sorted(identity_fail_counts.items())),
         "identity_fail_10x": identity_fail_10x,
