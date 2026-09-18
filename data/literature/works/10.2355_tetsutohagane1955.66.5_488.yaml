@@ -1,0 +1,375 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  citation: Yamada, K., Abe, H. & Kato, E. (1980), "Mass Spectrometric Study of the Activity in Liquid Fe-Si Alloys at 1600°C",
+    Tetsu-to-Hagane 66(5):488-495, DOI 10.2355/tetsutohagane1955.66.5_488
+  source_ids:
+  - kems-067-yamada-1980
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+    files:
+    - asset_id: pdf:kems-067-yamada-1980
+      role: pdf
+      path: raw/kems-067-yamada-1980/kems-067-yamada-1980.pdf
+      sha256:
+        tag: value
+        value: 36278ceb79de10c58cad9a70f8f631f1c81a22a41716583e4979bd1030356525
+    - asset_id: pdftotext:kems-067-yamada-1980
+      role: pdftotext
+      path: text/kems-067-yamada-1980
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-067-yamada-1980
+      role: table_csv
+      path: tables/kems-067-yamada-1980
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-067-yamada-1980
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/tetsutohagane1955.66.5_488
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried and abandoned (no reproducible Fe/Si
+          ion-intensity ratio; abundant SiO(g))
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        section: 2.3-2.4
+        note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    table: '2'
+    equation: '8'
+    note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried and abandoned (no reproducible Fe/Si
+          ion-intensity ratio; abundant SiO(g))
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        section: 2.3-2.4
+        note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    figure: '3'
+    note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium concentration in the specimen
+      for the deoxidizer.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    figure: '5'
+    note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    figure: '6'
+    note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    figure: '7'
+    note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    figure: '8'
+    note: Fig. 8. Activities for the Fe-Si system at 1600 C.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 493
+    pdf_page_index: 6
+    figure: '9'
+    note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
+- experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.66.5_488
+  locator:
+    published_page: 488
+    pdf_page_index: 1
+    section: '2'
+    note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for numerals
+      and English captions only.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: homemade thoria (ThO2) Knudsen cell; alumina and beryllia cells were tried and abandoned (no reproducible Fe/Si
+          ion-intensity ratio; abundant SiO(g))
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        section: 2.3-2.4
+        note: self-made thoria cell; ThO2 used for cell material (English synopsis p. 488)

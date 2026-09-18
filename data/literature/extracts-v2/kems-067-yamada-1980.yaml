@@ -1,0 +1,928 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-067-yamada-1980.yaml
+observations:
+- observation_id: kems-067-yamada-1980::yamada_1980_cell_po2_calculated
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_oxygen_partial_pressure'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'cell_oxide_in_equilibrium_with_Fe-Si-Al_Be_Th' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_oxygen_partial_pressure'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No Be or Th activity data; authors set N_Be=a_Be and N_Th=a_Th.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 489
+    pdf_page_index: 2
+    section: '2.4'
+    equation: 2-5
+    note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+  read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        section: '2.4'
+        equation: 2-5
+        note: calculated equilibrium P_O2 of Al2O3, BeO, ThO2 at 1600 C
+- observation_id: kems-067-yamada-1980::yamada_1980_fe_activity_fig8_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
+  identity:
+    quantity:
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No tabulated a_Fe series; Fig. 8 not digitised.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    figure: '8'
+    note: 'Fig. 8 a_Fe; conclusion: Raoultian negative deviation in 0.05 < N_Si < 0.5'
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig1_peak_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 1. Relation between the measured peak and the reference peak.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 489
+    pdf_page_index: 2
+    figure: '1'
+    note: Fig. 1. Relation between the measured peak and the reference peak.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig2_Si_O_po2_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O at 1600 C.'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'Si-O_system' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 489
+    pdf_page_index: 2
+    figure: '2'
+    note: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O at 1600 C.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig3_ISiO_over_ISi_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    figure: '3'
+    note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium
+        concentration in the specimen for the deoxidizer.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium concentration in the specimen
+      for the deoxidizer.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig5_gamma_Si_comparison_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    figure: '5'
+    note: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig6_integration_curve_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 6. Integration curve for the Fe-Si system at 1600 C.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    figure: '6'
+    note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig7_gamma_Si_this_work_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    figure: '7'
+    note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig8_activities_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 8. Activities for the Fe-Si system at 1600 C.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    figure: '8'
+    note: Fig. 8. Activities for the Fe-Si system at 1600 C.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fig9_ionization_efficiency_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; axes not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 493
+    pdf_page_index: 6
+    figure: '9'
+    note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_fragmentation_BeO_ThO2_ion_ratios
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_and_fragment_fraction'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_fragment_fraction does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_and_fragment_fraction'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'From Fig. 3, I+_SiO/I+_Si=16 implies about +5% of measured Si+ is fragment and +0.02 in log(I+_Si/I+_Fe). Authors:
+        this does not affect the Fig. 6 integration.'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 494
+    pdf_page_index: 7
+    equation: 12-14
+    note: 'BeO-cell and ThO2-cell I+_Fe : I+_Si : I+_SiO; K=0.25%'
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::1
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, composition_basis,
+      n_points, header_as_printed, points'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'No per-row sigma on Table 1. Authors: ion-intensity error +/-2%. I+_Si and I+_Fe are in different units so the
+        ratio is an instrument ratio, not a dimensionless pressure ratio.'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 490
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+  read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 490
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1. Experimental values of the ion current ratio for the Fe-Si system at 1600 C
+- observation_id: kems-067-yamada-1980::yamada_1980_kems_geometry_and_calibration
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'kems_method_geometry_reference'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si_in_thoria_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Ion-intensity measurement error +/-2% (section 4.1, citing Yamada et al.). T held at 1600 C with W-26%Re/W-5%Re
+        thermocouples at cell top and bottom, Kato-Furukawa correction. Sample composition from charge ratio; pure-Fe effusion
+        ~4.6 mg after 1 h at 1600 C. Chamber pressure unstated.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 488
+    pdf_page_index: 1
+    section: '2'
+    note: Hitachi RM-6K; ThO2 cell; orifice 0.4-0.7 mm; chamber voltage 24 V; sample ~1 g. Japanese body transcribed for numerals
+      and English captions only.
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'henrian_activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient_and_self_interaction_parameter';
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      log10_gamma_Si_infinite_dilution: '0.2'
+      log10_gamma_Si_from_integration_curves_only: '0.15'
+      epsilon_Si_Si: '1.5'
+      as_printed: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5
+      note: 'Multiple graphical integrations of Fig. 6 gave -3.1 +/- 0.15; including the N_Si=0.5 log gamma_Si assignment
+        error yields +/- 0.2. epsilon error assigned by the same method. Authors: log gamma_Si^o is more reliable than epsilon
+        because the integration area to N_Si=1 is large.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 492
+    pdf_page_index: 5
+    table: '2'
+    equation: '8'
+    note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+  read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 492
+        pdf_page_index: 5
+        table: '2'
+        equation: '8'
+        note: log gamma_Si^o = -3.1 +/- 0.2; epsilon_Si^Si = 11.5 +/- 1.5; Table 2 This work gamma_Si^o = 7.9e-4
+- observation_id: kems-067-yamada-1980::yamada_1980_p_Si_estimate_NSi_below_0p05
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::kems-067-yamada-1980
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si_NSi_below_0.05' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, gas_species, T_C, N_Si_less_than,
+      ion_current_A, p_atm_about, note'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Authors: considered to be about 10^-9 atm; fewer than 1 ion/s at 10^-20 A.'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    section: '3.1'
+    note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+  read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        section: '3.1'
+        note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
+- observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::5
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, N_Si, composition_basis,
+      log10_gamma_Si_average_used_in_eq8, points'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Authors: the spread of the five cited log gamma_Si values at N_Si=0.5 is +0.07, -0.04. Fig. 5 prints log gamma_Si
+        = -0.33 +/- 0.05 at N_Si=0.5.'
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 491
+    pdf_page_index: 4
+    figure: '5'
+    note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
+  read_from: pdf:kems-067-yamada-1980
+- observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+  experiment_id: 10.2355/tetsutohagane1955.66.5_488::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_self_interaction_parameter does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_coefficient_and_self_interaction_parameter';
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted; no uncertainties printed except where a T other than 1600 C is given.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-067-yamada-1980
+  locator:
+    published_page: 493
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
+  read_from: pdf:kems-067-yamada-1980

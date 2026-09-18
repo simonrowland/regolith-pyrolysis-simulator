@@ -1,34 +1,34 @@
 # Battery v2.1 migration report
 
-rows in: 45718
-records out (observations): 48304
+rows in: 45736
+records out (observations): 48322
 works: 165
-experiments: 5857
-queue size: 100635
+experiments: 5867
+queue size: 100728
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 167
-hard issues: 1203
+hard issues: 1215
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 165 (mismatch) |
-| doi_works | 56 | 82 (mismatch) |
-| no_doi_works | 91 | 83 (mismatch) |
-| admission_statuses | 374 | 478 (mismatch) |
+| citations | 147 | 166 (mismatch) |
+| doi_works | 56 | 83 (mismatch) |
+| no_doi_works | 91 | 82 (mismatch) |
+| admission_statuses | 374 | 488 (mismatch) |
 | supersedes | 422 | 422 |
 | series | 60 | 60 |
 | gibbs_reference_pressures | 1617 | 1617 |
 | gibbs_reference_100000 | 1023 | 1023 |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 1625 |
-| equipment_payloads | 670 | 659 (mismatch) |
-| absent_admissions | 3511 | 3648 (mismatch) |
+| equipment_payloads | 670 | 662 (mismatch) |
+| absent_admissions | 3511 | 3656 (mismatch) |
 | absent_classes | 2174 | 2174 |
-| range_only_T | 3125 | 2923 (mismatch) |
-| system_like_phases | 1065 | 2333 (mismatch) |
+| range_only_T | 3125 | 2937 (mismatch) |
+| system_like_phases | 1065 | 2351 (mismatch) |
 | missing_phases | 237 | 171 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -37,15 +37,15 @@ hard issues: 1203
 | source method_class | count |
 |---|---:|
 | `absent` | 567 |
-| `method_only` | 35 |
+| `method_only` | 36 |
 | `derived` | 26 |
 | `author_derived` | 19 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
+| `author_estimate` | 6 |
 | `authors_reduced_from_ion_intensities` | 6 |
 | `mixed_measured_and_model_curves` | 6 |
 | `mixed_quoted_literature_and_model_derived` | 6 |
-| `author_estimate` | 5 |
 | `measured_and_compiled_calorimetry` | 5 |
 | `qualitative_comparison` | 2 |
 | `author_reported_envelope` | 1 |
@@ -17989,6 +17989,7 @@ hard issues: 1203
 | `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 25 | 133 |
 | `data/literature/extracts/kems-058-ohara-1987.yaml` | 18 | 18 | 93 |
 | `data/literature/extracts/kems-066-ichise-1977.yaml` | 24 | 24 | 135 |
+| `data/literature/extracts/kems-067-yamada-1980.yaml` | 18 | 18 | 93 |
 | `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 18 | 104 |
 | `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 16 | 82 |
 | `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 16 | 90 |
@@ -18096,14 +18097,14 @@ hard issues: 1203
 
 ## Hard issue census
 
-hard issues: 1203
+hard issues: 1215
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 610 |
-| `conditional_field:derivation` | 593 |
+| `conditional_field:derived_from` | 616 |
+| `conditional_field:derivation` | 599 |
 
 ## Hard issues (first 50)
 
@@ -18160,8 +18161,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 123736
+advisory issues: 123749
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 123736 |
+| `identity_incomplete` | 123749 |
