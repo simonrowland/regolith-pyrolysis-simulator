@@ -31,6 +31,7 @@ from simulator.battery.migrate import (
     make_species,
     observation_from_plain,
 )
+from tests.battery import compilation_shard_observation_count
 from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 from simulator.battery.validate import reaction_atom_balance
 from simulator.battery.records import State
@@ -884,7 +885,7 @@ def test_b1544_store_is_record_sharded() -> None:
     assert all(path.parent == shard_dir for path in paths)
     assert all(path.name.startswith("usgs-b1544-") and path.name.endswith(".yaml") for path in paths)
     assert len(paths) == 33
-    n = sum(path.read_text(encoding="utf-8").count("\n- observation_id:") for path in paths)
+    n = compilation_shard_observation_count(ROOT, paths, B1544_STORE_DIR)
     assert n == B1544_STORED
 
 

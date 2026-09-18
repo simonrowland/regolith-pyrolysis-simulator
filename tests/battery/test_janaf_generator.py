@@ -18,6 +18,7 @@ import yaml
 from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity
 from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
+from tests.battery import compilation_shard_observation_count
 from simulator.battery.identity import (
     Identity,
     log10K_from_delta_fG_kJ_mol,
@@ -1546,9 +1547,7 @@ def test_janaf_store_is_element_sharded() -> None:
         path.name.startswith("janaf-") and path.name.endswith(".yaml") for path in paths
     )
     # 2117 segments × 6 tabulated quantities + 979 transitions = 13681
-    n = sum(
-        path.read_text(encoding="utf-8").count("\n- observation_id:") for path in paths
-    )
+    n = compilation_shard_observation_count(ROOT, paths, CURRENT_STORE_DIR)
     assert n == 13681
 
 

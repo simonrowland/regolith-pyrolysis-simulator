@@ -48,6 +48,7 @@ from simulator.battery.migrate import (
     write_outputs,
 )
 from simulator.battery.records import Species, State, as_decimal
+from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
 from tests.battery import factories as F
 
@@ -3112,17 +3113,47 @@ def test_observation_store_reader_unions_file_and_shard_directory(tmp_path: Path
     )
 
 
+_OBS_V2 = REPO_ROOT / "data" / "literature" / "observations-v2"
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+def _account_compilation_shard(path: Path, summary: dict[str, dict]) -> None:
+    rel = path.relative_to(_OBS_V2).as_posix()
+    cached = summary.get(rel)
+    assert cached is not None, f"observation_store_summary missing {rel}"
+    assert cached["size"] == path.stat().st_size, rel
+
+
+def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -> dict | None:
+    """YAML-load a store file only when the needle is present.
+
+    Compilation shards without the needle are not parsed; the derived summary
+    accounts for them (size-matched). Same observations are compared when the
+    needle is present.
+    """
+    raw = path.read_bytes()
+    family = compilation_family_from_store_path(path)
+    if family is not None:
+        _account_compilation_shard(path, summary)
+        if needle not in raw:
+            return None
+    elif needle not in raw:
+        return None
+    stored = yaml.load(raw.decode("utf-8"), Loader=_YAML_LOADER)
+    return stored if isinstance(stored, dict) else {}
+
+
 def test_l04_store_never_lifts_log10_psat_as_pressure() -> None:
-    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    obs_dir = _OBS_V2
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     bad = []
-    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    summary = load_observation_store_summary(REPO_ROOT)
+    needle = b"log10_Psat_over_P0"
     for path in iter_observation_store_paths(obs_dir):
-        text = path.read_text(encoding="utf-8")
-        if "log10_Psat_over_P0" not in text:
+        stored = _load_store_if_needle(path, needle, summary)
+        if stored is None:
             continue
-        stored = yaml.load(text, Loader=loader)
         for obs in stored.get("observations") or []:
             oid = str(obs.get("observation_id") or "")
             if "log10_Psat_over_P0" not in oid:
@@ -3141,10 +3172,13 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     if not roots[0].is_dir():
         pytest.skip("migrated store not generated yet")
     bad = []
-    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    summary = load_observation_store_summary(REPO_ROOT)
+    needle = b"evaporation_coefficient_alpha"
     for folder in roots:
         for path in iter_observation_store_paths(folder):
-            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
+            stored = _load_store_if_needle(path, needle, summary)
+            if stored is None:
+                continue
             for obs in stored.get("observations") or []:
                 q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
                 if q != "evaporation_coefficient_alpha":
@@ -3166,7 +3200,7 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
     ]
     if not queue_path.is_file() or not roots[0].is_dir():
         pytest.skip("migrated store not generated yet")
-    queued = yaml.safe_load(queue_path.read_text(encoding="utf-8")) or {}
+    queued = yaml.load(queue_path.read_text(encoding="utf-8"), Loader=_YAML_LOADER) or {}
     entries = queued.get("entries") or queued.get("queue") or queued
     if isinstance(entries, dict):
         entries = entries.get("items") or []
@@ -3181,10 +3215,13 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
             by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
     missing = []
     scanned = 0
-    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    summary = load_observation_store_summary(REPO_ROOT)
+    needle = b"kind: unavailable"
     for folder in roots:
         for path in iter_observation_store_paths(folder):
-            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
+            stored = _load_store_if_needle(path, needle, summary)
+            if stored is None:
+                continue
             for obs in stored.get("observations") or []:
                 val = obs.get("value") or {}
                 if val.get("kind") != "unavailable":
