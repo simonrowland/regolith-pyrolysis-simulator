@@ -7,7 +7,9 @@ a rail with zero eligible references is reported as zero.
 
 Hostname: `Simon-MacBookPro-M5.local`.
 
-This report measured store `7c1a4b458`: 45736 rows in, 61695 observations, 165 works, 5913 experiments, queue 114587, 1215 hard issues.
+This report measured store `0e78fd8a4`: 45736 rows in, 58693 observations, 165 works, 5881 experiments, queue 111652, 1215 hard issues.
+
+Warning: residuals ledger recorded store `0e78fd8a4` but the live store is `7c1a4b458`
 
 Engines: vaporock, imcc_sf04, imcc_sf04_ext, internal-analytical.
 
