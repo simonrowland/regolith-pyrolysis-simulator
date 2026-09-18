@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     NoticeKind,
     Phase,
+    Polymorph,
     Quantity,
     UncertaintyKind,
     ValueKind,
@@ -30,6 +31,7 @@ from simulator.battery.migrate import (
     make_species,
     observation_from_plain,
 )
+from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 from simulator.battery.validate import reaction_atom_balance
 from simulator.battery.records import State
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
@@ -959,7 +961,14 @@ def test_b1544_store_keeps_circularity_and_identity_fields() -> None:
     species = (corundum.get("identity") or {}).get("species") or {}
     assert species.get("formula") == "Al2O3"
     assert species.get("formula") != "usgs-b1544-corundum"
-    assert (species.get("polymorph") or {}).get("value") == "Corundum"
+    stored_polymorph = (species.get("polymorph") or {}).get("value")
+    assert stored_polymorph == Polymorph.CORUNDUM.value
+    assert coerce_polymorph_token("Corundum") is Polymorph.CORUNDUM
+    assert coerce_polymorph_token("Corundum").value == stored_polymorph
+    assert (
+        observation_from_plain(corundum).identity.species.polymorph.value
+        is Polymorph.CORUNDUM
+    )
     assert (species.get("phase") or {}).get("value") == "cr"
     assert (corundum.get("identity") or {}).get("temperature_K", {}).get("value") == "298.15"
     assert (corundum.get("identity") or {}).get("reaction", {}).get("tag") == "value"
@@ -1009,8 +1018,22 @@ def test_b1544_store_keeps_circularity_and_identity_fields() -> None:
     assert reaction_atom_balance(observation_from_plain(hydrated).identity.reaction.value) == {}
 
 
-def test_store_identity_gap_vs_janaf_overlapping_species() -> None:
-    """Probe, not a unification: identity_equal cannot cross-check JANAF vs B1544."""
+def _b1544_quartz_delta_fg(rows: list[dict], token: Polymorph) -> dict:
+    return next(
+        row
+        for row in rows
+        if row["observation_id"].startswith(
+            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz:delta_fG:from_the_elements:"
+        )
+        and ((row.get("identity") or {}).get("species") or {}).get("polymorph", {}).get(
+            "value"
+        )
+        == token.value
+    )
+
+
+def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
+    """Polymorph now agrees; identity_equal still cannot unify JANAF series vs B1544 points."""
 
     b1544_rows = _load_b1544_store_observations()
     corundum = next(
@@ -1020,15 +1043,8 @@ def test_store_identity_gap_vs_janaf_overlapping_species() -> None:
             "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-corundum:delta_fG:from_the_elements:T=298.15:"
         )
     )
-    quartz = next(
-        row
-        for row in b1544_rows
-        if row["observation_id"].startswith(
-            "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-quartz:delta_fG:from_the_elements:T=298.15:"
-        )
-        and ((row.get("identity") or {}).get("species") or {}).get("polymorph", {}).get("value")
-        == "alpha"
-    )
+    quartz_alpha = _b1544_quartz_delta_fg(b1544_rows, Polymorph.ALPHA)
+    quartz_beta = _b1544_quartz_delta_fg(b1544_rows, Polymorph.BETA)
 
     janaf_al = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-Al.yaml")
     janaf_o = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-O.yaml")
@@ -1037,48 +1053,53 @@ def test_store_identity_gap_vs_janaf_overlapping_species() -> None:
         for row in janaf_al["observations"]
         if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:segment-0"
     )
-    o037 = next(
+    o037_alpha = next(
         row
         for row in janaf_o["observations"]
         if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:segment-0"
     )
+    o037_beta = next(
+        row
+        for row in janaf_o["observations"]
+        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:segment-1"
+    )
 
     b1544_al = observation_from_plain(corundum)
-    b1544_qz = observation_from_plain(quartz)
+    b1544_alpha = observation_from_plain(quartz_alpha)
+    b1544_beta = observation_from_plain(quartz_beta)
     janaf_al2o3 = observation_from_plain(al096)
-    janaf_sio2 = observation_from_plain(o037)
+    janaf_alpha = observation_from_plain(o037_alpha)
+    janaf_beta = observation_from_plain(o037_beta)
 
+    assert janaf_al2o3.identity.species.polymorph.value is Polymorph.CORUNDUM
+    assert b1544_al.identity.species.polymorph.value is Polymorph.CORUNDUM
+    assert janaf_alpha.identity.species.formula == b1544_alpha.identity.species.formula == "SiO2"
+    assert janaf_alpha.identity.species.polymorph.value is Polymorph.ALPHA
+    assert b1544_alpha.identity.species.polymorph.value is Polymorph.ALPHA
+    assert janaf_beta.identity.species.polymorph.value is Polymorph.BETA
+    assert b1544_beta.identity.species.polymorph.value is Polymorph.BETA
+
+    remaining_unknown = ("temperature_K", "reaction", "formation_elements")
     al_gap = identity_equal(janaf_al2o3.identity, b1544_al.identity)
-    sio2_gap = identity_equal(janaf_sio2.identity, b1544_qz.identity)
-    assert al_gap.kind is not IdentityEqualKind.EQUAL
-    assert sio2_gap.kind is not IdentityEqualKind.EQUAL
-
-    # First blocking axis is polymorph. identity_equal short-circuits there,
-    # so T and reaction never get compared.
-    # Al2O3: JANAF unknown (index state 'cr' only, despite title
-    # "Aluminum Oxide, Alpha") vs B1544 named "Corundum" → IDENTITY_UNKNOWN.
-    # SiO2: JANAF named 'i' from the printed "I <--> II" label vs B1544
-    # "alpha" from the quartz phase split → IDENTITY_MISMATCH on the token.
-    assert "species.polymorph" in al_gap.fields
+    sio2_alpha_gap = identity_equal(janaf_alpha.identity, b1544_alpha.identity)
+    sio2_beta_gap = identity_equal(janaf_beta.identity, b1544_beta.identity)
     assert al_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert "species.polymorph" in sio2_gap.fields
-    assert sio2_gap.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert al_gap.fields == remaining_unknown
+    assert "species.polymorph" not in al_gap.fields
+    assert sio2_alpha_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert sio2_alpha_gap.fields == remaining_unknown
+    assert "species.polymorph" not in sio2_alpha_gap.fields
+    assert sio2_beta_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert sio2_beta_gap.fields == remaining_unknown
 
-    # What each side would need before a follow-up can even reach T / reaction:
-    # JANAF Al-096: read the printed title polymorph into species.polymorph.
-    # JANAF O-037: map 'i'/'ii' onto the same token B1544 uses ('alpha'/'beta'),
-    # or the reverse. B1544 already names the bulletin mineral/phase.
-    # Then T: JANAF series with unknown identity.temperature_K vs B1544 point
-    # at 298.15 K — identity_equal has no series-vs-point comparison.
-    # Then reaction: JANAF unknown prose vs B1544 filled Formation Reaction.
+    # Remaining gap: JANAF series leave T / reaction / formation_elements
+    # unknown; B1544 stores a point with a filled formation reaction.
+    # identity_equal has no series-vs-point comparison.
     assert janaf_al2o3.value.kind is ValueKind.SERIES
     assert b1544_al.value.kind is ValueKind.POINT
     assert janaf_al2o3.identity.temperature_K.is_unknown
     assert b1544_al.identity.temperature_K.is_value
     assert janaf_al2o3.identity.reaction.is_unknown
     assert b1544_al.identity.reaction.is_value
-    assert janaf_al2o3.identity.species.polymorph.is_unknown
-    assert b1544_al.identity.species.polymorph.value == "Corundum"
-    assert janaf_sio2.identity.species.formula == b1544_qz.identity.species.formula == "SiO2"
-    assert janaf_sio2.identity.species.polymorph.value == "i"
-    assert b1544_qz.identity.species.polymorph.value == "alpha"
+    assert janaf_al2o3.identity.formation_elements.is_unknown
+    assert b1544_al.identity.formation_elements.is_value
