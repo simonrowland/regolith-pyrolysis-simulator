@@ -322,30 +322,3 @@ experiments:
     pdf_page_index: 8
     section: '4.1'
     note: Comparable yield 1.17 %; figure in supplementary data not in this PDF
-- experiment_id: 10.1016/j.asr.2026.02.003::robinot_2026_deposit_measurements
-  kind: literature
-  method:
-    tag: value
-    value: solar_furnace_pyrolysis
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: source does not state a point temperature
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    regime:
-      regime_class:
-        tag: unknown
-        reason: source does not state pressure
-  work_id: 10.1016/j.asr.2026.02.003
-  locator:
-    note: citation_id=robinot_2026; source_location=results_section; extraction_method=text

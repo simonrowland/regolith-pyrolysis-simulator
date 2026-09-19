@@ -3882,6 +3882,8 @@ def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
         assert "no midpoint invented" in (obs.identity.temperature_K.reason or "")
         assert "1473.15" in (obs.identity.temperature_K.reason or "")
         assert obs.admission.status is AdmissionStatus.ADMITTED
+        local = obs.observation_id.split("::", 1)[1].split("::point:")[0]
+        assert local == "na_psat"
 
 
 def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None:
@@ -4103,7 +4105,7 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
                 continue
             if rail_for_quantity(q, species_formula=formula) is Rail.PYROLYSIS_YIELD:
                 rows.append(obs)
-    assert len(rows) == 32
+    assert len(rows) == 30
     tokens = {quantity_token(o.identity) for o in rows}
     assert Quantity.MASS_LOSS_FRACTION in tokens
     assert Quantity.YIELD_FRACTION in tokens
@@ -4115,11 +4117,11 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
         and o.evidence.class_.value in MEASURED_EVIDENCE
         and o.admission.status in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
     ]
-    assert len(candidates) == 28
+    assert len(candidates) == 26
     admitted = [o for o in candidates if o.admission.status is AdmissionStatus.ADMITTED]
     pending = [o for o in candidates if o.admission.status is AdmissionStatus.PENDING]
     assert len(admitted) == 18
-    assert len(pending) == 10
+    assert len(pending) == 8
     disagreed = [
         o
         for o in pending
@@ -4134,7 +4136,7 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
     assert decision_band_for(Quantity.YIELD_FRACTION, SourceRelation.INDEPENDENT) is None
 
 
-def test_vacuum_pyrolysis_sidecar_loads_pomeroy_and_robinot_yields(
+def test_vacuum_pyrolysis_sidecar_loads_pomeroy_not_robinot_duplicates(
     tmp_path: Path,
 ) -> None:
     root = _write_min_tree(tmp_path)
@@ -4157,15 +4159,10 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_and_robinot_yields(
     assert float(pomeroy.identity.temperature_K.value) == 1400.0 + 273.15
     assert pomeroy.admission.status is AdmissionStatus.PENDING
     assert "sample mass" in pomeroy.admission.reason or "not reported" in pomeroy.admission.reason or pomeroy.admission.reason.startswith("no observation admission_status")
-    robinot_yield = result.observations[
-        "robinot_2026_deposit_measurements:robinot_o2_mass_yield_fraction"
-    ]
-    assert quantity_token(robinot_yield.identity) is Quantity.YIELD_FRACTION
-    assert robinot_yield.value.point == as_decimal("0.0105")
-    assert robinot_yield.identity.temperature_K.is_unknown
-    robinot_o2 = result.observations[
-        "robinot_2026_deposit_measurements:robinot_feed_oxygen_extraction_fraction"
-    ]
-    assert quantity_token(robinot_o2.identity) is Quantity.O2_YIELD
-    assert robinot_o2.value.point == as_decimal("0.0247")
-    assert "robinot_2026_deposit_measurements:robinot_o2_final_mass_kg" not in result.observations
+    work = result.works[result.experiments[pomeroy.experiment_id].work_id]
+    asset_ids = {f.asset_id for f in work.source_files.files}
+    assert pomeroy.read_from in asset_ids
+    assert not any(
+        oid.startswith("robinot_2026_deposit_measurements:")
+        for oid in result.observations
+    )

@@ -1983,14 +1983,10 @@ def _yield_table_items(
 
 
 _VACUUM_PYROLYSIS_SIDECAR_QUANTITY = {
-    "robinot_o2_mass_yield_fraction": Quantity.YIELD_FRACTION,
-    "robinot_feed_oxygen_extraction_fraction": Quantity.O2_YIELD,
     "pomeroy_non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
-    "oxygen_yield_by_mass": Quantity.YIELD_FRACTION,
 }
 _VACUUM_PYROLYSIS_SIDECAR_METHOD = {
-    "robinot_2026_deposit_measurements": MethodToken.SOLAR_FURNACE_PYROLYSIS,
     "pomeroy_cardiff_2006_measurements": MethodToken.VACUUM_CHAMBER_PYROLYSIS,
 }
 
@@ -1999,10 +1995,6 @@ def _vacuum_pyrolysis_sidecar_quantity(observable: str) -> Quantity | None:
     if observable in _VACUUM_PYROLYSIS_SIDECAR_QUANTITY:
         return _VACUUM_PYROLYSIS_SIDECAR_QUANTITY[observable]
     lowered = observable.lower()
-    if lowered.endswith("feed_oxygen_extraction_fraction"):
-        return Quantity.O2_YIELD
-    if lowered.endswith("mass_yield_fraction") or lowered.endswith("oxygen_yield_by_mass"):
-        return Quantity.YIELD_FRACTION
     if lowered.endswith("mass_loss_fraction"):
         return Quantity.MASS_LOSS_FRACTION
     return None
@@ -4293,7 +4285,7 @@ class Migrator:
             values = {}
         oxygen_fields = _measured_oxygen_yield_fields(values)
         if oxygen_fields:
-            for child_quantity, field in oxygen_fields:
+            for index, (child_quantity, field) in enumerate(oxygen_fields):
                 child_values = dict(values)
                 child_values["quantity"] = child_quantity.value
                 if (
@@ -4303,7 +4295,10 @@ class Migrator:
                 ):
                     child_values["admission_status"] = "admitted"
                 child_obs = dict(obs)
-                child_obs["observation_id"] = f"{raw_obs_id}::{field}"
+                if len(oxygen_fields) == 1:
+                    child_obs["observation_id"] = raw_obs_id
+                else:
+                    child_obs["observation_id"] = f"{raw_obs_id}::point:{index}"
                 child_obs["values"] = child_values
                 self._migrate_extract_observation(
                     formula=formula,
@@ -5275,6 +5270,12 @@ class Migrator:
             return
         for meas_id, meas in measurements.items():
             if not isinstance(meas, Mapping):
+                continue
+            # Same paper as kems-044-robinot-2026. The extract already stores
+            # these yields against the PDF Work asset. Emitting them here
+            # would set read_from unknown:robinot_2026_deposit_measurements,
+            # which is not an asset of that Work.
+            if str(meas_id) == "robinot_2026_deposit_measurements":
                 continue
             paper = meas.get("paper_citation") if isinstance(meas.get("paper_citation"), Mapping) else {}
             citation = str(
