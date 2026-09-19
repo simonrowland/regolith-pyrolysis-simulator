@@ -921,6 +921,14 @@ them onto modern CODATA is a defect, not a cleanup.
   - USGS Bulletin 1544: `B1544_R_J_PER_MOL_K = 8.3143` J/(mol·K). B1544
     prints no gas constant; the value is inherited from the parent
     compilation USGS B1452 Table 1 (PDF p. 9 / printed p. 3).
+  - USGS Bulletin 1259 (Robie & Waldbaum 1968): `B1259_R_CAL = 1.98717`
+    cal/(mol·K), Table 1 (PDF p. 9 / printed p. 3) "Gas constant,
+    1.98717 ±.00030 cal deg-gfw 1". The printed calorie columns
+    (entropy, −(G−H298)/T, ΔfH, ΔfG) were computed with that
+    constant. Table 1 also prints `8.31469 joules`; that companion
+    is not `1.98717 × 4.184` and is not the transcription constant.
+    Do not unify the calorie R with the joule companion, with
+    JANAF 8.31441, with B1544 8.3143, or with CODATA.
 - **To do cross-source physics** — identity between observations from
   different sources — use CODATA / SI 2019 `R = N_A k_B` from
   `simulator.physical_constants.GAS_CONSTANT`

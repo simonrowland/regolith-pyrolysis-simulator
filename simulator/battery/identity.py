@@ -18,6 +18,12 @@ Two different jobs, two different R values. Do not unify them.
      ``B1544_R_J_PER_MOL_K = 8.3143`` J/(mol·K). B1544 prints no R;
      the value is inherited from the parent compilation USGS B1452
      Table 1 (PDF p. 9 / printed p. 3).
+   - USGS B1259 (Robie & Waldbaum 1968), Table 1 (PDF p. 9 /
+     printed p. 3): ``B1259_R_CAL = 1.98717`` cal/(mol·K). The
+     calorie tables were computed with that constant. Table 1 also
+     prints a joule companion ``8.31469 joules``; that figure is
+     **not** ``1.98717 × 4.184`` and is not the transcription
+     constant for the printed calorie columns. Do not unify them.
 
    A new source's transcription constant is declared next to that
    source's generator (or loader), with the page locus, and is passed
@@ -135,8 +141,9 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
 # R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019
 # R = N_A k_B = 8.314462618… J/(mol·K) from physical_constants.GAS_CONSTANT.
-# Source-era transcription constants (JANAF 8.31441, B1544 8.3143) stay on
-# their generators; see this module's Gas-constant policy docstring.
+# Source-era transcription constants (JANAF 8.31441, B1544 8.3143,
+# B1259 1.98717 cal/(mol·K)) stay on their generators; see this
+# module's Gas-constant policy docstring.
 # Algebra: log10 Kf = −ΔfG / (R T ln 10), ΔfG in J/mol, T in K.
 # Unit check: J/mol / (J/(mol·K) · K) is dimensionless.
 # Sanity: ΔfG = 0 → log10 Kf = 0; at 298.15 K, 1 kJ/mol ≈ 0.1752 dex.
