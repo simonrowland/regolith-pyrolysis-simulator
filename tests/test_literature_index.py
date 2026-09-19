@@ -633,6 +633,32 @@ def test_observation_store_summary_matches_full_scan():
         assert path.is_file(), rel
         assert path.stat().st_size == body["size"]
         assert builder.count_observation_ids(path) == body["observation_id_count"]
+    on_disk = builder.iter_observation_store_paths(obs_dir)
+    included = {
+        builder.posix(path.relative_to(obs_dir))
+        for path in on_disk
+        if builder.is_compilation_observation_shard(path)
+    }
+    excluded = {
+        builder.posix(path.relative_to(obs_dir))
+        for path in on_disk
+        if not builder.is_compilation_observation_shard(path)
+    }
+    missing = sorted(included - set(committed["shards"]))
+    extra = sorted(set(committed["shards"]) - included)
+    assert not missing and not extra, (
+        "compilation-shard summary scope drifted: "
+        f"missing={missing} extra={extra}"
+    )
+    leaked = sorted(excluded & set(committed["shards"]))
+    assert not leaked, (
+        f"{len(excluded)} non-compilation store files must be absent from the summary; "
+        f"leaked {leaked}"
+    )
+    assert len(excluded) == 7, (
+        "non-compilation store files excluded from the summary: "
+        f"expected 7, got {len(excluded)} {sorted(excluded)}"
+    )
 
 
 def test_load_v21_store_uses_summary_without_rereading_payloads(monkeypatch):

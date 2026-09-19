@@ -88,6 +88,13 @@ def compilation_family_from_store_path(path: Path) -> str | None:
     if parent.startswith("compilations-") and not parent.endswith("-reports"):
         return parent.removeprefix("compilations-")
     return None
+
+
+def is_compilation_observation_shard(path: Path) -> bool:
+    """True when an observations-v2 file belongs in the compilation-shard summary."""
+    if path.name.startswith("_") or "ledger" in path.name or "differential" in path.name:
+        return False
+    return compilation_family_from_store_path(path) is not None
 DOI_RE = re.compile(r"10\.\d{4,9}/[^\s,;]+")
 PDF_PATH_RE = re.compile(r"docs/references/pdfs/[^\s\"'<>]+/([A-Za-z0-9_.-]+)\.pdf")
 HUNT_RES = (
@@ -313,9 +320,7 @@ def build_observation_store_summary(root: Path) -> dict:
     shards = {}
     if obs_dir.is_dir():
         for path in iter_observation_store_paths(obs_dir):
-            if path.name.startswith("_") or "ledger" in path.name or "differential" in path.name:
-                continue
-            if compilation_family_from_store_path(path) is None:
+            if not is_compilation_observation_shard(path):
                 continue
             shards[posix(path.relative_to(obs_dir))] = {
                 "size": path.stat().st_size,
