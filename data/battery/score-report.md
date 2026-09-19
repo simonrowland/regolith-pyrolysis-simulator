@@ -7,59 +7,82 @@ a rail with zero eligible references is reported as zero.
 
 Hostname: `Simon-MacBookPro-M5.local`.
 
-This report measured store `0e78fd8a4`: 45736 rows in, 58693 observations, 165 works, 5881 experiments, queue 111652, 1215 hard issues.
+This report measured store `554775645`: 45737 rows in, 84322 observations, 166 works, 6624 experiments, queue 134791, 1215 hard issues.
 
-Warning: residuals ledger recorded store `0e78fd8a4` but the live store is `7c1a4b458`
-
-Engines: vaporock, imcc_sf04, imcc_sf04_ext, internal-analytical.
+Engines: vaporock, alphamelts, thermoengine, magemin, imcc_sf04, imcc_sf04_ext, internal-analytical.
 
 ## Per rail × engine headline
 
 | rail | engine | n candidates | n refused | n scored | match rate | median abs dex |
 |---|---|---:|---:|---:|---:|---:|
+| SiO_evolution | alphamelts | 6 | 6 | 0 | — | — |
 | SiO_evolution | imcc_sf04 | 6 | 6 | 0 | — | — |
 | SiO_evolution | imcc_sf04_ext | 6 | 6 | 0 | — | — |
 | SiO_evolution | internal-analytical | 6 | 6 | 0 | — | — |
+| SiO_evolution | magemin | 6 | 6 | 0 | — | — |
+| SiO_evolution | thermoengine | 6 | 6 | 0 | — | — |
 | SiO_evolution | vaporock | 6 | 6 | 0 | — | — |
+| alkali_shuttle | alphamelts | 0 | 0 | 0 | — | — |
 | alkali_shuttle | imcc_sf04 | 0 | 0 | 0 | — | — |
 | alkali_shuttle | imcc_sf04_ext | 0 | 0 | 0 | — | — |
 | alkali_shuttle | internal-analytical | 0 | 0 | 0 | — | — |
+| alkali_shuttle | magemin | 0 | 0 | 0 | — | — |
+| alkali_shuttle | thermoengine | 0 | 0 | 0 | — | — |
 | alkali_shuttle | vaporock | 0 | 0 | 0 | — | — |
+| melt_activity | alphamelts | 43 | 43 | 0 | — | — |
 | melt_activity | imcc_sf04 | 43 | 43 | 0 | — | — |
 | melt_activity | imcc_sf04_ext | 43 | 43 | 0 | — | — |
 | melt_activity | internal-analytical | 43 | 43 | 0 | — | — |
+| melt_activity | magemin | 43 | 43 | 0 | — | — |
+| melt_activity | thermoengine | 43 | 43 | 0 | — | — |
 | melt_activity | vaporock | 43 | 43 | 0 | — | — |
-| pyrolysis_yield | imcc_sf04 | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | imcc_sf04_ext | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | internal-analytical | 0 | 0 | 0 | — | — |
-| pyrolysis_yield | vaporock | 0 | 0 | 0 | — | — |
+| pyrolysis_yield | alphamelts | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | imcc_sf04 | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | imcc_sf04_ext | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | internal-analytical | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | magemin | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | thermoengine | 50 | 50 | 0 | — | — |
+| pyrolysis_yield | vaporock | 50 | 50 | 0 | — | — |
+| redox | alphamelts | 0 | 0 | 0 | — | — |
 | redox | imcc_sf04 | 0 | 0 | 0 | — | — |
 | redox | imcc_sf04_ext | 0 | 0 | 0 | — | — |
 | redox | internal-analytical | 0 | 0 | 0 | — | — |
+| redox | magemin | 0 | 0 | 0 | — | — |
+| redox | thermoengine | 0 | 0 | 0 | — | — |
 | redox | vaporock | 0 | 0 | 0 | — | — |
-| thermochemistry | imcc_sf04 | 39243 | 39243 | 0 | — | — |
-| thermochemistry | imcc_sf04_ext | 39243 | 39243 | 0 | — | — |
-| thermochemistry | internal-analytical | 39243 | 39243 | 0 | — | — |
-| thermochemistry | vaporock | 39243 | 39243 | 0 | — | — |
-| vapour | imcc_sf04 | 17295 | 17295 | 0 | — | — |
-| vapour | imcc_sf04_ext | 17295 | 17295 | 0 | — | — |
-| vapour | internal-analytical | 17295 | 17295 | 0 | — | — |
-| vapour | vaporock | 17295 | 17295 | 0 | — | — |
+| thermochemistry | alphamelts | 38063 | 38063 | 0 | — | — |
+| thermochemistry | imcc_sf04 | 38063 | 38063 | 0 | — | — |
+| thermochemistry | imcc_sf04_ext | 38063 | 38063 | 0 | — | — |
+| thermochemistry | internal-analytical | 38063 | 38063 | 0 | — | — |
+| thermochemistry | magemin | 38063 | 38063 | 0 | — | — |
+| thermochemistry | thermoengine | 38063 | 38063 | 0 | — | — |
+| thermochemistry | vaporock | 38063 | 38063 | 0 | — | — |
+| vapour | alphamelts | 17291 | 17291 | 0 | — | — |
+| vapour | imcc_sf04 | 17291 | 17291 | 0 | — | — |
+| vapour | imcc_sf04_ext | 17291 | 17291 | 0 | — | — |
+| vapour | internal-analytical | 17291 | 17291 | 0 | — | — |
+| vapour | magemin | 17291 | 17291 | 0 | — | — |
+| vapour | thermoengine | 17291 | 17291 | 0 | — | — |
+| vapour | vaporock | 17291 | 17291 | 0 | — | — |
+| wall_deposition | alphamelts | 0 | 0 | 0 | — | — |
 | wall_deposition | imcc_sf04 | 0 | 0 | 0 | — | — |
 | wall_deposition | imcc_sf04_ext | 0 | 0 | 0 | — | — |
 | wall_deposition | internal-analytical | 0 | 0 | 0 | — | — |
+| wall_deposition | magemin | 0 | 0 | 0 | — | — |
+| wall_deposition | thermoengine | 0 | 0 | 0 | — | — |
 | wall_deposition | vaporock | 0 | 0 | 0 | — | — |
 
 ## Refusal census
 
 | reason | n |
 |---|---:|
-| `identity_unknown:quantity_unknown` | 68096 |
-| `method_unknown` | 1120 |
-| `metric_domain` | 14852 |
-| `metric_domain:value_unknown` | 57220 |
-| `underdetermined_apparatus` | 4 |
-| `unsupported:diagnostic_population` | 85056 |
+| `identity_unknown:quantity_unknown` | 119140 |
+| `identity_unknown:species_formula_unparsed` | 21 |
+| `method_unknown` | 2128 |
+| `metric_domain` | 17731 |
+| `metric_domain:value_unknown` | 100135 |
+| `underdetermined_apparatus` | 168 |
+| `unsupported:diagnostic_population` | 148848 |
 
 ## Admission
 
@@ -69,8 +92,8 @@ numeric, never the empirical headline). The admission rule is unchanged.
 
 | count | n |
 |---|---:|
-| comparison candidates pending | 1277 |
-| comparison candidates admitted | 0 |
+| comparison candidates pending | 1291 |
+| comparison candidates admitted | 40 |
 | residuals with admission_admitted exclusion | 0 |
 | residuals that die on admission alone | 0 |
 | unique observations that die on admission alone | 0 |
@@ -79,8 +102,9 @@ numeric, never the empirical headline). The admission rule is unchanged.
 
 | notice kind | n |
 |---|---:|
-| `derivation_uses_compilation` | 85060 |
-| `out_of_certified_band` | 236 |
+| `derivation_uses_compilation` | 148855 |
+| `out_of_certified_band` | 413 |
+| `source_disagreement` | 28 |
 
 ## Internal-consistency / compilation diagnostics
 
@@ -89,11 +113,11 @@ are internal-consistency instruments, not scoring ledgers. Compilation
 observations are engine reference inputs. Neither population enters
 the empirical headline. Do not validate an engine against a compilation it consumes.
 
-Diagnostic residuals in this file: 221212.
+Diagnostic residuals in this file: 378805.
 
 ## Pin failures
 
-23748 pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.
+23746 pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.
 
 | key | reason | live | centre | pin_band |
 |---|---|---:|---:|---:|
@@ -147,10 +171,10 @@ Diagnostic residuals in this file: 221212.
 | `janaf-4th::anchor_PO_deltafG:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
 | `janaf-4th::extreme_reduction_from_phosphate:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
 | `janaf-4th::extreme_reduction_from_phosphate_P4:payload::delta_fG::thermochemistry::nasa_cea_9` | coverage_failure | None | None | 0.05 |
-| … | 23698 more | | | |
+| … | 23696 more | | | |
 
 ## status_diff vs old scorers
 
 No mapped outcome changes.
 
-Unmapped legacy keys: 23748. Old ledgers retained.
+Unmapped legacy keys: 23746. Old ledgers retained.
