@@ -1,0 +1,4176 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1926.058376'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-460.339'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1888.661784'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-451.401'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=600:row=4:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1847.415912'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-441.543'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=700:row=5:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1808.521448'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-432.247'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=800:row=6:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1769.777608'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-422.987'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fG:from_the_elements:T=900:row=7:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1731.176024'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-413.761'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fH:from_the_elements:T=1000:row=8:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2087.43944'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-498.910'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:delta_fH:from_the_elements:T=1100:row=9:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2085.146608'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='-498.362'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1000:row=8:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '88.373'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='88.373'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1100:row=9:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '78.467'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='78.467'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1200:row=10:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '70.14'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='70.140'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1300:row=11:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '62.85'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='62.850'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1400:row=12:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '56.609'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='56.609'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=1500:row=13:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '51.209'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='51.209'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '344.272'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='344.272'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '251.517'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='251.517'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '160.832'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='160.832'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=700:row=5:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '134.953'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='134.953'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=800:row=6:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '115.554'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='115.554'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:log10_Kf:from_the_elements:T=900:row=7:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0209-nepheline:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above 1521°K.
+          NEPHELINE" is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NaAlSiO4
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase "NaAlSiO 4' Crystals 298.15° to 1521°K. Carnegieite is the stable phase above
+                1521°K. NEPHELINE" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: Na
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - Na
+        - formula: Na
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '100.475'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 234
+    pdf_page_index: 240
+    table: b1259-ht-0209-nepheline
+    note: as_published='100.475'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0209-nepheline.json
+    record: b1259-ht-0209-nepheline
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless

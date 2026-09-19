@@ -1,24 +1,24 @@
 schema_version: battery_observations.v2.1
 sources:
-- data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
+- data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=1000:row=7:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=1000:row=7:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -70,7 +70,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '437.94'
+    point: '161.59'
   uncertainty:
     kind: none
   evidence:
@@ -85,13 +85,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='437.94'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='161.59'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -100,23 +100,121 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=298.15:row=0:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=1100:row=8:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '175.66'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='175.66'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Sm2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -168,7 +266,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '175.4'
+    point: '0'
   uncertainty:
     kind: none
   evidence:
@@ -183,13 +281,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='175.40'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='0.00'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -198,23 +296,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=400:row=1:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=400:row=1:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -266,7 +364,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '225.27'
+    point: '35.23'
   uncertainty:
     kind: none
   evidence:
@@ -281,13 +379,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='225.27'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='35.23'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -296,23 +394,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=500:row=2:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=500:row=2:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -364,7 +462,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '270.42'
+    point: '64.21'
   uncertainty:
     kind: none
   evidence:
@@ -379,13 +477,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='270.42'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='64.21'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -394,23 +492,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=600:row=3:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=600:row=3:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -462,7 +560,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '310.81'
+    point: '88.89'
   uncertainty:
     kind: none
   evidence:
@@ -477,13 +575,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='310.81'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='88.89'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -492,23 +590,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=700:row=4:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=700:row=4:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -560,7 +658,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '347.08'
+    point: '110.32'
   uncertainty:
     kind: none
   evidence:
@@ -575,13 +673,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='347.08'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='110.32'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -590,23 +688,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=800:row=5:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=800:row=5:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -658,7 +756,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '379.96'
+    point: '129.25'
   uncertainty:
     kind: none
   evidence:
@@ -673,13 +771,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='379.96'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='129.25'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -688,23 +786,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:S:shared:T=900:row=6:col=entropy
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:S:shared:T=900:row=6:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: S
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -756,7 +854,7 @@ observations:
       reason: profile S does not use wall
   value:
     kind: point
-    point: '410.09'
+    point: '146.21'
   uncertainty:
     kind: none
   evidence:
@@ -771,13 +869,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='410.09'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='146.21'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -786,23 +884,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=1000:row=7:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=1000:row=7:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -854,7 +952,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '268.51'
+    point: '146.87'
   uncertainty:
     kind: none
   evidence:
@@ -869,13 +967,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='268.51'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='146.87'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -884,23 +982,121 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=298.15:row=0:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=1100:row=8:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '148.54'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='148.54'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=298.15:row=0:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Sm2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -952,7 +1148,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '164.4'
+    point: '112.37'
   uncertainty:
     kind: none
   evidence:
@@ -967,13 +1163,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='164.40'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='112.37'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -982,23 +1178,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=400:row=1:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=400:row=1:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1050,7 +1246,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '190.13'
+    point: '126.22'
   uncertainty:
     kind: none
   evidence:
@@ -1065,13 +1261,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='190.13'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='126.22'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -1080,23 +1276,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=500:row=2:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=500:row=2:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1148,7 +1344,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '213.52'
+    point: '133.13'
   uncertainty:
     kind: none
   evidence:
@@ -1163,13 +1359,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='213.52'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='133.13'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -1178,23 +1374,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=600:row=3:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=600:row=3:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1246,7 +1442,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '229.19'
+    point: '137.44'
   uncertainty:
     kind: none
   evidence:
@@ -1261,13 +1457,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='229.19'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='137.44'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -1276,23 +1472,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=700:row=4:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=700:row=4:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1344,7 +1540,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '241.22'
+    point: '140.53'
   uncertainty:
     kind: none
   evidence:
@@ -1359,13 +1555,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='241.22'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='140.53'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -1374,23 +1570,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=800:row=5:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=800:row=5:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1442,7 +1638,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '251.3'
+    point: '142.98'
   uncertainty:
     kind: none
   evidence:
@@ -1457,13 +1653,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='251.30'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='142.98'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
@@ -1472,23 +1668,23 @@ observations:
     - unknown:robie-hemingway-fisher-1978-usgs-b1452
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:cp:shared:T=900:row=6:col=heat_capacity
-  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0383:tabulation
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:cp:shared:T=900:row=6:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0197:tabulation
   identity:
     quantity:
       tag: value
       value: cp
     species:
-      formula: NaAlSi2O6
+      formula: Sm2O3
       phase:
         tag: value
         value: cr
       polymorph:
         tag: unknown
-        reason: name_as_published "Crystals 298.15 to 1000 K.\n                                                                   1'0
-          Rill T IO I   FRO II THE.ILBIIEHTS\n                                                                                           GIBBS\nTEIIP.     (
-          u;-H~98 )/T      so      -(G;-u; 98 )/T      CD\n                                                            p     IITHALPY            l'BEE
-          EIIBGY     Log '£\n                               T\n  K         Jjaol•K        J/aol•lt     J/aol•K        J/aol•K        kJ/aol             kJ/aol"
+        reason: name_as_published 'Crystals 298.15 to 1100 K.\n                                                                      FOBBlriOII
+          FRO II THE ELEBEIITS\n                                r -\n                              so                                                       GIBBS\nTEI!P.     (
+          u;-u; 98 )/T     s298       -(G;-u~ 98 )/T      co\n                                                               p     EIITHALPY    PllEE
+          EII!BGY    Loq\n  K          Jjmol•K        J/•ol•K        J/llOl•K       J/•ol•K          kJ/•ol         kJ/IlOl'
           is not a closed Polymorph token
       charge:
         tag: value
@@ -1540,7 +1736,7 @@ observations:
       reason: profile cp does not use wall
   value:
     kind: point
-    point: '260.26'
+    point: '145.04'
   uncertainty:
     kind: none
   evidence:
@@ -1555,13 +1751,13 @@ observations:
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
-    published_page: 409
-    pdf_page_index: 415
-    table: robie-hemingway-fisher-1978-usgs-b1452-0383
-    note: as_published='260.26'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+    published_page: 223
+    pdf_page_index: 229
+    table: robie-hemingway-fisher-1978-usgs-b1452-0197
+    note: as_published='145.04'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
       ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
-    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0383.json
-    record: robie-hemingway-fisher-1978-usgs-b1452-0383
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0197.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0197
   read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
   derivation:
     relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do

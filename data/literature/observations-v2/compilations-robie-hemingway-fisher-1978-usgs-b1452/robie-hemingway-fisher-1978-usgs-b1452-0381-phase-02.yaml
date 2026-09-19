@@ -1,0 +1,6037 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+observations:
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1000:row=1:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '462.95'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='462.95'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1100:row=2:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '484.04'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='484.04'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1200:row=3:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '504.71'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='504.71'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1300:row=4:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '523.83'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='523.83'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1400:row=5:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '541.66'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='541.66'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1600:row=7:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '574.16'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='574.16'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1700:row=8:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '589.11'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='589.11'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=1800:row=9:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '603.34'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='603.34'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:S:shared:T=955:row=0:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '955'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '452.07'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='452.07'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1000:row=1:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '236.4'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='236.40'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1100:row=2:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '237.04'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='237.04'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1200:row=3:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '238.18'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='238.18'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1300:row=4:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '239.69'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='239.69'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1400:row=5:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '241.46'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='241.46'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1600:row=7:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '245.53'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='245.53'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1700:row=8:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '247.74'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='247.74'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=1800:row=9:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '250.05'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='250.05'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:cp:shared:T=955:row=0:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '955'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '236.33'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='236.33'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1300:row=4:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2307.614'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-2307.614'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1400:row=5:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2246.041'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-2246.041'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1500:row=6:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2184.615'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-2184.615'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1600:row=7:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2123.364'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-2123.364'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1700:row=8:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2061.41'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-2061.410'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fG:from_the_elements:T=1800:row=9:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1994.474'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-1994.474'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1100:row=2:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3114.402'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3114.402'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1200:row=3:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3111.952'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3111.952'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1300:row=4:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3109.537'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3109.537'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1400:row=5:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3107.109'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3107.109'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1500:row=6:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3104.632'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3104.632'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1600:row=7:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3102.073'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3102.073'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1700:row=8:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3200.423'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3200.423'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=1800:row=9:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3197.06'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3197.060'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:delta_fH:from_the_elements:T=955:row=0:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '955'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3036.067'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='-3036.067'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1300:row=4:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '92.721'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='92.721'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1400:row=5:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '83.801'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='83.801'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1500:row=6:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '76.075'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='76.075'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1600:row=7:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '69.321'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='69.321'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1700:row=8:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '63.34'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='63.340'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:log10_Kf:from_the_elements:T=1800:row=9:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: KAlSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: KAlSi2O6
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published 'Cubic crystals 955 to 1800 K.' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: K
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-3'
+        - species:
+            formula: Si
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - K
+        - formula: K
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - Si
+        - formula: Si
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '57.878'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 407
+    pdf_page_index: 413
+    table: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+    note: as_published='57.878'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0381-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless

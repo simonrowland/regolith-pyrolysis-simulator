@@ -1,0 +1,3549 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+observations:
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:S:shared:T=376:row=0:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '376'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '149.96'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='149.96'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:S:shared:T=400:row=1:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '155.98'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='155.98'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:S:shared:T=500:row=2:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '177.61'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='177.61'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:S:shared:T=600:row=3:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '195.39'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='195.39'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:S:shared:T=623:row=4:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '623'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '199.05'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='199.05'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:cp:shared:T=376:row=0:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '376'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '97.28'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='97.28'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:cp:shared:T=400:row=1:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '97.28'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='97.28'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:cp:shared:T=500:row=2:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '97.28'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='97.28'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:cp:shared:T=600:row=3:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '97.28'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='97.28'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:cp:shared:T=623:row=4:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '623'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '97.28'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='97.28'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fG:from_the_elements:T=376:row=0:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '376'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-88.66'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-88.660'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fG:from_the_elements:T=400:row=1:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-89.269'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-89.269'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fG:from_the_elements:T=500:row=2:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-92.269'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-92.269'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fG:from_the_elements:T=600:row=3:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-95.524'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-95.524'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fG:from_the_elements:T=623:row=4:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '623'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-96.294'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-96.294'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fH:from_the_elements:T=376:row=0:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '376'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-78.366'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-78.366'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fH:from_the_elements:T=400:row=1:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-77.297'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-77.297'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fH:from_the_elements:T=500:row=2:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-76.675'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-76.675'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fH:from_the_elements:T=600:row=3:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-75.816'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-75.816'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:delta_fH:from_the_elements:T=623:row=4:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '623'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-75.618'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='-75.618'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:log10_Kf:from_the_elements:T=376:row=0:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '376'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '12.317'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='12.317'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:log10_Kf:from_the_elements:T=400:row=1:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '11.657'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='11.657'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:log10_Kf:from_the_elements:T=500:row=2:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '9.639'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='9.639'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:log10_Kf:from_the_elements:T=600:row=3:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '8.316'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='8.316'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:log10_Kf:from_the_elements:T=623:row=4:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Cu2S
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals 376 to\n           623
+          K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+          FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+          H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~ 9 s)/T       cop      ENTHALPY      FREE
+          ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol• K       J/mol• K          kJjmol          kJ/1101"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '623'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Cu2S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "O~tho~hombic           c~ystals    298.15 to 376 K.           Hexagonal c~ystals
+                376 to\n           623 K.         cubic c~ystals 623 to melting point                   1403 K.\n                                                                          FOBI'IATION
+                FROM THE ELEI'IENTS\n                                                                                          GIBBS\nTEI'IP.    (
+                H~-H~   98   )/T\n                                    0\n                                   ST      -(G;-H~
+                9 s)/T       cop      ENTHALPY      FREE ENEBGY     Log Kf\n               Jjmol•K          J/mol• K     J/mol•
+                K       J/mol• K          kJjmol          kJ/1101" is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Cu
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Cu
+        - formula: Cu
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '8.073'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 122
+    pdf_page_index: 128
+    table: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+    note: as_published='8.073'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0096-phase-02
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless

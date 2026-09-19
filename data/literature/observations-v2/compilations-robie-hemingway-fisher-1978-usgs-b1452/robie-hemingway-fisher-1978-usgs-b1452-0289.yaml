@@ -1,0 +1,1939 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+observations:
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '151.08'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='151.08'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:S:shared:T=400:row=1:col=entropy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '208.94'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='208.94'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:cp:shared:T=298.15:row=0:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '139.37'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='139.37'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:cp:shared:T=400:row=1:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '190.79'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='190.79'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:cp:shared:T=500:row=2:col=heat_capacity
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '161.08'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='161.08'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fG:from_the_elements:T=298.15:row=0:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-183.803'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-183.803'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fG:from_the_elements:T=400:row=1:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-122.292'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-122.292'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fG:from_the_elements:T=500:row=2:col=formation_gibbs_energy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-64.508'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-64.508'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fH:from_the_elements:T=298.15:row=0:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-365.56'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-365.560'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fH:from_the_elements:T=400:row=1:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-358.483'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-358.483'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:delta_fH:from_the_elements:T=500:row=2:col=formation_enthalpy
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-349.018'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='-349.018'; unit='kJ/mol' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters:
+    - - kj_to_j
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          published_page: 30
+          pdf_page_index: 36
+          note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:log10_Kf:from_the_elements:T=400:row=1:col=log_kf
+  experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0289:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: NH4NO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+          at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+          EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+          • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+          400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+          739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+          0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+          VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+          ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+          is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: NH4NO3
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published "l88onia-niter undergoes pbase changes at 305.3, 357.4, 398.4 K.                     It\n            8e1ts
+                at 442.8 K.\n                                                         FORftATIOII FROM THE ELEMENTS\n                                                                         GIBBS\nTEI!P.                                                  EITHlLPY      FREE
+                EIIERGY\n  K                               J/aol• K    J/8ol•K          kJ/801          kJ/801\n 298.15         o.ooo    151.08     151.08    139.37       -365.560           -183.803         32
+                • .202\nUIICERTAIIITY              0.21       0.21                    0. 837             0.879          0.154\n
+                400        51.255       208.94     157.69    190.79      -358.483            -122.292         15.970\n 500        86.692       260.24     113.55    161.08      -349.018             -64.508          6.
+                739\nI!ELTIIIG POIIIT            442.80 K          BOILIIG POIIIT                                    K\nEIITHALPY
+                0' IIELTIIIG       5.439 ltJ        EIITHALPY OF VAPORIZATION                         kJ\n                                    kJ        IIOLAR
+                VOLUI!E                         4.6490 J/bar\n                                                                                    46.490
+                ca 3\nTRAIISITIOIIS IN REFEREMCE STATE ELEftEIITS\nREFERENCE        115       262                                    262                        COI!PILED\n                                                                                              7-24-76"
+                is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-2'
+        - species:
+            formula: N2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -3/2
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - N
+        - formula: N2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '15.97'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-hemingway-fisher-1978-usgs-b1452
+  locator:
+    published_page: 315
+    pdf_page_index: 321
+    table: robie-hemingway-fisher-1978-usgs-b1452-0289
+    note: as_published='15.970'; unit='dimensionless' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+      ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0289.json
+    record: robie-hemingway-fisher-1978-usgs-b1452-0289
+  read_from: unknown:robie-hemingway-fisher-1978-usgs-b1452
+  derivation:
+    relation: Direct B1452 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1452 heading FORMATION FROM THE ELEMENTS
+      (methods, printed p. 8); unmarked T-grids and the 298.15 K table are this convention. Schema v2.1 has no closed token
+      for it.
+    inputs:
+    - unknown:robie-hemingway-fisher-1978-usgs-b1452
+    parameters: []
+    output_unit: dimensionless
