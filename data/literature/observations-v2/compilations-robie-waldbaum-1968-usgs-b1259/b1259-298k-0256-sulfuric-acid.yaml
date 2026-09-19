@@ -1,0 +1,594 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0256-sulfuric-acid.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: H2S04
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '156.9'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 21
+    pdf_page_index: 27
+    table: b1259-298k-0256-sulfuric-acid
+    note: as_published='37.50'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0256-sulfuric-acid.json
+    record: b1259-298k-0256-sulfuric-acid
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: H2S04
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: H2S04
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-4'
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-690.117328'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 21
+    pdf_page_index: 27
+    table: b1259-298k-0256-sulfuric-acid
+    note: as_published='-164942'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+      formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0256-sulfuric-acid.json
+    record: b1259-298k-0256-sulfuric-acid
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_kJ
+      - state:
+          tag: value
+          value: '0.004184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: H2S04
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: H2S04
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-4'
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-813.988832'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 21
+    pdf_page_index: 27
+    table: b1259-298k-0256-sulfuric-acid
+    note: as_published='-194548'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+      formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0256-sulfuric-acid.json
+    record: b1259-298k-0256-sulfuric-acid
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_kJ
+      - state:
+          tag: value
+          value: '0.004184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0256-sulfuric-acid:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: H2S04
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: H2S04
+            phase:
+              tag: value
+              value: l
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: S
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-4'
+    formation_elements:
+      tag: value
+      value:
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - S
+        - formula: S
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '120.906'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 21
+    pdf_page_index: 27
+    table: b1259-298k-0256-sulfuric-acid
+    note: as_published='120.906'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+      formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0256-sulfuric-acid.json
+    record: b1259-298k-0256-sulfuric-acid
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless

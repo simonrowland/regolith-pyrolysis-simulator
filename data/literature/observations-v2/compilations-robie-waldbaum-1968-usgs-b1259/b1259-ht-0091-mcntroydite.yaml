@@ -1,0 +1,5491 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=1000:row=8:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '37.919592'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='9.063'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '4.711184'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='1.126'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '9.719432'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='2.323'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=600:row=4:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '15.008008'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='3.587'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=700:row=5:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '20.52252'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='4.905'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=800:row=6:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '26.204392'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='6.263'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:H_minus_H298:shared:T=900:row=7:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '32.015968'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='7.652'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=1000:row=8:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '133.80432'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='31.98'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '70.2912'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='16.80'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=500:row=3:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '95.01864'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='22.71'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=600:row=4:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '104.64184'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='25.01'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=700:row=5:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '113.13536'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='27.04'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=800:row=6:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '120.75024'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='28.86'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:S:shared:T=900:row=7:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '127.57016'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='30.49'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=1000:row=8:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '47.772912'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='11.418'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-58.567632'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-13.998'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-47.593'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-11.375'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-36.953088'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-8.832'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=600:row=4:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-26.497272'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-6.333'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=700:row=5:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-9.64412'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-2.305'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=800:row=6:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '9.736168'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='2.327'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fG:from_the_elements:T=900:row=7:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '28.873784'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='6.901'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=1000:row=8:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-140.164'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-33.500'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-90.838824'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-21.711'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-90.45808'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-21.620'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-89.70496'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-21.440'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=600:row=4:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-88.713352'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-21.203'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=700:row=5:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-146.226616'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-34.949'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=800:row=6:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-144.293608'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-34.487'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:delta_fH:from_the_elements:T=900:row=7:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-142.260184'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-34.001'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=1000:row=8:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-2.496'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-2.496'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '10.261'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='10.261'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '6.215'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='6.215'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '3.86'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='3.860'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=600:row=4:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '2.307'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='2.307'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=700:row=5:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '0.72'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='0.720'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=800:row=6:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-0.636'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-0.636'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:log10_Kf:from_the_elements:T=900:row=7:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0091-mcntroydite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: HgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: HgO
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: unknown
+              reason: name_as_published/phase 'Crystals 298-. 15° to 1000°K. MCNTROYDITE' is not a closed Polymorph token
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Hg
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Hg
+        - formula: Hg
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '-1.676'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 116
+    pdf_page_index: 122
+    table: b1259-ht-0091-mcntroydite
+    note: as_published='-1.676'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0091-mcntroydite.json
+    record: b1259-ht-0091-mcntroydite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless

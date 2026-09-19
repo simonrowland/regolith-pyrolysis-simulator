@@ -6,6 +6,8 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
@@ -18,16 +20,28 @@ from simulator.battery.identity import (
     THERMOCHEMICAL_CALORIE_J,
     quantity_token,
 )
+from simulator.battery.migrate import iter_observation_store_paths
+from tests.battery import compilation_shard_observation_count
 
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     COMPILATION_ROOT,
 )
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
+ROOT = Path(__file__).resolve().parents[2]
+B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
+B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
+B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1259_RAW = 29809
 B1259_STORED = 13072
 B1259_REFUSED = 4807
 B1259_EXCLUDED = 11930
+B1259_RECORD_COUNT = 549
+B1259_RECORDS_STORING_NOTHING = 136
+B1259_EMPTY_FORMULA_UNRESOLVED_298K = 88
+B1259_EMPTY_FORMULA_UNRESOLVED_HT = 43
+B1259_EMPTY_METADATA_TABLES = 3
+B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
 B1259_MERGED_PROPOSED = 4
 B1259_MERGED_STORED = 2
 B1259_MERGED_REFUSED = 2
@@ -487,11 +501,204 @@ def test_unguarded_merged_is_computed_not_aliased() -> None:
     assert splits["unguarded_stored"] <= splits["stored"]
 
 
-def test_migrate_is_not_wired() -> None:
-    root = Path(__file__).resolve().parents[2]
-    migrate = (root / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
-    assert "usgs_b1259" not in migrate
-    assert "_lift_b1259" not in migrate
+def test_b1259_lift_is_the_generator() -> None:
+    src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
+    assert "def _lift_b1259_from_generator" in src
+    assert "generate_record" in src
+    assert "def _is_usgs_b1259_record" in src
+
+
+def _load_yaml(path: Path) -> dict:
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    payload = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+    assert isinstance(payload, dict)
+    return payload
+
+
+def _b1259_store_paths() -> list[Path]:
+    paths = iter_observation_store_paths(B1259_STORE_DIR, B1259_STORE_PATTERN)
+    assert paths, "B1259 observation store is missing"
+    return paths
+
+
+def _load_b1259_store_observations() -> list[dict]:
+    observations: list[dict] = []
+    for path in _b1259_store_paths():
+        payload = _load_yaml(path)
+        observations.extend(payload.get("observations") or [])
+    return observations
+
+
+def _load_b1452_store_observations() -> list[dict]:
+    observations: list[dict] = []
+    for path in iter_observation_store_paths(B1259_STORE_DIR, B1452_STORE_PATTERN):
+        payload = _load_yaml(path)
+        observations.extend(payload.get("observations") or [])
+    return observations
+
+
+def test_b1259_store_is_record_sharded() -> None:
+    single = B1259_STORE_DIR / "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
+    shard_dir = B1259_STORE_DIR / "compilations-robie-waldbaum-1968-usgs-b1259"
+    assert not single.exists()
+    assert shard_dir.is_dir()
+    paths = _b1259_store_paths()
+    assert all(path.parent == shard_dir for path in paths)
+    assert all(
+        path.name.startswith("b1259-") and path.name.endswith(".yaml") for path in paths
+    )
+    n = compilation_shard_observation_count(ROOT, paths, B1259_STORE_DIR)
+    assert n == B1259_STORED
+
+
+def test_b1259_store_census_is_true_of_observations_v2() -> None:
+    """Stored/refused/excluded must hold of observations-v2, not just generate_record."""
+
+    stored_rows = _load_b1259_store_observations()
+    stored_ids = {row["observation_id"] for row in stored_rows}
+    assert len(stored_rows) == B1259_STORED
+    assert len(stored_ids) == B1259_STORED
+    unavailable = [
+        row
+        for row in stored_rows
+        if (row.get("value") or {}).get("kind") == "unavailable"
+    ]
+    assert unavailable == []
+
+    generated_ids: set[str] = set()
+    refused = 0
+    excluded = 0
+    raw = 0
+    records_with_obs: set[str] = set()
+    empty_formula_298k = 0
+    empty_formula_ht = 0
+    empty_metadata = 0
+    empty_all_refused = 0
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        generated = generator.generate_record(json.loads(path.read_text(encoding="utf-8")))
+        generated_ids.update(obs.observation_id for obs in generated.observations)
+        accounting = generated.report["cell_accounting"]
+        raw += int(accounting["raw_numeric_tokens"])
+        refused += int(accounting["refused"])
+        excluded += int(accounting["excluded"])
+        record_id = str(generated.report.get("record_id") or path.stem)
+        if generated.observations:
+            records_with_obs.add(record_id)
+            continue
+        resolution = generated.report.get("formula_resolution") or {}
+        kind = generated.report.get("table_kind")
+        if resolution.get("unresolved") and kind == "properties_298k":
+            empty_formula_298k += 1
+        elif resolution.get("unresolved") and kind == "high_temperature":
+            empty_formula_ht += 1
+        elif kind in {"table1_symbols", "table2_weights", "table3_bibliography"}:
+            empty_metadata += 1
+        else:
+            empty_all_refused += 1
+
+    assert raw == B1259_RAW
+    assert refused == B1259_REFUSED
+    assert excluded == B1259_EXCLUDED
+    assert stored_ids == generated_ids
+    assert B1259_STORED + B1259_REFUSED + B1259_EXCLUDED == B1259_RAW
+
+    stored_records = {
+        (row.get("locator") or {}).get("record") for row in stored_rows
+    }
+    assert stored_records == records_with_obs
+    n_empty = B1259_RECORD_COUNT - len(records_with_obs)
+    assert n_empty == B1259_RECORDS_STORING_NOTHING
+    assert empty_formula_298k == B1259_EMPTY_FORMULA_UNRESOLVED_298K
+    assert empty_formula_ht == B1259_EMPTY_FORMULA_UNRESOLVED_HT
+    assert empty_metadata == B1259_EMPTY_METADATA_TABLES
+    assert empty_all_refused == B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED
+    assert (
+        empty_formula_298k
+        + empty_formula_ht
+        + empty_metadata
+        + empty_all_refused
+        == n_empty
+    )
+
+
+def test_b1259_store_keeps_ag_plus_reconstructed_gibbs() -> None:
+    """SC-271: Ag+(aq) ΔfG 18433 cal → 77.123672 kJ must be in the store."""
+
+    stored_rows = _load_b1259_store_observations()
+    prefix = (
+        "robie-waldbaum-1968-usgs-b1259:"
+        "b1259-298k-0002-ag-aqueous-ion:"
+    )
+    gibbs = next(
+        row
+        for row in stored_rows
+        if row["observation_id"].startswith(prefix + "delta_fG:")
+        and "T=298.15:" in row["observation_id"]
+    )
+    logk = next(
+        row
+        for row in stored_rows
+        if row["observation_id"].startswith(prefix + "log10_Kf:")
+        and "T=298.15:" in row["observation_id"]
+    )
+    expected = Decimal("18433") * THERMOCHEMICAL_CALORIE_J / Decimal("1000")
+    assert Decimal(str(gibbs["value"]["point"])) == expected
+    assert expected == Decimal("77.123672")
+    assert Decimal(str(logk["value"]["point"])) == Decimal("-13.512")
+    note = (gibbs.get("locator") or {}).get("note") or ""
+    assert "as_published='18433'" in note
+    assert "unit='cal gfw^-1'" in note
+    species = (gibbs.get("identity") or {}).get("species") or {}
+    assert species.get("formula") == "Ag"
+    assert (species.get("phase") or {}).get("value") == Phase.AQ.value
+
+
+def test_b1259_store_refuses_wrong_split_2_29_48() -> None:
+    """SC-271 converse: jammed 2.29.48 must not land in the store."""
+
+    stored_rows = _load_b1259_store_observations()
+    notes = " ".join(
+        str((row.get("locator") or {}).get("note") or "") for row in stored_rows
+    )
+    assert "as_published='2.29.48'" not in notes
+    assert "as_published='2.29'" not in notes
+
+
+def test_ag_plus_delta_fg_b1259_agrees_with_b1452_within_printed_uncertainty() -> None:
+    """Two USGS bulletins, a decade apart, agree inside B1452's printed ±100 J."""
+
+    b1259_rows = _load_b1259_store_observations()
+    b1452_rows = _load_b1452_store_observations()
+    b1259 = next(
+        row
+        for row in b1259_rows
+        if row["observation_id"].startswith(
+            "robie-waldbaum-1968-usgs-b1259:"
+            "b1259-298k-0002-ag-aqueous-ion:delta_fG:"
+        )
+        and "T=298.15:" in row["observation_id"]
+    )
+    b1452 = next(
+        row
+        for row in b1452_rows
+        if row["observation_id"].startswith(
+            "robie-hemingway-fisher-1978-usgs-b1452:"
+            "robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:"
+        )
+        and "T=298.15:" in row["observation_id"]
+        and ":row=1:" in row["observation_id"]
+    )
+    b1259_kJ = Decimal(str(b1259["value"]["point"]))
+    b1452_kJ = Decimal(str(b1452["value"]["point"]))
+    b1259_J = b1259_kJ * Decimal("1000")
+    b1452_J = b1452_kJ * Decimal("1000")
+    printed_uncertainty_J = Decimal(str(b1452["uncertainty"]["verbatim"]))
+    note = (b1259.get("locator") or {}).get("note") or ""
+    assert "as_published='18433'" in note
+    assert b1259["uncertainty"]["kind"] == "none"
+    assert b1452["uncertainty"]["kind"] == "printed"
+    assert printed_uncertainty_J == Decimal("100")
+    assert abs(b1259_J - b1452_J) <= printed_uncertainty_J
 
 
 def test_full_census_closes() -> None:

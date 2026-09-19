@@ -1,0 +1,2203 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=400:row=2:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '6.518672'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='1.558'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:H_minus_H298:shared:T=500:row=3:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '14.3302'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='3.425'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '48.45072'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='11.58'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:S:shared:T=500:row=3:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '84.5168'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='20.20'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-910.748016'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-217.674'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=400:row=2:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-885.614728'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-211.667'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fG:from_the_elements:T=500:row=3:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-860.0212'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-205.550'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-985.332'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-235.500'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=400:row=2:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-985.871736'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-235.629'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:delta_fH:from_the_elements:T=500:row=3:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-985.223216'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='-235.474'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '159.559'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='159.559'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=400:row=2:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '115.649'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='115.649'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:log10_Kf:from_the_elements:T=500:row=3:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0069-boehmite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: AlO(OH)
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: boehmite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: AlO(OH)
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: boehmite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Al
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+        - species:
+            formula: H2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Al
+        - formula: Al
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+      - - H
+        - formula: H2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '89.846'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 94
+    pdf_page_index: 100
+    table: b1259-ht-0069-boehmite
+    note: as_published='89.846'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0069-boehmite.json
+    record: b1259-ht-0069-boehmite
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless

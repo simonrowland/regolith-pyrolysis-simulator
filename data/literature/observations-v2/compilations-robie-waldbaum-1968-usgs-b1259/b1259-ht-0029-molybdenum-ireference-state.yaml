@@ -1,0 +1,4280 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1000:row=7:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '18.501648'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='4.422'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1100:row=8:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '21.346768'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='5.102'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1300:row=10:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '27.271312'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='6.518'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1400:row=11:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '30.346552'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='7.253'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1500:row=12:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '33.497104'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='8.006'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1600:row=13:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '36.722968'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='8.777'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1700:row=14:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '40.024144'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='9.566'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1800:row=15:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '43.400632'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='10.373'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=1900:row=16:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '46.852432'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='11.198'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=2000:row=17:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '50.379544'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='12.041'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=298.15:row=0:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=400:row=1:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '2.502032'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='0.598'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=500:row=2:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '5.04172'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='1.205'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=600:row=3:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '7.648352'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='1.828'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=700:row=4:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '10.301008'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='2.462'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=800:row=5:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '12.987136'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='3.104'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:H_minus_H298:shared:T=900:row=6:col=H_minus_H298
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '15.715104'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='3.756'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1000:row=7:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '60.12408'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='14.370'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1100:row=8:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '62.80184'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='15.010'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1200:row=9:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '65.35408'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='15.620'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1300:row=10:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '67.73896'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='16.190'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1400:row=11:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '70.04016'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='16.740'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1500:row=12:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '72.21584'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='17.260'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1600:row=13:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '74.30784'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='17.760'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1700:row=14:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '76.27432'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='18.230'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1800:row=15:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '78.19896'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='18.690'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=1900:row=16:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '80.08176'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='19.140'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=2000:row=17:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '81.88088'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='19.570'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=298.15:row=0:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '28.6604'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='6.850'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=400:row=1:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '35.85688'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='8.570'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=500:row=2:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '41.54712'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='9.930'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=600:row=3:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '600'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '46.27504'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='11.060'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=800:row=5:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '53.9736'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='12.900'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:S:shared:T=900:row=6:col=entropy
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '57.15344'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='13.660'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:delta_fG:from_the_elements:T=298.15:row=0:col=delta_f_G
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Mo
+        - formula: Mo
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:delta_fH:from_the_elements:T=1900:row=16:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Mo
+        - formula: Mo
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:delta_fH:from_the_elements:T=298.15:row=0:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Mo
+        - formula: Mo
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:delta_fH:from_the_elements:T=400:row=1:col=delta_f_H
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '400'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Mo
+        - formula: Mo
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
+      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters:
+    - - kcal_th_to_kJ
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 26
+          pdf_page_index: 32
+          note: 'high-T table header (units_as_published on each substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T
+            in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:log10_Kf:from_the_elements:T=298.15:row=0:col=log_Kf
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0029-molybdenum-ireference-state:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: reference
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Mo
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: reference
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
+    formation_elements:
+      tag: value
+      value:
+      - - Mo
+        - formula: Mo
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: reference
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: point
+    point: '0'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 54
+    pdf_page_index: 60
+    table: b1259-ht-0029-molybdenum-ireference-state
+    note: as_published='0.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
+      table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
+      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json
+    record: b1259-ht-0029-molybdenum-ireference-state
+  read_from: unknown:robie-waldbaum-1968-usgs-b1259
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - unknown:robie-waldbaum-1968-usgs-b1259
+    parameters: []
+    output_unit: dimensionless

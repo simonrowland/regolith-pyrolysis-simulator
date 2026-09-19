@@ -2738,11 +2738,11 @@ def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     _write_compilation(
         root,
-        "robie-waldbaum-1968-usgs-b1259",
+        "robie-hemingway-1995-usgs-b2131",
         "al-ht",
         {
             "schema_version": "literature_compilation.v1",
-            "source_id": "robie-waldbaum-1968-usgs-b1259",
+            "source_id": "robie-hemingway-1995-usgs-b2131",
             "record_id": "al-ht",
             "table_kind": "high_temperature",
             "formula": "Al",
@@ -2756,7 +2756,7 @@ def test_l05g0_janaf_style_delta_fg_cells_stay_delta_fg(tmp_path: Path) -> None:
         },
     )
     result = migrate(root, write=False)
-    obs = result.observations["robie-waldbaum-1968-usgs-b1259:al-ht"]
+    obs = result.observations["robie-hemingway-1995-usgs-b2131:al-ht"]
     token, _reason = _quantity_state(obs)
     assert token is Quantity.DELTA_FG
 
@@ -3452,22 +3452,50 @@ def test_f1_usgs_unavailable_reasons_match_printed_gibbs_cells(tmp_path: Path) -
         for obs in gibbs
     )
 
-    ht = result.observations[
-        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state"
+    ht_prefix = (
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:"
+    )
+    ht = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(ht_prefix)
     ]
-    ht_reason = ht.value.unavailable_reason or ""
-    assert "delta_f_G" in ht_reason
-    assert "not imported by the generic migrator" in ht_reason
-    assert _ABSENT_DELTA_FG_CLAIM.search(ht_reason) is None, ht_reason
+    assert ht
+    assert f"{ht_prefix.rstrip(':')}" not in result.observations
+    assert all(obs.value.kind is ValueKind.POINT for obs in ht)
+    assert all(obs.identity.species.formula == "Ag" for obs in ht)
+    assert all(
+        "not imported by the generic migrator" not in (obs.value.unavailable_reason or "")
+        for obs in ht
+    )
+    assert all(
+        _ABSENT_DELTA_FG_CLAIM.search(obs.value.unavailable_reason or "") is None
+        for obs in ht
+    )
 
-    silver = result.observations[
-        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"
+    silver_prefix = "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver:"
+    silver = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(silver_prefix)
     ]
-    silver_reason = silver.value.unavailable_reason or ""
-    assert "delta_f_G" in silver_reason
-    assert "cal gfw^-1" in silver_reason
-    assert "not imported by the generic migrator" in silver_reason
-    assert _ABSENT_DELTA_FG_CLAIM.search(silver_reason) is None, silver_reason
+    assert silver
+    assert f"{silver_prefix.rstrip(':')}" not in result.observations
+    assert all(obs.value.kind is ValueKind.POINT for obs in silver)
+    assert all(obs.identity.species.formula == "Ag" for obs in silver)
+    assert all(
+        "not imported by the generic migrator" not in (obs.value.unavailable_reason or "")
+        for obs in silver
+    )
+    assert all(
+        _ABSENT_DELTA_FG_CLAIM.search(obs.value.unavailable_reason or "") is None
+        for obs in silver
+    )
+    assert all(
+        "as_published=" in (obs.locator.note or "")
+        and "calories stay as published" in (obs.locator.note or "")
+        for obs in silver
+    )
 
 
 def test_f1_store_usgs_reasons_do_not_deny_printed_gibbs() -> None:
@@ -3568,25 +3596,44 @@ def test_f2_phase_quotes_printed_text_and_keeps_unknown(tmp_path: Path) -> None:
     )
     assert all(obs.identity.species.formula == "Al2SiO5" for obs in b1544)
 
-    silver = result.observations[
-        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"
+    silver_prefix = "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver:"
+    silver = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(silver_prefix)
     ]
-    assert silver.identity.species.phase.is_unknown
-    assert "does not state phase" in (silver.identity.species.phase.reason or "")
+    assert silver
+    phases = [obs.identity.species.phase for obs in silver]
+    assert all(phase.is_value and phase.value is Phase.CR for phase in phases)
+    assert all(
+        "not in the closed automatic map" not in (phase.reason or "")
+        for phase in phases
+    )
+    assert all(obs.identity.species.formula == "Ag" for obs in silver)
 
-    aqueous = result.observations[
-        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0002-ag-aqueous-ion"
+    aqueous_prefix = (
+        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0002-ag-aqueous-ion:"
+    )
+    aqueous = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(aqueous_prefix)
     ]
-    assert aqueous.identity.species.phase.is_unknown
-    assert "aqueous ion" in (aqueous.identity.species.phase.reason or "")
-    assert "does not state phase" not in (aqueous.identity.species.phase.reason or "")
+    assert aqueous
+    phases = [obs.identity.species.phase for obs in aqueous]
+    assert all(phase.is_value and phase.value is Phase.AQ for phase in phases)
+    assert all(obs.identity.species.formula == "Ag" for obs in aqueous)
 
-    note_only = result.observations[
-        "robie-waldbaum-1968-usgs-b1259:b1259-298k-0048-li-aqueous-ion"
+    li_prefix = "robie-waldbaum-1968-usgs-b1259:b1259-298k-0048-li-aqueous-ion:"
+    note_only = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(li_prefix)
     ]
-    assert note_only.identity.species.phase.is_unknown
-    assert "Std. state" in (note_only.identity.species.phase.reason or "")
-    assert "does not state phase" not in (note_only.identity.species.phase.reason or "")
+    # Formula unresolved: generator stores nothing. The generic placeholder
+    # must not remain.
+    assert note_only == []
+    assert f"{li_prefix.rstrip(':')}" not in result.observations
 
 
 def test_f3_compilation_locator_names_the_record_file(tmp_path: Path) -> None:
@@ -3597,9 +3644,15 @@ def test_f3_compilation_locator_names_the_record_file(tmp_path: Path) -> None:
         "b1259-298k-0001-silver.json",
     )
     result = migrate(root, write=False)
-    obs = result.observations["robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver"]
+    prefix = "robie-waldbaum-1968-usgs-b1259:b1259-298k-0001-silver:"
+    silver = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(prefix)
+    ]
+    assert silver
     rel = dest.relative_to(root).as_posix()
-    assert obs.locator.source_path == rel
+    assert all(obs.locator.source_path == rel for obs in silver)
     assert dest.is_file()
 
 
