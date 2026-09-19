@@ -6629,3 +6629,55 @@ def migrate(
     if write:
         write_outputs(result, root)
     return result
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Lift the empirical battery into schema v2.1 records.
+
+    Writes works, extract-v2 / observations-v2 siblings, the alias registry,
+    migration-queue.yaml, and migration-report.md. Does not rewrite extract
+    sources, generate residuals, or touch pins.
+
+    The process exits 1 whenever hard_issues is non-zero, including on a
+    healthy run against the long-standing baseline. Assert the printed
+    hard_issues count against that baseline, not the exit status.
+
+    Landing a store change is three steps:
+
+    1. .venv/bin/python scripts/battery_migrate.py
+    2. .venv/bin/python data/literature/build_index.py --write-store-summary
+    3. the battery gate
+    """
+
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description=inspect.cleandoc(main.__doc__ or ""),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=REPO_ROOT,
+        help="repository root (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="run the lift without writing outputs",
+    )
+    args = parser.parse_args(argv)
+    result = migrate(args.root, write=not args.dry_run)
+    hard = 0 if result.validation is None else len(result.validation.hard_issues)
+    print(
+        f"rows_in={sum(c.rows_in for c in result.source_counts.values())} "
+        f"observations={len(result.observations)} works={len(result.works)} "
+        f"experiments={len(result.experiments)} queue={len(result.queue)} "
+        f"hard_issues={hard}"
+    )
+    return 0 if hard == 0 else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

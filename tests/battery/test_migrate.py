@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import subprocess
+import sys
 import unicodedata
 from pathlib import Path
 
@@ -130,6 +133,56 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
         yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     return root
+
+
+def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(REPO_ROOT)
+    return subprocess.run(
+        args,
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+
+
+def test_module_form_is_not_a_silent_success(tmp_path: Path) -> None:
+    """python -m simulator.battery.migrate must actually run the lift.
+
+    The unguarded module used to import and exit 0 with empty stdout, which
+    made ``git status`` after a no-op look like a current store.
+    """
+
+    root = _write_min_tree(tmp_path)
+    module = _run_migrate_cli(
+        [
+            sys.executable,
+            "-m",
+            "simulator.battery.migrate",
+            "--dry-run",
+            "--root",
+            str(root),
+        ]
+    )
+    script = _run_migrate_cli(
+        [
+            sys.executable,
+            str(REPO_ROOT / "scripts" / "battery_migrate.py"),
+            "--dry-run",
+            "--root",
+            str(root),
+        ]
+    )
+    assert "rows_in=" in module.stdout, (
+        "module form must run the lift (or fail loud); "
+        f"stdout={module.stdout!r} stderr={module.stderr!r} rc={module.returncode}"
+    )
+    assert module.stdout == script.stdout
+    assert module.returncode == script.returncode
+    assert not (root / "data" / "literature" / "observations-v2").exists()
+    assert not (root / "data" / "literature" / "works").exists()
 
 
 def test_citation_hash_nfc_and_whitespace() -> None:
