@@ -854,6 +854,56 @@ def _latex_to_formula(chunk: str) -> tuple[str, int | None]:
     return chunk, charge
 
 
+_ION_TOKEN_RE = re.compile(r"^([A-Z][a-z]?)([+]{1,4}|[-]{1,4})$")
+
+
+def _table2_symbols() -> set[str]:
+    weights, _names = _table2_elements()
+    return set(weights)
+
+
+def _formula_parses(text: str) -> bool:
+    try:
+        parse_formula(text)
+    except Exception:
+        return text in _table2_symbols() and bool(re.fullmatch(r"[A-Z][a-z]?", text))
+    return True
+
+
+def _is_closed_formula_token(text: str) -> bool:
+    """Page formula, not a word that parse_formula accepts as element soup.
+
+    CUBIC parses as C,U,B,I,C. Require a digit, a two-letter symbol, or an
+    exact Table 2 element token.
+    """
+
+    if not text or not _formula_parses(text):
+        return False
+    if re.search(r"\d", text):
+        return True
+    if re.search(r"[A-Z][a-z]", text):
+        return True
+    return bool(re.fullmatch(r"[A-Z][a-z]?", text)) and text in _table2_symbols()
+
+
+def _plain_formula_and_charge(text: str) -> tuple[str | None, int | None]:
+    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    if not compact:
+        return None, None
+    ion = _ION_TOKEN_RE.fullmatch(compact)
+    if ion is not None:
+        symbol = ion.group(1)
+        signs = ion.group(2)
+        if not _is_closed_formula_token(symbol):
+            return None, None
+        charge = len(signs) if signs[0] == "+" else -len(signs)
+        return symbol, charge
+    parsed = _parseable_formula(compact)
+    if parsed and _is_closed_formula_token(parsed):
+        return parsed, None
+    return None, None
+
+
 def _formula_from_name(name: str) -> tuple[str | None, int | None]:
     charge: int | None = None
     for chunk in _LATEX_MATH_RE.findall(name):
@@ -874,6 +924,18 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
             and _looks_like_formula(last)
         ):
             return last, charge
+        hits: list[tuple[str, int | None]] = []
+        for token in tokens:
+            formula, token_charge = _plain_formula_and_charge(token)
+            if formula:
+                hits.append((formula, token_charge))
+        unique = {formula for formula, _charge in hits}
+        if len(unique) == 1:
+            formula = next(iter(unique))
+            charges = {item_charge for item_formula, item_charge in hits if item_formula == formula}
+            if len(charges) == 1:
+                charge = next(iter(charges))
+            return formula, charge
     return None, charge
 
 
@@ -882,16 +944,22 @@ def _parseable_formula(text: str) -> str | None:
     if not compact or compact.startswith("$"):
         return None
     for candidate in (compact, compact.replace("0", "O")):
-        try:
-            parse_formula(candidate)
-        except Exception:
-            continue
-        return candidate
+        if _formula_parses(candidate):
+            return candidate
     return None
 
 
 def _looks_like_formula(text: str) -> bool:
     return _parseable_formula(text) is not None
+
+
+def _formula_from_formula_line(name: str) -> tuple[str | None, int | None]:
+    """Formula printed on the 298 K table's second line of a substance pair."""
+
+    formula, charge = _formula_from_name(name)
+    if formula:
+        return formula, charge
+    return _plain_formula_and_charge(name)
 
 
 @lru_cache(maxsize=1)
@@ -926,15 +994,25 @@ def _formula_weight_index_from_298k() -> dict[str, str]:
     for _name, fw, formula in _iter_298k_name_rows():
         if fw and formula:
             formulas[fw].add(formula)
+            compact = re.sub(r"\s+", "", fw)
+            if compact != fw:
+                formulas[compact].add(formula)
     return {
         fw: next(iter(forms)) for fw, forms in formulas.items() if len(forms) == 1
     }
 
 
 def _iter_298k_name_rows() -> tuple[tuple[str, str | None, str | None], ...]:
+    """Name, printed FW, and formula. The 298 K table prints each substance
+    as a name+FW value line followed by a formula line with blank FW.
+
+    Binding the next-line formula is page-grounded only when that next cell
+    is a formula and its own FW is blank (the uncertainty/formula line).
+    """
+
     path = RECORDS_DIR / f"{TABLE_298K_RECORD_ID}.json"
     record = json.loads(path.read_text(encoding="utf-8"))
-    rows: list[tuple[str, str | None, str | None]] = []
+    extracted: list[tuple[str, str | None, str | None]] = []
     for row in record.get("rows") or ():
         cells = row.get("cells") if isinstance(row, Mapping) else {}
         parsed = _as_published_cell((cells or {}).get("name_and_formula"))
@@ -943,7 +1021,16 @@ def _iter_298k_name_rows() -> tuple[tuple[str, str | None, str | None], ...]:
         fw_parsed = _as_published_cell((cells or {}).get("formula_weight"))
         fw = fw_parsed[0].strip() if fw_parsed and fw_parsed[0].strip() else None
         formula, _charge = _formula_from_name(parsed[0])
-        rows.append((parsed[0], fw, formula))
+        extracted.append((parsed[0], fw, formula))
+    rows: list[tuple[str, str | None, str | None]] = []
+    for index, (name, fw, formula) in enumerate(extracted):
+        if formula is None and fw and index + 1 < len(extracted):
+            next_name, next_fw, next_embedded = extracted[index + 1]
+            if not next_fw:
+                next_formula = next_embedded or _formula_from_formula_line(next_name)[0]
+                if next_formula:
+                    formula = next_formula
+        rows.append((name, fw, formula))
     return tuple(rows)
 
 
@@ -983,6 +1070,12 @@ def _name_key(name: str) -> str:
     if not words:
         return ""
     return words[0].upper()
+
+
+def _formula_weight_decimal(text: str | None) -> Decimal | None:
+    if not text:
+        return None
+    return _published_decimal(re.sub(r"\s+", "", text.strip()))
 
 
 def _formula_weight_as_published(
@@ -1102,7 +1195,10 @@ def _resolve_formula(
     key = _name_key(label)
     embedded, _charge = _formula_from_name(label)
     indexed = _formula_index_from_298k().get(key) if key else None
-    fw_indexed = _formula_weight_index_from_298k().get(fw_text) if fw_text else None
+    fw_index = _formula_weight_index_from_298k()
+    fw_indexed = fw_index.get(fw_text) if fw_text else None
+    if fw_indexed is None and fw_text:
+        fw_indexed = fw_index.get(re.sub(r"\s+", "", fw_text))
     consulted: dict[str, Any] = {
         "formula_as_published": printed_raw,
         "name": label or None,
@@ -1121,7 +1217,7 @@ def _resolve_formula(
         candidates.append((fw_indexed, "formula_weight"))
     printed = _parseable_formula(re.sub(r"\s+", "", printed_raw)) if printed_raw else None
     consulted["printed_parsed"] = printed
-    fw_value = _published_decimal(fw_text) if fw_text else None
+    fw_value = _formula_weight_decimal(fw_text)
     if printed:
         if fw_value is not None:
             mass = _formula_mass(printed)

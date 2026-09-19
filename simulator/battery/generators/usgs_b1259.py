@@ -10,6 +10,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from fractions import Fraction
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -64,6 +65,7 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 )
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
+TABLE2_RECORD_ID = "b1259-table-02-atomic-weights"
 SOURCE_PATH_PREFIX = (
     "data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records"
 )
@@ -850,6 +852,164 @@ def _formula_and_charge_from_published(
     return parsed, charge
 
 
+def _formula_weight_decimal(text: str | None) -> Decimal | None:
+    if not text:
+        return None
+    return _published_decimal(re.sub(r"\s+", "", text.strip()))
+
+
+def _gfw_text(record: Mapping[str, Any]) -> str | None:
+    cell = _as_published_cell(record.get("gram_formula_weight"))
+    if cell is None or not cell[0].strip():
+        return None
+    return cell[0].strip()
+
+
+def _name_key(name: str) -> str:
+    text = re.sub(r"\([^)]*\)", " ", name)
+    words = [word for word in re.split(r"[^A-Za-z]+", text) if word]
+    if not words:
+        return ""
+    return words[0].upper()
+
+
+def _sibling_name_key(name: str) -> str:
+    text = re.sub(r"\([^)]*\)", " ", name or "")
+    text = re.sub(r"[^A-Za-z]+", " ", text)
+    drop = {"REFERENCE", "STATE", "IDEAL", "GAS", "AQUEOUS", "ION", "STD", "THE"}
+    words = [word.upper() for word in text.split() if word.upper() not in drop]
+    return " ".join(words)
+
+
+@lru_cache(maxsize=1)
+def _table2_elements() -> tuple[dict[str, Decimal], dict[str, str]]:
+    """Table 2 1963 weights, only rows whose name/symbol pair is legible."""
+
+    path = RECORDS_DIR / f"{TABLE2_RECORD_ID}.json"
+    record = json.loads(path.read_text(encoding="utf-8"))
+    corrections: dict[str, str] = {}
+    for item in record.get("corrections") or ():
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("field") != "weight":
+            continue
+        printed = item.get("printed_token")
+        quote = str(item.get("image_quote") or "")
+        match = re.search(r"\b([A-Z][a-z]?)\b", quote)
+        if printed and match:
+            corrections[match.group(1)] = str(printed)
+    weights: dict[str, Decimal] = {}
+    names: dict[str, str] = {}
+    for row in record.get("rows") or ():
+        if not isinstance(row, Mapping):
+            continue
+        symbol = str(row.get("symbol_as_published") or "").strip()
+        if not re.fullmatch(r"[A-Z][a-z]?", symbol):
+            continue
+        element = re.sub(r"[^A-Za-z\s]", " ", str(row.get("element_as_published") or ""))
+        tokens = [token for token in element.split() if token]
+        weight_cell = row.get("weight") if isinstance(row.get("weight"), Mapping) else {}
+        mass = _formula_weight_decimal(
+            corrections.get(symbol)
+            or (weight_cell.get("as_published") if isinstance(weight_cell, Mapping) else None)
+        )
+        if mass is None:
+            continue
+        if len(tokens) == 2 and tokens[1] == symbol and len(tokens[0]) >= 3:
+            names[tokens[0]] = symbol
+            weights[symbol] = mass
+        elif len(tokens) == 1 and len(tokens[0]) >= 3 and tokens[0][0].isupper():
+            names[tokens[0]] = symbol
+            weights[symbol] = mass
+    return weights, names
+
+
+def _parse_counts(formula: str) -> dict[str, Fraction] | None:
+    try:
+        parsed = parse_formula(formula)
+    except Exception:
+        if re.fullmatch(r"[A-Z][a-z]?", formula) and formula in _table2_elements()[0]:
+            return {formula: Fraction(1)}
+        return None
+    counts: dict[str, Fraction] = {}
+    for element, amount in parsed.elements.items():
+        counts[str(element)] = Fraction(str(amount)).limit_denominator(1000)
+    return counts or None
+
+
+def _formula_mass(formula: str) -> Decimal | None:
+    counts = _parse_counts(formula)
+    if counts is None:
+        return None
+    weights, _names = _table2_elements()
+    if all(element in weights for element in counts):
+        total = Decimal("0")
+        for element, amount in counts.items():
+            mass = weights[element]
+            total += mass * Decimal(amount.numerator) / Decimal(amount.denominator)
+        return total
+    try:
+        parsed = parse_formula(formula)
+    except Exception:
+        return None
+    return Decimal(str(parsed.molar_mass_g_mol))
+
+
+def _mass_matches_formula_weight(formula: str, fw: Decimal) -> bool:
+    mass = _formula_mass(formula)
+    if mass is None:
+        return False
+    grain = max(_value_grain(fw) * 2, Decimal("0.01"))
+    return abs(mass - fw) <= grain
+
+
+def _allotrope_from_weight(name: str, fw: Decimal) -> str | None:
+    weights, names = _table2_elements()
+    hits: set[str] = set()
+    for element_name, symbol in names.items():
+        if not re.search(
+            rf"(?<![A-Za-z]){re.escape(element_name)}(?![A-Za-z])",
+            name,
+            flags=re.IGNORECASE,
+        ):
+            continue
+        aw = weights.get(symbol)
+        if aw is None or aw == 0:
+            continue
+        n = (fw / aw).to_integral_value()
+        if n < 1:
+            continue
+        formula = symbol if n == 1 else f"{symbol}{int(n)}"
+        if _mass_matches_formula_weight(formula, fw):
+            hits.add(formula)
+    if len(hits) == 1:
+        return next(iter(hits))
+    return None
+
+
+def _ocr_formula_variants(text: str) -> tuple[str, ...]:
+    """Closed OCR repairs of a printed formula. Mass-check is the gate."""
+
+    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = compact.translate(_SUBSCRIPT_TRANSLATION)
+    if not compact:
+        return ()
+    variants = {compact}
+    for _step in range(2):
+        grown = set(variants)
+        for item in variants:
+            grown.add(item.replace("°", "O"))
+            grown.add(item.replace("0", "O"))
+            grown.add(item.replace(",", "2").replace("_", "2"))
+            grown.add(item.replace("A1", "Al").replace("C1", "Cl"))
+            if item[:1].islower():
+                grown.add(item[0].upper() + item[1:])
+            if item.endswith("l") and len(item) > 1:
+                grown.add(item[:-1] + "I")
+        variants = grown
+    return tuple(sorted(variants))
+
+
 def _consulted_formula_reason(
     consulted: Mapping[str, Any], *, prefix: str, extra: str | None = None
 ) -> str:
@@ -860,46 +1020,223 @@ def _consulted_formula_reason(
         f"state_note_as_published={consulted.get('state_note_as_published')!r}",
         f"gram_formula_weight={consulted.get('gram_formula_weight')!r}",
         f"printed_parsed={consulted.get('printed_parsed')!r}",
+        f"name_key={consulted.get('name_key')!r}",
+        f"name_index={consulted.get('name_index')!r}",
+        f"formula_weight_index={consulted.get('formula_weight_index')!r}",
+        f"sibling={consulted.get('sibling')!r}",
     ]
+    mismatch = consulted.get("printed_mass_mismatch")
+    if mismatch:
+        parts.append(f"printed_mass_mismatch={mismatch!r}")
     if extra:
         parts.append(extra)
     return f"{prefix} consulted " + ", ".join(parts)
 
 
+def _load_property_records() -> tuple[Mapping[str, Any], ...]:
+    records: list[Mapping[str, Any]] = []
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, Mapping):
+            continue
+        kind = payload.get("table_kind")
+        if kind in {"properties_298k", "high_temperature"}:
+            records.append(payload)
+    return tuple(records)
+
+
+def _consulted_shell(record: Mapping[str, Any]) -> dict[str, Any]:
+    raw = record.get("formula_as_published")
+    printed_raw = raw.strip() if isinstance(raw, str) and raw.strip() else None
+    label = str(record.get("name_as_published") or "")
+    return {
+        "formula_as_published": printed_raw,
+        "name_as_published": label or None,
+        "phase": record.get("phase") or None,
+        "state_note_as_published": record.get("state_note_as_published") or None,
+        "gram_formula_weight": _gfw_text(record),
+        "printed_parsed": None,
+        "printed_charge": None,
+        "name_key": _name_key(label) or None,
+        "name_index": None,
+        "formula_weight_index": None,
+        "sibling": None,
+    }
+
+
+def _resolve_formula_local(record: Mapping[str, Any]) -> FormulaResolution:
+    """Printed formula, OCR repair of that formula, or allotrope. No indexes."""
+
+    consulted = _consulted_shell(record)
+    printed_raw = consulted["formula_as_published"]
+    label = str(consulted["name_as_published"] or "")
+    fw_value = _formula_weight_decimal(consulted["gram_formula_weight"])
+    if printed_raw:
+        parsed, printed_charge = _formula_and_charge_from_published(printed_raw)
+        consulted["printed_parsed"] = parsed
+        consulted["printed_charge"] = printed_charge
+        if parsed is not None:
+            return FormulaResolution(
+                parsed, "printed_formula", consulted, None, printed_charge
+            )
+        ocr_hits: list[tuple[str, int | None]] = []
+        for variant in _ocr_formula_variants(printed_raw):
+            formula, ocr_charge = _formula_and_charge_from_published(variant)
+            if formula is None:
+                continue
+            if fw_value is not None and not _mass_matches_formula_weight(formula, fw_value):
+                continue
+            ocr_hits.append((formula, ocr_charge))
+        unique_ocr = {formula for formula, _charge in ocr_hits}
+        if len(unique_ocr) == 1:
+            formula = next(iter(unique_ocr))
+            charges = {
+                item_charge
+                for item_formula, item_charge in ocr_hits
+                if item_formula == formula
+            }
+            ocr_charge = next(iter(charges)) if len(charges) == 1 else None
+            consulted["printed_ocr"] = formula
+            return FormulaResolution(
+                formula, "printed_formula_ocr", consulted, None, ocr_charge
+            )
+    if fw_value is not None:
+        named_allotrope = _allotrope_from_weight(label, fw_value)
+        if named_allotrope:
+            return FormulaResolution(named_allotrope, "formula_weight", consulted, None)
+    return FormulaResolution(
+        None,
+        None,
+        consulted,
+        _consulted_formula_reason(consulted, prefix=FORMULA_UNRESOLVED_REASON_PREFIX),
+    )
+
+
+@lru_cache(maxsize=1)
+def _formula_index_from_298k() -> dict[str, str]:
+    formulas: dict[str, set[str]] = defaultdict(set)
+    formula_less: dict[str, int] = defaultdict(int)
+    for record in _load_property_records():
+        if record.get("table_kind") != "properties_298k":
+            continue
+        name = str(record.get("name_as_published") or "")
+        key = _name_key(name)
+        if not key:
+            continue
+        resolved = _resolve_formula_local(record)
+        if resolved.formula:
+            formulas[key].add(resolved.formula)
+        else:
+            formula_less[key] += 1
+    return {
+        key: next(iter(forms))
+        for key, forms in formulas.items()
+        if len(forms) == 1 and formula_less.get(key, 0) == 0
+    }
+
+
+@lru_cache(maxsize=1)
+def _formula_weight_index_from_298k() -> dict[Decimal, str]:
+    formulas: dict[Decimal, set[str]] = defaultdict(set)
+    for record in _load_property_records():
+        if record.get("table_kind") != "properties_298k":
+            continue
+        resolved = _resolve_formula_local(record)
+        gfw = _formula_weight_decimal(_gfw_text(record))
+        if (
+            resolved.formula
+            and gfw is not None
+            and _mass_matches_formula_weight(resolved.formula, gfw)
+        ):
+            formulas[gfw].add(resolved.formula)
+    return {
+        gfw: next(iter(forms)) for gfw, forms in formulas.items() if len(forms) == 1
+    }
+
+
+@lru_cache(maxsize=1)
+def _sibling_formula_index() -> dict[tuple[str, Decimal], str]:
+    hits: dict[tuple[str, Decimal], set[str]] = defaultdict(set)
+    for record in _load_property_records():
+        resolved = _resolve_formula_local(record)
+        if not resolved.formula:
+            continue
+        key = _sibling_name_key(str(record.get("name_as_published") or ""))
+        gfw = _formula_weight_decimal(_gfw_text(record))
+        if not key or gfw is None:
+            continue
+        if not _mass_matches_formula_weight(resolved.formula, gfw):
+            continue
+        hits[(key, gfw)].add(resolved.formula)
+    return {item: next(iter(forms)) for item, forms in hits.items() if len(forms) == 1}
+
+
 def _resolve_formula(record: Mapping[str, Any]) -> FormulaResolution:
     """Page-grounded formula or a refusal. Never title-case a name."""
 
-    raw = record.get("formula_as_published")
-    printed_raw = raw.strip() if isinstance(raw, str) and raw.strip() else None
-    gfw_cell = _as_published_cell(record.get("gram_formula_weight"))
-    gfw_text = gfw_cell[0].strip() if gfw_cell and gfw_cell[0].strip() else None
-    consulted: dict[str, Any] = {
-        "formula_as_published": printed_raw,
-        "name_as_published": record.get("name_as_published") or None,
-        "phase": record.get("phase") or None,
-        "state_note_as_published": record.get("state_note_as_published") or None,
-        "gram_formula_weight": gfw_text,
-        "printed_parsed": None,
-        "printed_charge": None,
-    }
-    if not printed_raw:
+    local = _resolve_formula_local(record)
+    if local.formula and local.source == "printed_formula":
+        return local
+    consulted = dict(local.consulted)
+    label = str(consulted.get("name_as_published") or "")
+    key = consulted.get("name_key")
+    fw_value = _formula_weight_decimal(consulted.get("gram_formula_weight"))
+    indexed = _formula_index_from_298k().get(key) if key else None
+    fw_indexed = (
+        _formula_weight_index_from_298k().get(fw_value) if fw_value is not None else None
+    )
+    sibling_key = _sibling_name_key(label)
+    sibling = (
+        _sibling_formula_index().get((sibling_key, fw_value))
+        if sibling_key and fw_value is not None
+        else None
+    )
+    consulted["name_index"] = indexed
+    consulted["formula_weight_index"] = None if fw_indexed is None else str(fw_indexed)
+    consulted["sibling"] = sibling
+    candidates: list[tuple[str, str, int | None]] = []
+    if local.formula:
+        candidates.append((local.formula, local.source or "local", local.charge))
+    if indexed:
+        candidates.append((indexed, "name_index", None))
+    if fw_indexed:
+        candidates.append((fw_indexed, "formula_weight", None))
+    if sibling:
+        candidates.append((sibling, "sibling", None))
+    if fw_value is not None:
+        matching = [
+            item
+            for item in candidates
+            if _formula_mass(item[0]) is None
+            or _mass_matches_formula_weight(item[0], fw_value)
+        ]
+        if matching:
+            candidates = matching
+    unique = {formula for formula, _source, _charge in candidates}
+    if len(unique) == 1:
+        formula = next(iter(unique))
+        sources = sorted({source for value, source, _charge in candidates if value == formula})
+        charges = {item_charge for value, _source, item_charge in candidates if value == formula}
+        charges.discard(None)
+        charge = next(iter(charges)) if len(charges) == 1 else local.charge
+        return FormulaResolution(formula, "+".join(sources), consulted, None, charge)
+    if len(unique) > 1:
         return FormulaResolution(
             None,
             None,
             consulted,
-            _consulted_formula_reason(consulted, prefix=FORMULA_UNRESOLVED_REASON_PREFIX),
+            _consulted_formula_reason(
+                consulted,
+                prefix=FORMULA_CONFLICT_REASON_PREFIX,
+                extra=f"formulas={sorted(unique)}",
+            ),
         )
-    parsed, charge = _formula_and_charge_from_published(printed_raw)
-    consulted["printed_parsed"] = parsed
-    consulted["printed_charge"] = charge
-    if parsed is None:
-        return FormulaResolution(
-            None,
-            None,
-            consulted,
-            _consulted_formula_reason(consulted, prefix=FORMULA_UNRESOLVED_REASON_PREFIX),
-        )
-    return FormulaResolution(parsed, "printed_formula", consulted, None, charge)
+    return FormulaResolution(
+        None,
+        None,
+        consulted,
+        _consulted_formula_reason(consulted, prefix=FORMULA_UNRESOLVED_REASON_PREFIX),
+    )
 
 
 def _phase_from_text(text: str) -> tuple[State[Phase], State[Polymorph]]:
@@ -952,17 +1289,6 @@ def _phase_state(record: Mapping[str, Any]) -> tuple[State[Phase], State[Polymor
         if named.is_value:
             polymorph = named
     return phase, polymorph
-
-
-def _parse_counts(formula: str) -> dict[str, Fraction] | None:
-    try:
-        parsed = parse_formula(formula)
-    except Exception:
-        return None
-    counts: dict[str, Fraction] = {}
-    for element, amount in parsed.elements.items():
-        counts[str(element)] = Fraction(str(amount)).limit_denominator(1000)
-    return counts or None
 
 
 def _element_reference_species(symbol: str) -> Species:

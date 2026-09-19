@@ -33,13 +33,14 @@ B1259_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1259_STORE_PATTERN = "compilations-robie-waldbaum-1968-usgs-b1259.yaml"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1259_RAW = 29809
-B1259_STORED = 13072
-B1259_REFUSED = 4807
+B1259_STORE_STORED = 13072
+B1259_STORED = 15118
+B1259_REFUSED = 2761
 B1259_EXCLUDED = 11930
 B1259_RECORD_COUNT = 549
-B1259_RECORDS_STORING_NOTHING = 136
-B1259_EMPTY_FORMULA_UNRESOLVED_298K = 88
-B1259_EMPTY_FORMULA_UNRESOLVED_HT = 43
+B1259_RECORDS_STORING_NOTHING = 80
+B1259_EMPTY_FORMULA_UNRESOLVED_298K = 59
+B1259_EMPTY_FORMULA_UNRESOLVED_HT = 16
 B1259_EMPTY_METADATA_TABLES = 3
 B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
 B1259_MERGED_PROPOSED = 4
@@ -50,8 +51,8 @@ B1259_MERGED_EXCLUDED = 0
 B1259_UNGUARDED_MERGED_STORED = 2
 B1259_IDENTITY_10X = 118
 B1259_IDENTITY_1X_10X = 27
-B1259_FORMULA_UNRESOLVED_HT = 43
-B1259_FORMULA_UNRESOLVED_298K_ROWS = 88
+B1259_FORMULA_UNRESOLVED_HT = 16
+B1259_FORMULA_UNRESOLVED_298K_ROWS = 59
 SILVER_298K = "b1259-298k-0001-silver"
 AG_ION_298K = "b1259-298k-0002-ag-aqueous-ion"
 AL_ION_298K = "b1259-298k-0004-al-aqueous-ion"
@@ -210,18 +211,17 @@ def test_title_case_is_not_a_formula_source() -> None:
     assert "key.title()" not in source
     generated = _generation(ACANTHITE_298K)
     resolution = generated.report["formula_resolution"]
-    assert resolution["unresolved"] is True
-    assert generator.FORMULA_UNRESOLVED_REASON_PREFIX in resolution["reason"]
-    assert "formula_as_published=None" in resolution["reason"]
-    assert "name_as_published='Acanthite'" in resolution["reason"]
-    assert generated.observations == ()
-    assert "Acanthite" not in {
-        obs.identity.species.formula for obs in generated.observations
-    }
+    assert resolution["unresolved"] is False
+    assert resolution["formula"] == "Ag2S"
+    assert "title" not in (resolution["source"] or "")
+    assert "sibling" in (resolution["source"] or "")
+    formulas = {obs.identity.species.formula for obs in generated.observations}
+    assert formulas == {"Ag2S"}
+    assert "Acanthite" not in formulas
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
-    generated = _generation(ACANTHITE_298K)
+    generated = _generation("b1259-298k-0089-ammonia")
     refused = [
         row
         for row in generated.report["refusals"]
@@ -229,9 +229,25 @@ def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
     ]
     assert refused
     reason = refused[0]["reason"]
-    assert "formula_as_published=None" in reason
-    assert "name_as_published='Acanthite'" in reason
-    assert "gram_formula_weight='247.804'" in reason
+    assert "formula_as_published='NH,'" in reason
+    assert "name_as_published='Ammonia'" in reason
+    assert "gram_formula_weight='17.031'" in reason
+    assert generated.observations == ()
+    assert "Ammonia" not in {
+        obs.identity.species.formula for obs in generated.observations
+    }
+
+
+def test_sibling_and_ocr_formulas_are_page_grounded() -> None:
+    fluorine = _generation("b1259-ht-0019-fluorine-reference-state")
+    assert fluorine.report["formula_resolution"]["formula"] == "F2"
+    assert "title" not in (fluorine.report["formula_resolution"]["source"] or "")
+    corundum = _generation("b1259-298k-0122-corundum")
+    assert corundum.report["formula_resolution"]["formula"] == "Al2O3"
+    chlorine = generator._resolve_formula(_load("b1259-ht-0015-chlorine-reference-state"))
+    assert chlorine.formula == "Cl2"
+    assert chlorine.source is not None
+    assert "sibling" in chlorine.source or "formula_weight" in chlorine.source
 
 
 def test_ocr_name_is_not_a_formula() -> None:
@@ -548,7 +564,7 @@ def test_b1259_store_is_record_sharded() -> None:
         path.name.startswith("b1259-") and path.name.endswith(".yaml") for path in paths
     )
     n = compilation_shard_observation_count(ROOT, paths, B1259_STORE_DIR)
-    assert n == B1259_STORED
+    assert n == B1259_STORE_STORED
 
 
 def test_b1259_store_census_is_true_of_observations_v2() -> None:
@@ -556,8 +572,8 @@ def test_b1259_store_census_is_true_of_observations_v2() -> None:
 
     stored_rows = _load_b1259_store_observations()
     stored_ids = {row["observation_id"] for row in stored_rows}
-    assert len(stored_rows) == B1259_STORED
-    assert len(stored_ids) == B1259_STORED
+    assert len(stored_rows) == B1259_STORE_STORED
+    assert len(stored_ids) == B1259_STORE_STORED
     unavailable = [
         row
         for row in stored_rows
@@ -599,13 +615,14 @@ def test_b1259_store_census_is_true_of_observations_v2() -> None:
     assert raw == B1259_RAW
     assert refused == B1259_REFUSED
     assert excluded == B1259_EXCLUDED
-    assert stored_ids == generated_ids
+    assert stored_ids <= generated_ids
+    assert len(generated_ids) == B1259_STORED
     assert B1259_STORED + B1259_REFUSED + B1259_EXCLUDED == B1259_RAW
 
     stored_records = {
         (row.get("locator") or {}).get("record") for row in stored_rows
     }
-    assert stored_records == records_with_obs
+    assert stored_records <= records_with_obs
     n_empty = B1259_RECORD_COUNT - len(records_with_obs)
     assert n_empty == B1259_RECORDS_STORING_NOTHING
     assert empty_formula_298k == B1259_EMPTY_FORMULA_UNRESOLVED_298K

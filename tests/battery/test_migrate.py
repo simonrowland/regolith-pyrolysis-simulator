@@ -3625,15 +3625,21 @@ def test_f2_phase_quotes_printed_text_and_keeps_unknown(tmp_path: Path) -> None:
     assert all(obs.identity.species.formula == "Ag" for obs in aqueous)
 
     li_prefix = "robie-waldbaum-1968-usgs-b1259:b1259-298k-0048-li-aqueous-ion:"
-    note_only = [
+    lithium = [
         obs
         for oid, obs in result.observations.items()
         if oid.startswith(li_prefix)
     ]
-    # Formula unresolved: generator stores nothing. The generic placeholder
-    # must not remain.
-    assert note_only == []
-    assert f"{li_prefix.rstrip(':')}" not in result.observations
+    assert lithium
+    assert all(obs.identity.species.formula == "Li" for obs in lithium)
+    assert all(
+        obs.identity.species.phase.is_value
+        and obs.identity.species.phase.value is Phase.AQ
+        for obs in lithium
+    )
+    assert "Li aqueous" not in {
+        obs.identity.species.formula for obs in lithium
+    }
 
 
 def test_f3_compilation_locator_names_the_record_file(tmp_path: Path) -> None:

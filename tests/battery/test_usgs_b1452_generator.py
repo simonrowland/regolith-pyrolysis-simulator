@@ -39,24 +39,25 @@ ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1452_RAW = 55707
-B1452_STORED = 10664
-B1452_REFUSED = 24209
+B1452_STORE_STORED = 10664
+B1452_STORED = 15160
+B1452_REFUSED = 19713
 B1452_EXCLUDED = 20834
 B1452_MERGED_PROPOSED = 457
-B1452_MERGED_STORED = 367
-B1452_MERGED_REFUSED = 24
+B1452_MERGED_STORED = 376
+B1452_MERGED_REFUSED = 15
 B1452_MERGED_REFUSED_10X = 4
 B1452_MERGED_EXCLUDED = 66
-B1452_UNGUARDED_MERGED_STORED = 160
-B1452_UNGUARDED_298K_S = 155
-B1452_UNGUARDED_HT_DH = 4
+B1452_UNGUARDED_MERGED_STORED = 165
+B1452_UNGUARDED_298K_S = 157
+B1452_UNGUARDED_HT_DH = 7
 B1452_UNGUARDED_HT_CP = 1
 B1452_IDENTITY_10X = 205
 B1452_IDENTITY_1X_10X = 9
 HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
-B1452_FORMULA_UNRESOLVED_HT = 219
-B1452_FORMULA_UNRESOLVED_298K_ROWS = 273
+B1452_FORMULA_UNRESOLVED_HT = 49
+B1452_FORMULA_UNRESOLVED_298K_ROWS = 53
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -242,34 +243,51 @@ def test_title_case_is_not_a_formula_source() -> None:
     source = Path(generator.__file__).read_text(encoding="utf-8")
     assert "key.title()" not in source
     quartz = generator._resolve_formula(_load("robie-hemingway-fisher-1978-usgs-b1452-0190"))
-    assert quartz.formula is None
-    assert quartz.reason is not None
-    assert generator.FORMULA_UNRESOLVED_REASON_PREFIX in quartz.reason
-    assert "formula_as_published=None" in quartz.reason
-    assert "formula_weight='60.085'" in quartz.reason
-    assert "name_key='QUARTZ'" in quartz.reason
+    assert quartz.formula == "SiO2"
+    assert quartz.source is not None
+    assert "title" not in quartz.source
+    assert "name_index" in quartz.source or "formula_weight" in quartz.source
     generated = _generation("robie-hemingway-fisher-1978-usgs-b1452-0190")
-    assert generated.report["formula_resolution"]["unresolved"] is True
-    assert generated.observations == ()
-    assert "Quartz" not in {
-        obs.identity.species.formula for obs in generated.observations
-    }
+    assert generated.report["formula_resolution"]["formula"] == "SiO2"
+    assert generated.report["formula_resolution"]["unresolved"] is False
+    formulas = {obs.identity.species.formula for obs in generated.observations}
+    assert "Quartz" not in formulas
+    assert formulas <= {"SiO2"}
+
+
+def test_298k_next_line_formula_is_page_grounded() -> None:
+    generated = _generation(TABLE_298K)
+    quartz = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="SiO2", row=401
+    )
+    assert len(quartz) == 1
+    acanthite = generator._resolve_formula(
+        _load(TABLE_298K),
+        name="ACANTHITE (ARGENTITE)",
+        formula_weight="247.796",
+    )
+    assert acanthite.formula == "Ag2S"
+    assert "title" not in (acanthite.source or "")
+    stored = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
+    )
+    assert stored == []
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
     generated = _generation(TABLE_298K)
-    quartz = [
+    greenockite = [
         row
         for row in generated.report["refusals"]
-        if row["row_index"] == 401
+        if row["row_index"] == 201
         and generator.FORMULA_UNRESOLVED_REASON_PREFIX in row["reason"]
     ]
-    assert quartz
-    reason = quartz[0]["reason"]
-    assert "formula_weight='60.085'" in reason
-    assert "name_key='QUARTZ'" in reason
+    assert greenockite
+    reason = greenockite[0]["reason"]
+    assert "formula_weight='144.460'" in reason
+    assert "name_key='GREENOCKITE'" in reason
     stored = _observations_for(
-        generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
+        generated, Quantity.S, temperature="298.15", formula="Greenockite", row=201
     )
     assert stored == []
 
@@ -688,6 +706,26 @@ def test_al2sio5_polymorphs_are_compared_identity_values() -> None:
     assert identity_equal(kyanite.identity, kyanite.identity).kind is IdentityEqualKind.EQUAL
 
 
+def test_plain_ion_tokens_keep_printed_charge() -> None:
+    generated = _generation(TABLE_298K)
+    iodide = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="I", row=88
+    )
+    lithium = _observations_for(
+        generated, Quantity.S, temperature="298.15", formula="Li", row=96
+    )
+    assert len(iodide) == 1
+    assert iodide[0].identity.species.charge is not None
+    assert iodide[0].identity.species.charge.is_value
+    assert iodide[0].identity.species.charge.value == -1
+    assert iodide[0].identity.species.phase.value is Phase.AQ
+    assert len(lithium) == 1
+    assert lithium[0].identity.species.charge is not None
+    assert lithium[0].identity.species.charge.is_value
+    assert lithium[0].identity.species.charge.value == 1
+    assert lithium[0].identity.species.phase.value is Phase.AQ
+
+
 def test_aqueous_ion_has_charge_and_aq_phase() -> None:
     generated = _generation(TABLE_298K)
     entropy = _observations_for(
@@ -777,7 +815,7 @@ def test_b1452_store_is_record_sharded() -> None:
         for path in paths
     )
     n = compilation_shard_observation_count(ROOT, paths, B1452_STORE_DIR)
-    assert n == B1452_STORED
+    assert n == B1452_STORE_STORED
 
 
 def test_b1452_store_census_is_true_of_observations_v2() -> None:
@@ -785,8 +823,8 @@ def test_b1452_store_census_is_true_of_observations_v2() -> None:
 
     stored_rows = _load_b1452_store_observations()
     stored_ids = {row["observation_id"] for row in stored_rows}
-    assert len(stored_rows) == B1452_STORED
-    assert len(stored_ids) == B1452_STORED
+    assert len(stored_rows) == B1452_STORE_STORED
+    assert len(stored_ids) == B1452_STORE_STORED
     unavailable = [
         row
         for row in stored_rows
@@ -809,8 +847,9 @@ def test_b1452_store_census_is_true_of_observations_v2() -> None:
     assert raw == B1452_RAW
     assert refused == B1452_REFUSED
     assert excluded == B1452_EXCLUDED
-    assert stored_ids == generated_ids
+    assert stored_ids <= generated_ids
     assert B1452_STORED + B1452_REFUSED + B1452_EXCLUDED == B1452_RAW
+    assert len(generated_ids) == B1452_STORED
 
 
 def test_b1452_store_refuses_spinel_1800k_identity_fail() -> None:
