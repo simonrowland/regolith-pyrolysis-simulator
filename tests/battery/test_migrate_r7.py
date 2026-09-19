@@ -446,7 +446,6 @@ _EXPECTED_COUNT_CLAIMS = {
     "compilations-pankratz-1984-usbm-b677.yaml": 9235,
     "compilations-pankratz-1987-usbm-b689.yaml": 3362,
     "compilations-robie-hemingway-1995-usgs-b2131.yaml": 4083,
-    "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml": 503,
     "compilations-robie-waldbaum-1968-usgs-b1259.yaml": 512,
 }
 _COMPILATION_STORE_PATHS = iter_observation_store_paths(
@@ -615,7 +614,7 @@ def test_h5_whole_store_numeric_cell_claims_match_sources(path):
 
 
 def test_h5_numeric_cell_claim_inventory_and_mutation():
-    assert sum(_EXPECTED_COUNT_CLAIMS.values()) == 36605
+    assert sum(_EXPECTED_COUNT_CLAIMS.values()) == 36102
     path = (
         REPO_ROOT
         / "data/literature/observations-v2/compilations-pankratz-1984-usbm-b677.yaml"

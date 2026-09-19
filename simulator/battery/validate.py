@@ -80,6 +80,7 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
 
@@ -328,16 +329,52 @@ def _expand_parenthetical_groups(formula: str) -> str:
     return text
 
 
+def _accounting_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
+    """Atom counts from the ledger parser the USGS generators already use.
+
+    JANAF formula_composition treats the `.5` in CuSO4.5H2O as decimal
+    oxygen (O4.5 + H2O) because its token stream has no hydrate split.
+    The generator built the formation reaction from parse_formula, which
+    reads `.5H2O` as five waters. Using that parser here is the balance
+    check against the reaction that was stored, not a second chemistry.
+    """
+
+    try:
+        parsed = parse_formula(formula)
+    except Exception:
+        return None
+    return tuple(
+        sorted((element, float(count)) for element, count in parsed.elements.items())
+    )
+
+
+def _term_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
+    # Dotted hydrates/mixtures (CuSO4.5H2O, 3Al2O3.2SiO2) and bracket
+    # groups are not JANAF tokens. parse_formula is the generator's parser;
+    # do not let a successful but wrong JANAF decimal-oxygen parse win.
+    # Decimal subscripts (NaO0.5, Fe0.947O) fail parse_formula and must
+    # still use the JANAF tokenizer.
+    if "." in formula or "[" in formula:
+        parsed = _accounting_composition(formula)
+        if parsed is not None:
+            return parsed
+        return formula_composition(formula)
+    parsed = formula_composition(formula)
+    if parsed is None:
+        expanded = _expand_parenthetical_groups(formula)
+        if expanded != formula and "(" not in expanded:
+            parsed = formula_composition(expanded)
+    if parsed is None:
+        parsed = _accounting_composition(formula)
+    return parsed
+
+
 def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
     """Net element counts. Empty dict means balanced (within 1e-12)."""
 
     net: dict[str, float] = {}
     for term in reaction.terms:
-        parsed = formula_composition(term.species.formula)
-        if parsed is None:
-            expanded = _expand_parenthetical_groups(term.species.formula)
-            if expanded != term.species.formula and "(" not in expanded:
-                parsed = formula_composition(expanded)
+        parsed = _term_composition(term.species.formula)
         if parsed is None:
             net[f"?{term.species.formula}"] = net.get(f"?{term.species.formula}", 0.0) + float(
                 term.coefficient

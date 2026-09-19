@@ -6,6 +6,8 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
@@ -21,12 +23,21 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
 )
+from simulator.battery.migrate import (
+    iter_observation_store_paths,
+    observation_from_plain,
+)
+from simulator.battery.validate import reaction_atom_balance
+from tests.battery import compilation_shard_observation_count
 
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
 )
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
+ROOT = Path(__file__).resolve().parents[2]
+B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
+B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1452_RAW = 55707
 B1452_STORED = 10664
 B1452_REFUSED = 24209
@@ -725,11 +736,148 @@ def test_captured_units_never_copied_onto_observations() -> None:
             assert fragment not in note
 
 
-def test_migrate_is_not_wired() -> None:
-    root = Path(__file__).resolve().parents[2]
-    migrate = (root / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
-    assert "usgs_b1452" not in migrate
-    assert "_lift_b1452" not in migrate
+def _load_yaml(path: Path) -> dict:
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    payload = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+    assert isinstance(payload, dict)
+    return payload
+
+
+def _b1452_store_paths() -> list[Path]:
+    paths = iter_observation_store_paths(B1452_STORE_DIR, B1452_STORE_PATTERN)
+    assert paths, "B1452 observation store is missing"
+    return paths
+
+
+def _load_b1452_store_observations() -> list[dict]:
+    observations: list[dict] = []
+    for path in _b1452_store_paths():
+        payload = _load_yaml(path)
+        observations.extend(payload.get("observations") or [])
+    return observations
+
+
+def test_b1452_lift_is_the_generator() -> None:
+    src = (ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
+    assert "def _lift_b1452_from_generator" in src
+    assert "generate_record" in src
+    assert "def _is_usgs_b1452_record" in src
+
+
+def test_b1452_store_is_record_sharded() -> None:
+    single = B1452_STORE_DIR / "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
+    shard_dir = B1452_STORE_DIR / "compilations-robie-hemingway-fisher-1978-usgs-b1452"
+    assert not single.exists()
+    assert shard_dir.is_dir()
+    paths = _b1452_store_paths()
+    assert all(path.parent == shard_dir for path in paths)
+    assert all(
+        path.name.startswith("robie-hemingway-fisher-1978-usgs-b1452-")
+        and path.name.endswith(".yaml")
+        for path in paths
+    )
+    n = compilation_shard_observation_count(ROOT, paths, B1452_STORE_DIR)
+    assert n == B1452_STORED
+
+
+def test_b1452_store_census_is_true_of_observations_v2() -> None:
+    """Stored/refused/excluded must hold of observations-v2, not just generate_record."""
+
+    stored_rows = _load_b1452_store_observations()
+    stored_ids = {row["observation_id"] for row in stored_rows}
+    assert len(stored_rows) == B1452_STORED
+    assert len(stored_ids) == B1452_STORED
+    unavailable = [
+        row
+        for row in stored_rows
+        if (row.get("value") or {}).get("kind") == "unavailable"
+    ]
+    assert unavailable == []
+
+    generated_ids: set[str] = set()
+    refused = 0
+    excluded = 0
+    raw = 0
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        generated = generator.generate_record(json.loads(path.read_text(encoding="utf-8")))
+        generated_ids.update(obs.observation_id for obs in generated.observations)
+        accounting = generated.report["cell_accounting"]
+        raw += int(accounting["raw_numeric_tokens"])
+        refused += int(accounting["refused"])
+        excluded += int(accounting["excluded"])
+
+    assert raw == B1452_RAW
+    assert refused == B1452_REFUSED
+    assert excluded == B1452_EXCLUDED
+    assert stored_ids == generated_ids
+    assert B1452_STORED + B1452_REFUSED + B1452_EXCLUDED == B1452_RAW
+
+
+def test_b1452_store_refuses_spinel_1800k_identity_fail() -> None:
+    """SC-271: Spinel 1800 K gef 2.29.48 must not land in the store."""
+
+    stored_rows = _load_b1452_store_observations()
+    notes = " ".join(
+        str((row.get("locator") or {}).get("note") or "") for row in stored_rows
+    )
+    assert "as_published='2.29.48'" not in notes
+    spinel_1800 = [
+        row
+        for row in stored_rows
+        if "robie-hemingway-fisher-1978-usgs-b1452-0236" in row["observation_id"]
+        and "T=1800" in row["observation_id"]
+        and "negative_gibbs_function" in row["observation_id"]
+    ]
+    assert spinel_1800 == []
+
+
+def test_b1452_store_keeps_ag_plus_reconstructed_gibbs() -> None:
+    """b-517: Ag+ 298 K ΔfG 77.077 kJ and log Kf −13.504 must be in the store."""
+
+    stored_rows = _load_b1452_store_observations()
+    prefix = (
+        "robie-hemingway-fisher-1978-usgs-b1452:"
+        "robie-hemingway-fisher-1978-usgs-b1452-0003:"
+    )
+    gibbs = next(
+        row
+        for row in stored_rows
+        if row["observation_id"].startswith(prefix + "delta_fG:")
+        and "T=298.15:" in row["observation_id"]
+        and ":row=1:" in row["observation_id"]
+    )
+    logk = next(
+        row
+        for row in stored_rows
+        if row["observation_id"].startswith(prefix + "log10_Kf:")
+        and "T=298.15:" in row["observation_id"]
+        and ":row=1:" in row["observation_id"]
+    )
+    assert Decimal(str(gibbs["value"]["point"])) == Decimal("77.077")
+    assert Decimal(str(logk["value"]["point"])) == Decimal("-13.504")
+    species = (gibbs.get("identity") or {}).get("species") or {}
+    assert species.get("formula") == "Ag"
+    assert (species.get("phase") or {}).get("value") == Phase.AQ.value
+
+
+def test_b1452_store_dotted_hydrate_reaction_balances() -> None:
+    """CuSO4.5H2O is five waters, not decimal oxygen on the sulfate."""
+
+    stored_rows = _load_b1452_store_observations()
+    hydrated = next(
+        row
+        for row in stored_rows
+        if ((row.get("identity") or {}).get("species") or {}).get("formula")
+        == "CuSO4.5H2O"
+        and row["observation_id"].startswith(
+            "robie-hemingway-fisher-1978-usgs-b1452:"
+            "robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:"
+        )
+    )
+    assert (
+        reaction_atom_balance(observation_from_plain(hydrated).identity.reaction.value)
+        == {}
+    )
 
 
 def test_full_census_closes() -> None:

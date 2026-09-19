@@ -8,15 +8,15 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 437
+  sources: 438
   by_stage:
     located: 130
     inbox: 109
     in_progress: 9
-    ingested_partial: 10
-    ingested_complete: 1
+    ingested_partial: 15
+    ingested_complete: 2
     wired: 0
-    unknown: 178
+    unknown: 173
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -448,15 +448,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: cardiff-2007-vacuum-pyrolysis-gsfc
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
-    reason: v2.1 store present but 0 of 7 rows are battery-usable (measured evidence class AND known quantity
-      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 7
+    reason: v2.1 store present; 9/15 rows battery-usable
+  usable_rows: 9
+  total_rows: 15
   inbox_exclusion_reason: null
 - source_id: chapter-3-the-origin-and-evolution-of-organic-matter-2018-primitive-meteor
   stage: inbox
@@ -2903,15 +2902,14 @@ sources:
   total_rows: 22
   inbox_exclusion_reason: null
 - source_id: kems-026-markova-1984
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kems-026-markova-1984.yaml
-    reason: v2.1 store present but 0 of 15 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 15
+    reason: v2.1 store present; 24/37 rows battery-usable
+  usable_rows: 24
+  total_rows: 37
   inbox_exclusion_reason: null
 - source_id: kems-027-plante-hastie-1983
   stage: ingested_partial
@@ -2977,15 +2975,14 @@ sources:
   total_rows: 5
   inbox_exclusion_reason: null
 - source_id: kems-035-sauerborn-2005
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kems-035-sauerborn-2005.yaml
-    reason: v2.1 store present but 0 of 60 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 60
+    reason: v2.1 store present; 8/66 rows battery-usable
+  usable_rows: 8
+  total_rows: 66
   inbox_exclusion_reason: null
 - source_id: kems-036-sesko-2024
   stage: unknown
@@ -3009,15 +3006,14 @@ sources:
   total_rows: 4
   inbox_exclusion_reason: null
 - source_id: kems-038-matchett-2006
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kems-038-matchett-2006.yaml
-    reason: v2.1 store present but 0 of 3 rows are battery-usable (measured evidence class AND known quantity
-      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 3
+    reason: v2.1 store present; 9/11 rows battery-usable
+  usable_rows: 9
+  total_rows: 11
   inbox_exclusion_reason: null
 - source_id: kems-039-wolf-2023-vaporock
   stage: inbox
@@ -3062,15 +3058,14 @@ sources:
   total_rows: 383
   inbox_exclusion_reason: null
 - source_id: kems-044-robinot-2026
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kems-044-robinot-2026.yaml
-    reason: v2.1 store present but 0 of 19 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
-  total_rows: 19
+    reason: v2.1 store present; 3/20 rows battery-usable
+  usable_rows: 3
+  total_rows: 20
   inbox_exclusion_reason: null
 - source_id: kems-045-sossi-2018-pnas-cr
   stage: unknown
@@ -5634,6 +5629,16 @@ sources:
   usable_rows: 0
   total_rows: 1
   inbox_exclusion_reason: null
+- source_id: pomeroy_cardiff_2006_measurements
+  stage: ingested_complete
+  evidence:
+    decided_by: ingested_complete
+    artefacts:
+    - data/literature/observations-v2/vacuum_pyrolysis_measurements.yaml
+    reason: v2.1 store present; 1/1 rows battery-usable
+  usable_rows: 1
+  total_rows: 1
+  inbox_exclusion_reason: null
 - source_id: pound-1972-cr-langmuir-knudsen
   stage: unknown
   evidence:
@@ -5881,11 +5886,309 @@ sources:
   evidence:
     decided_by: unknown
     artefacts:
-    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml
-    reason: v2.1 store present but 0 of 606 rows are battery-usable (measured evidence class AND known
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0003.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0004.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0005-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0005.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0006.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0008-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0008.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0009.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0010-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0010-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0010-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0010.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0012-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0012.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0013-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0013.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0014.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0015.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0016-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0016-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0016-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0016.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0017-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0017-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0019.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0020-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0020-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0020.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0021.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0026-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0026.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0028-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0028-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0028-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0028.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0029-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0029.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0030-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0030-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0030.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0032.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0033.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0034.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0035-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0035.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0036-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0036.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0038-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0038.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0039.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0040-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0040.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0041.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0042-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0042-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0042-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0042.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0043-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0043-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0043.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0044.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0045-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0045-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0045.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0046-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0046-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0046-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0046-phase-05.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0046.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0049-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0049-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0049.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0051-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0051.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0055.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0056-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0056.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0058.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0059-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0059-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0059.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0060.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0063.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0067-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0067-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0067-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0067.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0068.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0069.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0070-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0070.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0071-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0071.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0072-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0072-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0072.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0073-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0073.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0075-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0075.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0077.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0082-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0082-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0082-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0082.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0084-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0084-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0084-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0084.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0086.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0087.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0088-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0088-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0088.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0090-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0090-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0090.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0091-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0091.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0092.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0093.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0097-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0097-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0097.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0098-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0098-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0098.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0100.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0101.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0102.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0106.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0108.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0111.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0112.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0114-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0114.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0115-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0115.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0117.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0118.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0119.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0124.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0125.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0126.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0127.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0128.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0129.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0131.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0133.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0135-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0135.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0136.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0138-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0138.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0139-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0139.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0141.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0142.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0143.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0145.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0149.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0150.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0151.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0152.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0153-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0153.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0160.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0180-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0180.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0181-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0181-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0181.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0186.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0187.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0189.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0205-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0205.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0225.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0226.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0227-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0227.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0228-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0228.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0229.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0230.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0232-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0232.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0233.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0234.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0236.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0237.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0238.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0240.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0241.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0242.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0243-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0243.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0246.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0252-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0252.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0269.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0296-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0296-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0296.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0299.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0300.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0301-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0301.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0302-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0302-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0302-phase-04.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0302.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0304.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0310.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0311.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0313.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0314.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0315.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0316.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0317.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0318.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0319.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0320.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0321-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0321-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0321.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0322-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0322-phase-03.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0322.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0323.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0324.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0326.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0327.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0328.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0330.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0331.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0332.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0333-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0333.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0334-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0334.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0335-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0335.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0336-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0336.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0338.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0340.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0341.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0342.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0343-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0343.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0344-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0344.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0345.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0346.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0347.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0348.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0349.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0350.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0351.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0352.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0353.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0354.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0355.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0356.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0357.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0358.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0359-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0359.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0360.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0361.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0362.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0363.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0364.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0365.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0366.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0367.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0368.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0369.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0371.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0374.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0375.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0376.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0377.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0378.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0379-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0379.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0380-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0380.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0383.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0384.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0385.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0386-phase-02.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0386.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0387.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0388.yaml
+    - data/literature/observations-v2/compilations-robie-hemingway-fisher-1978-usgs-b1452/robie-hemingway-fisher-1978-usgs-b1452-0389.yaml
+    reason: v2.1 store present but 0 of 10664 rows are battery-usable (measured evidence class AND known
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 606
+  total_rows: 10664
   inbox_exclusion_reason: 'compilation-path: source reaches the store through data/literature/compilations/
     rather than a per-source extract; not counted as inbox'
 - source_id: robie-waldbaum-1968-usgs-b1259

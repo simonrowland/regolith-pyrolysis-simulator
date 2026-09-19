@@ -566,12 +566,12 @@ observations:
     table: '1'
     note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
   read_from: pdf:kems-026-markova-1984
-- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:0
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'residual_melt_composition_vs_T_and_mass_loss'
+      tag: value
+      value: mass_loss_fraction
     species:
       formula: SiO2
       phase:
@@ -583,13 +583,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1748.15, 2564.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'residual_melt_composition_vs_T_and_mass_loss';
-      refusing to pick a number
+    kind: point
+    point: '0'
   uncertainty:
     kind: printed
     verbatim:
@@ -611,12 +652,1490 @@ observations:
     note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
       of corpus PDF page 2; left panel = composition VI (lherzolite)
   read_from: pdf:kems-026-markova-1984
-- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:1
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
   identity:
     quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
       tag: unknown
-      reason: unsupported quantity 'residual_melt_composition_vs_T_and_mass_loss'
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1748.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0146'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1748.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.46'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:10
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2480.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.9551'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2480.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '95.51'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:11
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2564.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.9834'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2564.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '98.34'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1765.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0416'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1765.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4.16'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:3
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1905.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0974'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1905.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '9.74'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:4
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1999.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.218'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1999.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '21.8'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:5
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2069.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.3835'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2069.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '38.35'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:6
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2156.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.6521'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2156.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '65.21'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:7
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2233.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.8605'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2233.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '86.05'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:8
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2311.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.8925'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2311.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '89.25'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:9
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2391.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.9181'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2391.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '91.81'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; left panel = composition VI (lherzolite)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:0
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
     species:
       formula: SiO2
       phase:
@@ -628,13 +2147,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1749.15, 2528.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'residual_melt_composition_vs_T_and_mass_loss';
-      refusing to pick a number
+    kind: point
+    point: '0'
   uncertainty:
     kind: printed
     verbatim:
@@ -656,6 +2216,1484 @@ observations:
     note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
       of corpus PDF page 2; right panel = composition V (alumina basalt)
   read_from: pdf:kems-026-markova-1984
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:1
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1749.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0117'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1749.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.17'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:10
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.8368'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '83.68'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:11
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2528.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.9799'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2528.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '97.99'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1817.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0439'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1817.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4.39'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:3
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1913.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.1441'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1913.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '14.41'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:4
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1992.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.3717'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1992.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '37.17'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:5
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2063.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.5353'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2063.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '53.53'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:6
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2082.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.6601'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2082.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '66.01'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:7
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2230.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.6935'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2230.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '69.35'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:8
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2303.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.7133'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2303.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '71.33'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:9
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2392.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.7619'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2392.15'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-026-markova-1984
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '76.19'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          published_page: 510
+          pdf_page_index: 2
+          table: '2'
+          note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+            of corpus PDF page 2; right panel = composition V (alumina basalt)
+    output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_text_basalt_ANT_window
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
   identity:

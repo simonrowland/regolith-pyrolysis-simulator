@@ -3389,26 +3389,45 @@ def test_f1_usgs_unavailable_reasons_match_printed_gibbs_cells(tmp_path: Path) -
         _copy_compilation_record(root, source_id, filename)
     result = migrate(root, write=False)
 
-    b1452 = result.observations[
-        "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0004"
-    ]
-    assert quantity_token(b1452.identity) is Quantity.DELTA_FG
-    assert b1452.value.kind is ValueKind.UNAVAILABLE
-    reason = b1452.value.unavailable_reason or ""
-    assert _ABSENT_DELTA_FG_CLAIM.search(reason) is None, reason
-    assert "formation_gibbs_energy" in reason
-    assert "kJ/1101" in reason
-    assert "not imported by the generic migrator" in reason
-    assert "per-source compilation generator" in reason
-
-    ocr = result.observations[
+    b1452_prefix = (
         "robie-hemingway-fisher-1978-usgs-b1452:"
-        "robie-hemingway-fisher-1978-usgs-b1452-0011-phase-02"
+        "robie-hemingway-fisher-1978-usgs-b1452-0004:"
+    )
+    b1452 = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(b1452_prefix)
     ]
-    ocr_reason = ocr.value.unavailable_reason or ""
-    assert "OCR-suspect" in ocr_reason
-    assert "formation_gibbs_energy" in ocr_reason
-    assert _ABSENT_DELTA_FG_CLAIM.search(ocr_reason) is None, ocr_reason
+    assert b1452
+    assert f"{b1452_prefix.rstrip(':')}" not in result.observations
+    gibbs_0004 = [
+        obs for obs in b1452 if quantity_token(obs.identity) is Quantity.DELTA_FG
+    ]
+    assert gibbs_0004
+    assert all(obs.value.kind is ValueKind.POINT for obs in gibbs_0004)
+    assert all(obs.identity.species.formula == "Ag" for obs in gibbs_0004)
+    assert all(
+        "not imported by the generic migrator" not in (obs.value.unavailable_reason or "")
+        for obs in gibbs_0004
+    )
+    assert all(
+        _ABSENT_DELTA_FG_CLAIM.search(obs.value.unavailable_reason or "") is None
+        for obs in gibbs_0004
+    )
+
+    ocr_prefix = (
+        "robie-hemingway-fisher-1978-usgs-b1452:"
+        "robie-hemingway-fisher-1978-usgs-b1452-0011-phase-02:"
+    )
+    ocr = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(ocr_prefix)
+    ]
+    # Generator stored 0: every numeric cell is OCR-suspect or excluded.
+    # The generic placeholder must not remain.
+    assert ocr == []
+    assert f"{ocr_prefix.rstrip(':')}" not in result.observations
 
     b1544_prefix = (
         "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference:"
@@ -3514,14 +3533,23 @@ def test_f2_phase_quotes_printed_text_and_keeps_unknown(tmp_path: Path) -> None:
     )
     result = migrate(root, write=False)
 
-    b1452 = result.observations[
-        "robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0004"
+    b1452_prefix = (
+        "robie-hemingway-fisher-1978-usgs-b1452:"
+        "robie-hemingway-fisher-1978-usgs-b1452-0004:"
+    )
+    b1452 = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(b1452_prefix)
     ]
-    phase = b1452.identity.species.phase
-    assert phase.is_unknown
-    assert "does not state phase" not in (phase.reason or "")
-    assert "Face-cente" in (phase.reason or "")
-    assert "not in the closed automatic map" in (phase.reason or "")
+    assert b1452
+    phases = [obs.identity.species.phase for obs in b1452]
+    assert all(phase.is_value and phase.value is Phase.CR for phase in phases)
+    assert all(
+        "not in the closed automatic map" not in (phase.reason or "")
+        for phase in phases
+    )
+    assert all(obs.identity.species.formula == "Ag" for obs in b1452)
 
     b1544_prefix = (
         "hemingway-haas-robinson-1982-usgs-b1544:usgs-b1544-al2sio5-reference:"
