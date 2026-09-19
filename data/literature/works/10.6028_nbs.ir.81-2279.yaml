@@ -47,20 +47,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 61
@@ -78,20 +81,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 63
@@ -108,20 +114,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 23
@@ -148,20 +157,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 28
@@ -177,11 +189,40 @@ experiments:
           page: 28
           paragraph: relatively small effusion orifice (0.34 mm diameter)
         inference:
-          relation: area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          relation: identity:m2
           inputs:
-          - '{''page'': 28, ''paragraph'': ''relatively small effusion orifice (0.34 mm diameter)''}'
-          parameters: []
+          - as_published=9.079226e-08 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000009079226'
+              locator:
+                page: 28
+                paragraph: relatively small effusion orifice (0.34 mm diameter)
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.00034'
+        locator:
+          page: 28
+          paragraph: relatively small effusion orifice (0.34 mm diameter)
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.00034 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00034'
+              locator:
+                page: 28
+                paragraph: relatively small effusion orifice (0.34 mm diameter)
+          output_unit: m
 - experiment_id: 10.6028/nbs.ir.81-2279::21
   kind: literature
   method:
@@ -192,20 +233,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 53
@@ -223,20 +267,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 43
@@ -254,20 +301,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 51
@@ -283,20 +333,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 51
@@ -311,20 +364,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 60
@@ -340,20 +396,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: pressure value is not numeric
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 11
@@ -379,22 +438,67 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 51
     section: '15'
     note: figure captions report pp. 51-53; figures PDF 61-81
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum TMS/KMS (Bonnell and Hastie 1979)
+      locator:
+        page: 12
+        paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.00034'
+        locator:
+          page: 51
+          section: '15'
+          note: figure captions report pp. 51-53; figures PDF 61-81
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          - as_published=0.34 mm
+          - printed=orifice_mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.34'
+              locator:
+                page: 51
+                section: '15'
+                note: figure captions report pp. 51-53; figures PDF 61-81
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 51
+                section: '15'
+                note: figure captions report pp. 51-53; figures PDF 61-81
+          output_unit: m

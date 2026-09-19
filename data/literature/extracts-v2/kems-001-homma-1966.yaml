@@ -162,6 +162,43 @@ observations:
     note: Melt 6503-11
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1485'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-11
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=148.5 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '148.5'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -214,6 +251,43 @@ observations:
     note: Melt 6503-11
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1524'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-11
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=152.4 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '152.4'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -266,6 +340,43 @@ observations:
     note: Melt 6503-11
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1491'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-11
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.1'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -318,6 +429,43 @@ observations:
     note: Melt 6503-11
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1495'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-11
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.5 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.5'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-11
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -370,6 +518,43 @@ observations:
     note: Melt 6503-12
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1511'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-12
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.1'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -422,6 +607,43 @@ observations:
     note: Melt 6503-12
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1528'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-12
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=152.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '152.8'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -474,6 +696,43 @@ observations:
     note: Melt 6503-12
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1512'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-12
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.2 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.2'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -526,6 +785,43 @@ observations:
     note: Melt 6503-12
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1508'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-12
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.8'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-12
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -578,6 +874,43 @@ observations:
     note: Melt 6503-16
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1513'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-16
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.3 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.3'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -630,6 +963,43 @@ observations:
     note: Melt 6503-16
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1508'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-16
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.8'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -682,6 +1052,43 @@ observations:
     note: Melt 6503-16
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1504'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-16
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.4 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.4'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -734,6 +1141,43 @@ observations:
     note: Melt 6503-16
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1498'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-16
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.8'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-16
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -786,6 +1230,43 @@ observations:
     note: Melt 6503-28
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.149'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-28
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -838,6 +1319,43 @@ observations:
     note: Melt 6503-28
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1507'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-28
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.7 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.7'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -890,6 +1408,43 @@ observations:
     note: Melt 6503-28
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.151'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-28
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -942,6 +1497,43 @@ observations:
     note: Melt 6503-28
     source_path: tables/kems-001-homma-1966/table-2.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1496'
+      locator:
+        page: 517–518
+        table: '2'
+        note: Melt 6503-28
+        source_path: tables/kems-001-homma-1966/table-2.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.6 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.6'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 517–518
+              table: '2'
+              note: Melt 6503-28
+              source_path: tables/kems-001-homma-1966/table-2.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
   experiment_id: 10.2320/jinstmet1952.30.6_515::2
   identity:
@@ -1391,6 +1983,43 @@ observations:
     note: Melt 6412-14
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1504'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6412-14
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.4 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.4'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1441,6 +2070,43 @@ observations:
     note: Melt 6412-14
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1502'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6412-14
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.2 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.2'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1491,6 +2157,43 @@ observations:
     note: Melt 6412-14
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1503'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6412-14
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.3 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.3'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6412-14
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1541,6 +2244,43 @@ observations:
     note: Melt 6502-1
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1496'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-1
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.6 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.6'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1591,6 +2331,43 @@ observations:
     note: Melt 6502-1
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.151'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-1
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1641,6 +2418,43 @@ observations:
     note: Melt 6502-1
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1506'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-1
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.6 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.6'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-1
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1691,6 +2505,43 @@ observations:
     note: Melt 6502-2
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1501'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-2
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.1'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1741,6 +2592,43 @@ observations:
     note: Melt 6502-2
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1496'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-2
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.6 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.6'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -1791,6 +2679,43 @@ observations:
     note: Melt 6502-2
     source_path: tables/kems-001-homma-1966/table-1.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1496'
+      locator:
+        page: '517'
+        table: '1'
+        note: Melt 6502-2
+        source_path: tables/kems-001-homma-1966/table-1.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.6 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.6'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '517'
+              table: '1'
+              note: Melt 6502-2
+              source_path: tables/kems-001-homma-1966/table-1.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
   experiment_id: 10.2320/jinstmet1952.30.6_515::1
   identity:
@@ -2231,6 +3156,43 @@ observations:
     note: Melt 6503-14
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1503'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-14
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.3 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.3'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2283,6 +3245,43 @@ observations:
     note: Melt 6503-14
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1501'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-14
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.1'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2335,6 +3334,43 @@ observations:
     note: Melt 6503-14
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1481'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-14
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=148.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '148.1'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2387,6 +3423,43 @@ observations:
     note: Melt 6503-14
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1485'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-14
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=148.5 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '148.5'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-14
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2439,6 +3512,43 @@ observations:
     note: Melt 6503-15
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1515'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-15
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.5 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.5'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2491,6 +3601,43 @@ observations:
     note: Melt 6503-15
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1507'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-15
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.7 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.7'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2543,6 +3690,43 @@ observations:
     note: Melt 6503-15
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1518'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-15
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.8'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2595,6 +3779,43 @@ observations:
     note: Melt 6503-15
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1511'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6503-15
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=151.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '151.1'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6503-15
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2647,6 +3868,43 @@ observations:
     note: Melt 6504-1
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1501'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6504-1
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.1'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:1
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2699,6 +3957,43 @@ observations:
     note: Melt 6504-1
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1501'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6504-1
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150.1 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150.1'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:2
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2751,6 +4046,43 @@ observations:
     note: Melt 6504-1
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.15'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6504-1
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=150 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '150'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep::point:3
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:
@@ -2803,6 +4135,43 @@ observations:
     note: Melt 6504-1
     source_path: tables/kems-001-homma-1966/table-3.csv
   read_from: tables:kems-001-homma-1966
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.1498'
+      locator:
+        page: '518'
+        table: '3'
+        note: Melt 6504-1
+        source_path: tables/kems-001-homma-1966/table-3.csv
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=149.8 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '149.8'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: '518'
+              table: '3'
+              note: Melt 6504-1
+              source_path: tables/kems-001-homma-1966/table-3.csv
+        output_unit: kg
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
   experiment_id: 10.2320/jinstmet1952.30.6_515::3
   identity:

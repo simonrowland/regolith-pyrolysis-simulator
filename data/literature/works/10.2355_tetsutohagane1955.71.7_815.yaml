@@ -48,7 +48,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -63,6 +63,8 @@ experiments:
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
+        - as_published=1.0 atm
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -84,11 +86,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.71.7_815
   locator:
     page: 3
@@ -117,7 +119,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -132,6 +134,8 @@ experiments:
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
+        - as_published=1.0 atm
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -153,11 +157,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.71.7_815
   locator:
     page: 7
@@ -188,11 +192,19 @@ experiments:
           published_page: 816
           paragraph: 3-2 実験方法 inner diameter 15 mm
         inference:
-          relation: 'area = π (d/2)^2 from stated graphite-crucible inner diameter 15 mm (section 3-2). Same crucible class
-            used for the a_Na2O runs (4-1: apparatus identical except Fe-Csat omitted).'
+          relation: identity:m2
           inputs:
-          - '{''page'': 2, ''published_page'': 816, ''paragraph'': ''3-2 実験方法 inner diameter 15 mm''}'
-          parameters: []
+          - as_published=0.0001767 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0001767'
+              locator:
+                page: 2
+                published_page: 816
+                paragraph: 3-2 実験方法 inner diameter 15 mm
           output_unit: m2
 - experiment_id: 10.2355/tetsutohagane1955.71.7_815::8
   kind: literature
@@ -204,7 +216,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -219,6 +231,8 @@ experiments:
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
+        - as_published=1.0 atm
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -240,11 +254,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.71.7_815
   locator:
     page: 7
@@ -272,20 +286,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/tetsutohagane1955.71.7_815
   locator:
     page: 1

@@ -41,25 +41,47 @@ experiments:
   method:
     tag: unknown
     reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.05'
+          CaO: '10.73'
+          FeO: '19.76'
+          K2O: '0.073'
+          MgO: '7.82'
+          MnO: '0.256'
+          Na2O: '0.27'
+          SiO2: '46.87'
+          TiO2: '3.34'
+      locator:
+        page: 1369
+        figure: '1'
+        paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points only
+        note: figure-digitized absolute P series; not tabulated in source
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '1'
@@ -67,14 +89,6 @@ experiments:
     line_range: 103-105
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re
-      locator:
-        paragraph: rhenium containers; passivated Re for 12065
-        line_range: 32-56
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     geometry:
       orifice_area_m2:
         state:
@@ -85,12 +99,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::2
   kind: literature
   method:
@@ -101,20 +146,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '2'
@@ -140,12 +188,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::3
   kind: literature
   method:
@@ -156,51 +235,29 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '3'
     paragraph: Partial pressures of Mg over samples 12022 and 12065; indicative initial points
     line_range: 173-175
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re
-      locator:
-        paragraph: rhenium containers; passivated Re for 12065
-        line_range: 32-56
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-    geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value: '0.000004154756'
-        locator:
-          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
-          line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
-          inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
-          output_unit: m2
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::4
   kind: literature
   method:
@@ -211,20 +268,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     figure: '4'
@@ -250,12 +310,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::5
   kind: literature
   method:
@@ -266,20 +357,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     figure: '5'
@@ -305,12 +399,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::6
   kind: literature
   method:
@@ -321,20 +446,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '6'
@@ -360,12 +488,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::7
   kind: literature
   method:
@@ -376,20 +535,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '7'
@@ -415,12 +577,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::8
   kind: literature
   method:
@@ -431,20 +624,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     table: '8'
@@ -470,12 +666,43 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''rhenium containers knife-edge effusion hole 2.3 mm diameter'', ''line_range'': ''32''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   kind: literature
   method:
@@ -486,47 +713,52 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     paragraph: multiple rotating Knudsen cell; three cells 1 mm knife-edge
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Re (sample); multi-cell set Re / Fe / MgO; Ta external cap on Fe cell
-      locator:
-        paragraph: rhenium, iron, and magnesium oxide crucibles
-        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
     geometry:
-      orifice_area_m2:
+      orifice_diameter_m:
         state:
           tag: value
-          value: '0.000000785398'
+          value: '0.0023'
         locator:
-          paragraph: knife-edge orifice, 1 mm in diameter
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: A=pi*(d/2)^2 with d=1.0 mm multi-cell orifice
+          relation: identity:m
           inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md'',
-            ''paragraph'': ''knife-edge orifice, 1 mm in diameter''}'
-          parameters: []
-          output_unit: m2
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+                line_range: '32'
+                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          output_unit: m
 - experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   kind: literature
   method:
@@ -537,20 +769,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
   locator:
     published_page: 1368
@@ -575,9 +810,40 @@ experiments:
           pdf_page_index: 2
           paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
         inference:
-          relation: area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          relation: identity:m2
           inputs:
-          - '{''published_page'': 1368, ''pdf_page_index'': 2, ''paragraph'': ''rhenium containers having a knife-edge effusion
-            hole 2.3 mm in diameter''}'
-          parameters: []
+          - as_published=4.154756e-06 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000004154756'
+              locator:
+                published_page: 1368
+                pdf_page_index: 2
+                paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
           output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value: '0.0023'
+        locator:
+          published_page: 1368
+          pdf_page_index: 2
+          paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.0023 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0023'
+              locator:
+                published_page: 1368
+                pdf_page_index: 2
+                paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+          output_unit: m

@@ -361,6 +361,39 @@ observations:
               table: '3'
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '18.66513157894736842105263158'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.14 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.14'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -474,6 +507,40 @@ observations:
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
   read_from: unknown:kems-038-matchett-2006
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2.666447368421052631578947368'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-2 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -619,6 +686,39 @@ observations:
               table: '3'
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '106.6578947368421052631578947'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=8e-1 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -764,6 +864,39 @@ observations:
               table: '3'
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '5.86618421052631578947368421'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.044 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.044'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -909,6 +1042,39 @@ observations:
               table: '3'
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '30.66414473684210526315789473'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.23 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.23'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1199,6 +1365,39 @@ observations:
               table: '3'
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1333.223684210526315789473684'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=10 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1305,6 +1504,40 @@ observations:
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
   read_from: unknown:kems-038-matchett-2006
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '133.3223684210526315789473684'
+      locator:
+        page: 27
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=1. Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 27
+              table: '3'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:

@@ -17962,7 +17962,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 106 | 526 | 1078 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 8 | 38 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 38 | 285 | 427 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 38 | 285 | 428 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 10 | 69 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 56 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 6 |
@@ -17981,12 +17981,12 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 26 |
 | `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 60 | 66 | 289 |
 | `data/literature/extracts/kems-036-sesko-2024.yaml` | 8 | 8 | 44 |
-| `data/literature/extracts/kems-037-richter-2002.yaml` | 4 | 4 | 19 |
+| `data/literature/extracts/kems-037-richter-2002.yaml` | 4 | 4 | 18 |
 | `data/literature/extracts/kems-038-matchett-2006.yaml` | 3 | 11 | 19 |
 | `data/literature/extracts/kems-040-stolyarova-2015.yaml` | 2 | 2 | 11 |
 | `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 155 | 155 | 796 |
 | `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 928 |
-| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 69 |
+| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 70 |
 | `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 25 | 129 |
 | `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 6 | 37 |
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 12 | 12 | 74 |
@@ -18000,7 +18000,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 16 | 82 |
 | `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 16 | 90 |
 | `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 34 | 173 |
-| `data/literature/extracts/kems-095-ueda-1986.yaml` | 18 | 18 | 100 |
+| `data/literature/extracts/kems-095-ueda-1986.yaml` | 18 | 18 | 99 |
 | `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 16 | 81 |
 | `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 4 | 26 |
 | `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 13 | 53 |

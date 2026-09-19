@@ -1400,6 +1400,25 @@ def convert_mass_to_kg(
     return None, f"unmapped mass unit {units!r}"
 
 
+def convert_length_to_m(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "length value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing length unit"
+    lowered = str(units).strip().lower().replace(" ", "")
+    if lowered in {"m", "meter", "metre", "meters", "metres"}:
+        return amount, "identity:m"
+    if lowered in {"cm"}:
+        # Premise: 1 m = 100 cm exactly (SI).
+        return amount / Decimal("100"), "cm_to_m"
+    if lowered in {"mm"}:
+        return amount / Decimal("1000"), "mm_to_m"
+    return None, f"unmapped length unit {units!r}"
+
+
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "Torr_to_Pa": (
@@ -1427,6 +1446,8 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "mm2_to_m2": (Decimal("1000000"), "A_m2 = A_mm2 / 1e6", "m2", "mm2"),
     "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
+    "cm_to_m": (Decimal("100"), "L_m = L_cm / 100", "m", "cm"),
+    "mm_to_m": (Decimal("1000"), "L_m = L_mm / 1000", "m", "mm"),
     "percent_to_fraction": (
         Decimal("100"),
         "x = pct / 100",
@@ -1468,11 +1489,22 @@ def conversion_derivation(
 # ---------------------------------------------------------------------------
 
 
-def unknown_pressure_environment(reason: str = "source does not state pressure") -> PressureEnvironment:
+def unknown_pressure_environment(reason: str) -> PressureEnvironment:
+    """Unknown pressure payload. ``reason`` must name what was looked for."""
+
+    if not reason:
+        raise ValueError("unknown_pressure_environment requires a reason")
     return PressureEnvironment(
         total_pressure_Pa=located_unknown(reason),
-        sweep_gas=located_unknown(reason),
-        regime=FlowRegime(regime_class=State.unknown(reason)),
+        sweep_gas=located_unknown(
+            "no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract"
+        ),
+        regime=FlowRegime(
+            regime_class=State.unknown(
+                "no flow-regime field under keys regime_class / knudsen_number_orifice "
+                "/ knudsen_number_chamber in this extract"
+            )
+        ),
     )
 
 
@@ -3569,141 +3601,672 @@ def _series_point_value(
     return sel.amount, sel.unit_trail, sel.unused_ancillary
 
 
-def apparatus_from_equipment(equipment: object) -> Apparatus | None:
-    if not isinstance(equipment, Mapping) or not equipment:
+# ---------------------------------------------------------------------------
+# Lab-parameter vocabulary (printed extract name → schema field + unit)
+# ---------------------------------------------------------------------------
+
+LAB_PARAMETER_VOCAB_PATH = LITERATURE / "lab_parameter_vocabulary.yaml"
+_VOCAB_CACHE: dict[Path, tuple["VocabEntry", ...]] = {}
+_WALK_SKIP_KEYS = {
+    "quote",
+    "note",
+    "headers_as_published",
+    "fidelity_samples",
+    "supersedes",
+    "supersession_note",
+    "missing_for_motzfeldt",
+    "missing_note",
+}
+
+
+@dataclass(frozen=True)
+class VocabEntry:
+    printed: str
+    field: str
+    unit: str | None
+
+
+@dataclass(frozen=True)
+class LabHit:
+    entry: VocabEntry
+    amount: Decimal
+    units: str
+    locator: Locator
+    as_published: str
+    path: str
+    mapping: Mapping[str, Any] | None = None
+
+
+def load_lab_parameter_vocabulary(path: Path | None = None) -> tuple[VocabEntry, ...]:
+    target = (path or LAB_PARAMETER_VOCAB_PATH).resolve()
+    cached = _VOCAB_CACHE.get(target)
+    if cached is not None:
+        return cached
+    if not target.is_file():
+        entries: tuple[VocabEntry, ...] = ()
+        _VOCAB_CACHE[target] = entries
+        return entries
+    doc = load_yaml(target)
+    rows = doc.get("entries") if isinstance(doc, Mapping) else None
+    parsed: list[VocabEntry] = []
+    if isinstance(rows, list):
+        for row in rows:
+            if not isinstance(row, Mapping) or not row.get("printed") or not row.get("field"):
+                continue
+            unit = row.get("unit")
+            parsed.append(
+                VocabEntry(
+                    printed=str(row["printed"]),
+                    field=str(row["field"]),
+                    unit=None if unit in (None, "") else str(unit),
+                )
+            )
+    entries = tuple(parsed)
+    _VOCAB_CACHE[target] = entries
+    return entries
+
+
+def _vocab_for_root(root: Path | None) -> tuple[VocabEntry, ...]:
+    if root is not None:
+        candidate = Path(root) / "data" / "literature" / "lab_parameter_vocabulary.yaml"
+        if candidate.is_file():
+            return load_lab_parameter_vocabulary(candidate)
+    return load_lab_parameter_vocabulary()
+
+
+def printed_names_for(field: str, vocabulary: tuple[VocabEntry, ...] | None = None) -> tuple[str, ...]:
+    vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
+    return tuple(e.printed for e in vocab if e.field == field)
+
+
+def _lab_kind(field: str) -> str:
+    if field.endswith("printed_composition") or field.endswith("initial_composition"):
+        return "composition"
+    if field.endswith("mass_kg"):
+        return "mass"
+    if field.endswith("area_m2"):
+        return "area"
+    if field.endswith("_Pa"):
+        return "pressure"
+    if field.endswith("diameter_m") or field.endswith("length_m"):
+        return "length"
+    return "factor"
+
+
+def _convert_lab_value(
+    field: str, amount: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    kind = _lab_kind(field)
+    if kind == "mass":
+        return convert_mass_to_kg(amount, units)
+    if kind == "area":
+        return convert_area_to_m2(amount, units)
+    if kind == "length":
+        return convert_length_to_m(amount, units)
+    if kind == "pressure":
+        return convert_pressure_to_pa(amount, units)
+    if kind == "factor":
+        value = _as_dec_or_none(amount)
+        if value is None:
+            return None, "factor value is not numeric"
+        return value, "identity:1"
+    return None, f"unmapped lab field {field}"
+
+
+def _output_unit_for(field: str) -> str:
+    kind = _lab_kind(field)
+    return {
+        "mass": "kg",
+        "area": "m2",
+        "length": "m",
+        "pressure": "Pa",
+        "factor": "1",
+        "composition": "as_published",
+    }.get(kind, "as_published")
+
+
+def _looked_for_reason(field: str, vocabulary: tuple[VocabEntry, ...]) -> str:
+    keys = printed_names_for(field, vocabulary)
+    listed = " / ".join(keys) if keys else field
+    kind = _lab_kind(field)
+    if kind == "pressure":
+        noun = "pressure"
+    elif kind == "mass":
+        noun = "mass"
+    elif kind == "area":
+        noun = "area"
+    elif kind == "length":
+        noun = "length"
+    elif kind == "composition":
+        noun = "composition"
+    else:
+        noun = field.rsplit(".", 1)[-1]
+    return f"no {noun} field under keys {listed} in this extract"
+
+
+def _hit_from_value(
+    entry: VocabEntry,
+    value: object,
+    parent_locator: Locator | None,
+    path: str,
+) -> LabHit | None:
+    if _lab_kind(entry.field) == "composition":
         return None
-    cell = None
-    geometry_kwargs: dict[str, Located[Decimal]] = {}
+    units = entry.unit
+    loc = parent_locator
+    raw = value
+    mapping: Mapping[str, Any] | None = None
+    if isinstance(value, Mapping):
+        mapping = value
+        if value.get("value") is None:
+            return None
+        raw = value.get("value")
+        if value.get("units") not in (None, ""):
+            units = str(value.get("units"))
+        loc = locator_from_mapping(value.get("locator")) or loc
+    amount = _as_dec_or_none(raw)
+    if amount is None or loc is None:
+        return None
+    unit_text = str(units) if units else ""
+    published = f"{raw} {unit_text}".strip()
+    return LabHit(
+        entry=entry,
+        amount=amount,
+        units=unit_text,
+        locator=loc,
+        as_published=published,
+        path=path,
+        mapping=mapping,
+    )
+
+
+def _walk_lab_hits(
+    obj: object,
+    by_printed: Mapping[str, VocabEntry],
+    *,
+    parent_locator: Locator | None = None,
+    path: str = "",
+    depth: int = 0,
+) -> list[LabHit]:
+    if depth > 14:
+        return []
+    hits: list[LabHit] = []
+    if isinstance(obj, Mapping):
+        loc = locator_from_mapping(obj.get("locator")) or parent_locator
+        for key, value in obj.items():
+            name = str(key)
+            if name in _WALK_SKIP_KEYS:
+                continue
+            child = f"{path}.{name}" if path else name
+            entry = by_printed.get(name)
+            if entry is not None:
+                hit = _hit_from_value(entry, value, loc, child)
+                if hit is not None:
+                    hits.append(hit)
+            if name == "locator":
+                continue
+            hits.extend(
+                _walk_lab_hits(
+                    value,
+                    by_printed,
+                    parent_locator=loc,
+                    path=child,
+                    depth=depth + 1,
+                )
+            )
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            hits.extend(
+                _walk_lab_hits(
+                    item,
+                    by_printed,
+                    parent_locator=parent_locator,
+                    path=f"{path}[{i}]",
+                    depth=depth + 1,
+                )
+            )
+    return hits
+
+
+def collect_lab_hits(
+    roots: Iterable[object],
+    vocabulary: tuple[VocabEntry, ...],
+    *,
+    fallback_locator: Locator | None = None,
+) -> list[LabHit]:
+    by_printed = {e.printed: e for e in vocabulary}
+    hits: list[LabHit] = []
+    for root in roots:
+        hits.extend(
+            _walk_lab_hits(root, by_printed, parent_locator=fallback_locator)
+        )
+    return hits
+
+
+def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[Decimal]:
+    converted = conversion_derivation(trail, hit.amount, hit.locator)
+    extra = (f"as_published={hit.as_published}", f"printed={hit.entry.printed}")
+    if converted is not None:
+        return Located(
+            State.of(si),
+            locator=hit.locator,
+            inference=Derivation(
+                relation=converted.relation,
+                inputs=converted.inputs + extra,
+                parameters=converted.parameters,
+                output_unit=converted.output_unit,
+            ),
+        )
+    return Located(
+        State.of(si),
+        locator=hit.locator,
+        inference=Derivation(
+            relation=str(trail or "identity"),
+            inputs=extra,
+            parameters=(
+                ("original", Located(State.of(hit.amount), locator=hit.locator)),
+            ),
+            output_unit=_output_unit_for(hit.entry.field),
+        ),
+    )
+
+
+def _unique_located(
+    hits: list[LabHit],
+) -> Located[Decimal] | None:
+    converted: list[tuple[Decimal, LabHit, str | None]] = []
+    for hit in hits:
+        si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
+        if si is None:
+            continue
+        converted.append((si, hit, trail))
+    if not converted:
+        if not hits:
+            return None
+        _, why = _convert_lab_value(hits[0].entry.field, hits[0].amount, hits[0].units)
+        return located_unknown(why or "missing unit")
+    values = {item[0] for item in converted}
+    if len(values) > 1:
+        return None
+    si, hit, trail = converted[0]
+    return _located_from_hit(hit, si, trail)
+
+
+def _hits_for(hits: list[LabHit], field: str) -> list[LabHit]:
+    return [h for h in hits if h.entry.field == field]
+
+
+def _printed_composition_from_roots(
+    roots: Iterable[object],
+    vocabulary: tuple[VocabEntry, ...],
+    *,
+    fallback_locator: Locator | None = None,
+) -> Located[Mapping[str, Any]] | None:
+    names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
+    found: list[tuple[tuple[tuple[str, str], ...], Locator]] = []
+
+    def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
+        if depth > 14:
+            return
+        if isinstance(obj, Mapping):
+            loc = locator_from_mapping(obj.get("locator")) or parent_loc
+            for key, value in obj.items():
+                name = str(key)
+                if name in names and isinstance(value, Mapping):
+                    comps = {
+                        str(k): v
+                        for k, v in value.items()
+                        if k not in _WALK_SKIP_KEYS
+                        and k != "locator"
+                        and _as_dec_or_none(v) is not None
+                    }
+                    if comps and loc is not None:
+                        fingerprint = tuple(
+                            sorted((k, _dec_str(as_decimal(v))) for k, v in comps.items())
+                        )
+                        found.append((fingerprint, loc))
+                if name not in _WALK_SKIP_KEYS and name != "locator":
+                    walk(value, loc, depth + 1)
+        elif isinstance(obj, list):
+            for item in obj:
+                walk(item, parent_loc, depth + 1)
+
+    for root in roots:
+        walk(root, fallback_locator, 0)
+    if not found:
+        return None
+    fingerprints = {item[0] for item in found}
+    if len(fingerprints) > 1:
+        return None
+    fingerprint, loc = found[0]
+    return located_value({k: v for k, v in fingerprint}, loc)
+
+
+def _lab_roots(
+    equipment: object,
+    values: object = None,
+    extra: object = None,
+) -> list[object]:
+    roots: list[object] = []
+    if isinstance(equipment, Mapping) and equipment:
+        roots.append(equipment)
+    if isinstance(values, Mapping) and values:
+        roots.append(values)
+    if extra is not None and extra is not equipment and extra is not values:
+        roots.append(extra)
+    return roots
+
+
+def _form_and_container(
+    equipment: object,
+) -> tuple[Located[str] | None, Located[str] | None]:
+    if not isinstance(equipment, Mapping):
+        return None, None
+    form_located: Located[str] | None = None
+    container_located: Located[str] | None = None
+    raw_sample = equipment.get("sample")
+    if not isinstance(raw_sample, Mapping):
+        return None, None
+    loc = locator_from_mapping(raw_sample.get("locator"))
+    form = raw_sample.get("form")
+    container = raw_sample.get("container")
+    if isinstance(form, str) and form:
+        form_located = located_value(form, loc)
+    elif isinstance(form, Mapping) and form.get("value") is not None:
+        form_located = located_value(
+            str(form["value"]), locator_from_mapping(form.get("locator")) or loc
+        )
+    if isinstance(container, str) and container:
+        container_located = located_value(container, loc)
+    elif isinstance(container, Mapping) and container.get("value") is not None:
+        container_located = located_value(
+            str(container["value"]),
+            locator_from_mapping(container.get("locator")) or loc,
+        )
+    return form_located, container_located
+
+
+def _cell_from_equipment(equipment: object) -> Located[str] | None:
+    if not isinstance(equipment, Mapping):
+        return None
     raw_cell = equipment.get("cell_material")
     if isinstance(raw_cell, Mapping) and raw_cell.get("value") is not None:
         loc = locator_from_mapping(raw_cell.get("locator"))
-        cell = located_value(str(raw_cell["value"]), loc)
-    field_map = {
-        "orifice_area": "orifice_area_m2",
-        "clausing_factor": "clausing_factor",
-        "sample_surface_area": "exposed_area_m2",
+        return located_value(str(raw_cell["value"]), loc)
+    return None
+
+
+def _prefer_located(
+    old: Located[Any] | None, new: Located[Any] | None
+) -> Located[Any] | None:
+    if new is None:
+        return old
+    if old is None:
+        return new
+    if old.state.is_unknown and new.state.is_value:
+        return new
+    if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
+        return None
+    return old
+
+
+def _merge_geometry(
+    old: ApparatusGeometry | None, new: ApparatusGeometry | None
+) -> ApparatusGeometry | None:
+    if old is None:
+        return new
+    if new is None:
+        return old
+    kwargs = {
+        name: _prefer_located(getattr(old, name), getattr(new, name))
+        for name in (
+            "orifice_area_m2",
+            "orifice_diameter_m",
+            "clausing_factor",
+            "orifice_to_sample_area_ratio",
+            "exposed_area_m2",
+            "chamber_length_m",
+        )
     }
-    for src, dest in field_map.items():
-        payload = equipment.get(src)
-        if not isinstance(payload, Mapping):
-            continue
-        amount = _as_dec_or_none(payload.get("value"))
-        if amount is None:
-            continue
-        loc = locator_from_mapping(payload.get("locator"))
-        if src in {"orifice_area", "sample_surface_area"}:
-            converted, trail = convert_area_to_m2(amount, payload.get("units"))
-            if converted is None:
-                geometry_kwargs[dest] = located_unknown(trail or "unmapped area unit")
-            else:
-                inference = None
-                if payload.get("inferred") or payload.get("inference"):
-                    inference = Derivation(
-                        relation=str(payload.get("inference") or "inferred"),
-                        inputs=(str(payload.get("locator") or dest),),
-                        parameters=(),
-                        output_unit="m2",
-                    )
-                elif trail:
-                    inference = conversion_derivation(trail, amount, loc)
-                geometry_kwargs[dest] = Located(
-                    State.of(converted), locator=loc, inference=inference
-                )
-            continue
-        geometry_kwargs[dest] = located_value(amount, loc)
+    if not any(v is not None for v in kwargs.values()):
+        return None
+    return ApparatusGeometry(**kwargs)
+
+
+def _merge_apparatus(
+    old: Apparatus | None, new: Apparatus | None
+) -> Apparatus | None:
+    if old is None:
+        return new
+    if new is None:
+        return old
+    cell = _prefer_located(old.cell_material_and_liner, new.cell_material_and_liner)
+    geometry = _merge_geometry(old.geometry, new.geometry)
+    if cell is None and geometry is None:
+        return None
+    return Apparatus(cell_material_and_liner=cell, geometry=geometry)
+
+
+def _merge_pressure(
+    old: PressureEnvironment, new: PressureEnvironment
+) -> PressureEnvironment:
+    total = _prefer_located(old.total_pressure_Pa, new.total_pressure_Pa)
+    if total is None:
+        total = located_unknown(
+            "conflicting printed pressures; not collapsed into one number"
+        )
+    kn_old = old.regime.knudsen_number_orifice if old.regime else None
+    kn_new = new.regime.knudsen_number_orifice if new.regime else None
+    knc_old = old.regime.knudsen_number_chamber if old.regime else None
+    knc_new = new.regime.knudsen_number_chamber if new.regime else None
+    regime_class = old.regime.regime_class
+    if regime_class.is_unknown and new.regime.regime_class.is_value:
+        regime_class = new.regime.regime_class
+    sweep = old.sweep_gas
+    if sweep.state.is_unknown and new.sweep_gas.state.is_value:
+        sweep = new.sweep_gas
+    return PressureEnvironment(
+        total_pressure_Pa=total,
+        sweep_gas=sweep,
+        regime=FlowRegime(
+            regime_class=regime_class,
+            knudsen_number_orifice=_prefer_located(kn_old, kn_new),
+            knudsen_number_chamber=_prefer_located(knc_old, knc_new),
+        ),
+        gauge=old.gauge or new.gauge,
+        pressure_profile=_prefer_located(old.pressure_profile, new.pressure_profile),
+        pumping=old.pumping or new.pumping,
+        cell_internal_pressure_note=_prefer_located(
+            old.cell_internal_pressure_note, new.cell_internal_pressure_note
+        ),
+    )
+
+
+def _merge_experiment_lab_params(
+    existing: Experiment,
+    sample: Sample,
+    apparatus: Apparatus | None,
+    pressure_env: PressureEnvironment,
+) -> Experiment:
+    merged_sample = Sample(
+        mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
+        initial_composition=_prefer_located(
+            existing.sample.initial_composition, sample.initial_composition
+        ),
+        printed_composition=_prefer_located(
+            existing.sample.printed_composition, sample.printed_composition
+        ),
+        form=_prefer_located(existing.sample.form, sample.form),
+        container=_prefer_located(existing.sample.container, sample.container),
+    )
+    return replace(
+        existing,
+        sample=merged_sample,
+        apparatus=_merge_apparatus(existing.apparatus, apparatus),
+        pressure_environment=_merge_pressure(existing.pressure_environment, pressure_env),
+    )
+
+
+def apparatus_from_equipment(
+    equipment: object,
+    *,
+    vocabulary: tuple[VocabEntry, ...] | None = None,
+    values: object = None,
+    locator: Locator | None = None,
+) -> Apparatus | None:
+    vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
+    roots = _lab_roots(equipment, values)
+    hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
+    geometry_kwargs: dict[str, Located[Decimal]] = {}
+    for dest, field in (
+        ("orifice_area_m2", "apparatus.geometry.orifice_area_m2"),
+        ("orifice_diameter_m", "apparatus.geometry.orifice_diameter_m"),
+        ("clausing_factor", "apparatus.geometry.clausing_factor"),
+        ("orifice_to_sample_area_ratio", "apparatus.geometry.orifice_to_sample_area_ratio"),
+        ("exposed_area_m2", "apparatus.geometry.exposed_area_m2"),
+        ("chamber_length_m", "apparatus.geometry.chamber_length_m"),
+    ):
+        located = _unique_located(_hits_for(hits, field))
+        if located is not None:
+            geometry_kwargs[dest] = located
+    cell = _cell_from_equipment(equipment)
     geometry = ApparatusGeometry(**geometry_kwargs) if geometry_kwargs else None
     if cell is None and geometry is None:
         return None
     return Apparatus(cell_material_and_liner=cell, geometry=geometry)
 
 
-def sample_from_equipment(equipment: object) -> Sample:
+def sample_from_equipment(
+    equipment: object,
+    *,
+    vocabulary: tuple[VocabEntry, ...] | None = None,
+    values: object = None,
+    locator: Locator | None = None,
+) -> Sample:
     """Transfer a stated sample payload; never invent mass, form, or units."""
 
-    if not isinstance(equipment, Mapping) or not equipment:
-        return Sample()
-    mass_src: Mapping[str, Any] | None = None
-    implied_unit: str | None = None
-    form_located: Located[str] | None = None
-    container_located: Located[str] | None = None
-    raw_sample = equipment.get("sample")
-    if isinstance(raw_sample, Mapping):
-        nested = raw_sample.get("mass") or raw_sample.get("mass_kg")
-        if isinstance(nested, Mapping):
-            mass_src = nested
-        form = raw_sample.get("form")
-        container = raw_sample.get("container")
-        loc = locator_from_mapping(raw_sample.get("locator"))
-        if isinstance(form, str) and form:
-            form_located = located_value(form, loc)
-        elif isinstance(form, Mapping) and form.get("value") is not None:
-            form_located = located_value(
-                str(form["value"]), locator_from_mapping(form.get("locator")) or loc
-            )
-        if isinstance(container, str) and container:
-            container_located = located_value(container, loc)
-        elif isinstance(container, Mapping) and container.get("value") is not None:
-            container_located = located_value(
-                str(container["value"]),
-                locator_from_mapping(container.get("locator")) or loc,
-            )
-    for key, unit in (
-        ("sample_mass", None),
-        ("sample_mass_kg", "kg"),
-        ("sample_mass_g", "g"),
-        ("sample_mass_mg", "mg"),
+    vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
+    roots = _lab_roots(equipment, values)
+    hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
+    mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
+    form_located, container_located = _form_and_container(equipment)
+    printed = _printed_composition_from_roots(
+        roots, vocab, fallback_locator=locator
+    )
+    if (
+        mass_located is None
+        and form_located is None
+        and container_located is None
+        and printed is None
     ):
-        payload = equipment.get(key)
-        if isinstance(payload, Mapping) and payload.get("value") is not None:
-            mass_src = payload
-            implied_unit = unit
-            break
-    mass_located: Located[Decimal] | None = None
-    if isinstance(mass_src, Mapping) and mass_src.get("value") is not None:
-        units = mass_src.get("units") or implied_unit
-        loc = locator_from_mapping(mass_src.get("locator"))
-        kg, trail = convert_mass_to_kg(mass_src.get("value"), units)
-        if kg is None:
-            mass_located = located_unknown(trail or "missing mass unit")
-        else:
-            mass_located = Located(
-                State.of(kg),
-                locator=loc,
-                inference=conversion_derivation(trail, mass_src.get("value"), loc),
-            )
-    if mass_located is None and form_located is None and container_located is None:
         return Sample()
     return Sample(
         mass_kg=mass_located,
         form=form_located,
         container=container_located,
+        printed_composition=printed,
     )
 
 
-def pressure_from_equipment(equipment: object) -> PressureEnvironment:
-    reason = "source does not state pressure"
-    if not isinstance(equipment, Mapping):
-        return unknown_pressure_environment(reason)
-    payload = equipment.get("chamber_pressure")
-    if not isinstance(payload, Mapping) or payload.get("value") is None:
-        return unknown_pressure_environment(reason)
-    pa, trail = convert_pressure_to_pa(payload.get("value"), payload.get("units"))
-    loc = locator_from_mapping(payload.get("locator"))
-    if pa is None:
-        return unknown_pressure_environment(
-            trail or "chamber_pressure is not a numeric pressure"
-        )
+def pressure_from_equipment(
+    equipment: object,
+    *,
+    vocabulary: tuple[VocabEntry, ...] | None = None,
+    values: object = None,
+    locator: Locator | None = None,
+) -> PressureEnvironment:
+    vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
+    roots = _lab_roots(equipment, values)
+    hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
+    field = "pressure_environment.total_pressure_Pa"
+    pressure_hits = _hits_for(hits, field)
+    located = _unique_located(pressure_hits)
+    if located is None:
+        converted_si = []
+        unit_why = None
+        for hit in pressure_hits:
+            si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
+            if si is None:
+                unit_why = trail
+            else:
+                converted_si.append(si)
+        if len(set(converted_si)) > 1:
+            return unknown_pressure_environment(
+                "conflicting printed pressures; not collapsed into one number"
+            )
+        if unit_why:
+            return unknown_pressure_environment(unit_why)
+        return unknown_pressure_environment(_looked_for_reason(field, vocab))
+    kn_orifice = _unique_located(
+        _hits_for(hits, "pressure_environment.regime.knudsen_number_orifice")
+    )
+    kn_chamber = _unique_located(
+        _hits_for(hits, "pressure_environment.regime.knudsen_number_chamber")
+    )
     return PressureEnvironment(
-        total_pressure_Pa=Located(
-            State.of(pa),
-            locator=loc,
-            inference=conversion_derivation(trail, payload.get("value"), loc),
+        total_pressure_Pa=located,
+        sweep_gas=located_unknown(
+            "no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract"
         ),
-        sweep_gas=located_unknown("source does not state sweep gas"),
         regime=FlowRegime(
-            regime_class=State.unknown("source does not state flow regime")
+            regime_class=State.unknown(
+                "no flow-regime field under keys regime_class / knudsen_number_orifice "
+                "/ knudsen_number_chamber in this extract"
+            ),
+            knudsen_number_orifice=kn_orifice,
+            knudsen_number_chamber=kn_chamber,
         ),
     )
+
+
+def _sample_matched_roots(equipment: object, series_item: object) -> list[object]:
+    if not isinstance(series_item, Mapping):
+        return []
+    sid = series_item.get("sample") or series_item.get("id")
+    if not isinstance(sid, str) or not sid.strip():
+        return []
+    matched: list[object] = []
+
+    def walk(obj: object) -> None:
+        if isinstance(obj, Mapping):
+            if obj.get("sample") == sid or obj.get("id") == sid:
+                matched.append(obj)
+            for value in obj.values():
+                walk(value)
+        elif isinstance(obj, list):
+            for item in obj:
+                walk(item)
+
+    walk(equipment)
+    return matched
+
+
+def point_lab_conditions(
+    *,
+    series_item: object,
+    equipment: object,
+    vocabulary: tuple[VocabEntry, ...],
+    locator: Locator | None,
+) -> dict[str, Located[Decimal]]:
+    roots: list[object] = []
+    if isinstance(series_item, Mapping):
+        roots.append(series_item)
+    roots.extend(_sample_matched_roots(equipment, series_item))
+    if not roots:
+        return {}
+    hits = collect_lab_hits(roots, vocabulary, fallback_locator=locator)
+    out: dict[str, Located[Decimal]] = {}
+    for key, field in (
+        ("mass_kg", "sample.mass_kg"),
+        ("exposed_area_m2", "apparatus.geometry.exposed_area_m2"),
+        ("total_pressure_Pa", "pressure_environment.total_pressure_Pa"),
+        ("orifice_area_m2", "apparatus.geometry.orifice_area_m2"),
+        ("orifice_diameter_m", "apparatus.geometry.orifice_diameter_m"),
+    ):
+        located = _unique_located(_hits_for(hits, field))
+        if located is not None and located.state.is_value:
+            out[key] = located
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -4012,6 +4575,7 @@ class Migrator:
         )
         self.aliases.update(REVIEWED_ALIASES)
         self.result = MigrationResult(aliases=dict(self.aliases))
+        self._vocab = _vocab_for_root(self.root)
         self._work_citations: dict[str, str] = {}
         self._work_dois: dict[str, str | None] = {}
         self._work_source_ids: dict[str, list[str]] = defaultdict(list)
@@ -4116,19 +4680,41 @@ class Migrator:
         locator: Locator | None,
         method: State[MethodToken],
         equipment: object,
+        values: object = None,
         conditions: dict[str, Located[Decimal]] | None = None,
         observation_id: str | None = None,
         source: str | None = None,
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
-        if existing is not None:
-            return existing
         cond = conditions or {
-            "temperature_K": located_unknown("source does not state a point temperature")
+            "temperature_K": located_unknown(
+                "no temperature field under keys T_K / T_C / temperature_K in this extract"
+            )
         }
-        pressure_env = pressure_from_equipment(equipment)
-        apparatus = apparatus_from_equipment(equipment)
-        sample = sample_from_equipment(equipment)
+        pressure_env = pressure_from_equipment(
+            equipment,
+            vocabulary=self._vocab,
+            values=values,
+            locator=locator,
+        )
+        apparatus = apparatus_from_equipment(
+            equipment,
+            vocabulary=self._vocab,
+            values=values,
+            locator=locator,
+        )
+        sample = sample_from_equipment(
+            equipment,
+            vocabulary=self._vocab,
+            values=values,
+            locator=locator,
+        )
+        if existing is not None:
+            merged = _merge_experiment_lab_params(
+                existing, sample, apparatus, pressure_env
+            )
+            self.result.experiments[experiment_id] = merged
+            return merged
         if (
             isinstance(equipment, Mapping)
             and isinstance(equipment.get("chamber_pressure"), Mapping)
@@ -4607,6 +5193,7 @@ class Migrator:
             locator=locator,
             method=method,
             equipment=obs.get("equipment"),
+            values=values if isinstance(values, Mapping) else None,
             observation_id=obs_id,
             source=source_key,
         )
@@ -4690,6 +5277,7 @@ class Migrator:
                     read_from=read_from,
                     derived_from=derived_from,
                     notices=point_notices,
+                    equipment=obs.get("equipment"),
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -4711,6 +5299,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    equipment=obs.get("equipment"),
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -4792,6 +5381,7 @@ class Migrator:
         read_from: str,
         derived_from: tuple[str, ...] | None = None,
         notices: tuple[Notice, ...] = (),
+        equipment: object = None,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -4916,6 +5506,14 @@ class Migrator:
                     inference=conversion_derivation(t_trail, t_original, point_locator),
                 )
             }
+        lab_pc = point_lab_conditions(
+            series_item=raw_item if isinstance(raw_item, Mapping) else None,
+            equipment=equipment,
+            vocabulary=self._vocab,
+            locator=point_locator,
+        )
+        if lab_pc:
+            point_conditions = {**(point_conditions or {}), **lab_pc}
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,

@@ -72,41 +72,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    regime:
-      regime_class:
-        tag: unknown
-        reason: source does not state pressure
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    page: 53
-    table: '1'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
-      measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.; quote=Element
-      | Calculated | Measured | St. Dev.
-
-      Mn | 992.4 | 690.2 | 3.8'
-    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-- experiment_id: 10.1016/j.gca.2019.06.021::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -121,6 +87,8 @@ experiments:
         inputs:
         - P_Pa = P_bar × 1e5
         - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -142,11 +110,107 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2019.06.021
+  locator:
+    page: 53
+    table: '1'
+    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml;
+      measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.; quote=Element
+      | Calculated | Measured | St. Dev.
+
+      Mn | 992.4 | 690.2 | 3.8'
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+      locator:
+        paragraph: loaded onto a metal wire loop; Re used where possible
+        line_range: '67'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value: '0.00002'
+        locator:
+          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+          line_range: '71'
+          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
+- experiment_id: 10.1016/j.gca.2019.06.021::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        paragraph: 1-atm vertical tube gas-mixing furnaces
+        line_range: '408'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     table: '2'
@@ -173,6 +237,21 @@ experiments:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
           source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2019.06.021::3
   kind: literature
   method:
@@ -183,39 +262,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: source does not state pressure
-    regime:
-      regime_class:
-        tag: unknown
-        reason: source does not state pressure
-  work_id: 10.1016/j.gca.2019.06.021
-  locator:
-    table: '3'
-    paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
-    section: Results — Na / Table 3
-    line_range: '1108'
-    note: Table 3 fitted logK* at 1673.15 K; prose §4.2 also states -4.25±0.10
-    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
-- experiment_id: 10.1016/j.gca.2019.06.021::4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -230,6 +277,8 @@ experiments:
         inputs:
         - P_Pa = P_bar × 1e5
         - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -251,11 +300,105 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2019.06.021
+  locator:
+    table: '3'
+    paragraph: log K* Na = -4.25±0.10 at 1400 °C (1673.15 K); n=1; reaction NaO0.5(l)=Na(g)+1/4 O2
+    section: Results — Na / Table 3
+    line_range: '1108'
+    note: Table 3 fitted logK* at 1673.15 K; prose §4.2 also states -4.25±0.10
+    source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+      locator:
+        paragraph: loaded onto a metal wire loop; Re used where possible
+        line_range: '67'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value: '0.00002'
+        locator:
+          paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+          line_range: '71'
+          source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
+- experiment_id: 10.1016/j.gca.2019.06.021::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '100000'
+      locator:
+        paragraph: 1-atm vertical tube gas-mixing furnaces
+        line_range: '408'
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              paragraph: 1-atm vertical tube gas-mixing furnaces
+              line_range: '408'
+              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     table: '4'
@@ -281,6 +424,21 @@ experiments:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
           line_range: '71'
           source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m)
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2019.06.021::5
   kind: literature
   method:
@@ -291,20 +449,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     table: '5'
@@ -323,20 +484,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     table: '6'
@@ -355,7 +519,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -370,6 +534,8 @@ experiments:
         inputs:
         - P_Pa = P_bar × 1e5
         - original_unit=bar
+        - as_published=1.0 bar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -391,11 +557,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     section: 4.6 Evaporation coefficients
@@ -406,9 +572,9 @@ experiments:
     cell_material_and_liner:
       state:
         tag: value
-        value: Re wire loop where possible; Pt wire otherwise (not Knudsen cell)
+        value: Re/Pt wire loops
       locator:
-        paragraph: loaded onto a metal wire loop; Re used where possible
+        paragraph: metal wire loop
         line_range: '67'
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     geometry:
@@ -420,6 +586,21 @@ experiments:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
           line_range: '71'
           source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        inference:
+          relation: identity:m2
+          inputs:
+          - as_published=2e-05 m2
+          - printed=sample_surface_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
+                line_range: '71'
+                source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+          output_unit: m2
 - experiment_id: 10.1016/j.gca.2019.06.021::sossi_2019_na_open_furnace_apparent
   kind: literature
   method:
@@ -430,20 +611,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.021
   locator:
     note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021

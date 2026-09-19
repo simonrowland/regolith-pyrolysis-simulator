@@ -775,6 +775,78 @@ observations:
               paragraph: R3-12
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000254'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-12
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000224'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-12
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:1
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1115,6 +1187,78 @@ observations:
               paragraph: R3-10
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000284'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-10
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=28.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '28.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.000024'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-10
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=24.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '24'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:10
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1455,6 +1599,78 @@ observations:
               paragraph: R-6
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000209'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-6
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=20.9 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.00002'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-6
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-6
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:11
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -1795,6 +2011,78 @@ observations:
               paragraph: R-3
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000238'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-3
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=23.8 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000215'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-3
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.5 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:12
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2135,6 +2423,78 @@ observations:
               paragraph: R-2
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000263'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=26.3 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '26.3'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000228'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.8 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:13
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2475,6 +2835,78 @@ observations:
               paragraph: R-18
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000399'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=39.9 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '39.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000274'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=27.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '27.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:14
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -2815,6 +3247,78 @@ observations:
               paragraph: R-4
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000222'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=22.2 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000206'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.6 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:15
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3155,6 +3659,78 @@ observations:
               paragraph: R3-14
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000276'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=27.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '27.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000235'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=23.5 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:16
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3495,6 +4071,78 @@ observations:
               paragraph: R2-1
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000242'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=24.2 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '24.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000217'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.7 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:17
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -3835,6 +4483,78 @@ observations:
               paragraph: R-7
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000301'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=30.1 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '30.1'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000278'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=27.8 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '27.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:18
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -4515,6 +5235,78 @@ observations:
               paragraph: R-8
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001719'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=171.9 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '171.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000875'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=87.5 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '87.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:2
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -4855,6 +5647,78 @@ observations:
               paragraph: R3-11
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000226'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=22.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000209'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:20
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -5195,6 +6059,78 @@ observations:
               paragraph: R-9
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001466'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=146.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '146.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000826'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=82.6 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '82.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:21
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -5535,6 +6471,78 @@ observations:
               paragraph: R-11
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001904'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=190.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '190.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000913'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=91.3 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '91.3'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:22
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -5875,6 +6883,78 @@ observations:
               paragraph: R2-4
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001766'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=176.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '176.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000885'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=88.5 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '88.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:23
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6215,6 +7295,78 @@ observations:
               paragraph: R2-5
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000186'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-5
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=186.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '186'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000904'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-5
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=90.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '90.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:24
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6555,6 +7707,78 @@ observations:
               paragraph: R2-21
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000018'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-21
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=1.8 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000039'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-21
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=3.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:25
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -6895,6 +8119,78 @@ observations:
               paragraph: R2-20
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000002'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-20
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=2.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000042'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-20
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=4.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:26
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7235,6 +8531,78 @@ observations:
               paragraph: R2-18
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000025'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=2.5 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000047'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=4.7 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:27
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7575,6 +8943,78 @@ observations:
               paragraph: R2-19
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000034'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-19
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=3.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000054'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-19
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:28
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -7915,6 +9355,78 @@ observations:
               paragraph: R2-17
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000028'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-17
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=2.8 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000051'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-17
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.1 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.1'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:29
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8255,6 +9767,78 @@ observations:
               paragraph: R2-7
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000037'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=3.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000056'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.6 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:3
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8595,6 +10179,78 @@ observations:
               paragraph: R3-13
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000233'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-13
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=23.3 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23.3'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000213'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-13
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.3 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.3'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:30
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -8935,6 +10591,78 @@ observations:
               paragraph: R2-3
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000169'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-3
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=16.9 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '16.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000179'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-3
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=17.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '17.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-3
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:31
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9275,6 +11003,78 @@ observations:
               paragraph: R2-10
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000254'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-10
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000222'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-10
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-10
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:32
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9615,6 +11415,78 @@ observations:
               paragraph: R2-16
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000178'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-16
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=17.8 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '17.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000184'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-16
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=18.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '18.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:33
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -9955,6 +11827,78 @@ observations:
               paragraph: R2-11
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000287'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=28.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '28.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.000024'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-11
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=24.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '24'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-11
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:34
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10295,6 +12239,78 @@ observations:
               paragraph: R2-12
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000319'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-12
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=31.9 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '31.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000252'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-12
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=25.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-12
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:35
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10635,6 +12651,78 @@ observations:
               paragraph: R2-2
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000205'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=20.5 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000197'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R2-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=19.7 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '19.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R2-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:36
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -10975,6 +13063,78 @@ observations:
               paragraph: R2-13
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000003'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-13
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=3.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000052'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-13
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.2'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-13
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:37
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -11315,6 +13475,78 @@ observations:
               paragraph: R2-15
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000043'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.3 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.3'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000059'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.9'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:38
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -11655,6 +13887,78 @@ observations:
               paragraph: R2-14
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000034'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=3.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000054'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.4'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:39
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -11995,6 +14299,78 @@ observations:
               paragraph: R2-9
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000044'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.000006'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=6.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:4
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -12335,6 +14711,78 @@ observations:
               paragraph: R3-15
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000241'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=24.1 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '24.1'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000217'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.7 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.7'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:40
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -12675,6 +15123,78 @@ observations:
               paragraph: R2-8
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000027'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=2.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.7'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000049'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R2-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=4.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.9'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R2-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:41
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13015,6 +15535,78 @@ observations:
               paragraph: R3-2
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000025'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000221'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-2
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.1 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.1'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-2
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:42
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13355,6 +15947,78 @@ observations:
               paragraph: R3-1
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000257'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.7'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000223'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-1
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.3 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.3'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-1
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:43
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -13695,6 +16359,78 @@ observations:
               paragraph: R3-20
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000256'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-20
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.6'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000222'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-20
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=22.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.2'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-20
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:44
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14035,6 +16771,78 @@ observations:
               paragraph: R3-21
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000033'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-21
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=33.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '33'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000254'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-21
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=25.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.4'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-21
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:45
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14375,6 +17183,78 @@ observations:
               paragraph: R3-4
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000225'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=22.5 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000206'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-4
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.6 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.6'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-4
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:46
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -14715,6 +17595,78 @@ observations:
               paragraph: R3-7
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000022'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=22.0 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000204'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-7
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.4'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-7
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:47
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15055,6 +18007,78 @@ observations:
               paragraph: R3-19
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000317'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-19
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=31.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '31.7'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000251'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-19
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=25.1 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25.1'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-19
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:48
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15395,6 +18419,78 @@ observations:
               paragraph: R3-18
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000248'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=24.8 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '24.8'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000218'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-18
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.8 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.8'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-18
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:49
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -15735,6 +18831,78 @@ observations:
               paragraph: R3-8
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000237'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=23.7 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23.7'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000212'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-8
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=21.2 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '21.2'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-8
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:5
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16075,6 +19243,78 @@ observations:
               paragraph: R3-9
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000356'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=35.6 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '35.6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000264'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R3-9
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=26.4 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '26.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R3-9
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:50
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16415,6 +19655,78 @@ observations:
               paragraph: R3-5
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000231'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-5
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=23.1 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23.1'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000209'
+      locator:
+        published_page: 5550
+        table: '1'
+        paragraph: R3-5
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=20.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20.9'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5550
+              table: '1'
+              paragraph: R3-5
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:6
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -16755,6 +20067,78 @@ observations:
               paragraph: R-16
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000042'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-16
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.2 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.2'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000059'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-16
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.9 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.9'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-16
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:7
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -17095,6 +20479,78 @@ observations:
               paragraph: R-14
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000041'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.1 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.1'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.0000058'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-14
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=5.8 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '5.8'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-14
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:8
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -17435,6 +20891,78 @@ observations:
               paragraph: R-15
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000045'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.5 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.5'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.000006'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-15
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=6.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-15
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series::point:9
   experiment_id: 10.1016/j.gca.2007.09.005::1
   identity:
@@ -17775,6 +21303,78 @@ observations:
               paragraph: R-17
               source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
         output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000044'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-17
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=4.4 mg
+        - printed=initial_weight_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: kg
+    exposed_area_m2:
+      state:
+        tag: value
+        value: '0.000006'
+      locator:
+        published_page: 5549
+        table: '1'
+        paragraph: R-17
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+      inference:
+        relation: mm2_to_m2
+        inputs:
+        - A_m2 = A_mm2 / 1e6
+        - original_unit=mm2
+        - as_published=6.0 mm2
+        - printed=initial_area_mm2
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5549
+              table: '1'
+              paragraph: R-17
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        output_unit: m2
 - observation_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
   experiment_id: 10.1016/j.gca.2007.09.005::3
   identity:

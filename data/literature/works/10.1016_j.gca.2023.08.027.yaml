@@ -48,20 +48,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     page: 10
@@ -76,20 +79,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 22
@@ -104,20 +110,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 30
@@ -133,7 +142,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -147,6 +156,8 @@ experiments:
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
+        - as_published=1e-06 mbar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -166,11 +177,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 2
@@ -193,10 +204,18 @@ experiments:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          relation: identity:m2
           inputs:
-          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
-          parameters: []
+          - as_published=1.256637e-07 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000001256637'
+              locator:
+                pdf_page_index: 5
+                paragraph: a lid with a 0.4 mm orifice at its centre
           output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S2
   kind: literature
@@ -208,7 +227,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -222,6 +241,8 @@ experiments:
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
+        - as_published=1e-06 mbar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -241,11 +262,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 3
@@ -268,10 +289,18 @@ experiments:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          relation: identity:m2
           inputs:
-          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
-          parameters: []
+          - as_published=1.256637e-07 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000001256637'
+              locator:
+                pdf_page_index: 5
+                paragraph: a lid with a 0.4 mm orifice at its centre
           output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
   kind: literature
@@ -283,7 +312,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -297,6 +326,8 @@ experiments:
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
+        - as_published=1e-06 mbar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -316,11 +347,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 5
@@ -342,10 +373,18 @@ experiments:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          relation: identity:m2
           inputs:
-          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
-          parameters: []
+          - as_published=1.256637e-07 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000001256637'
+              locator:
+                pdf_page_index: 5
+                paragraph: a lid with a 0.4 mm orifice at its centre
           output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
   kind: literature
@@ -357,7 +396,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -371,6 +410,8 @@ experiments:
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
+        - as_published=1e-06 mbar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -390,11 +431,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 6
@@ -416,10 +457,18 @@ experiments:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          relation: identity:m2
           inputs:
-          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
-          parameters: []
+          - as_published=1.256637e-07 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000001256637'
+              locator:
+                pdf_page_index: 5
+                paragraph: a lid with a 0.4 mm orifice at its centre
           output_unit: m2
 - experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
   kind: literature
@@ -431,7 +480,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -445,6 +494,8 @@ experiments:
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
+        - as_published=1e-06 mbar
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -464,11 +515,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     pdf_page_index: 23
@@ -492,8 +543,16 @@ experiments:
           pdf_page_index: 5
           paragraph: a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          relation: identity:m2
           inputs:
-          - '{''pdf_page_index'': 5, ''paragraph'': ''a lid with a 0.4 mm orifice at its centre''}'
-          parameters: []
+          - as_published=1.256637e-07 m2
+          - printed=orifice_area
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000001256637'
+              locator:
+                pdf_page_index: 5
+                paragraph: a lid with a 0.4 mm orifice at its centre
           output_unit: m2

@@ -1,0 +1,178 @@
+# Printed extract field name → Experiment schema field + unit.
+# A new extract that prints one of these names is lifted with no migrator
+# code change. Add a row here; do not hard-code aliases in Python.
+#
+# unit: SI conversion source unit when the extract omits payload.units.
+#       null means the extract must carry units (e.g. chamber_pressure).
+# field: Experiment path using the records.py schema names.
+schema_version: lab_parameter_vocabulary.v1
+entries:
+  # sample mass → sample.mass_kg
+  - printed: mass
+    field: sample.mass_kg
+    unit: null
+  - printed: mass_kg
+    field: sample.mass_kg
+    unit: kg
+  - printed: sample_mass
+    field: sample.mass_kg
+    unit: null
+  - printed: sample_mass_kg
+    field: sample.mass_kg
+    unit: kg
+  - printed: sample_mass_g
+    field: sample.mass_kg
+    unit: g
+  - printed: sample_mass_mg
+    field: sample.mass_kg
+    unit: mg
+  - printed: initial_weight_mg
+    field: sample.mass_kg
+    unit: mg
+  - printed: initial_mass_g
+    field: sample.mass_kg
+    unit: g
+  - printed: initial_mass_mg
+    field: sample.mass_kg
+    unit: mg
+  - printed: initial_sample_mass_mg
+    field: sample.mass_kg
+    unit: mg
+  - printed: mass_g
+    field: sample.mass_kg
+    unit: g
+  - printed: specimen_mass_mg
+    field: sample.mass_kg
+    unit: mg
+  - printed: tga_sample_mass_mg
+    field: sample.mass_kg
+    unit: mg
+  # exposed area → apparatus.geometry.exposed_area_m2
+  - printed: sample_surface_area
+    field: apparatus.geometry.exposed_area_m2
+    unit: null
+  - printed: sample_surface_area_m2
+    field: apparatus.geometry.exposed_area_m2
+    unit: m2
+  - printed: exposed_area_m2
+    field: apparatus.geometry.exposed_area_m2
+    unit: m2
+  - printed: initial_area_mm2
+    field: apparatus.geometry.exposed_area_m2
+    unit: mm2
+  - printed: init_area_mm2
+    field: apparatus.geometry.exposed_area_m2
+    unit: mm2
+  - printed: avg_area_cm2
+    field: apparatus.geometry.exposed_area_m2
+    unit: cm2
+  - printed: avg_area_m2
+    field: apparatus.geometry.exposed_area_m2
+    unit: m2
+  # orifice area / diameter
+  - printed: orifice_area
+    field: apparatus.geometry.orifice_area_m2
+    unit: null
+  - printed: orifice_area_m2
+    field: apparatus.geometry.orifice_area_m2
+    unit: m2
+  - printed: orifice_diameter_m
+    field: apparatus.geometry.orifice_diameter_m
+    unit: m
+  - printed: orifice_diameter_mm
+    field: apparatus.geometry.orifice_diameter_m
+    unit: mm
+  - printed: orifice_diameter_mm_as_printed
+    field: apparatus.geometry.orifice_diameter_m
+    unit: mm
+  - printed: orifice_mm
+    field: apparatus.geometry.orifice_diameter_m
+    unit: mm
+  - printed: diameter_m
+    field: apparatus.geometry.orifice_diameter_m
+    unit: m
+  - printed: clausing_factor
+    field: apparatus.geometry.clausing_factor
+    unit: "1"
+  # chamber / vessel
+  - printed: chamber_length_m
+    field: apparatus.geometry.chamber_length_m
+    unit: m
+  - printed: chamber_length_mm
+    field: apparatus.geometry.chamber_length_m
+    unit: mm
+  - printed: orifice_to_sample_area_ratio
+    field: apparatus.geometry.orifice_to_sample_area_ratio
+    unit: "1"
+  # overhead / chamber pressure → total_pressure_Pa
+  - printed: chamber_pressure
+    field: pressure_environment.total_pressure_Pa
+    unit: null
+  - printed: total_pressure_Pa
+    field: pressure_environment.total_pressure_Pa
+    unit: Pa
+  - printed: total_pressure_atm
+    field: pressure_environment.total_pressure_Pa
+    unit: atm
+  - printed: pressure_Pa
+    field: pressure_environment.total_pressure_Pa
+    unit: Pa
+  - printed: pressure_pa
+    field: pressure_environment.total_pressure_Pa
+    unit: Pa
+  - printed: pressure_mbar
+    field: pressure_environment.total_pressure_Pa
+    unit: mbar
+  - printed: vacuum_mbar
+    field: pressure_environment.total_pressure_Pa
+    unit: mbar
+  - printed: vacuum_bar
+    field: pressure_environment.total_pressure_Pa
+    unit: bar
+  - printed: vacuum_during_run_Torr
+    field: pressure_environment.total_pressure_Pa
+    unit: Torr
+  - printed: max_vacuum_Torr
+    field: pressure_environment.total_pressure_Pa
+    unit: Torr
+  - printed: chamber_pressure_bar
+    field: pressure_environment.total_pressure_Pa
+    unit: bar
+  - printed: chamber_pressure_Pa_about
+    field: pressure_environment.total_pressure_Pa
+    unit: Pa
+  - printed: chamber_pressure_start_mbar
+    field: pressure_environment.total_pressure_Pa
+    unit: mbar
+  - printed: chamber_pressure_run_mbar_about
+    field: pressure_environment.total_pressure_Pa
+    unit: mbar
+  - printed: chamber_pressure_fill_mbar_about
+    field: pressure_environment.total_pressure_Pa
+    unit: mbar
+  - printed: P_test_Torr
+    field: pressure_environment.total_pressure_Pa
+    unit: Torr
+  # flow
+  - printed: knudsen_number_orifice
+    field: pressure_environment.regime.knudsen_number_orifice
+    unit: "1"
+  - printed: knudsen_number_chamber
+    field: pressure_environment.regime.knudsen_number_chamber
+    unit: "1"
+  # printed composition (as-published map; not a converted SI scalar)
+  - printed: composition_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct
+  - printed: major_oxide_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct
+  - printed: oxides_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct
+  - printed: starting_glass_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct
+  - printed: sample_oxide_composition_wt_pct
+    field: sample.printed_composition
+    unit: wt_pct

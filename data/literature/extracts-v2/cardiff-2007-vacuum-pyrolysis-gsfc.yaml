@@ -390,6 +390,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '186.6513157894736842105263158'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=1.4 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.4'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -536,6 +569,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '18.66513157894736842105263158'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.14 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.14'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -650,6 +716,40 @@ observations:
     table: '1'
     note: TABLE 1. Results of 12 tests with the prototype system from 2005
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2.666447368421052631578947368'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.02 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -796,6 +896,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '106.6578947368421052631578947'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.8 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -942,6 +1075,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '5.86618421052631578947368421'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.044 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.044'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1088,6 +1254,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '30.66414473684210526315789473'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.23 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.23'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1234,6 +1433,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '426.6315789473684210526315789'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=3.2 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1380,6 +1612,39 @@ observations:
               table: '1'
               note: TABLE 1. Results of 12 tests with the prototype system from 2005
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1333.223684210526315789473684'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=10.0 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1487,6 +1752,40 @@ observations:
     table: '1'
     note: TABLE 1. Results of 12 tests with the prototype system from 2005
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '133.3223684210526315789473684'
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=1.0 Torr
+        - printed=P_test_Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              pdf_page_index: 3
+              table: '1'
+              note: TABLE 1. Results of 12 tests with the prototype system from 2005
+        output_unit: Pa
   derivation:
     relation: percent_to_fraction
     inputs:

@@ -349,6 +349,40 @@ observations:
     pdf_page_index: 5
     table: I
   read_from: tables:kems-031-halwax-2024
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00005393'
+      locator:
+        page: 825
+        pdf_page_index: 5
+        table: I
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=53.93 mg
+        - printed=initial_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '53.93'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::I
   identity:
@@ -394,6 +428,40 @@ observations:
     pdf_page_index: 5
     table: I
   read_from: tables:kems-031-halwax-2024
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00004951'
+      locator:
+        page: 825
+        pdf_page_index: 5
+        table: I
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=49.51 mg
+        - printed=initial_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '49.51'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:0
   experiment_id: 10.1007/s11663-024-02995-6::I
   identity:
@@ -439,6 +507,40 @@ observations:
     pdf_page_index: 5
     table: I
   read_from: tables:kems-031-halwax-2024
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00005367'
+      locator:
+        page: 825
+        pdf_page_index: 5
+        table: I
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=53.67 mg
+        - printed=initial_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '53.67'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::I
   identity:
@@ -484,6 +586,40 @@ observations:
     pdf_page_index: 5
     table: I
   read_from: tables:kems-031-halwax-2024
+  point_conditions:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00005158'
+      locator:
+        page: 825
+        pdf_page_index: 5
+        table: I
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=51.58 mg
+        - printed=initial_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '51.58'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 825
+              pdf_page_index: 5
+              table: I
+        output_unit: kg
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
   experiment_id: 10.1007/s11663-024-02995-6::II
   identity:

@@ -47,47 +47,49 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: value
         value: '0.01333223684210526315789473684'
       locator:
-        paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
-        line_range: 80-160
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
       inference:
         relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
               tag: value
               value: '0.0001'
             locator:
-              paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
-              line_range: 80-160
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
         - - factor
           - state:
               tag: value
               value: '133.3223684210526315789473684'
             locator:
-              paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
-              line_range: 80-160
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
         output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     figure: '1'
@@ -114,20 +116,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 123
@@ -140,25 +145,64 @@ experiments:
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 114
+        pdf_page_index: 4
+        table: '2'
+        note: Heating conditions and run notations
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        output_unit: kg
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 114
@@ -175,7 +219,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -190,6 +234,8 @@ experiments:
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -211,11 +257,11 @@ experiments:
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 116
@@ -242,20 +288,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 118
@@ -272,20 +321,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 122
@@ -302,20 +354,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 124
@@ -332,20 +387,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 123
@@ -363,7 +421,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -372,14 +430,28 @@ experiments:
       locator:
         paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.0013 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0013'
+            locator:
+              paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state sweep gas
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state flow regime
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     paragraph: molten spherule free evaporation graphite crucible
@@ -402,20 +474,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
     published_page: 128

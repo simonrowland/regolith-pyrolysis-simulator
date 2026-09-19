@@ -846,6 +846,33 @@ observations:
         value: '1673.15'
       locator:
         page: 76
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0006719'
+      locator:
+        page: 76
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.6719 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.6719'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 76
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -959,6 +986,33 @@ observations:
         value: '1815.15'
       locator:
         page: 82
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000717'
+      locator:
+        page: 82
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.717 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.717'
+            locator:
+              page: 82
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 82
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1072,6 +1126,33 @@ observations:
         value: '1836.15'
       locator:
         page: 88
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000991'
+      locator:
+        page: 88
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.991 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.991'
+            locator:
+              page: 88
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 88
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1185,6 +1266,33 @@ observations:
         value: '1853.15'
       locator:
         page: 98
+    mass_kg:
+      state:
+        tag: value
+        value: '0.007856'
+      locator:
+        page: 98
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=7.856 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '7.856'
+            locator:
+              page: 98
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 98
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1297,6 +1405,33 @@ observations:
         value: '1673.15'
       locator:
         page: 76
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0006719'
+      locator:
+        page: 76
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.6719 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.6719'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 76
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1409,6 +1544,33 @@ observations:
         value: '1815.15'
       locator:
         page: 82
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000717'
+      locator:
+        page: 82
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.717 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.717'
+            locator:
+              page: 82
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 82
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1521,6 +1683,33 @@ observations:
         value: '1836.15'
       locator:
         page: 88
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000991'
+      locator:
+        page: 88
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.991 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.991'
+            locator:
+              page: 88
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 88
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1633,6 +1822,33 @@ observations:
         value: '1853.15'
       locator:
         page: 98
+    mass_kg:
+      state:
+        tag: value
+        value: '0.007856'
+      locator:
+        page: 98
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=7.856 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '7.856'
+            locator:
+              page: 98
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 98
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:

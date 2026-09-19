@@ -72,20 +72,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     table: '1'
@@ -99,46 +102,61 @@ experiments:
       locator:
         paragraph: iridium loops
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value: '0.0000224'
-        locator:
-          table: '1'
-          paragraph: R3-12 Init area 22.4 mm2
-          source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-        inference:
-          relation: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
-          inputs:
-          - '{''source_path'': ''docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md'',
-            ''table'': ''1'', ''paragraph'': ''R3-12 Init area 22.4 mm2''}'
-          parameters: []
-          output_unit: m2
 - experiment_id: 10.1016/j.gca.2007.09.005::2
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19.39'
+          CaO: '23.12'
+          MgO: '11.48'
+          SiO2: '46'
+      locator:
+        figure: '2'
+        line_range: 183-191
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: source does not state pressure
+        tag: value
+        value: '0.000133322'
+      locator:
+        paragraph: pressure at run conditions was always less than 10^-6 Torr
+        line_range: '105'
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.000133322 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000133322'
+            locator:
+              paragraph: pressure at run conditions was always less than 10^-6 Torr
+              line_range: '105'
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     figure: '2'
@@ -154,35 +172,29 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     figure: '3'
     line_range: 447-448
     note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
     source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
-      locator:
-        paragraph: iridium loop; Hashimoto high-temperature vacuum furnace
-        line_range: 105-107
-        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
 - experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   kind: literature
   method:
@@ -193,20 +205,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     published_page: 5551
@@ -222,20 +237,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     note: Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005
@@ -250,20 +268,23 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: source does not state a point temperature
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
     sweep_gas:
       state:
         tag: unknown
-        reason: source does not state pressure
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
     regime:
       regime_class:
         tag: unknown
-        reason: source does not state pressure
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2007.09.005
   locator:
     note: Richter et al. (2007) GCA 71:5544-5564 abstract; cSi form
