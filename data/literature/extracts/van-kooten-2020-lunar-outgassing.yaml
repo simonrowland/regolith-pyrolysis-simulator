@@ -1,0 +1,303 @@
+schema_version: literature_extract.v1
+source_id: van-kooten-2020-lunar-outgassing
+source:
+  citation: van Kooten, E. M. M. E., Moynier, F. & Day, J. M. D. (2020), "Evidence for Transient Atmospheres during Eruptive Outgassing on the Moon", The Planetary Science Journal 1:67, DOI 10.3847/PSJ/abbe13.
+  doi: 10.3847/PSJ/abbe13
+  url: https://doi.org/10.3847/PSJ/abbe13
+  year: 2020
+extraction:
+  method: Manual transcription from clean-text-layer PDF using pdftotext -layout; Table 1 and the experimental procedure are transcribed from the published PDF. The paper's referenced supplementary tar.gz tables were not present in the corpus directory and are not reconstructed here.
+  date: '2026-09-19'
+  worker: w3-van-kooten-2020-lunar-outgassing
+  provenance_path: raw/van-kooten-2020-lunar-outgassing/van-kooten-2020-lunar-outgassing.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Zn.observations[van_kooten_2020_zinc_method_and_new_measurements].values.rows[0].delta_66Zn_permil
+  value: 7.6
+  locator:
+    table: '1'
+    published_page: 2
+    pdf_page_index: 3
+    note: Table 1, sample 15455 section 400, This study.
+species:
+  Zn:
+    observations:
+    - observation_id: van_kooten_2020_zinc_method_and_new_measurements
+      type: rate_series
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        table: '1'
+        section: 2. Zinc Isotope Data of MGS and Mare Basalts
+        note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+      T_range_K: null
+      phase: lunar_rock_samples
+      condensed_form:
+        state: solid_rock
+        metastable: false
+        basis: explicit_author
+        note: Magnesian suite samples and one high-Ti mare basalt.
+      standard_state: JMC Lyon Zn isotope standard; delta notation is per mille deviation from the standard.
+      regime: solution_digestion_and_isotope_analysis
+      units: delta values in per mille (‰) as printed; Zn concentration in ppm; uncertainty is 2SD.
+      values:
+        quantity: zinc_isotope_delta_and_concentration
+        method_class: measured_direct
+        evidence_class: measured_direct
+        measurement_status: authors_this_study
+        sample_preparation:
+          portions_mg_as_printed: 100-300
+          digestion_reagent: concentrated HF/HNO3
+          digestion_duration_h: 48
+          digestion_temperature_C: 140
+          drying_and_redissolution: aqua regia
+          redissolution_duration_h: 24
+          redissolution_temperature_C: 140
+          purified_aliquot_mg: 5
+          purification_method: according to van Kooten and Moynier (2019) small column chemistry procedures
+        rows:
+        - sample: '15455'
+          section: '400'
+          type: Norite
+          delta_66Zn_permil: 7.60
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 15.46
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 2.0
+          n: 1
+          evidence_class: measured_direct
+        - sample: '76255'
+          section: '137'
+          type: Norite
+          delta_66Zn_permil: 1.89
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 3.40
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 3.3
+          n: 1
+          evidence_class: measured_direct
+        - sample: '76335'
+          section: '83'
+          type: Troctolite
+          delta_66Zn_permil: 2.37
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 5.38
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 1.5
+          n: 1
+          evidence_class: measured_direct
+        - sample: '76535'
+          section: '196'
+          type: Troctolite
+          delta_66Zn_permil: 2.52
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 8.42
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 1.5
+          n: 1
+          evidence_class: measured_direct
+        - sample: '77035'
+          section: '269'
+          type: Norite
+          delta_66Zn_permil: 3.54
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 7.09
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 2.9
+          n: 1
+          evidence_class: measured_direct
+        - sample: '78328'
+          section: null
+          type: Norite
+          delta_66Zn_permil: 2.05
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 6.82
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 2.0
+          n: 1
+          evidence_class: measured_direct
+        - sample: '10045'
+          section: null
+          type: High-Ti mare basalt
+          delta_66Zn_permil: 1.00
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 2.50
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 0.5
+          n: 1
+          evidence_class: measured_direct
+        locator_note: Every row above is Table 1, p. 2; preparation values are the method paragraph on p. 2.
+      uncertainty:
+        convention: 2SD
+        note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+      equipment:
+        cell_material:
+          value: isotope-analysis apparatus not stated
+          locator:
+            published_page: 2
+            section: 2. Zinc Isotope Data of MGS and Mare Basalts
+            note: No instrument or container identity is printed in this paper's method paragraph.
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 2
+            section: 2. Zinc Isotope Data of MGS and Mare Basalts
+            note: No vacuum or pressure parameter is printed.
+    - observation_id: van_kooten_2020_zinc_table1_quoted_rows
+      type: rate_series
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+      quote: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference column.
+      T_range_K: null
+      phase: lunar_rock_samples
+      condensed_form:
+        state: solid_rock
+        metastable: false
+        basis: explicit_author
+      standard_state: JMC Lyon Zn isotope standard as described for Table 1.
+      regime: isotope_analysis_compiled_from_prior_studies
+      units: delta values in per mille (‰) as printed; Zn concentration in ppm; uncertainty is 2SD.
+      values:
+        quantity: zinc_isotope_delta_and_concentration
+        method_class: quoted_measurement
+        evidence_class: quoted_attributed
+        measurement_status: prior_study_rows_reproduced_in_this_paper
+        rows:
+        - sample: '15445'
+          section: '333'
+          type: Norite
+          delta_66Zn_permil: 2.46
+          delta_66Zn_2SD_permil: 0.29
+          delta_68Zn_permil: 5.40
+          delta_68Zn_2SD_permil: 0.44
+          Zn_ppm: 0.8
+          n: 2
+          reference: Day20
+          evidence_class: quoted_attributed
+        - sample: '15455'
+          section: '391'
+          type: Norite
+          delta_66Zn_permil: 9.27
+          delta_66Zn_2SD_permil: 0.11
+          delta_68Zn_permil: 18.82
+          delta_68Zn_2SD_permil: 0.21
+          Zn_ppm: 2.0
+          n: 2
+          reference: Day20
+          evidence_class: quoted_attributed
+        - sample: '72415'
+          section: null
+          type: Dunite
+          delta_66Zn_permil: 6.27
+          delta_66Zn_2SD_permil: 0.04
+          delta_68Zn_permil: 12.43
+          delta_68Zn_2SD_permil: 0.08
+          Zn_ppm: 2.6
+          n: 1
+          reference: Kato17
+          evidence_class: quoted_attributed
+        - sample: '76535'
+          section: '186'
+          type: Troctolite
+          delta_66Zn_permil: 3.14
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 6.58
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 1.5
+          n: 1
+          reference: Day20
+          evidence_class: quoted_attributed
+        - sample: '77215'
+          section: null
+          type: Alkali norite
+          delta_66Zn_permil: 3.04
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 5.95
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 3.6
+          n: 1
+          reference: Kato17
+          evidence_class: quoted_attributed
+        - sample: '78235'
+          section: '156'
+          type: Norite
+          delta_66Zn_permil: 3.50
+          delta_66Zn_2SD_permil: 0.28
+          delta_68Zn_permil: 7.10
+          delta_68Zn_2SD_permil: 0.56
+          Zn_ppm: 2.0
+          n: 2
+          reference: Day20
+          evidence_class: quoted_attributed
+        - sample: '78235'
+          section: '172'
+          type: Norite
+          delta_66Zn_permil: 3.35
+          delta_66Zn_2SD_permil: 0.12
+          delta_68Zn_permil: 6.99
+          delta_68Zn_2SD_permil: 0.24
+          Zn_ppm: 2.0
+          n: 1
+          reference: Day20
+          evidence_class: quoted_attributed
+      uncertainty:
+        convention: 2SD
+        note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements here.
+    - observation_id: van_kooten_2020_zinc_printed_aggregate_comparisons
+      type: rate_series
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 3. Limitations within the Lunar MVE Data Set
+        note: Printed aggregate ranges and weighted averages; underlying Table S1 is only referenced, not included in the corpus PDF.
+      T_range_K: null
+      phase: lunar_rock_sample_compilation
+      regime: compilation_assessed
+      units: delta values in per mille (‰) as printed; Zn concentration in ppm.
+      values:
+        quantity: printed_zinc_isotope_aggregate_statistics
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        MGS_delta_66Zn_range_permil: 1.9-8.7
+        MGS_delta_66Zn_range_2SD_permil: 0.1
+        MGS_delta_66Zn_weighted_average_permil: 4.6
+        MGS_delta_66Zn_weighted_average_2SD_permil: 1.5
+        mare_basalt_delta_66Zn_weighted_average_permil: 1.4
+        mare_basalt_delta_66Zn_weighted_average_2SD_permil: 0.1
+        MGS_Zn_concentration_range_ppm: 0.8-3.6
+        MGS_Zn_concentration_average_ppm: 2.0
+        high_Ti_mare_basalt_10045_Zn_ppm: 0.5
+        mare_basalt_typical_Zn_range_ppm: 0.5-2.0
+        note: These are printed aggregate/comparison values, not newly measured rows in this paper.
+        model_derived_results:
+          method_class: model_derived
+          evidence_class: model_derived
+          generator: author_nonideal_Rayleigh_distillation_using_reduced_masses
+          alpha_reduced_mass_ZnO: 0.997
+          alpha_reduced_mass_ZnS: 0.996
+          alpha_reduced_mass_ZnCl2: 0.995
+          R2_reduced_mass_fit_all_elements: 0.97
+          saturation_index_mare_basalt_from_BSE_percent: 89
+          saturation_index_mare_basalt_from_BSE_uncertainty_percent: 2
+          saturation_index_mare_basalt_from_OC_EC_percent: 92
+          saturation_index_mare_basalt_from_OC_EC_uncertainty_percent: 2
+          saturation_index_MGS_anorthosite_percent: 76
+          saturation_index_MGS_anorthosite_uncertainty_percent: 2
+          atmospheric_duration_Ma_about: 70
+          atmospheric_pressure_kPa_about: 1
+          locator:
+            published_page: 5
+            pdf_page_index: 6
+            section: 4. What does the Lunar MVE Isotope Fractionation Signify?
+            note: Reduced-mass Rayleigh calculation and ZnO/ZnS/ZnCl2 fractionation factors; results refer to Table S3 that is not present in the corpus directory.
+          note: Model outputs and author estimates are not validation evidence; the generator is named to prevent circularity confusion.
+          uncertainty:
+            R2_note: fit statistic, not a measurement uncertainty
+            saturation_index_note: Uncertainties are from Isoplot Yorkfit slopes incorporating 2SD input errors.
+            atmospheric_note: Duration and pressure are author model estimates.
+      uncertainty:
+        note: Printed 2SD qualifiers apply to the isotope averages/ranges where shown; no uncertainty is printed for the concentration summaries.
