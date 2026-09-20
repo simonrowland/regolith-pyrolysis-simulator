@@ -1,0 +1,261 @@
+schema_version: literature_extract.v1
+source_id: cooper-2007-sintering-lunar-simulant
+source:
+  citation: Cooper, Bonnie L. (2007), "Sintering of Lunar and Simulant Glass", Space Technology and Applications International Forum (STAIF).
+  url: https://ntrs.nasa.gov/citations/20070030826
+  year: 2007
+extraction:
+  method: Born-digital 9-page PDF; pdftotext -layout; printed prose, figure captions, and printed summary statistics transcribed; plotted curves and axis readings not digitised.
+  date: '2026-09-20'
+  worker: i1-cooper-2007-sintering-lunar-simulant
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/cooper-2007-sintering-lunar-simulant/cooper-2007-sintering-lunar-simulant.pdf
+review_status: draft
+corrections: []
+evidence_policy:
+  classification: mixed_quoted_measurement_model_and_figure
+  measurement_claim: This is a review/technical synthesis. It reports measured-reduced grain-size statistics and informal author observations, but its cited sintering results and the Figure 5 fluidization result are not new primary experiments in this paper.
+  apparatus_status: No sample mass, crucible, cell dimensions, or temperature calibration is stated for the cited experiments; Figure 3 names thermocouples in a NASA/JSC inconel chamber, but does not provide a complete apparatus or run record.
+  model_generators:
+  - author's simple cylindrical-reactor fluidization calculation for Figure 5; the source does not name a software package
+  figure_policy: Figure 1, Figure 5, and Figure 6 plotted curves are not digitised; only values printed in prose or captions are retained.
+  missing_conditions: Vacuum level, pumping, gas pressure/flow details, sample mass/form, exposed area, fO2 control, temperature calibration, and run durations are absent unless explicitly stated in an observation below.
+fidelity_samples:
+- species: JSC-1AF
+  observable: grain_size_statistics
+  observation_id: cooper_2007_jsc1af_grain_size_statistics
+  field: mean_size_um
+  value: 22.14
+  locator:
+    pdf_page_index: 8
+    section: Nomenclature
+- species: JSC-1
+  observable: sintered_strength
+  observation_id: cooper_2007_jsc1_sintered_brick_strength
+  field: strength_kPa_max
+  value: 13790
+  locator:
+    pdf_page_index: 7
+    section: Sintered Construction Materials
+species:
+  JSC-1A:
+    observations:
+    - observation_id: cooper_2007_jsc1a_grain_size_statistics
+      type: rate_series
+      locator: {pdf_page_index: 8, section: Nomenclature}
+      phase: particulate_glass_rich_simulant
+      regime: simulant_characterisation
+      units: micrometres as printed
+      values:
+        quantity: particle_size_distribution
+        method_class: measured_reduced
+        material: JSC-1A
+        mean_size_um: 151.3
+        standard_deviation_um: 105.2
+        distribution_type: well-graded / poorly-sorted
+      uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
+    - observation_id: cooper_2007_jsc1a_glass_fraction
+      type: condensate_composition
+      locator: {pdf_page_index: 1, section: What Is Sintering, and Why Is It a Concern?}
+      phase: glass
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: printed_composition
+        method_class: quoted_unattributed
+        glass_fraction_wt_pct: approximately 49
+        material: JSC-1A
+        note: The paper gives this composition without a source citation at the statement.
+      uncertainty: {note: approximate qualifier retained; no numerical uncertainty printed}
+    - observation_id: cooper_2007_jsc1a_sintering_1100c_quoted
+      type: transition_temperature
+      locator: {pdf_page_index: 2, section: What Is Sintering, and Why Is It a Concern?}
+      phase: glass
+      regime: sintering
+      units: degree C and time as printed
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        quoted_from: Allen et al. (1992a)
+        temperature_C: 1100
+        onset_time: a matter of minutes
+        sample_form: compressed JSC-1 samples
+        outcome: high-strength sintered bricks
+      uncertainty: {note: no numerical uncertainty printed}
+      equipment: {note: apparatus details of the cited experiment are not stated in this source}
+    - observation_id: cooper_2007_jsc1a_sintering_1050c_three_hours
+      type: transition_temperature
+      locator: {pdf_page_index: 2, section: What Is Sintering, and Why Is It a Concern?}
+      phase: glass
+      regime: sintering
+      units: degree C and hours as printed
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        quoted_from: Allen et al. (1996a)
+        temperature_C: 1050
+        duration_h: 3
+        sample_form: uncompressed samples
+        outcome: lightly-sintered material disaggregable with gentle pressure
+      uncertainty: {note: no numerical uncertainty printed}
+      equipment: {note: apparatus details of the cited experiment are not stated in this source}
+  JSC-1AF:
+    observations:
+    - observation_id: cooper_2007_jsc1af_grain_size_statistics
+      type: rate_series
+      locator: {pdf_page_index: 8, section: Nomenclature}
+      phase: particulate_glass_rich_simulant
+      regime: simulant_characterisation
+      units: micrometres as printed
+      values:
+        quantity: particle_size_distribution
+        method_class: measured_reduced
+        instrument: Microtrac S3500 laser diffraction instrument
+        mean_size_um: 22.14
+        standard_deviation_um: 9.99
+        distribution_type: well-graded / poorly-sorted
+      uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
+      equipment: {instrument: Microtrac S3500 laser diffraction instrument, note: measurement courtesy of Microtrac Incorporated}
+    - observation_id: cooper_2007_jsc1af_figure1_sintering_threshold
+      type: transition_temperature
+      locator: {pdf_page_index: 2, figure: '1', section: What Is Sintering, and Why Is It a Concern?}
+      phase: synthetic_apollo14_composition_glass
+      regime: sintering
+      units: degree C, micrometres, dyne/cm, and time as printed
+      values:
+        quantity: sintering_onset_conditions
+        method_class: figure_only
+        quoted_from: Wozinski et al. (1972)
+        particle_radius_um: 14
+        equivalent_jsc1af_diameter_um: approximately 24
+        contact_time: more than a few minutes
+        temperature_C: at or above 800
+        neck_radius_to_grain_radius: 0.2
+        surface_tension_dyne_per_cm: 300
+        note: Caption assumptions and prose values are printed; the graphical solution itself was not digitised.
+      uncertainty: {note: no numerical uncertainty printed}
+  Lunar_soil:
+    observations:
+    - observation_id: cooper_2007_lunar_soil_agglutinate_fraction
+      type: condensate_composition
+      locator: {pdf_page_index: 8, section: Nomenclature}
+      phase: lunar_soil
+      regime: lunar_material_characterisation
+      units: volume percent as printed
+      values:
+        quantity: printed_composition
+        method_class: compilation_assessed
+        agglutinate_fraction_volume_pct: 25 to 30
+        mature_soil_agglutinate_fraction_volume_pct: up to 60
+        component: agglutinates / soil grains bonded by glass
+      uncertainty: {note: range and upper bound retained; no numerical uncertainty printed}
+  Apollo_14_glass:
+    observations:
+    - observation_id: cooper_2007_apollo14_glass_sintering_minutes_800c
+      type: transition_temperature
+      locator: {pdf_page_index: 1, figure: '1', section: What Is Sintering, and Why Is It a Concern?}
+      phase: synthetic_apollo14_composition_glass
+      regime: sintering
+      units: degree C and time as printed
+      values:
+        quantity: sintering_onset_conditions
+        method_class: quoted_attributed
+        quoted_from: Wozinski et al. (1972)
+        temperature_C: 800
+        duration: within minutes
+        sample_condition: packed and undisturbed soil
+        note: The prose reports the cited result; this paper does not provide the cited apparatus details.
+      uncertainty: {note: no numerical uncertainty printed}
+  Fluidized_bed:
+    observations:
+    - observation_id: cooper_2007_humid_air_channelization_sequence
+      type: mass_loss_fraction_vs_T
+      locator: {pdf_page_index: 3, figure: '2', section: How Can Sintering Be Prevented?}
+      phase: particulate_simulant
+      regime: informal_fluidized_bed_mockup_observation
+      units: seconds as printed
+      values:
+        quantity: channelization_timing
+        method_class: measured_direct
+        gas: humid air
+        elapsed_s_first_frame: 31
+        interval_between_frames_s: 5
+        outcome: fluidization ceases and a channel bypasses the soil
+        note: Informal mockup sequence; no sample mass, vessel dimensions, gas flow, or calibration is stated.
+      uncertainty: {note: no numerical uncertainty printed}
+    - observation_id: cooper_2007_humidity_channelization_window
+      type: mass_loss_fraction_vs_T
+      locator: {pdf_page_index: 6, section: Humidity}
+      phase: particulate_simulant
+      regime: informal_fluidized_bed_mockup_observation
+      units: seconds and minutes as printed
+      values:
+        quantity: channelization_timing
+        method_class: measured_direct
+        humid_air_complete_channelization_s: 95
+        desiccated_air_observation_window: tens of minutes
+        desiccated_air_channelization: did not occur during the observation window
+        note: Informal tests with mockups; no gas humidity, flow, sample mass, or chamber geometry is stated.
+      uncertainty: {note: observation window is qualitative and retained as printed}
+    - observation_id: cooper_2007_thermocouple_divergence_after_heater_600c
+      type: transition_temperature
+      locator: {pdf_page_index: 3, figure: '3', section: Indirect evidence of channel formation}
+      phase: particulate_simulant
+      regime: NASA_JSC_inconel_reaction_chamber_observation
+      units: degree C and time as printed
+      values:
+        quantity: channelization_indicator
+        method_class: measured_direct
+        heater_thermocouple_temperature_C: approximately 600
+        central_temperature_divergence: within a few minutes after heater reaches approximately 600 C
+        thermocouples: TC 212, TC 214, TC 215, and TC 221
+        note: Figure 3 identifies TC 212 and TC 215 near the outer edge/middle sample area; no calibration or complete run conditions are printed.
+      uncertainty: {note: approximate qualifiers retained; no numerical uncertainty printed}
+      equipment:
+        chamber_material: inconel
+        temperature_measurement: thermocouples
+    - observation_id: cooper_2007_fluidization_fraction_1000c_model
+      type: mass_loss_fraction_vs_T
+      locator: {pdf_page_index: 5, figure: '5', section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization}
+      phase: particulate_simulant
+      regime: fluidization_model
+      units: percent, degree C, and litres per minute as printed
+      values:
+        quantity: fluidizing_fraction
+        method_class: model_derived
+        generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
+        material: JSC-1A
+        hydrogen_temperature_C: 1000
+        fluidizing_fraction_pct: approximately 70
+        flow_rate_axis: 0.01 to 100 L/min as plotted
+        note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.
+      uncertainty: {note: approximate qualifier retained; no model uncertainty printed}
+    - observation_id: cooper_2007_partial_gravity_fluidized_bed_figure_only
+      type: transition_temperature
+      locator: {pdf_page_index: 6, figure: '6', section: Discussion}
+      phase: particulate_simulant
+      regime: partial_gravity_fluidization
+      units: gravity fraction as printed
+      values:
+        quantity: fluidization_behavior
+        method_class: figure_only
+        quoted_from: Gibson and Knudsen (1989)
+        gravity_level: 1/6 g
+        note: Figure-only qualitative study; no plotted values were read.
+      uncertainty: {note: figure-only; no numerical uncertainty printed}
+  JSC-1:
+    observations:
+    - observation_id: cooper_2007_jsc1_sintered_brick_strength
+      type: viscosity
+      locator: {pdf_page_index: 7, section: Sintered Construction Materials}
+      phase: glass
+      regime: sintered_construction_material
+      units: kPa and psi as printed
+      values:
+        quantity: sintered_strength
+        method_class: quoted_attributed
+        quoted_from: Allen et al. (1992a)
+        strength_kPa_max: up to 13790
+        strength_psi_max: 2000
+        preparation: compressed and heated to 1100 C
+        note: Both printed units retained; no conversion performed.
+      uncertainty: {note: upper-bound wording retained; no numerical uncertainty printed}
