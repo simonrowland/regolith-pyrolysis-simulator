@@ -1,0 +1,291 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  citation: Hemingway, B. S. (1990), "Thermodynamic properties of bunsenite, NiO, magnetite, Fe3O4, and hematite, Fe2O3",
+    American Mineralogist, 75, 781-790.
+  source_ids:
+  - ammin-75-781-hemingway-1990
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ammin-75-781-hemingway-1990
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000027914'
+      locator:
+        published_page: 782
+        section: Samples and apparatus
+        note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=27.914 mg
+        - printed=sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '27.914'
+            locator:
+              published_page: 782
+              section: Samples and apparatus
+              note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 782
+              section: Samples and apparatus
+              note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        output_unit: kg
+    container:
+      state:
+        tag: value
+        value: unsealed gold pans
+      locator:
+        published_page: 782
+        section: Samples and apparatus
+        note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 782
+    section: Samples and apparatus
+    note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 783
+    table: '1'
+    note: Table 1 is headed Experimental molar heat capacities for bunsenite, NiO; three experimental series are printed.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'third_law_thermodynamic_functions' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 783
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 786
+    table: '3'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'third_law_thermodynamic_functions' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 787
+    table: '4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 787
+    table: '5'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+- experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'third_law_thermodynamic_functions' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8
+  locator:
+    published_page: 788
+    table: '6'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf

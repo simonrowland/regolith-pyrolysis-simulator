@@ -1,0 +1,74 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad
+  citation: O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3,
+    Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486.
+  source_ids:
+  - ammin-73-470-oneill-1988
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ammin-73-470-oneill-1988
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_emf_oxygen_buffer' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad
+  locator:
+    published_page: 470
+    section: Abstract; equation printed in abstract
+    note: Equation is reported from the Fe + Fe3O4 cells; the source's table and discussion identify 750-833 K as the stable
+      Fe-Fe3O4 interval.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+  apparatus:
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: Au melting point 1337.58 K, IPTS-68; 18 calibrations on eight thermocouples; mean Au-point emf 10.275 +/-
+            0.002 mV
+        locator:
+          published_page: 471
+          section: Experimental details; design of electrochemical cells with air reference electrodes
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+    temperature_measurement:
+      thermocouples:
+        state:
+          tag: value
+          value: two, one above sample electrode and one below air reference electrode; beads separated by 8 mm
+        locator:
+          published_page: 471
+          section: Experimental details; design of electrochemical cells with air reference electrodes
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf

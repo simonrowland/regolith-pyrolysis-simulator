@@ -1,0 +1,268 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml
+observations:
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_appendix_sample_provenance
+  experiment_id: 10.1186/s40645-020-00382-8::hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_rock_sample_mass_used_in_compiled_analyses'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_chondrite_powder' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_rock_sample_mass_used_in_compiled_analyses';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 25
+    section: Appendix (A) Data
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_model_setup
+  experiment_id: 10.1186/s40645-020-00382-8::hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'numerical_model_parameters_and_constraints'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'primordial_CI_like_dust_aggregate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'numerical_model_parameters_and_constraints'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 2
+    section: 2.1 Methods
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions
+  experiment_id: 10.1186/s40645-020-00382-8::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_and_chondrule_silicate_compositions'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'chondrite_silicate_or_average_chondrule_silicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_and_chondrule_silicate_compositions'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 4
+    table: '1'
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table2_depletion_factors
+  experiment_id: 10.1186/s40645-020-00382-8::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'imposed_Cr_and_Mn_depletion_factors'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'primordial_CI_like_silicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'imposed_Cr_and_Mn_depletion_factors'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 6
+    table: '2'
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table3_ghost_cai_inputs
+  experiment_id: 10.1186/s40645-020-00382-8::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxide_elements_entered_as_ghost_CAIs'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'primordial_CI_like_silicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_elements_entered_as_ghost_CAIs'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 9
+    table: '3'
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table4_calculation_results
+  experiment_id: 10.1186/s40645-020-00382-8::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_vaporization_and_component_proportions'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'chondrite_bulk_and_chondrule_mixture' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_vaporization_and_component_proportions';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 10
+    table: '4'
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii
+- observation_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table5_component_fractions
+  experiment_id: 10.1186/s40645-020-00382-8::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_component_molar_fractions'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'chondrite_bulk_and_average_chondrule' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_component_molar_fractions'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  locator:
+    page: 11
+    table: '5'
+  read_from: unknown:hashimoto-nakano-2021-bubbles-to-chondrites-ii

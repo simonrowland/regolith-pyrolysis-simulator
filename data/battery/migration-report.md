@@ -1,35 +1,35 @@
 # Battery v2.1 migration report
 
-rows in: 46162
-records out (observations): 91335
-works: 199
-experiments: 6943
-queue size: 143186
+rows in: 46255
+records out (observations): 91460
+works: 211
+experiments: 6987
+queue size: 143711
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 167
-hard issues: 1340
+hard issues: 1402
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 199 (mismatch) |
-| doi_works | 56 | 101 (mismatch) |
-| no_doi_works | 91 | 98 (mismatch) |
-| admission_statuses | 374 | 614 (mismatch) |
+| citations | 147 | 211 (mismatch) |
+| doi_works | 56 | 108 (mismatch) |
+| no_doi_works | 91 | 103 (mismatch) |
+| admission_statuses | 374 | 618 (mismatch) |
 | supersedes | 422 | 422 |
-| series | 60 | 68 (mismatch) |
+| series | 60 | 71 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1617 |
 | gibbs_reference_100000 | 1023 | 1023 |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 1625 |
-| equipment_payloads | 670 | 797 (mismatch) |
-| absent_admissions | 3511 | 3956 (mismatch) |
+| equipment_payloads | 670 | 804 (mismatch) |
+| absent_admissions | 3511 | 4045 (mismatch) |
 | absent_classes | 2174 | 2194 (mismatch) |
-| range_only_T | 3125 | 2962 (mismatch) |
-| system_like_phases | 1065 | 2552 (mismatch) |
-| missing_phases | 237 | 299 (mismatch) |
+| range_only_T | 3125 | 2986 (mismatch) |
+| system_like_phases | 1065 | 2608 (mismatch) |
+| missing_phases | 237 | 313 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -37,23 +37,24 @@ hard issues: 1340
 | source method_class | count |
 |---|---:|
 | `absent` | 568 |
-| `compilation_assessed` | 65 |
+| `compilation_assessed` | 71 |
 | `method_only` | 39 |
 | `derived` | 26 |
 | `author_derived` | 19 |
+| `measured_tabulated` | 10 |
+| `quoted_attributed` | 10 |
+| `author_estimate` | 8 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
-| `measured_tabulated` | 7 |
-| `author_estimate` | 6 |
 | `authors_reduced_from_ion_intensities` | 6 |
 | `mixed_measured_and_model_curves` | 6 |
 | `mixed_quoted_literature_and_model_derived` | 6 |
 | `measured_and_compiled_calorimetry` | 5 |
+| `measured_reduced` | 4 |
 | `measured_or_compiled_characterization` | 3 |
 | `measured_direct_from_residue_compositions` | 2 |
 | `measured_direct_regression` | 2 |
 | `measured_direct_with_author_calculated_capacity` | 2 |
-| `measured_reduced` | 2 |
 | `qualitative_comparison` | 2 |
 | `author_reported_envelope` | 1 |
 | `derived_from_figure_8_linear_portion` | 1 |
@@ -17942,15 +17943,22 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/sgte-unary/records/ZR-TETRAGONAL_U.yaml` | 1 | 1 | 3 |
 | `data/literature/compilations/sgte-unary/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/extracts/1997jonesthermo-jones-1997.yaml` | 9 | 9 | 60 |
+| `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` | 8 | 8 | 45 |
 | `data/literature/extracts/ames-walsh-white-1967.yaml` | 2 | 2 | 8 |
+| `data/literature/extracts/ammin-73-470-oneill-1988.yaml` | 9 | 9 | 53 |
+| `data/literature/extracts/ammin-75-781-hemingway-1990.yaml` | 12 | 12 | 62 |
+| `data/literature/extracts/ammin-76-904-lange-1991.yaml` | 6 | 34 | 62 |
 | `data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml` | 5 | 5 | 29 |
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 1 | 2 |
+| `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 13 | 13 | 70 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 4 | 4 | 23 |
 | `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 41 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 37 | 37 | 148 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 36 |
+| `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 0 |
+| `data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml` | 14 | 14 | 61 |
 | `data/literature/extracts/costa-jacobson-2015.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 12 |
@@ -17967,8 +17975,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/giauque-powell-1939-cl2.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 9 |
+| `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 40 |
 | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` | 8 | 8 | 36 |
+| `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` | 9 | 9 | 46 |
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 4 | 4 | 22 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 4 | 11 |
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
@@ -18063,6 +18074,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lh87-mgo-g.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-pbo-g.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/lh87-sno-g.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/lpi-compendium-65701.yaml` | 4 | 4 | 23 |
 | `data/literature/extracts/lpi-lunar-sourcebook-chapter08.yaml` | 10 | 10 | 40 |
 | `data/literature/extracts/lunarsurface-2020-5029.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml` | 3 | 11 | 7 |
@@ -18121,6 +18133,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 161 |
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 99 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 12 |
+| `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 7 | 11 | 41 |
 | `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 5 | 5 | 35 |
@@ -18150,14 +18163,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1340
+hard issues: 1402
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 692 |
-| `conditional_field:derivation` | 646 |
+| `conditional_field:derived_from` | 721 |
+| `conditional_field:derivation` | 679 |
 | `referential_integrity:derived_from` | 2 |
 
 ## Hard issues (first 50)
@@ -18176,6 +18189,28 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[1997jonesthermo::jones_1997_water_gas_shift_equilibrium].derivation` conditional_field: derived observation requires derivation
 - `observation[1997jonesthermo::jones_1997_boudouard_equilibrium].derived_from` conditional_field: derived observation requires derived_from
 - `observation[1997jonesthermo::jones_1997_boudouard_equilibrium].derivation` conditional_field: derived observation requires derivation
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_equilibrium_gas].derived_from` conditional_field: derived observation requires derived_from
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_equilibrium_gas].derivation` conditional_field: derived observation requires derivation
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift].derived_from` conditional_field: derived observation requires derived_from
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift].derivation` conditional_field: derived observation requires derivation
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hot_rock_vapor_species].derived_from` conditional_field: derived observation requires derived_from
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hot_rock_vapor_species].derivation` conditional_field: derived observation requires derivation
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hadean_timeline_and_co2_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hadean_timeline_and_co2_model].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derivation` conditional_field: derived observation requires derivation
+- `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derived_from` conditional_field: derived observation requires derived_from
+- `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model].derived_from` conditional_field: derived observation requires derived_from
@@ -18184,39 +18219,17 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derivation` conditional_field: derived observation requires derivation
+- `observation[boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure].derivation` conditional_field: derived observation requires derivation
+- `observation[boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c].derivation` conditional_field: derived observation requires derivation
+- `observation[boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_tl_author_partial_pressures].derivation` conditional_field: derived observation requires derivation
+- `observation[boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation].derivation` conditional_field: derived observation requires derivation
 - `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only].derived_from` conditional_field: derived observation requires derived_from
 - `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only].derivation` conditional_field: derived observation requires derivation
-- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only].derived_from` conditional_field: derived observation requires derived_from
-- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table1_si_bearing_gas_partial_pressures].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table1_si_bearing_gas_partial_pressures].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table4_hydroxide_partial_pressures].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table4_hydroxide_partial_pressures].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table5_gas_magma_distribution_coefficients].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2016-rock-steam-solubility::fegley_2016_table5_gas_magma_distribution_coefficients].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model].derivation` conditional_field: derived observation requires derivation
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model].derivation` conditional_field: derived observation requires derivation
 
 ## Advisory issue census
 
-advisory issues: 134172
+advisory issues: 134268
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 134172 |
+| `identity_incomplete` | 134268 |

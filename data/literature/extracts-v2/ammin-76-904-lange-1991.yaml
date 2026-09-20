@@ -1,0 +1,1416 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ammin-76-904-lange-1991.yaml
+observations:
+- observation_id: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 909
+    section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+    equation: '6'
+    note: pdf_page=6
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_crystallization_repeated_runs
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'diopside_liquid_to_clinopyroxene_solid_solution_and_wollastonite' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 910
+    figure: '6'
+    section: Observations on incongruent melting and preliminary crystallization study
+    note: pdf_page=7
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_fusion_and_melting_transition
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_to_liquid_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 904
+    section: Abstract
+    note: pdf_page=1
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 909
+    section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+    note: pdf_page=6
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table1_diopside_composition
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_and_diopside_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 905
+    table: '1'
+    note: pdf_page=2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:1
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:10
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:11
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:12
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:13
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:14
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:15
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:16
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:17
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:18
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:19
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:2
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:20
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:21
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:22
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:23
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:24
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:25
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:26
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:27
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:28
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:3
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:4
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:5
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:6
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:7
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:8
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904
+- observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:9
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1403, 1762]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: empty values
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-76-904
+  locator:
+    published_page: 908
+    table: '2'
+    note: pdf_page=5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  read_from: unknown:ammin-76-904

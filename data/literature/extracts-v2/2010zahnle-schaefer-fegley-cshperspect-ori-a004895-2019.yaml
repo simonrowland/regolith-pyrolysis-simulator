@@ -1,0 +1,336 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml
+observations:
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ci_volatile_composition
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatile_bulk_composition'
+    species:
+      formula: CI_chondrite
+      phase:
+        tag: unknown
+        reason: phase string 'CI_carbonaceous_chondrite_bulk_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_bulk_composition'; refusing to pick a
+      number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Water is an upper bound as printed; no uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    section: The Secondary Atmosphere
+    note: Prose sentence cites Hashimoto et al. (2007); values are not measurements made in this review.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CO_to_CH4_ratio'
+    species:
+      formula: ordinary_chondrite_gas
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondritic_material_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'CO_to_CH4_ratio'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Both temperatures are approximate; no uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    section: The Secondary Atmosphere
+    note: Examples reported from the Schaefer and Fegley (2007) model.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hadean_timeline_and_co2_model
+  experiment_id: 10.1101/cshperspect.a004895::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Hadean_thermal_atmospheric_history'
+    species:
+      formula: Hadean_Earth
+      phase:
+        tag: unknown
+        reason: phase string 'post_moon_forming_impact_Earth' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Hadean_thermal_atmospheric_history'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Schematic model ranges and approximate values are retained as printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 9
+    pdf_page_index: 9
+    figure: '3'
+    note: Figure 3 caption; schematic but energetically self-consistent history after Zahnle et al. (2006).
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hot_rock_vapor_species
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'abundant_gas_species'
+    species:
+      formula: silicate_rock_vapor
+      phase:
+        tag: unknown
+        reason: phase string 'hot_silicate_rock_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'abundant_gas_species'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical abundance or uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 9
+    pdf_page_index: 9
+    section: The Moon-Forming Impact
+    note: Qualitative result attributed to Schaefer and Fegley (2009), not a direct measurement.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_impact_degas_velocity_threshold
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'impact_velocity_for_water_degas'
+    species:
+      formula: CI_chondrite
+      phase:
+        tag: unknown
+        reason: phase string 'carbonaceous_chondrite_impact_degassing' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'impact_velocity_for_water_degas'; refusing to
+      pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Threshold is a bound, not a point estimate.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    section: The Secondary Atmosphere
+    note: Review reports the experimental finding of Lange et al. (1985) and Tyburczy et al. (1986).
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_equilibrium_gas
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_gas_species'
+    species:
+      formula: ordinary_chondrite_gas
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondritic_material_at_solidus' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1225, 1225]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_gas_species'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Temperature is approximate; no quantitative uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    section: The Secondary Atmosphere
+    note: Review summarizes Schaefer and Fegley (2007) chemical-equilibrium calculations.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_volatile_composition
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatile_bulk_composition'
+    species:
+      formula: ordinary_chondrite
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondrite_bulk_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_bulk_composition'; refusing to pick a
+      number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The prose says "about"; no uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: The Secondary Atmosphere
+    note: Prose immediately after the discussion of Schaefer and Fegley (2007); values are attributed to that prior compilation.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_post_solidification_co2_estimate
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'atmospheric_CO2_and_surface_temperature'
+    species:
+      formula: Hadean_Earth
+      phase:
+        tag: unknown
+        reason: phase string 'post_solidification_Earth_atmosphere' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'atmospheric_CO2_and_surface_temperature'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Range and approximation retained; no statistical uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    section: The Moon-Forming Impact
+    note: Authors state this was estimated from modest CO2 solubility in magma; this is not a direct measurement.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019

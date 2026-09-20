@@ -1,0 +1,156 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpi-compendium-65701.yaml
+observations:
+- observation_id: lpi-compendium-65701::lpi_compendium_65701_attributed_trace_and_exposure_values
+  experiment_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'attributed_sample_characterization'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'attributed_sample_characterization'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-65701
+  locator:
+    pdf_page_index: 1
+    section: Chemistry
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  read_from: unknown:lpi-compendium-65701
+- observation_id: lpi-compendium-65701::lpi_compendium_65701_chemical_composition_table
+  experiment_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_composition'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chemical_composition'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-65701
+  locator:
+    pdf_page_index: 4
+    table: '1'
+    section: Chemical composition of 65701
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  read_from: unknown:lpi-compendium-65701
+- observation_id: lpi-compendium-65701::lpi_compendium_65701_figure_only_characterization
+  experiment_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'composition_and_maturity_comparison'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'composition_and_maturity_comparison'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-65701
+  locator:
+    pdf_page_index: 0
+    figure: '4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  read_from: unknown:lpi-compendium-65701
+- observation_id: lpi-compendium-65701::lpi_compendium_65701_sample_characterization
+  experiment_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::/Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-compendium-65701
+  locator:
+    pdf_page_index: 0
+    section: Introduction and Petrography
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  read_from: unknown:lpi-compendium-65701

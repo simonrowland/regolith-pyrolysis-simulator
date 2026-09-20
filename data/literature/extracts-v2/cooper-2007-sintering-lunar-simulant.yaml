@@ -1,0 +1,640 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
+observations:
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_apollo14_glass_sintering_minutes_800c
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sintering_onset_conditions'
+    species:
+      formula: Apollo_14_glass
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_apollo14_composition_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_onset_conditions'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 1
+    figure: '1'
+    section: What Is Sintering, and Why Is It a Concern?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fluidizing_fraction'
+    species:
+      formula: Fluidized_bed
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fluidizing_fraction'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: approximate qualifier retained; no model uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 5
+    figure: '5'
+    section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_humid_air_channelization_sequence
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'channelization_timing'
+    species:
+      formula: Fluidized_bed
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'channelization_timing'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 3
+    figure: '2'
+    section: How Can Sintering Be Prevented?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_humidity_channelization_window
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'channelization_timing'
+    species:
+      formula: Fluidized_bed
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'channelization_timing'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: observation window is qualitative and retained as printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 6
+    section: Humidity
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1_sintered_brick_strength
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sintered_strength'
+    species:
+      formula: JSC-1
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sintered_strength'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: upper-bound wording retained; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 7
+    section: Sintered Construction Materials
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_glass_fraction
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_composition'
+    species:
+      formula: JSC-1A
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_composition'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: approximate qualifier retained; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 1
+    section: What Is Sintering, and Why Is It a Concern?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'particle_size_distribution'
+    species:
+      formula: JSC-1A
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_glass_rich_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'particle_size_distribution'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed standard deviation is retained; no other uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 8
+    section: Nomenclature
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1050c_three_hours
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: JSC-1A
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: quantity, method_class, quoted_from,
+      temperature_C, duration_h, sample_form, outcome'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 2
+    section: What Is Sintering, and Why Is It a Concern?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1100c_quoted
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: JSC-1A
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: quantity, method_class, quoted_from,
+      temperature_C, onset_time, sample_form, outcome'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 2
+    section: What Is Sintering, and Why Is It a Concern?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_figure1_sintering_threshold
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sintering_onset_conditions'
+    species:
+      formula: JSC-1AF
+      phase:
+        tag: unknown
+        reason: phase string 'synthetic_apollo14_composition_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_onset_conditions'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 2
+    figure: '1'
+    section: What Is Sintering, and Why Is It a Concern?
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_grain_size_statistics
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'particle_size_distribution'
+    species:
+      formula: JSC-1AF
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_glass_rich_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'particle_size_distribution'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed standard deviation is retained; no other uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 8
+    section: Nomenclature
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_lunar_soil_agglutinate_fraction
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_composition'
+    species:
+      formula: Lunar_soil
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_composition'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: range and upper bound retained; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 8
+    section: Nomenclature
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_partial_gravity_fluidized_bed_figure_only
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fluidization_behavior'
+    species:
+      formula: Fluidized_bed
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fluidization_behavior'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 6
+    figure: '6'
+    section: Discussion
+  read_from: unknown:cooper-2007-sintering-lunar-simulant
+- observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_thermocouple_divergence_after_heater_600c
+  experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'channelization_indicator'
+    species:
+      formula: Fluidized_bed
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'channelization_indicator'; refusing to pick a
+      number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: approximate qualifiers retained; no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: cooper-2007-sintering-lunar-simulant
+  locator:
+    pdf_page_index: 3
+    figure: '3'
+    section: Indirect evidence of channel formation
+  read_from: unknown:cooper-2007-sintering-lunar-simulant

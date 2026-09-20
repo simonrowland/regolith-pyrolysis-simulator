@@ -1,0 +1,728 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ammin-75-781-hemingway-1990.yaml
+observations:
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermodynamic_functions'
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 1800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      formation_enthalpy_uncertainty_kJ_per_mol: '1.25'
+      formation_gibbs_energy_uncertainty_kJ_per_mol: '1.25'
+      uncertainty_locator: published page 788, Table 6 uncertainty row
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 788
+    table: '6'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_heat_capacity_table3
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::3
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [338.9, 997.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: method_class, quantity, table_note, selected_source_values'
+  uncertainty:
+    kind: printed
+    verbatim:
+      fit_average_deviation_pct: '0.34'
+      fit_average_deviation_locator: published page 785, text following Equation 3
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 786
+    table: '3'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_m2_m3_table5
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::5
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [338.9, 499.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: method_class, quantity, selected_source_values'
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 787
+    table: '5'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_phase_composition_estimate
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_composition'
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_composition'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class author_estimate
+    original_method_class: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 782
+    section: Samples and apparatus
+    note: Composition estimate follows the observed cell edge paragraph and uses Lindsley's relationship.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_pure_samples_1000k
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: method_class, quantity, sample_M2_at_1000_K, sample_M3_at_1000_K,
+      note'
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 786
+    section: paragraph beginning "In an effort to establish the best value"
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_sample_characterization
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_characterization'
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_characterization'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 782
+    section: Samples and apparatus
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermodynamic_functions'
+    species:
+      formula: Fe3O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 1800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 787
+    table: '4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [245.0, 1800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: method_class, generator, quantity, fit_segments'
+  uncertainty:
+    kind: printed
+    verbatim:
+      equation_1_average_deviation_pct: '0.45'
+      equation_2_average_deviation_pct: '0.9'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 783
+    section: High-temperature heat capacities and thermodynamic functions for bunsenite
+    note: equations=['1', '2']
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_nio_heat_capacity_table1
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::1
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [338.5, 837.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: method_class, quantity, table_series, selected_source_values,
+      note'
+  uncertainty:
+    kind: printed
+    verbatim:
+      fit_average_deviation_pct: '0.45'
+      fit_average_deviation_locator: published page 783, text following Equation 1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 783
+    table: '1'
+    note: Table 1 is headed Experimental molar heat capacities for bunsenite, NiO; three experimental series are printed.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_nio_sample_and_dsc_conditions
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_and_measurement_conditions'
+    species:
+      formula: NiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_and_measurement_conditions'; refusing to
+      pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 782
+    section: Samples and apparatus
+    note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermodynamic_functions'
+    species:
+      formula: NiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 1800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 783
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
+- observation_id: ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations
+  experiment_id: 37808afe4a14c753bac82fa2bba57f6786415cb81e2c46e8b0c3b1a43fca43e8::/Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'delta_G_buffer'
+    species:
+      formula: Fe_O_buffer
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_G_buffer'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      qfm_average_deviation_pct: '0.1'
+      mh_average_deviation_pct_by_range:
+      - '0.1'
+      - '0.2'
+      - '0.4'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ammin-75-781-hemingway-1990
+  locator:
+    published_page: 787
+    section: Discussion
+    note: QFM relation is printed on page 787; MH relations are printed on page 789.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+  read_from: unknown:ammin-75-781-hemingway-1990
