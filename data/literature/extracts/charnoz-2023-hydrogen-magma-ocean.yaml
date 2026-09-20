@@ -1,0 +1,186 @@
+schema_version: literature_extract.v1
+source_id: charnoz-2023-hydrogen-magma-ocean
+source:
+  citation: >-
+    Charnoz, S., Falco, A., Tremblin, P., Sossi, P., Caracas, R. & Lagage, P.-O.
+    (2023), "The effect of a small amount of hydrogen in the atmosphere of ultrahot
+    magma-ocean planets: Atmospheric composition and escape", Astronomy & Astrophysics
+    674:A224.
+  doi: 10.1051/0004-6361/202245763
+  url: https://doi.org/10.1051/0004-6361/202245763
+  year: 2023
+extraction:
+  method: >-
+    Manual transcription from the 15-page born-digital PDF using pdftotext -layout;
+    printed table cells, equations, bounds, ranges, and figure-caption conditions retained.
+    Plotted curves were not digitized.
+  date: '2026-09-20'
+  worker: i1-charnoz-2023-hydrogen-magma-ocean
+  source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/charnoz-2023-hydrogen-magma-ocean/charnoz-2023-hydrogen-magma-ocean.pdf
+review_status: draft
+species: {}
+evidence_policy:
+  classification: model_derived_and_compilation_assessed
+  measurement_claim: >-
+    No new laboratory measurements or apparatus runs are reported. The paper is a
+    chemical-equilibrium and atmospheric-escape modelling study; cited observations,
+    catalog values, and comparisons remain attributed or compiled evidence.
+  model_generators:
+  - authors' coupled vapor-liquid equilibrium model
+  - CEA/NASA chemical-equilibrium code (Gordon & McBride 1996)
+  - VapoRock activity-coefficient outputs (Wolf et al. 2023)
+  - JANAF thermochemical data (Chase 1998)
+  - VASP density-functional-theory molecular-dynamics comparison
+  - energy-limited atmospheric-escape scaling following Salz et al. (2016)
+  missing_values: >-
+    No sample mass, crucible, cell/orifice geometry, exposed area, vacuum, pumping,
+    gas-flow, temperature calibration, fO2-control apparatus, or experimental run
+    duration is stated because this source contains no laboratory experiment.
+  figure_policy: >-
+    Figures 3-15 and Appendices A-B are retained as qualitative figure-only records
+    or caption conditions; numeric curve values were not read off or invented.
+model_tables:
+- table: '1'
+  locator: {published_page: 5, pdf_page_index: 5, table: '1'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: JANAF equilibrium constants and the authors' coupled magma-ocean model
+    quantity: liquid_gas_vaporization_reaction_inventory
+    rows_as_printed:
+    - {number: 1, reactants: 'SiO2(l)', vapor: 'SiO(g) + 1/2O2', s: 1/2, reference: 'Chase (1998)'}
+    - {number: 2, reactants: 'SiO2(l)', vapor: 'SiO2(g)', s: 0, reference: 'Chase (1998)'}
+    - {number: 3, reactants: 'NaO1/2(l)', vapor: 'Na(g) + 1/4O2', s: 1/4, reference: 'Chase (1998)'}
+    - {number: 4, reactants: 'KO1/2(l)', vapor: 'K(g) + 1/4O2', s: 1/4, reference: 'Chase (1998)'}
+    - {number: 5, reactants: 'MgO(l)', vapor: 'Mg(g) + 1/2O2', s: 1/2, reference: 'Chase (1998)'}
+    - {number: 6, reactants: 'FeO(l)', vapor: 'Fe(g) + 1/2O2', s: 1/2, reference: 'Chase (1998)'}
+    note: NaO1/2 and KO1/2 are oxide-normalized forms; their melt mole fractions are Na2O and K2O.
+- table: '2'
+  locator: {published_page: 6, pdf_page_index: 6, table: '2'}
+  classification: compilation_assessed
+  values:
+    method_class: compilation_assessed
+    generator: BSE composition attributed to Palme & O'Neill (2014), used as fixed model input
+    quantity: BSE_magma_ocean_composition
+    units: molar fraction
+    rows_as_printed:
+    - {oxide: MgO, molar_fraction: 0.468}
+    - {oxide: SiO2, molar_fraction: 0.388}
+    - {oxide: FeO, molar_fraction: 0.0579}
+    - {oxide: Na1O1/2, molar_fraction: 0.00578}
+    - {oxide: K1O1/2, molar_fraction: '3.42 × 10−4'}
+model_conditions:
+- locator: {published_page: 5, pdf_page_index: 5, section: '3. Full model method calculation'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: authors' coupled vapor-liquid equilibrium model with CEA/NASA
+    quantity: model_setup
+    liquid_components: [SiO2(l), MgO(l), FeO(l), Na2O(l), K2O(l)]
+    magma_ocean: infinite_fixed_composition
+    hydrogen_state: all H remains in vapor; H2 and H2O dissolution excluded
+    equilibrium_constraints: [liquid_gas_equilibrium, oxygen_mass_conservation, hydrogen_mass_conservation]
+    activity_model: 'a(liquid j) = Xj × Γj; Γj interpolated from VapoRock'
+- locator: {published_page: 6, pdf_page_index: 6, section: '3.2. Constitutive equations'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: CEA/NASA coupled to the authors' liquid-vapor model
+    quantity: numerical_solution_conditions
+    temperature_range_K: '1800–3500'
+    total_hydrogen_pressure_range_bar: '10−6–10^6'
+    pressure_limit_note: '>1 Mbar metallic hydrogen beyond scope; ideal-gas breakdown estimated above ~10^3–10^4 bar'
+    relative_accuracy_each_partial_pressure: 'better than 10−3'
+    fiducial_temperatures_K: [1800, 2000, 3000, 3400]
+    included_CEA_species: 'Fe, FeO, H, H2, H2O, H2O2, HO2, K, K2, K2O, K2O2, K2O2H2, KH, KNa, KO, KOH, Mg, Mg2, MgH, MgO, MgOH, Na, Na2, Na2O, Na2O2, Na2O2H2, NaH, NaO, NaOH, O, O2, O3, OH, Si, Si2, Si3, SiH, SiH2, SiH3, SiH4, SiO, SiO2'
+- locator: {published_page: 6, pdf_page_index: 6, section: '3.4. Validation against molecular dynamics calculations'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: VASP ab initio molecular dynamics with PBE generalized-gradient approximation
+    quantity: molecular_dynamics_validation_setup
+    temperature_K: 3000
+    density_g_cm3: 0.4
+    initial_configurations: 5
+    simulation_duration_ps: '50–136'
+    timestep_fs: 2
+    pyrolite_composition_as_printed: '1/2Na2O·2CaO·3/2Al2O3·4FeO·30MgO·24SiO2'
+    main_vapor_components: [SiO, FeO2, Na, O2, Mg, FeO, O, SiO2]
+    discrepancy: FeO2 appears in the ab initio vapor but is absent from the thermodynamic model
+escape_model_values:
+- locator: {published_page: 10, pdf_page_index: 10, section: '5. Atmospheric escape'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: energy-limited escape model scaled from Salz et al. (2016)
+    quantity: escape_model_assumptions
+    tidal_factor_K: 1
+    planet_orbit_au: 0.02
+    star_age_Gyr: 5
+    hydrogen_initial_mass_fraction_range: '10−6–10−1 of planet mass'
+    magma_ocean_mass_fraction_assumed: 0.5
+    escape_temperature_thresholds_K: ['>1800', '>2000', '>3000', '>3200', '>3500']
+    heating_efficiency_mineral_atmosphere: '2 × 10−4–4 × 10−3'
+    heating_efficiency_hydrogen_atmosphere: '>0.1'
+    caveat: values are order-of-magnitude model estimates; composition is fixed rather than Rayleigh-evolving
+- locator: {published_page: 11, pdf_page_index: 11, section: '5.2. Results', figure: '14'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: authors' energy-limited escape calculation
+    quantity: reported_escape_outcomes
+    planet: '1 M⊕, 1 R⊕'
+    hydrogen_loss_time: 'about 100 kyr–10 Myr'
+    mantle_Na_lost_after_gigayear: 'about 30%'
+    note: values are read from printed prose, not digitized from the figure
+- locator: {published_page: 12, pdf_page_index: 12, section: '5.2. Results', figure: '15'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: authors' energy-limited escape calculation
+    quantity: reported_element_loss_outcomes
+    Si_lost_after_5_Gyr_at_H_fraction_10e_minus_6: 'about 1%'
+    Si_lost_after_5_Gyr_at_H_fraction_0_1: 'about 10%'
+    Fe_loss_condition: '>10% for Tsurf >2600 K and MH0/Mp >0.01'
+    Mg_loss_maximum: 'up to 8% for Tsurf >3200 K and MH0/Mp >10−2'
+    broad_conclusion: 'a few 10% of mantle content may be evaporated for Tsurf >2600 K and initial H mass >1%'
+figure_only:
+- locator: {published_page: 7, pdf_page_index: 7, figures: '5–10'}
+  classification: figure_only
+  values:
+    method_class: figure_only
+    generator: authors' coupled thermodynamic model
+    quantity: fiducial_plots_and_transition_pressures
+    temperatures_K: [1800, 2000, 3000, 3400]
+    mineral_vapor_pressure_transition_bar: ['about 10−5', 'about 10−4', 'about 10−1', 'about 10']
+    note: plots show total pressure, hydrogen mass, and equilibrium compositions; no curve points digitized
+- locator: {published_page: 9, pdf_page_index: 9, figures: '11–13'}
+  classification: figure_only
+  values:
+    method_class: figure_only
+    generator: authors' coupled thermodynamic model
+    quantity: atmospheric_ratio_trends
+    printed_trends: [Mg/Si is independent of H for T >3000 K, Mg/Fe is independent of H, Na/Si is H-sensitive]
+- locator: {published_page: 15, pdf_page_index: 15, appendix: 'A-B', figures: 'A.1, B.1-B.4'}
+  classification: figure_only
+  values:
+    method_class: figure_only
+    generator: authors' coupled thermodynamic model
+    quantity: hydrogen_free_and_hydrogenated_partial_pressure_plots
+    plotted_temperatures_K: [1800, 2000, 3000, 3400]
+    note: appendix curves were not digitized
+quoted_attributed:
+- locator: {published_page: 6, pdf_page_index: 6, section: '3.4. Validation against molecular dynamics calculations'}
+  classification: quoted_attributed
+  values:
+    method_class: quoted_attributed
+    generator: authors' comparison of the thermodynamic model with VASP molecular dynamics
+    quantity: discrepancy_statement
+    claim: FeO2 occurs in the ab initio vapor at all simulated temperatures but is absent from the thermodynamic tables/model
+- locator: {published_page: 13, pdf_page_index: 13, section: Conclusions}
+  classification: quoted_attributed
+  values:
+    method_class: quoted_attributed
+    generator: authors' interpretation of their model outputs
+    quantity: headline_conclusions
+    claims: [hydrogen lowers O2 fugacity and promotes Na/K/Fe/Mg/Si degassing, Mg/Si is H-independent above 3000 K, Na/Si is H-sensitive, Mg/Fe is H-independent, most H is lost in <10 Myr for Earth-sized planets inside 0.02 au above 2000 K]
