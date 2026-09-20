@@ -1,0 +1,153 @@
+schema_version: literature_extract.v1
+source_id: metsoc-2024-6131
+source:
+  citation: >-
+    Singerling, S. A., Brenker, F. E., Tkalcec, H., Connolly Jr., H. C. & Lauretta, D. S. (2024),
+    "Nanoscale studies of sulfides and carbonates in OSIRIS-REx samples: What can they tell us about
+    alteration on Bennu?", 86th Annual Meeting of the Meteoritical Society, LPI Contribution No. 3036,
+    abstract 6131.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/metsoc2024/pdf/6131.pdf
+  year: 2024
+  conference: 86th Annual Meeting of the Meteoritical Society
+extraction:
+  method: >-
+    Official one-page conference-abstract PDF from corpus raw/metsoc-2024-6131/metsoc-2024-6131.pdf.
+    Text transcribed with pdftotext -layout. The source has a clean text layer; no OCR or figure/table
+    transcription was needed. All reported numeric values below are retained as printed. This source
+    contains direct TEM/EDS characterization of Bennu aggregates, but no vaporization, evaporation,
+    sublimation, thermal-decomposition, pressure, melt-thermodynamic, or mass-loss measurements.
+  date: '2026-09-19'
+  worker: w1-metsoc-2024-6131
+  provenance_path: data/literature/extracts/metsoc-2024-6131.yaml
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Bennu_sample
+  observable: rate_series
+  observation_id: metsoc_2024_6131_tem_sample_preparation
+  field: operating_voltage_kV
+  value: 200
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: TEM operated at 200 kV as printed.
+- species: Bennu_sample
+  observable: rate_series
+  observation_id: metsoc_2024_6131_sulfide_aggregate_characterization
+  field: aggregates_analyzed
+  value: 22
+  locator:
+    pdf_page_index: 1
+    section: Results and Discussion
+    note: 22 aggregates analyzed as printed.
+- species: Bennu_sample
+  observable: rate_series
+  observation_id: metsoc_2024_6131_carbonate_aggregate_characterization
+  field: aggregates_containing_carbonates
+  value: 7
+  locator:
+    pdf_page_index: 1
+    section: Results and Discussion
+    note: Seven aggregates contain carbonates as printed.
+species:
+  Bennu_sample:
+    observations:
+    - observation_id: metsoc_2024_6131_tem_sample_preparation
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Methods
+        note: >-
+          Fine-particle Bennu aggregates were prepared for TEM by depositing crushed powders from
+          OREX-800045-102 onto TEM copper mesh grids with a lacey carbon support.
+      phase: Bennu_asteroid_fine_particle_aggregates
+      condensed_form:
+        state: particulate_aggregate
+        metastable: false
+        basis: explicit_author
+        note: crushed Bennu powder deposited on TEM grids
+      regime: TEM_EDS_characterization
+      units: as published
+      values:
+        quantity: TEM_EDS_sample_preparation_and_instrument
+        method_class: measured_direct
+        sample_material: OREX-800045-102 crushed Bennu powders
+        support: TEM copper mesh grids with lacey carbon support
+        instrument: Thermo Scientific Talos F200-X G2 S/TEM
+        operating_voltage_kV: 200
+        camera: Ceta-S 4k x 4k 16M camera
+        EDS_detectors: 4
+        EDS_detector_type: windowless SDD
+      uncertainty:
+        note: none printed
+    - observation_id: metsoc_2024_6131_sulfide_aggregate_characterization
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: >-
+          The abstract reports analysis of 22 aggregates, their size range, and the observed sulfide
+          occurrences and textures.
+      phase: Bennu_sulfide_bearing_aggregates
+      condensed_form:
+        state: particulate_aggregate
+        metastable: false
+        basis: explicit_author
+      regime: TEM_EDS_characterization
+      units: as published
+      values:
+        quantity: aggregate_size_and_sulfide_occurrence
+        method_class: measured_direct
+        aggregates_analyzed: 22
+        aggregate_size_range_as_printed: 380 nm to 2.6 µm
+        aggregate_size_min_nm: 380
+        aggregate_size_max_um: 2.6
+        aggregates_containing_pyrrhotite_and_pentlandite: 15
+        pyrrhotite_pentlandite_relative_proportions: roughly equal (% area)
+        pyrrhotite_size_as_printed: ">100 nm"
+        pentlandite_size_as_printed: "<100 nm"
+        pyrrhotite_texture: more euhedral, less evenly distributed, larger
+        pentlandite_texture: less euhedral, more evenly distributed, smaller
+        sulfide_matrix: fine-grained phyllosilicate fibers
+        sulfide_occurrence: clusters embedded in phyllosilicate matrix
+        compound_pyrrhotite_pentlandite_sphalerite_aggregates: 2
+        sphalerite_Zn_to_Fe_ratio_as_printed: almost 1:1
+        sphalerite_composition: Fe-rich
+      uncertainty:
+        note: none printed; qualitative size bounds and proportions retained as printed
+    - observation_id: metsoc_2024_6131_carbonate_aggregate_characterization
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: >-
+          The abstract reports carbonate-bearing aggregate counts, preliminary phase identifications,
+          grain-size descriptions, and EDS minor-element contents.
+      phase: Bennu_carbonate_bearing_aggregates
+      condensed_form:
+        state: particulate_aggregate
+        metastable: false
+        basis: explicit_author
+      regime: TEM_electron_diffraction_EDS_characterization
+      units: as published
+      values:
+        quantity: carbonate_phase_occurrence_and_characterization
+        method_class: measured_direct
+        aggregates_containing_carbonates: 7
+        preliminary_carbonate_phase_identifications:
+        - calcite (CaCO3)
+        - gaylussite (Na2Ca(CO3)2·5H2O) or pirssonite (Na2Ca(CO3)2·2H2O)
+        - magnesite (MgCO3)
+        gaylussite_pirssonite_distinction: electron diffraction data too similar to distinguish
+        calcite_size_as_printed: 100 to 200 nm
+        calcite_context: often embedded in fluffy smectite
+        aggregates_with_Na_bearing_carbonates: 2 of 3 aggregates containing Na-bearing carbonates
+        gaylussite_or_pirssonite_size_as_printed: ">1 µm"
+        gaylussite_or_pirssonite_association: phyllosilicates attached to grain surface
+        magnesite_size_as_printed: "~1 µm"
+        magnesite_minor_elements: Fe 1.4 at.%; Mn 1.0 at.%
+      uncertainty:
+        note: >-
+          Phase identification of gaylussite versus pirssonite is unresolved in the source; grain-size
+          bounds and approximate values are retained as printed.
