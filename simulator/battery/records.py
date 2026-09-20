@@ -562,6 +562,17 @@ def _located_value(value: Located[Value] | Located[Decimal] | None) -> Located[V
     )
 
 
+def _required_located_value(
+    value: Located[Value] | Located[Decimal] | None,
+    path: str,
+) -> Located[Value]:
+    if value is None:
+        raise ValueError(f"{path} requires a Located value or typed absence state")
+    promoted = _located_value(value)
+    assert promoted is not None
+    return promoted
+
+
 def _validate_bench_absence(value: object, path: str = "bench") -> None:
     """Reject free-text absence reasons on the new bench evidence surface."""
 
@@ -805,7 +816,12 @@ class ThermalRamp:
     end_temperature_K: Located[Value] | None = None
 
     def __post_init__(self) -> None:
-        for name in ("rate_K_s", "start_temperature_K", "end_temperature_K"):
+        object.__setattr__(
+            self,
+            "rate_K_s",
+            _required_located_value(self.rate_K_s, "thermal_schedule.ramp.rate_K_s"),
+        )
+        for name in ("start_temperature_K", "end_temperature_K"):
             object.__setattr__(self, name, _located_value(getattr(self, name)))
         _validate_bench_absence(self, "thermal_schedule.ramp")
 
@@ -816,7 +832,13 @@ class ThermalSetpoint:
     hold_duration_s: Located[Value] | None = None
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "temperature_K", _located_value(self.temperature_K))
+        object.__setattr__(
+            self,
+            "temperature_K",
+            _required_located_value(
+                self.temperature_K, "thermal_schedule.setpoint.temperature_K"
+            ),
+        )
         object.__setattr__(self, "hold_duration_s", _located_value(self.hold_duration_s))
         _validate_bench_absence(self, "thermal_schedule.setpoint")
 
@@ -827,8 +849,18 @@ class ThermalPoint:
     temperature_K: Located[Value]
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "time_s", _located_value(self.time_s))
-        object.__setattr__(self, "temperature_K", _located_value(self.temperature_K))
+        object.__setattr__(
+            self,
+            "time_s",
+            _required_located_value(self.time_s, "thermal_schedule.point.time_s"),
+        )
+        object.__setattr__(
+            self,
+            "temperature_K",
+            _required_located_value(
+                self.temperature_K, "thermal_schedule.point.temperature_K"
+            ),
+        )
         _validate_bench_absence(self, "thermal_schedule.point")
 
 

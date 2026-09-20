@@ -19,6 +19,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.migrate import (
     _geometry_from_plain,
+    _state_from_plain,
     _thermal_schedule_from_plain,
 )
 from simulator.battery.records import (
@@ -34,7 +35,10 @@ from simulator.battery.records import (
     PressureEnvironment,
     Sample,
     State,
+    ThermalPoint,
+    ThermalRamp,
     ThermalSchedule,
+    ThermalSetpoint,
     Value,
 )
 from simulator.battery.validity import underdetermined_apparatus
@@ -271,6 +275,36 @@ def test_incomplete_thermal_entries_are_rejected(
         _thermal_schedule_from_plain(payload)
 
 
+@pytest.mark.parametrize(
+    ("record_type", "kwargs", "field"),
+    (
+        (ThermalRamp, {"rate_K_s": None}, "rate_K_s"),
+        (ThermalSetpoint, {"temperature_K": None}, "temperature_K"),
+        (
+            ThermalPoint,
+            {"time_s": None, "temperature_K": factories.located(300)},
+            "time_s",
+        ),
+        (
+            ThermalPoint,
+            {"time_s": factories.located(0), "temperature_K": None},
+            "temperature_K",
+        ),
+    ),
+)
+def test_required_thermal_fields_refuse_none(
+    record_type: type, kwargs: dict[str, object], field: str
+) -> None:
+    with pytest.raises(ValueError, match=rf"{field} requires .*typed absence state"):
+        record_type(**kwargs)
+
+
+def test_required_thermal_field_accepts_typed_absence_state() -> None:
+    missing = Located(State.unknown(BenchAbsenceReason.NOT_PUBLISHED))
+    ramp = ThermalRamp(rate_K_s=missing)
+    assert ramp.rate_K_s.state.reason == BenchAbsenceReason.NOT_PUBLISHED
+
+
 @pytest.mark.parametrize("payload", ([], "schedule", 1))
 def test_nonmapping_thermal_schedule_is_rejected(payload: object) -> None:
     with pytest.raises(TypeError, match="thermal schedule must be a mapping"):
@@ -283,6 +317,18 @@ def test_point_pressure_reconciles_with_decimal_identity() -> None:
         Decimal("0.001"),
     )
     assert report.ok, report.hard_issues
+
+
+def test_point_pressure_rejects_mismatching_decimal_identity() -> None:
+    report = _pressure_validation_report(
+        Decimal("0.002"),
+        Decimal("0.001"),
+    )
+    assert any(
+        issue.path.endswith("identity.total_pressure_Pa")
+        and issue.reason.value == "invalid_identity"
+        for issue in report.hard_issues
+    )
 
 
 @pytest.mark.parametrize(
@@ -354,6 +400,34 @@ def test_pressure_identity_reconciliation_rejects_unknown_bound_operator() -> No
         and issue.detail == "unsupported pressure bound operator 'about'"
         for issue in report.hard_issues
     )
+
+
+@pytest.mark.parametrize(
+    "pressure",
+    (
+        Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("0.002")),
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.0005"),
+            interval_high=Decimal("0.002"),
+        ),
+    ),
+)
+def test_nonfinite_pressure_identity_is_a_typed_issue(pressure: Value) -> None:
+    report = _pressure_validation_report(pressure, Decimal("NaN"))
+    assert any(
+        issue.path.endswith("identity.total_pressure_Pa")
+        and issue.reason.value == "invalid_identity"
+        and issue.detail == "identity numeric must be finite"
+        for issue in report.hard_issues
+    )
+
+
+@pytest.mark.parametrize("tag", ("unknown", "not_applicable"))
+@pytest.mark.parametrize("reason", (None, 0, False, "", "   ", 123))
+def test_persisted_absence_reason_is_not_coerced(tag: str, reason: object) -> None:
+    with pytest.raises(ValueError, match="reason"):
+        _state_from_plain({"tag": tag, "reason": reason}, str)
 
 
 def test_bench_absence_reason_is_closed() -> None:

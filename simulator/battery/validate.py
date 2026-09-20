@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, fields, is_dataclass
+from decimal import Decimal
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -178,6 +179,15 @@ def _reconcile_identity_axis(
         ident_value = as_decimal(identity_state.value)
     except TypeError:
         ident_value = identity_state.value
+    if isinstance(ident_value, Decimal) and not ident_value.is_finite():
+        issues.append(
+            _issue(
+                path,
+                RefusalReason.INVALID_IDENTITY,
+                "identity numeric must be finite",
+            )
+        )
+        return
     matches = ident_value == source_value
     if isinstance(source_value, Value):
         if source_value.kind is ValueKind.BOUND:

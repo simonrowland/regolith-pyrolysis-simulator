@@ -601,10 +601,10 @@ def _state_from_plain(payload: object, cast) -> State:
     tag = StateTag(str(payload.get("tag") or "value"))
     if tag is StateTag.VALUE:
         return State.of(cast(payload.get("value")))
-    reason = str(payload.get("reason") or tag.value)
+    reason = payload.get("reason")
     if tag is StateTag.NOT_APPLICABLE:
-        return State.not_applicable(reason)
-    return State.unknown(reason)
+        return State.not_applicable(reason)  # type: ignore[arg-type]
+    return State.unknown(reason)  # type: ignore[arg-type]
 
 
 def _locator_from_plain(payload: object) -> Locator | None:
