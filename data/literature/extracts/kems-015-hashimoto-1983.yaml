@@ -9,9 +9,10 @@ source:
 extraction:
   method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract; WB-2 2026-09-06 Tables
     1–7 transcribed from 200 dpi pdftoppm of the J-STAGE PDF (parent observation objects retained; new
-    observation_ids only). Figure "~" grids not used as data.
-  date: '2026-09-06'
-  worker: wave-WB-2
+    observation_ids only). Figure "~" grids not used as data. 2026-09-19 laboratory-parameter harvest from
+    the J-STAGE PDF text layer (pdftotext; no OCR) of Hashimoto's own EXPERIMENTS section.
+  date: '2026-09-19'
+  worker: harvest-hashimoto-1983
   provenance_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/
 review_status: draft
 species:
@@ -32,6 +33,254 @@ species:
       regime: langmuir_free_evaporation
       units: as published (vaporized fraction VF wt%)
       values:
+        <<: &hashimoto_1983_lab_harvest
+          initial_sample_mass_mg:
+            value: 100.0
+            units: mg
+            locator:
+              published_page: 112
+              section: Sample preparation
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+          composition_wt_pct:
+            SiO2: 35.43
+            Al2O3: 3.16
+            FeO: 35.04
+            MgO: 23.84
+            CaO: 2.53
+            locator:
+              published_page: 113
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+          sample_form:
+            value: powder pressed into tubes then recovered as a single molten spherule
+            locator:
+              published_page: 112
+              section: Sample preparation
+          sample_container:
+            value: high-purity graphite crucible (atomic-pile grade block)
+            locator:
+              published_page: 113
+              section: Experimental device
+          vacuum_chamber_height_mm:
+            value: 400
+            units: mm
+            locator:
+              published_page: 112
+              section: Experimental device
+              paragraph: vacuum chamber (400mm height, 300mm diameter)
+          vacuum_chamber_diameter_mm:
+            value: 300
+            units: mm
+            locator:
+              published_page: 112
+              section: Experimental device
+              paragraph: vacuum chamber (400mm height, 300mm diameter)
+          crucible_inner_diameter_mm:
+            kind: range
+            min: 11.5
+            max: 16.0
+            units: mm
+            as_printed: inner diameter 11.5-16.0mm
+            locator:
+              published_page: 112
+              section: Experimental device
+              note: sentence wraps p. 112 "The crucible (inner diameter 11.5-" onto p. 113 "16.0mm, height
+                75mm)"
+          crucible_height_mm:
+            value: 75
+            units: mm
+            locator:
+              published_page: 113
+              section: Experimental device
+              paragraph: 16.0mm, height 75mm) is made of a high purity graphite block
+          heater_material:
+            value: tungsten resistant heater of cylinder type
+            locator:
+              published_page: 112
+              section: Experimental device
+          heater_inner_diameter_mm:
+            value: 32
+            units: mm
+            locator:
+              published_page: 112
+              section: Experimental device
+              paragraph: inner diameter 32mm, height 120mm, thickness 0.3 mm
+          heater_height_mm:
+            value: 120
+            units: mm
+            locator:
+              published_page: 112
+              section: Experimental device
+          heater_thickness_mm:
+            value: 0.3
+            units: mm
+            locator:
+              published_page: 112
+              section: Experimental device
+          thermal_shields:
+            value: tungsten-molybdenum alloy, four-fold
+            locator:
+              published_page: 112
+              section: Experimental device
+          tungsten_guide_wire_diameter_mm:
+            value: 0.2
+            units: mm
+            locator:
+              published_page: 113
+              section: Experimental device
+              paragraph: The tungsten wire (0.2mm in diameter) hung downward
+          vacuum_pump_type:
+            value: diffusion pump
+            locator:
+              published_page: 114
+              section: Experimental device
+              paragraph: Vacuum was kept by operation of a diffusion pump
+          vacuum_pump_evacuation_rate_L_per_s:
+            value: 100
+            units: L/s
+            as_printed: 100ℓ/sec.
+            locator:
+              published_page: 114
+              section: Experimental device
+              paragraph: evacuation rate 100ℓ/sec., maximum vacuum reached 7 × 10^{-8} Torr
+          pump_maximum_vacuum_Torr:
+            value: 7.0e-8
+            units: Torr
+            kind: pump_ultimate
+            as_printed: 7 × 10^{-8} Torr
+            locator:
+              published_page: 114
+              section: Experimental device
+              paragraph: maximum vacuum reached 7 × 10^{-8} Torr
+          pressure_before_throw_Torr:
+            value: 1.0e-5
+            units: Torr
+            kind: about_nominal
+            as_printed: about 10^{-5} Torr
+            locator:
+              published_page: 114
+              section: Experimental conditions and procedures
+              paragraph: The pressure reading is about 10^{-5} Torr before throwing a sample into the crucible
+          pressure_on_throw_Torr:
+            kind: about_nominal_by_temperature
+            units: Torr
+            as_printed: '~1.5 × 10^{-4}, ~3 × 10^{-4}, ~7 × 10^{-4} and ~2 × 10^{-3} Torr at 1,700, 1,800,
+              1,900 and 2,000°C'
+            by_T_C:
+              1700: 1.5e-4
+              1800: 3.0e-4
+              1900: 7.0e-4
+              2000: 2.0e-3
+            note: On throwing, pressure abruptly increases more than one order of magnitude, then becomes
+              lower with time. These are about-nominal transients, not a single run pressure.
+            locator:
+              published_page: 114
+              section: Experimental conditions and procedures
+          vacuum_gauge_placement:
+            value: gauge set close to the pump; chamber pressure might have been a little higher than reading
+            locator:
+              published_page: 114
+              section: Experimental device
+          pyrometer:
+            value: optical pyrometer on the crucible surface
+            locator:
+              published_page: 113
+              section: Experimental device
+          pyrometer_emissivity:
+            value: 0.95
+            units: '1'
+            note: graphite rough surface
+            locator:
+              published_page: 113
+              section: Experimental device
+              paragraph: reading was corrected for a thermal emissivity of 0.95 (graphite rough surface)
+          thermocouple_types:
+            value: Pt/Pt-13%Rh and W/W-26%Re inserted in the crucible wall; monitoring only (carbon diffusion)
+            locator:
+              published_page: 113
+              section: Experimental device
+          pyrometer_thermocouple_agreement_pm_C:
+            value: 10
+            units: deg_C
+            kind: bound_within
+            as_printed: agreed with the pyrometry within 10°C
+            locator:
+              published_page: 114
+              section: Experimental device
+          crucible_inside_outside_agreement_pm_C:
+            value: 3
+            units: deg_C
+            kind: bound_within
+            as_printed: agreed within 3°C after thermal equilibrium, 1,700-2,000°C
+            locator:
+              published_page: 114
+              section: Experimental device
+          temperature_control_pm_C:
+            value: 5
+            units: deg_C
+            as_printed: maintained with an accuracy of ±5°C
+            locator:
+              published_page: 114
+              section: Experimental conditions and procedures
+          weighing_accuracy_mg:
+            value: 0.1
+            units: mg
+            as_printed: ±0.1 mg
+            locator:
+              published_page: 114
+              section: Analytical procedures
+              paragraph: weighed by a microbalance with an accuracy of ±0.1 mg
+          fO2_control:
+            during_run: none
+            sample_prep_sinter:
+              T_C: 1100
+              PCO2_over_PH2: 1
+              note: ferrous-iron stability field; starting-material sinter, not a run buffer
+            note: No buffer gas or gas mix during the vacuum runs. Graphite crucible; the paper states
+              a high fO2 to keep iron ferric cannot be sustained.
+            locator:
+              published_page: 118
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+          ionization_conditions_status:
+            value: not_reported_not_a_KEMS_experiment
+            locator:
+              published_page: 112
+              section: EXPERIMENTS
+          kems_sensitivity_factors_status:
+            value: not_reported_not_a_KEMS_experiment
+            locator:
+              published_page: 112
+              section: EXPERIMENTS
+          orifice_status:
+            value: not_a_Knudsen_cell_no_orifice
+            note: 1.2 mm hole is the sample preform hole, not a Knudsen orifice
+            locator:
+              published_page: 112
+              section: Sample preparation
+          clausing_factor_status:
+            value: not_reported_not_a_Knudsen_cell
+            locator:
+              published_page: 112
+              section: Experimental device
+          exposed_area_numeric_status:
+            value: not_tabulated_molten_spherule
+            locator:
+              published_page: 113
+              section: Experimental device
+              paragraph: the silicate sample showed a single spherule after quenching
+          epma_acceleration_voltage_keV:
+            value: 15
+            units: keV
+            note: residue EPMA (JEOL JXA-5A), not KEMS electron energy
+            locator:
+              published_page: 115
+              section: Analytical procedures
+          epma_absorbed_current_uA:
+            value: 0.015
+            units: uA
+            locator:
+              published_page: 115
+              section: Analytical procedures
         quantity: free_evap_residue_composition_vs_time
         material: FeO-MgO-SiO2-CaO-Al2O3 solar-abundance melt
         starting_tube_od_mm: 4.0
@@ -40,7 +289,6 @@ species:
         starting_tube_hole_note: sample preform hole — NOT Knudsen cell orifice
         recovered_form: single_spherule
         vacuum_during_run_Torr: 0.0001
-        max_vacuum_Torr: 7.0e-08
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -48,14 +296,14 @@ species:
         missing_note: Free-evap graphite crucible; sample forms molten spherule. Surface area of spherule
           used for rates but per-run numeric As not tabulated in OCR text (scale ~1 mm in Fig. 2). Do
           not invent Clausing or Knudsen orifice.
-      equipment:
+      equipment: &hashimoto_1983_equipment
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade block)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: Graphite crucible; high purity graphite block
-            line_range: 70-74
+            published_page: 113
+            section: Experimental device
             figure: '1'
+            paragraph: made of a high purity graphite block commonly used in atomic piles
         sample_surface_area:
           value:
             form: molten_spherule
@@ -64,19 +312,23 @@ species:
               diameter: 4.0
               hole_diameter: 1.2
             numeric_m2_series: null
-            note: recovered single spherules; free surface of melt droplet
+            note: recovered single spherules; free surface of melt droplet. Per-run numeric area is not
+              tabulated.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: All the recovered samples were single spherules
-            line_range: '90'
+            published_page: 113
+            section: Experimental device
+            paragraph: the silicate sample showed a single spherule after quenching
         chamber_pressure:
           value: 0.0001
           units: Torr
-          note: vacuum level during experiments ~10^-4 Torr; max pump vacuum 7e-8 Torr
+          kind: about_nominal
+          as_printed: about 10^{-4} Torr during the experiments
+          note: Nominal during-run chamber reading. Not the pump ultimate (7e-8 Torr) and not the temperature-dependent
+            throw transient on p. 114.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
-            line_range: 80-160
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_fe_geometry_class_b1
       type: rate_series
       locator:
@@ -105,12 +357,14 @@ species:
           — ABSENT_NOT_NUMERIC for Motzfeldt (not a Knudsen cell). No area is estimated from the preform
           dimensions.'
         sample_surface_area_status: ABSENT_NOT_NUMERIC_series
+        <<: *hashimoto_1983_lab_harvest
       equipment:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: graphite crucible
+            published_page: 113
+            section: Experimental device
+            paragraph: made of a high purity graphite block commonly used in atomic piles
         sample_surface_area:
           value:
             form: molten_spherule
@@ -121,16 +375,20 @@ species:
             numeric_m2_series: null
             note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: starting preform height 4 mm diameter 4 mm
+            published_page: 112
+            section: Sample preparation
+            paragraph: tubes of 4mm height and 4mm diameter with a straight hole of 1.2mm diameter
         chamber_pressure:
-          value: 0.0013
-          units: Pa
-          inferred: true
-          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          value: 0.0001
+          units: Torr
+          kind: about_nominal
+          as_printed: about 10^{-4} Torr during the experiments
+          note: Hashimoto printed during-run nominal. Fedkin's 1.3e-8 bar is the before-throw reading
+            (about 10^{-5} Torr), not the run pressure; it is not stored here.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
       type: rate_series
       locator:
@@ -174,14 +432,14 @@ species:
           than a fixed pairwise rate ranking.
       equipment:
         chamber_pressure:
-          value: 0.0133322
-          units: Pa
-          inferred: true
-          inference: about 1e-4 Torr during experiments * 133.322 Pa/Torr = 0.0133322 Pa
+          value: 0.0001
+          units: Torr
+          kind: about_nominal
+          as_printed: about 10^{-4} Torr during the experiments
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-            paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
-            line_range: '160'
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_table1_starting_composition
       type: rate_series
       locator:
@@ -279,6 +537,8 @@ species:
         initial_sample_mass_mg: 100.0
         temperature_control_pm_C: 5
         pyrometer_thermocouple_agreement_pm_C: 10
+        <<: *hashimoto_1983_lab_harvest
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_table3_residue_composition_series
       type: rate_series
       locator:
@@ -299,6 +559,7 @@ species:
       regime: langmuir_free_evaporation
       units: wt % (100% normalized) and VF wt % as published
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
         method_class: measured_direct
         semantics: composition_table_not_species_rate
@@ -816,6 +1077,7 @@ species:
       regime: langmuir_free_evaporation
       units: wt % average as published
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: quench_phase_compositions
         method_class: measured_direct
         semantics: composition_table_not_species_rate
@@ -895,6 +1157,7 @@ species:
           Total: 98.39
           n_analyses: 7
         note: Fe2O3 dashes on olivine/glass are true absence, not 0.
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
       type: rate_series
       locator:
@@ -910,6 +1173,7 @@ species:
       regime: langmuir_free_evaporation
       units: mol/s as published (not a Hertz-Knudsen area flux)
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: initial_stage_vaporization_rate_F
         method_class: derived_from_figure_8_linear_portion
         semantics: mol_s_rate_not_hkl_area_flux
@@ -958,6 +1222,7 @@ species:
           Uk_plus_Uv_cm3_s: 8.88e3
         note: Printed Uv column is 0.041 x 10^3 cm3/s at 1700 C etc. CSV stores the product.
           Pbar = (Pb+Po)/2 as printed. Knudsen flow predominates over viscous flow in this range.
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_table6_feo_vaporization_enthalpies
       type: gibbs_table
       locator:
@@ -973,6 +1238,7 @@ species:
       regime: thermodynamic_tabulation
       units: kcal/mol as published at 2000 K
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: vaporization_reaction_enthalpies_JANAF
         method_class: secondary_compilation
         semantics: janaf_enthalpy_compilation_not_species_rate
@@ -1002,6 +1268,7 @@ species:
           delta_H_over_z_kcal_mol: 109.476
         note: Full 20-row table in tables/kems-015-hashimoto-1983/t6.csv. These are JANAF thermodynamic
           values, not measured evaporation rates. No kcal-to-kJ conversion.
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_derived_feo_activation_energy
       type: rate_series
       locator:
@@ -1018,6 +1285,7 @@ species:
       regime: langmuir_free_evaporation
       units: kcal/mol as published
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: activation_energy_of_vaporization
         method_class: model_derived
         semantics: second_law_fit_not_measured_rate
@@ -1030,6 +1298,7 @@ species:
           values 97.1 and 100.1 kcal/mol are figure-only and are not transcribed as data this round.
           Trend - E increases with lowering molar concentration of FeO.
         figure_10_points: figure-only
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_derived_feo_reaction_order_endpoints
       type: rate_series
       locator:
@@ -1046,6 +1315,7 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless reaction order as published
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: surface_reaction_order
         method_class: model_derived
         semantics: second_law_fit_not_measured_rate
@@ -1056,6 +1326,7 @@ species:
           endpoints 1.204 (1700 C) and 0.798 (2000 C) are stored. Intermediate figure-only slopes are
           not transcribed this round.
         figure_9_points: figure-only
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
       type: alpha
       locator:
@@ -1071,6 +1342,7 @@ species:
       regime: langmuir_free_evaporation
       units: dimensionless
       values:
+        <<: *hashimoto_1983_lab_harvest
         quantity: vaporization_coefficient_alpha_i
         method_class: model_derived_assumption
         semantics: assumed_unity_ratio_not_measured_alpha
@@ -1087,6 +1359,7 @@ species:
           2006 Table 3 inversions of these experiments, not numbers printed here.'
         note: Do not promote the assumed unity ratio to a measured alpha. Competing with Fedkin 2006
           inversions; do not average.
+      equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_table3_residue_composition_series_quoted
       type: rate_series
       locator:
@@ -2636,13 +2909,16 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
         chamber_pressure:
-          value: 0.0013
-          units: Pa
-          inferred: true
-          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          value: 0.0001
+          units: Torr
+          kind: about_nominal
+          as_printed: about 10^{-4} Torr during the experiments
+          note: Hashimoto printed during-run nominal. Fedkin's 1.3e-8 bar is the before-throw reading
+            (about 10^{-5} Torr), not the run pressure; it is not stored here.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_table3_mgo_residue_series
       type: rate_series
       locator:
@@ -3550,13 +3826,16 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
         chamber_pressure:
-          value: 0.0013
-          units: Pa
-          inferred: true
-          inference: 1.3e-8 bar * 1e5 Pa/bar = 1.3e-3 Pa (from Fedkin citation of Hashimoto apparatus)
+          value: 0.0001
+          units: Torr
+          kind: about_nominal
+          as_printed: about 10^{-4} Torr during the experiments
+          note: Hashimoto printed during-run nominal. Fedkin's 1.3e-8 bar is the before-throw reading
+            (about 10^{-5} Torr), not the run pressure; it is not stored here.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
-            paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+            published_page: 118
+            pdf_page_index: 8
+            paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_table3_sio2_residue_series
       type: rate_series
       locator:
@@ -5107,6 +5386,65 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
     line_range: '160'
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: initial_sample_mass_mg
+  value:
+    value: 100.0
+    units: mg
+    locator:
+      published_page: 112
+      section: Sample preparation
+      paragraph: finally their weights were adjusted to 100.0mg with a knife
+  locator:
+    published_page: 112
+    section: Sample preparation
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: pump_maximum_vacuum_Torr
+  value:
+    value: 7.0e-8
+    units: Torr
+    kind: pump_ultimate
+    as_printed: 7 × 10^{-8} Torr
+    locator:
+      published_page: 114
+      section: Experimental device
+      paragraph: maximum vacuum reached 7 × 10^{-8} Torr
+  locator:
+    published_page: 114
+    section: Experimental device
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: vacuum_chamber_height_mm
+  value:
+    value: 400
+    units: mm
+    locator:
+      published_page: 112
+      section: Experimental device
+      paragraph: vacuum chamber (400mm height, 300mm diameter)
+  locator:
+    published_page: 112
+    section: Experimental device
+- species: Fe
+  observable: rate_series
+  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+  field: pyrometer_emissivity
+  value:
+    value: 0.95
+    units: '1'
+    note: graphite rough surface
+    locator:
+      published_page: 113
+      section: Experimental device
+      paragraph: reading was corrected for a thermal emissivity of 0.95 (graphite rough surface)
+  locator:
+    published_page: 113
+    section: Experimental device
 - species: Fe
   observable: rate_series
   observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
