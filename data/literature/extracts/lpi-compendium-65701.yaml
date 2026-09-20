@@ -1,0 +1,287 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-65701
+source:
+  citation: "Meyer, C. (2010), Lunar Sample Compendium: 65701, Lunar and Planetary Institute."
+  url: https://www.lpi.usra.edu/lunar/samples/atlas/compendium/65701.pdf
+  year: 2010
+extraction:
+  method: pdftotext -layout transcription checked against the five-page PDF; table columns retained as printed
+  date: '2026-09-20'
+  worker: i2-lpi-compendium-65701
+  provenance_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  source_scope: secondary sample compendium entry; no vaporization experiment or apparatus is reported
+review_status: draft
+source_locators:
+  sample_overview: &sample_overview
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    pdf_page_index: 0
+    section: Introduction and Petrography
+  chemistry: &chemistry
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    pdf_page_index: 4
+    table: '1'
+    section: Chemical composition of 65701
+  chemistry_narrative: &chemistry_narrative
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    pdf_page_index: 1
+    section: Chemistry
+  grain_size: &grain_size
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    pdf_page_index: 2
+    figure: '7'
+    section: Petrography
+fidelity_samples:
+- path: species.regolith.observations[lpi_compendium_65701_sample_characterization].values.mass_g
+  value: 171
+  locator: *sample_overview
+- path: species.regolith.observations[lpi_compendium_65701_chemical_composition_table].values.rows[0].values.LSPET72
+  value: '45.03 (a)'
+  locator: *chemistry
+laboratory_parameters:
+  absent_parameters:
+    value:
+      thermal_treatment_or_vaporization_run: not stated
+      furnace_or_heated_cell: not stated
+      crucible_or_container_for_thermal_experiment: not stated
+      effusion_orifice_geometry: not stated
+      exposed_thermal_area: not stated
+      pumping_mechanism_or_speed: not stated
+      run_pressure_history: not stated
+      run_gas_identity_or_pressure: not stated
+      temperature_measurement_or_calibration: not stated
+      fO2_control: not stated
+      run_duration: not stated
+    locator: *sample_overview
+    note: Storage, collection, and analytical methods are not converted into vaporization-run conditions.
+sample_characterization:
+  apollo_16_sample_65701:
+    locator: *sample_overview
+    values:
+      sample_number: '65701'
+      collection_context: Station 5, base of Stone Mountain on the Cayley Plain; small crater
+      mass_g: 171
+      sieve_fraction_as_printed: '<1 mm'
+      average_grain_size_microns: 58
+      maturity_index_Is_FeO: 106
+      mineral_mode: not reported
+      agglutinate_content: not reported
+      evidence_class: measured_tabulated
+    note: Mass and particle-size information are sample characterization; no bulk density or BET area is printed for 65701 in this entry.
+species:
+  regolith:
+    observations:
+    - observation_id: lpi_compendium_65701_sample_characterization
+      type: rate_series
+      locator: *sample_overview
+      phase: lunar_soil
+      regime: sample_provenance_and_characterization
+      units: as printed
+      values:
+        quantity: sample_provenance_and_characterization
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        sample_number: '65701'
+        station: '5'
+        mass_g: 171
+        sieve_fraction: '<1 mm'
+        average_grain_size_microns: 58
+        maturity_index_Is_FeO: 106
+        mineral_mode: not reported
+        agglutinate_content: not reported
+        collection_note: Figures 1-3 locate the sample at Station 5; the entry states that 65701 was taken from a small crater.
+    - observation_id: lpi_compendium_65701_chemical_composition_table
+      type: rate_series
+      locator: *chemistry
+      phase: lunar_soil
+      regime: compiled_sample_chemistry
+      units: wt_percent for oxides and S; ppm, ppb as printed
+      values:
+        quantity: chemical_composition
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        table_header: "Table 1 Chemical composition of 65701"
+        reference_columns: [LSPET72, Compston73, Taylor73, Wrigley73, Wanke73, Haskin73, Boynton76, Korotev81]
+        technique_key: "a=XRF; b=SSMS; c=INAA; d=radiation count; e=RNAA; f=IDMS"
+        rows:
+        - component: SiO2
+          unit: '%'
+          values: {LSPET72: '45.03 (a)', Compston73: '44.95 (a)', Taylor73: '44.7 (b)', Wanke73: '45.1 (c)', Haskin73: '45.4', Korotev81: '45.3'}
+        - component: TiO2
+          unit: '%'
+          values: {LSPET72: '0.64 (a)', Compston73: '0.65 (a)', Taylor73: '0.65 (b)', Wanke73: '0.7', Korotev81: '0.65'}
+        - component: Al2O3
+          unit: '%'
+          values: {LSPET72: '26.47 (a)', Compston73: '26.22 (a)', Taylor73: '26.3 (b)', Wanke73: '26.6 (c)', Haskin73: '28.2', Korotev81: '26.2'}
+        - component: FeO
+          unit: '%'
+          values: {LSPET72: '5.87 (a)', Compston73: '5.85 (a)', Taylor73: '5.68 (b)', Wanke73: '5.84 (c)', Haskin73: '5.53', Korotev81: '5.85'}
+        - component: MnO
+          unit: '%'
+          values: {LSPET72: '0.08 (a)', Compston73: '0.08 (a)', Wanke73: '0.07 (c)', Korotev81: '0.075'}
+        - component: MgO
+          unit: '%'
+          values: {LSPET72: '6.02 (a)', Compston73: '6.34 (a)', Taylor73: '6.19 (b)', Wanke73: '6.1 (c)', Haskin73: '6.02', Korotev81: '6.25'}
+        - component: CaO
+          unit: '%'
+          values: {LSPET72: '15.29 (a)', Compston73: '15.39 (a)', Taylor73: '15 (b)', Wanke73: '15.1 (c)', Haskin73: '12.8', Korotev81: '15'}
+        - component: Na2O
+          unit: '%'
+          values: {LSPET72: '0.41 (a)', Compston73: '0.45 (a)', Taylor73: '0.43 (b)', Wanke73: '0.44 (c)', Haskin73: '0.48', Korotev81: '0.45'}
+        - component: K2O
+          unit: '%'
+          values: {LSPET72: '0.12 (a)', Compston73: '0.12 (a)', Taylor73: '0.25 (b)', Wrigley73: '0.12 (d)', Wanke73: '0.12 (c)', Haskin73: '0.138', Korotev81: '0.134'}
+        - component: P2O5
+          unit: '%'
+          values: {LSPET72: '0.13 (a)', Compston73: '0.11 (a)'}
+        - component: S
+          unit: '%'
+          values: {LSPET72: '0.09 (a)', Compston73: '0.06 (a)'}
+        - component: Sc
+          unit: ppm
+          values: {Taylor73: '11 (b)', Wanke73: '9 (c)', Haskin73: '10.11 (c)', Korotev81: '10.1'}
+        - component: V
+          unit: ppm
+          values: {Taylor73: '30 (b)', Korotev81: '25'}
+        - component: Cr
+          unit: ppm
+          values: {LSPET72: '820 (a)', Taylor73: '850 (b)', Wanke73: '770 (c)', Korotev81: '780'}
+        - component: Co
+          unit: ppm
+          values: {Taylor73: '30 (b)', Wanke73: '30 (c)', Haskin73: '31.7', Korotev81: '31'}
+        - component: Ni
+          unit: ppm
+          values: {LSPET72: '356 (a)', Taylor73: '370 (b)', Wanke73: '420 (c)', Haskin73: '510', Boynton76: '498 (e)', Korotev81: '430'}
+        - component: Cu
+          unit: ppm
+          values: {Taylor73: '8 (b)', Korotev81: '91'}
+        - component: Zn
+          unit: ppm
+          values: {Boynton76: '17.7 (e)'}
+        - component: Ga
+          unit: ppm
+          values: {Haskin73: '15.4 (c)', Boynton76: '5.4 (e)'}
+        - component: Ge
+          unit: ppb
+          values: {Haskin73: '1000 (e)'}
+        - component: Rb
+          unit: ppm
+          values: {LSPET72: '2.9 (a)', Compston73: '3.14 (f)', Taylor73: '2.15 (b)', Wanke73: '3.2 (c)', Korotev81: '3.3'}
+        - component: Sr
+          unit: ppm
+          values: {LSPET72: '173 (a)', Compston73: '168 (f)', Wanke73: '152 (c)', Korotev81: '162'}
+        - component: Y
+          unit: ppm
+          values: {LSPET72: '48 (a)', Taylor73: '45 (b)', Korotev81: '48'}
+        - component: Zr
+          unit: ppm
+          values: {LSPET72: '207 (a)', Taylor73: '207 (b)', Korotev81: '205'}
+        - component: Nb
+          unit: ppm
+          values: {LSPET72: '13 (a)', Taylor73: '13.9 (b)'}
+        - component: Cs
+          unit: ppm
+          values: {Taylor73: '0.09 (b)'}
+        - component: Ba
+          unit: ppm
+          values: {Taylor73: '180 (b)', Wanke73: '100 (c)', Korotev81: '130'}
+        - component: La
+          unit: ppm
+          values: {Taylor73: '13.6 (b)', Wanke73: '13 (c)', Haskin73: '14.7 (c)', Korotev81: '14.4'}
+        - component: Ce
+          unit: ppm
+          values: {Taylor73: '36.6 (b)', Wanke73: '38 (c)', Haskin73: '38.3 (c)'}
+        - component: Pr
+          unit: ppm
+          values: {Taylor73: '4.7 (b)'}
+        - component: Nd
+          unit: ppm
+          values: {Taylor73: '20 (b)', Wanke73: '19 (c)', Haskin73: '25.4 (c)'}
+        - component: Sm
+          unit: ppm
+          values: {Taylor73: '5.61 (b)', Wanke73: '5.9 (c)', Haskin73: '7.01 (c)', Korotev81: '6.7'}
+        - component: Eu
+          unit: ppm
+          values: {Taylor73: '1.09 (b)', Wanke73: '1.17 (c)', Haskin73: '1.27 (c)', Korotev81: '1.24'}
+        - component: Gd
+          unit: ppm
+          values: {Taylor73: '7.55 (b)', Haskin73: '8.8 (c)'}
+        - component: Tb
+          unit: ppm
+          values: {Taylor73: '1.1 (b)', Wanke73: '1.2 (c)', Haskin73: '1.46 (c)', Korotev81: '1.44'}
+        - component: Dy
+          unit: ppm
+          values: {Taylor73: '7.3 (b)', Wanke73: '7.5 (c)', Haskin73: '9.6 (c)'}
+        - component: Ho
+          unit: ppm
+          values: {Taylor73: '1.81 (b)', Wanke73: '1.9 (c)'}
+        - component: Er
+          unit: ppm
+          values: {Taylor73: '5 (b)'}
+        - component: Tm
+          unit: ppm
+          values: {Taylor73: '0.76 (b)'}
+        - component: Yb
+          unit: ppm
+          values: {Taylor73: '4.62 (b)', Wanke73: '4.45 (c)', Haskin73: '5.05 (c)', Korotev81: '4.9'}
+        - component: Lu
+          unit: ppm
+          values: {Taylor73: '0.72 (b)', Wanke73: '0.58 (c)', Haskin73: '0.71 (c)', Korotev81: '0.71'}
+        - component: Hf
+          unit: ppm
+          values: {Wanke73: '4.8 (c)', Haskin73: '5.4 (c)', Korotev81: '5.1'}
+        - component: Ta
+          unit: ppm
+          values: {Wanke73: '0.54 (c)', Korotev81: '0.54'}
+        - component: Ir
+          unit: ppb
+          values: {Wanke73: '19 (c)', Boynton76: '9.2 (e)'}
+        - component: Au
+          unit: ppb
+          values: {Wanke73: '13.5 (c)', Boynton76: '9.4 (e)'}
+        - component: Th
+          unit: ppm
+          values: {LSPET72: '1.9 (a)', Taylor73: '2.4 (b)', Wrigley73: '2.31 (d)', Korotev81: '2.2'}
+        - component: U
+          unit: ppm
+          values: {Taylor73: '0.63 (b)', Wrigley73: '0.57 (d)', Korotev81: '0.67'}
+        omitted_table_rows: [Mo, Ru, Rh, Pd, Ag, In, Sn, Sb, Te, W, Re, Os, Pt]
+        omission_policy: blank cells omitted; no zero inferred
+    - observation_id: lpi_compendium_65701_attributed_trace_and_exposure_values
+      type: rate_series
+      locator: *chemistry_narrative
+      phase: lunar_soil
+      regime: prior_study_results_reproduced_in_compendium
+      units: ppm, ppb, dpm_per_kg, and million_years as printed
+      values:
+        quantity: attributed_sample_characterization
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        carbon_ppm: 190
+        carbon_source: Moore et al. (1973)
+        nitrogen_ppm: 118
+        nitrogen_source: Kerridge et al. (1975)
+        cadmium_ppb: 75
+        zinc_ppm: 22
+        cadmium_zinc_source: Cirlin and Housley (1981)
+        Al26_activity_dpm_per_kg: 131
+        Na22_activity_dpm_per_kg: 56
+        cosmogenic_activity_source: Wrigley (1973)
+        Ne_exposure_age_million_years: 200
+        exposure_age_source: Walton et al. (1973)
+        grain_size_distribution_source: Graf (1993), from data by Butler et al. (1973)
+      note: Values are reproduced from named prior studies; they are not new measurements by Meyer (2010).
+    - observation_id: lpi_compendium_65701_figure_only_characterization
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        pdf_page_index: 0
+        figure: '4'
+      phase: lunar_soil
+      regime: figure_only_comparison
+      units: plotted values not transcribed
+      values:
+        quantity: composition_and_maturity_comparison
+        method_class: figure_only
+        evidence_class: figure_only
+        figures: [4, 5, 6]
+        note: Figures compare 65701 with Apollo soils; no plotted values were read off or computed.
