@@ -1,0 +1,354 @@
+schema_version: literature_extract.v1
+source_id: ammin-75-781-hemingway-1990
+source:
+  citation: Hemingway, B. S. (1990), "Thermodynamic properties of bunsenite, NiO, magnetite, Fe3O4, and hematite, Fe2O3", American Mineralogist, 75, 781-790.
+  url: http://www.minsocam.org/ammin/AM75/AM75_781.pdf
+  year: 1990
+extraction:
+  method: layout-preserving pdftotext review and transcription of source-printed tables and apparatus statements
+  date: '2026-09-20'
+  worker: i1-ammin-75-781
+  provenance_path: docs-private/research/2026-09-20-ammin-75-781/ammin-75-781.pdf
+review_status: draft
+fidelity_samples:
+- species: NiO
+  observable: rate_series
+  observation_id: hemingway_1990_nio_heat_capacity_table1
+  field: selected_source_values
+  value: [338.5, 48.44]
+  locator: {published_page: 783, table: '1'}
+- species: Fe3O4
+  observable: rate_series
+  observation_id: hemingway_1990_magnetite_heat_capacity_table3
+  field: selected_source_values
+  value: [845.2, 329.0]
+  locator: {published_page: 786, table: '3'}
+scope_assessment:
+  document_type: primary experimental thermodynamic study with calorimetric measurements and fitted/derived thermodynamic functions
+  measured_direct_observations: 3
+  measured_tabulated_observations: 2
+  model_derived_observations: 4
+  compilation_assessed_observations: 0
+  note: The paper is in scope for oxide thermochemistry and sample characterization, but not for vaporization or effusion geometry.
+  absent_from_source:
+  - vacuum level or chamber pressure
+  - pumping equipment or pumping speed
+  - effusion orifice geometry and Clausing factor
+  - exposed sample area
+  - run durations and scan rates
+  - temperature calibration method
+  - controlled oxygen fugacity for the DSC measurements
+species:
+  NiO:
+    observations:
+    - observation_id: hemingway_1990_nio_sample_and_dsc_conditions
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 782
+        section: Samples and apparatus
+        note: Bunsenite paragraph and high-temperature heat-capacity apparatus paragraph.
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: as printed
+      values:
+        method_class: measured_direct
+        quantity: sample_and_measurement_conditions
+        sample_material: Fischer Scientific reagent material, lot 784016
+        sample_preparation: heated 24 h at 1000 C
+        sample_mass_mg: 27.914
+        sample_form: dull green powder; well-crystallized emerald green grains under low magnification
+        instrument: differential scanning calorimeter
+        sample_container: unsealed gold pans
+        carrier_gas: N2
+        sample_mass_locator: published page 782, Samples and apparatus, bunsenite paragraph
+        dsc_conditions_locator: published page 783, paragraph beginning "High-temperature heat capacities were measured"
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: hemingway_1990_nio_heat_capacity_table1
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 783
+        table: '1'
+        note: Table 1 is headed Experimental molar heat capacities for bunsenite, NiO; three experimental series are printed.
+      T_range_K: [338.5, 837.0]
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: J/(mol K), K as printed
+      values:
+        method_class: measured_direct
+        quantity: cp
+        table_series: 1-6
+        selected_source_values:
+        - [338.5, 48.44]
+        - [398.3, 53.02]
+        - [498.0, 64.25]
+        - [518.0, 69.36]
+        - [527.9, 60.68]
+        - [837.0, 55.34]
+        note: Selected entries preserve printed table values; the full three-series table remains in the cited source table.
+      uncertainty:
+        fit_average_deviation_pct: 0.45
+        fit_average_deviation_locator: published page 783, text following Equation 1
+    - observation_id: hemingway_1990_nio_cp_fits
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 783
+        section: High-temperature heat capacities and thermodynamic functions for bunsenite
+        equations: ['1', '2']
+      T_range_K: [245.0, 1800.0]
+      phase: cr
+      regime: fitted_heat_capacity
+      units: Cp in J/(mol K), T in K as printed
+      values:
+        method_class: model_derived
+        generator: least-squares fit to this study's measurements combined with cited calorimetric data
+        quantity: cp
+        fit_segments:
+        - equation: 1
+          range_K: [245.0, 519.0]
+          expression_as_printed: "Cp = 4110.720 - 5.3024127 T + 3.52061e-3 T^2 - 53039.297 T^-0.5 + 2.43067e7 T^-2"
+        - equation: 2
+          range_K: [519.0, 1800.0]
+          expression_as_printed: "Cp = -8.776 + 4.2232e-2 T - 7.5267e-6 T^2 + 787.257 T^-0.5 + 3.6067e6 T^-2"
+      uncertainty:
+        equation_1_average_deviation_pct: 0.45
+        equation_2_average_deviation_pct: 0.9
+    - observation_id: hemingway_1990_nio_thermodynamic_table2
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 783
+        table: '2'
+      T_range_K: [298.15, 1800.0]
+      phase: cr
+      regime: third_law_thermodynamic_functions
+      units: Cp and S in J/(mol K); formation H and G in kJ/mol as printed
+      values:
+        method_class: model_derived
+        generator: calorimetric integration using Equations 1-2 and cited calorimetric data
+        quantity: thermodynamic_functions
+        molecular_mass_g_per_mol: 74.6994
+        selected_source_values:
+        - T_K: 298.15
+          cp_J_per_mol_K: 44.49
+          S_J_per_mol_K: 37.99
+          delta_fH_kJ_per_mol: -239.3
+          delta_fG_kJ_per_mol: -211.1
+        - T_K: 1000
+          cp_J_per_mol_K: 54.43
+          S_J_per_mol_K: 103.8
+          delta_fH_kJ_per_mol: -236.0
+          delta_fG_kJ_per_mol: -149.2
+        - T_K: 1800
+          cp_J_per_mol_K: 62.52
+          S_J_per_mol_K: 137.9
+          delta_fH_kJ_per_mol: -228.1
+          delta_fG_kJ_per_mol: -81.4
+      uncertainty:
+        reported_status: not_reported
+  Fe3O4:
+    observations:
+    - observation_id: hemingway_1990_magnetite_sample_characterization
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 782
+        section: Samples and apparatus
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: as printed
+      values:
+        method_class: measured_direct
+        quantity: sample_characterization
+        primary_sample_mass_mg: 38.244
+        primary_sample_history: portion of Bartel et al. sample sealed in a glass tube under a reducing atmosphere; localized unreacted hematite removed by hand picking
+        xray_internal_standard: BaF2
+        xray_radiation: CuKa
+        observed_a_cell_dimension_A: 8.392
+        additional_sample_M2: single crystal, skull-melting technique, subsolidus anneal at 1000 C and log fO2 = -9.48 for 119.5 h, final dimensions 4.0 x 4.0 x 0.7 mm, mass about 54 mg
+        additional_sample_M3: powder of approximately single-domain single-crystal cubes
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: hemingway_1990_magnetite_phase_composition_estimate
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 782
+        section: Samples and apparatus
+        note: Composition estimate follows the observed cell edge paragraph and uses Lindsley's relationship.
+      phase: cr
+      regime: sample_characterization
+      units: mol% as printed
+      values:
+        method_class: author_estimate
+        quantity: sample_composition
+        Fe3O4_mol_pct: 87
+        gamma_Fe2O3_mol_pct: 13
+        generator: Lindsley (1976) relationship applied to the observed alpha cell dimension
+        note: Not a direct chemical assay.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: hemingway_1990_magnetite_heat_capacity_table3
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 786
+        table: '3'
+      T_range_K: [338.9, 997.0]
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: J/(mol K), K as printed
+      values:
+        method_class: measured_direct
+        quantity: cp
+        table_note: Results corrected for Fe2O3; entries marked with a dash were not used in the computer fit above 900 K.
+        selected_source_values:
+        - [338.9, 161.9]
+        - [540.2, 197.9]
+        - [701.3, 226.8]
+        - [800.0, 274.6]
+        - [844.2, 326.9]
+        - [845.2, 329.0]
+        - [900.7, 216.0]
+        - [997.0, 206.7]
+      uncertainty:
+        fit_average_deviation_pct: 0.34
+        fit_average_deviation_locator: published page 785, text following Equation 3
+    - observation_id: hemingway_1990_magnetite_pure_samples_1000k
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 786
+        section: paragraph beginning "In an effort to establish the best value"
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: J/(mol K)
+      values:
+        method_class: measured_direct
+        quantity: cp
+        sample_M2_at_1000_K: 205.8
+        sample_M3_at_1000_K: 205.5
+        note: Source compares these values with recommended and prior heat-content values; no uncertainty is printed for the two measurements.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: hemingway_1990_magnetite_thermodynamic_table4
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 787
+        table: '4'
+      T_range_K: [298.15, 1800.0]
+      phase: cr
+      regime: third_law_thermodynamic_functions
+      units: Cp and S in J/(mol K); formation H and G in kJ/mol as printed
+      values:
+        method_class: model_derived
+        generator: integration of Equations 3-5 and hand integration over 845.5-900 K
+        quantity: thermodynamic_functions
+        molecular_mass_g_per_mol: 231.539
+        selected_source_values:
+        - T_K: 298.15
+          cp_J_per_mol_K: 150.87
+          S_J_per_mol_K: 146.14
+          delta_fH_kJ_per_mol: -1115.726
+          delta_fG_kJ_per_mol: -1012.566
+        - T_K: 845.5
+          cp_J_per_mol_K: 330.5
+          S_J_per_mol_K: 354.0
+          delta_fH_kJ_per_mol: -1087.840
+          delta_fG_kJ_per_mol: -835.264
+        - T_K: 1800
+          cp_J_per_mol_K: 209.2
+          S_J_per_mol_K: 509.8
+          delta_fH_kJ_per_mol: -1083.585
+          delta_fG_kJ_per_mol: -551.606
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: hemingway_1990_magnetite_m2_m3_table5
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 787
+        table: '5'
+      T_range_K: [338.9, 499.0]
+      phase: cr
+      regime: differential_scanning_calorimetry
+      units: J/(mol K), K as printed
+      values:
+        method_class: measured_tabulated
+        quantity: cp
+        selected_source_values:
+        - {T_K: 338.9, M2_Cp: 161.9, M3_Cp: 161.7}
+        - {T_K: 349.0, M2_Cp: 164.1, M3_Cp: 163.9}
+        - {T_K: 359.1, M2_Cp: 166.5, M3_Cp: 166.3}
+        - {T_K: 399.3, M2_Cp: 175.4, M3_Cp: 175.4}
+        - {T_K: 499.0, M2_Cp: 192.2, M3_Cp: 192.5}
+      uncertainty:
+        reported_status: not_reported
+  Fe2O3:
+    observations:
+    - observation_id: hemingway_1990_hematite_thermodynamic_table6
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 788
+        table: '6'
+      T_range_K: [298.15, 1800.0]
+      phase: cr
+      regime: third_law_thermodynamic_functions
+      units: Cp and S in J/(mol K); formation H and G in kJ/mol as printed
+      values:
+        method_class: model_derived
+        generator: O'Neill (1988) formation values combined with Robie et al. (1979) heat-capacity functions
+        quantity: thermodynamic_functions
+        molecular_mass_g_per_mol: 159.692
+        selected_source_values:
+        - T_K: 298.15
+          cp_J_per_mol_K: 103.85
+          S_J_per_mol_K: 87.40
+          delta_fH_kJ_per_mol: -826.230
+          delta_fG_kJ_per_mol: -744.273
+        - T_K: 1000
+          cp_J_per_mol_K: 148.49
+          S_J_per_mol_K: 252.71
+          delta_fH_kJ_per_mol: -810.813
+          delta_fG_kJ_per_mol: -537.791
+        - T_K: 1800
+          cp_J_per_mol_K: 163.95
+          S_J_per_mol_K: 338.32
+          delta_fH_kJ_per_mol: -802.719
+          delta_fG_kJ_per_mol: -365.757
+      uncertainty:
+        formation_enthalpy_uncertainty_kJ_per_mol: 1.25
+        formation_gibbs_energy_uncertainty_kJ_per_mol: 1.25
+        uncertainty_locator: published page 788, Table 6 uncertainty row
+  Fe_O_buffer:
+    observations:
+    - observation_id: hemingway_1990_qfm_and_mh_fitted_relations
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-75-781/ammin-75-781.pdf
+        published_page: 787
+        section: Discussion
+        note: QFM relation is printed on page 787; MH relations are printed on page 789.
+      phase: cr
+      regime: oxygen_buffer_thermodynamics
+      units: Gibbs energy in kJ; T in K as printed
+      values:
+        method_class: model_derived
+        generator: fitted thermodynamic relations derived from the paper's tabulated functions
+        quantity: delta_G_buffer
+        qfm_reaction: 2 magnetite + 3 quartz = 3 fayalite + O2
+        qfm_expression_as_printed: "Delta G = 474.155 - 0.16120 T"
+        qfm_range_K: [800.0, 1400.0]
+        mh_reaction: 6 hematite = 4 magnetite + O2
+        mh_expressions_as_printed:
+        - {range_K: [298.15, 700.0], expression: "Delta G = 496.215 - 0.27114 T"}
+        - {range_K: [700.0, 1100.0], expression: "Delta G = 514.690 - 0.29753 T"}
+        - {range_K: [1100.0, 1600.0], expression: "Delta G = 501.348 - 0.28547 T"}
+      uncertainty:
+        qfm_average_deviation_pct: 0.1
+        mh_average_deviation_pct_by_range: [0.1, 0.2, 0.4]
