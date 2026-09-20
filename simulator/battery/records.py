@@ -22,7 +22,7 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from decimal import Decimal
 from fractions import Fraction
 from typing import Any, Generic, Mapping, TypeVar
@@ -32,6 +32,8 @@ from simulator.battery.enums import (
     AmountBasis,
     AssetRole,
     Authority,
+    BenchAbsenceReason,
+    BenchIdentityBasis,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -119,6 +121,8 @@ class State(Generic[T]):
     reason: str | None = None
 
     def __post_init__(self) -> None:
+        if self.reason is not None:
+            object.__setattr__(self, "reason", str(self.reason))
         if self.tag is StateTag.VALUE:
             if self.value is None:
                 raise ValueError("State.value requires a value")
@@ -134,11 +138,11 @@ class State(Generic[T]):
 
     @classmethod
     def unknown(cls, reason: str) -> "State[T]":
-        return cls(StateTag.UNKNOWN, reason=reason)
+        return cls(StateTag.UNKNOWN, reason=str(reason))
 
     @classmethod
     def not_applicable(cls, reason: str) -> "State[T]":
-        return cls(StateTag.NOT_APPLICABLE, reason=reason)
+        return cls(StateTag.NOT_APPLICABLE, reason=str(reason))
 
     @property
     def is_value(self) -> bool:
@@ -474,8 +478,11 @@ class Value:
     expression_parameters: tuple[tuple[str, Decimal], ...] | None = None
     expression_domain: str | None = None
     unavailable_reason: str | None = None
+    approximate: bool = False
 
     def __post_init__(self) -> None:
+        if not isinstance(self.approximate, bool):
+            raise TypeError("Value.approximate must be bool")
         kind = self.kind
         allowed = _VALUE_PAYLOAD.get(kind)
         if allowed is None:  # pragma: no cover
@@ -538,6 +545,48 @@ class Value:
     @classmethod
     def point_of(cls, value: object) -> "Value":
         return cls(ValueKind.POINT, point=as_decimal(value))
+
+
+def _located_value(value: Located[Value] | Located[Decimal] | None) -> Located[Value] | None:
+    """Promote legacy decimal evidence to a tagged POINT without losing provenance."""
+
+    if value is None or not value.state.is_value:
+        return value  # type: ignore[return-value]
+    raw = value.state.value
+    if isinstance(raw, Value):
+        return value  # type: ignore[return-value]
+    return Located(
+        state=State.of(Value.point_of(raw)),
+        locator=value.locator,
+        inference=value.inference,
+    )
+
+
+def _validate_bench_absence(value: object, path: str = "bench") -> None:
+    """Reject free-text absence reasons on the new bench evidence surface."""
+
+    if isinstance(value, Located):
+        state = value.state
+        if state.is_unknown or state.is_not_applicable:
+            try:
+                BenchAbsenceReason(str(state.reason))
+            except ValueError as exc:
+                allowed = ", ".join(item.value for item in BenchAbsenceReason)
+                raise ValueError(
+                    f"{path} absence reason must be one of {allowed}; got {state.reason!r}"
+                ) from exc
+        return
+    if is_dataclass(value) and not isinstance(value, type):
+        for item in fields(value):
+            _validate_bench_absence(getattr(value, item.name), f"{path}.{item.name}")
+        return
+    if isinstance(value, Mapping):
+        for name, item in value.items():
+            _validate_bench_absence(item, f"{path}.{name}")
+        return
+    if isinstance(value, (tuple, list)):
+        for index, item in enumerate(value):
+            _validate_bench_absence(item, f"{path}[{index}]")
 
 
 @dataclass(frozen=True)
@@ -608,12 +657,40 @@ class Work:
 
 @dataclass(frozen=True)
 class ApparatusGeometry:
-    orifice_area_m2: Located[Decimal] | None = None
-    orifice_diameter_m: Located[Decimal] | None = None
-    clausing_factor: Located[Decimal] | None = None
-    orifice_to_sample_area_ratio: Located[Decimal] | None = None
-    exposed_area_m2: Located[Decimal] | None = None
-    chamber_length_m: Located[Decimal] | None = None
+    orifice_area_m2: Located[Value] | None = None
+    orifice_diameter_m: Located[Value] | None = None
+    clausing_factor: Located[Value] | None = None
+    orifice_to_sample_area_ratio: Located[Value] | None = None
+    exposed_area_m2: Located[Value] | None = None
+    chamber_length_m: Located[Value] | None = None
+    cell_internal_dimensions: Mapping[str, Located[Value]] | None = None
+    chamber_dimensions: Mapping[str, Located[Value]] | None = None
+    chamber_volume_m3: Located[Value] | None = None
+    orifice_channel_length_m: Located[Value] | None = None
+    orifice_count: Located[Value] | None = None
+    orifice_shape: Located[str] | None = None
+
+    def __post_init__(self) -> None:
+        for name in (
+            "orifice_area_m2",
+            "orifice_diameter_m",
+            "clausing_factor",
+            "orifice_to_sample_area_ratio",
+            "exposed_area_m2",
+            "chamber_length_m",
+            "chamber_volume_m3",
+            "orifice_channel_length_m",
+            "orifice_count",
+        ):
+            object.__setattr__(self, name, _located_value(getattr(self, name)))
+        for name in ("cell_internal_dimensions", "chamber_dimensions"):
+            raw = getattr(self, name)
+            if raw is not None:
+                object.__setattr__(
+                    self,
+                    name,
+                    {key: _located_value(value) for key, value in raw.items()},
+                )
 
 
 @dataclass(frozen=True)
@@ -628,17 +705,149 @@ class Apparatus:
 
 @dataclass(frozen=True)
 class Sample:
-    mass_kg: Located[Decimal] | None = None
+    mass_kg: Located[Value] | None = None
     initial_composition: Located[Composition] | None = None
     printed_composition: Located[Mapping[str, Any]] | None = None
     form: Located[str] | None = None
     container: Located[str] | None = None
+    composition_class: Located[str] | None = None
+    characterization: Located[str] | None = None
+    surface_area_m2: Located[Value] | None = None
+    pretreatment: Located[str] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "mass_kg", _located_value(self.mass_kg))
+        object.__setattr__(self, "surface_area_m2", _located_value(self.surface_area_m2))
+
+
+@dataclass(frozen=True)
+class BenchReference:
+    work_id: str | None
+    cited_as: str
+    for_parameters: tuple[str, ...]
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        if not self.cited_as.strip():
+            raise ValueError("BenchReference.cited_as is required")
+
+
+@dataclass(frozen=True)
+class BenchIdentity:
+    basis: BenchIdentityBasis
+    ref: BenchReference | None = None
+
+    def __post_init__(self) -> None:
+        basis = BenchIdentityBasis(self.basis)
+        object.__setattr__(self, "basis", basis)
+        if basis is BenchIdentityBasis.CITED_BY_AUTHOR:
+            if self.ref is None or not self.ref.cited_as.strip():
+                raise ValueError("cited_by_author BenchIdentity requires ref.cited_as")
+        elif self.ref is not None:
+            raise ValueError("described_in_this_work BenchIdentity cannot carry ref")
+
+
+@dataclass(frozen=True)
+class BenchFact:
+    name: str
+    value: Located[Value]
+    unit: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("BenchFact.name is required")
+        object.__setattr__(self, "value", _located_value(self.value))
+        _validate_bench_absence(self.value, f"bench.other_facts.{self.name}")
+
+
+@dataclass(frozen=True)
+class Bench:
+    id: str
+    work_id: str
+    identity: BenchIdentity
+    apparatus_family: Located[str] | None = None
+    method: Located[str] | None = None
+    cell_material_and_liner: Located[str] | None = None
+    geometry: ApparatusGeometry | None = None
+    pumping_type: Located[str] | None = None
+    pumping_speed_m3_s: Located[Value] | None = None
+    gauges: Mapping[str, Located[str]] | None = None
+    detector: Located[str] | None = None
+    ionization: Mapping[str, Located[Value | str]] | None = None
+    temperature_measurement: Mapping[str, Located[str]] | None = None
+    temperature_calibration: Mapping[str, Located[str]] | None = None
+    heating_method: Located[str] | None = None
+    other_facts: tuple[BenchFact, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.id or not self.work_id:
+            raise ValueError("Bench requires id and work_id")
+        object.__setattr__(
+            self, "pumping_speed_m3_s", _located_value(self.pumping_speed_m3_s)
+        )
+        _validate_bench_absence(self)
+
+
+@dataclass(frozen=True)
+class ThermalRamp:
+    rate_K_s: Located[Value]
+    start_temperature_K: Located[Value] | None = None
+    end_temperature_K: Located[Value] | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("rate_K_s", "start_temperature_K", "end_temperature_K"):
+            object.__setattr__(self, name, _located_value(getattr(self, name)))
+        _validate_bench_absence(self, "thermal_schedule.ramp")
+
+
+@dataclass(frozen=True)
+class ThermalSetpoint:
+    temperature_K: Located[Value]
+    hold_duration_s: Located[Value] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "temperature_K", _located_value(self.temperature_K))
+        object.__setattr__(self, "hold_duration_s", _located_value(self.hold_duration_s))
+        _validate_bench_absence(self, "thermal_schedule.setpoint")
+
+
+@dataclass(frozen=True)
+class ThermalPoint:
+    time_s: Located[Value]
+    temperature_K: Located[Value]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "time_s", _located_value(self.time_s))
+        object.__setattr__(self, "temperature_K", _located_value(self.temperature_K))
+        _validate_bench_absence(self, "thermal_schedule.point")
+
+
+@dataclass(frozen=True)
+class ThermalSchedule:
+    method: Located[str] | None = None
+    ramps: tuple[ThermalRamp, ...] | None = None
+    setpoints_and_holds: tuple[ThermalSetpoint, ...] | None = None
+    total_duration_s: Located[Value] | None = None
+    cooling_or_quench: Located[str] | None = None
+    points: tuple[ThermalPoint, ...] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "total_duration_s", _located_value(self.total_duration_s))
+        _validate_bench_absence(self, "thermal_schedule")
 
 
 @dataclass(frozen=True)
 class FO2Control:
     channel: State[FO2Channel]
     buffer: Located[str] | None = None
+    oxygen_partial_pressure_Pa: Located[Value] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "oxygen_partial_pressure_Pa",
+            _located_value(self.oxygen_partial_pressure_Pa),
+        )
 
 
 @dataclass(frozen=True)
@@ -651,19 +860,30 @@ class SweepGas:
 @dataclass(frozen=True)
 class FlowRegime:
     regime_class: State[RegimeClass]
-    knudsen_number_orifice: Located[Decimal] | None = None
-    knudsen_number_chamber: Located[Decimal] | None = None
+    knudsen_number_orifice: Located[Value] | None = None
+    knudsen_number_chamber: Located[Value] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "knudsen_number_orifice", _located_value(self.knudsen_number_orifice)
+        )
+        object.__setattr__(
+            self, "knudsen_number_chamber", _located_value(self.knudsen_number_chamber)
+        )
 
 
 @dataclass(frozen=True)
 class PressureEnvironment:
-    total_pressure_Pa: Located[Decimal]
+    total_pressure_Pa: Located[Value]
     sweep_gas: Located[SweepGas]
     regime: FlowRegime
     gauge: Mapping[str, Located[str]] | None = None
     pressure_profile: Located[tuple[tuple[Decimal, Decimal], ...]] | None = None
     pumping: Mapping[str, Located[Any]] | None = None
     cell_internal_pressure_note: Located[str] | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "total_pressure_Pa", _located_value(self.total_pressure_Pa))
 
 
 @dataclass(frozen=True)
@@ -679,6 +899,8 @@ class Experiment:
     locator: Locator | None = None
     apparatus: Apparatus | None = None
     fO2_control: FO2Control | None = None
+    bench_id: str | None = None
+    thermal_schedule: ThermalSchedule | None = None
 
     def __post_init__(self) -> None:
         if not self.experiment_id:

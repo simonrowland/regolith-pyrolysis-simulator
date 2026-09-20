@@ -131,6 +131,20 @@ class RefusalReason(StrEnum):
     CONDITIONAL_FIELD = "conditional_field"
 
 
+class BenchAbsenceReason(StrEnum):
+    NOT_PUBLISHED = "not_published"
+    NOT_NUMERIC = "not_numeric"
+    IN_CITED_SOURCE = "in_cited_source"
+    ILLEGIBLE = "illegible"
+    WOULD_INVENT = "would_invent"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class BenchIdentityBasis(StrEnum):
+    DESCRIBED_IN_THIS_WORK = "described_in_this_work"
+    CITED_BY_AUTHOR = "cited_by_author"
+
+
 class NoticeKind(StrEnum):
     FLOOR_INVERSION = "floor_inversion"
     FALLBACK = "fallback"

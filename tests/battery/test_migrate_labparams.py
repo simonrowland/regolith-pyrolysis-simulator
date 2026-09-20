@@ -37,7 +37,7 @@ def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> Non
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     experiment = next(iter(result.experiments.values()))
     area = experiment.apparatus.geometry.orifice_area_m2
-    assert area.state.value == as_decimal("7.068583e-08")
+    assert area.state.value.point == as_decimal("7.068583e-08")
     assert area.inference is not None
     assert "inferred=true" in area.inference.inputs
     assert derivation in area.inference.inputs
@@ -117,7 +117,7 @@ def test_inferred_unit_conversion_keeps_original_and_factor(tmp_path: Path) -> N
     }
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     pressure = next(iter(result.experiments.values())).pressure_environment.total_pressure_Pa
-    assert pressure.state.value == as_decimal("101325")
+    assert pressure.state.value.point == as_decimal("101325")
     assert pressure.inference.relation == "extract_inference"
     assert "unit_conversion=atm_to_Pa" in pressure.inference.inputs
     params = dict(pressure.inference.parameters)
@@ -173,7 +173,7 @@ def test_labparam_richter_initial_weight_mg_reaches_sample_mass_kg(tmp_path: Pat
         "sample.mass_kg is missing; printed initial_weight_mg 25.4 was dropped"
     )
     assert located.state.is_value, located.state.reason
-    assert located.state.value == as_decimal("25.4") / as_decimal("1000000")
+    assert located.state.value.point == as_decimal("25.4") / as_decimal("1000000")
     assert located.locator is not None, "no value without a locator"
     assert located.inference is not None
     assert located.inference.relation == "mg_to_kg"
@@ -207,7 +207,7 @@ def test_labparam_vocabulary_is_data(tmp_path: Path) -> None:
     result = migrate(root, write=False)
     located = next(iter(result.experiments.values())).sample.mass_kg
     assert located is not None and located.state.is_value
-    assert located.state.value == as_decimal("3.5") / as_decimal("1000")
+    assert located.state.value.point == as_decimal("3.5") / as_decimal("1000")
 
 
 def test_labparam_absence_reason_names_keys_looked_for(tmp_path: Path) -> None:
@@ -231,7 +231,7 @@ def test_labparam_absence_reason_names_keys_looked_for(tmp_path: Path) -> None:
         assert "source does not state" not in reason
         assert "vacuum_mbar" in reason or "chamber_pressure" in reason
     else:
-        assert env.total_pressure_Pa.state.value == as_decimal("1")  # 0.01 mbar = 1 Pa
+        assert env.total_pressure_Pa.state.value.point == as_decimal("1")  # 0.01 mbar = 1 Pa
 
     silent = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     silent["species"]["Na"]["observations"][0]["equipment"] = {

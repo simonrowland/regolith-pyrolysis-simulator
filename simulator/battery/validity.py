@@ -42,12 +42,14 @@ from simulator.battery.enums import (
     Quantity,
     RefusalReason,
     StateTag,
+    ValueKind,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol, quantity_token
 from simulator.battery.records import (
     Experiment,
     Located,
     Observation,
+    Value,
     as_decimal,
 )
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
@@ -95,20 +97,25 @@ def _pass(checks: list[GateCheck]) -> GateOutcome:
     return GateOutcome(passed=True, checks=tuple(checks))
 
 
-def _located_decimal(located: Located[Decimal] | None) -> Decimal | None:
+def _located_decimal(located: Located[Value | Decimal] | None) -> Decimal | None:
     if located is None or not located.state.is_value or located.state.value is None:
         return None
-    return as_decimal(located.state.value)
+    value = located.state.value
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        return value.point
+    return as_decimal(value)
 
 
-def _finite_positive(located: Located[Decimal] | None) -> Decimal | None:
+def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
     value = _located_decimal(located)
     if value is None or not value.is_finite() or value <= 0:
         return None
     return value
 
 
-def _clausing_ok(located: Located[Decimal] | None) -> bool:
+def _clausing_ok(located: Located[Value | Decimal] | None) -> bool:
     value = _located_decimal(located)
     return value is not None and value.is_finite() and value > 0 and value <= 1
 

@@ -105,6 +105,10 @@ from simulator.battery.records import (
     Species,
     State,
     SweepGas,
+    ThermalPoint,
+    ThermalRamp,
+    ThermalSchedule,
+    ThermalSetpoint,
     Uncertainty,
     Value,
     Work,
@@ -895,7 +899,16 @@ def _value_from_plain(payload: object) -> Value:
         kwargs["expression_domain"] = str(payload["expression_domain"])
     if payload.get("unavailable_reason") is not None:
         kwargs["unavailable_reason"] = str(payload["unavailable_reason"])
+    kwargs["approximate"] = bool(payload.get("approximate", False))
     return Value(**kwargs)
+
+
+def _value_or_point_from_plain(payload: object) -> Value:
+    if isinstance(payload, Value):
+        return payload
+    if isinstance(payload, Mapping) and payload.get("kind") is not None:
+        return _value_from_plain(payload)
+    return _value_from_plain({"kind": ValueKind.POINT.value, "point": payload})
 
 
 def _uncertainty_from_plain(payload: object) -> Uncertainty:
@@ -1008,8 +1021,14 @@ def _sample_from_plain(payload: object) -> Sample:
     container = payload.get("container")
     printed = payload.get("printed_composition")
     initial = payload.get("initial_composition")
+    composition_class = payload.get("composition_class")
+    characterization = payload.get("characterization")
+    surface_area = payload.get("surface_area_m2")
+    pretreatment = payload.get("pretreatment")
     return Sample(
-        mass_kg=None if mass is None else _located_from_plain(mass, as_decimal),
+        mass_kg=None
+        if mass is None
+        else _located_from_plain(mass, _value_or_point_from_plain),
         form=None if form is None else _located_from_plain(form, str),
         container=None if container is None else _located_from_plain(container, str),
         printed_composition=None
@@ -1018,6 +1037,18 @@ def _sample_from_plain(payload: object) -> Sample:
         initial_composition=None
         if initial is None
         else _located_from_plain(initial, _composition_from_plain),
+        composition_class=None
+        if composition_class is None
+        else _located_from_plain(composition_class, str),
+        characterization=None
+        if characterization is None
+        else _located_from_plain(characterization, str),
+        surface_area_m2=None
+        if surface_area is None
+        else _located_from_plain(surface_area, _value_or_point_from_plain),
+        pretreatment=None
+        if pretreatment is None
+        else _located_from_plain(pretreatment, str),
     )
 
 
@@ -1034,7 +1065,26 @@ def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
         "chamber_length_m",
     ):
         if payload.get(name) is not None:
-            kwargs[name] = _located_from_plain(payload[name], as_decimal)
+            kwargs[name] = _located_from_plain(
+                payload[name], _value_or_point_from_plain
+            )
+    for name in ("cell_internal_dimensions", "chamber_dimensions"):
+        if isinstance(payload.get(name), Mapping):
+            kwargs[name] = {
+                str(key): _located_from_plain(value, _value_or_point_from_plain)
+                for key, value in payload[name].items()
+            }
+    for name in (
+        "chamber_volume_m3",
+        "orifice_channel_length_m",
+        "orifice_count",
+    ):
+        if payload.get(name) is not None:
+            kwargs[name] = _located_from_plain(
+                payload[name], _value_or_point_from_plain
+            )
+    if payload.get("orifice_shape") is not None:
+        kwargs["orifice_shape"] = _located_from_plain(payload["orifice_shape"], str)
     return ApparatusGeometry(**kwargs) if kwargs else None
 
 
@@ -1091,7 +1141,9 @@ def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
     regime_raw = payload.get("regime") or {}
     note = payload.get("cell_internal_pressure_note")
     return PressureEnvironment(
-        total_pressure_Pa=_located_from_plain(payload["total_pressure_Pa"], as_decimal),
+        total_pressure_Pa=_located_from_plain(
+            payload["total_pressure_Pa"], _value_or_point_from_plain
+        ),
         sweep_gas=_located_from_plain(
             payload["sweep_gas"],
             lambda v: _sweep_gas_from_plain(v) if isinstance(v, Mapping) else v,
@@ -1100,13 +1152,94 @@ def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
             regime_class=_state_from_plain(
                 (regime_raw or {}).get("regime_class"),
                 lambda v: RegimeClass(str(v)),
-            )
+            ),
+            knudsen_number_orifice=None
+            if (regime_raw or {}).get("knudsen_number_orifice") is None
+            else _located_from_plain(
+                regime_raw["knudsen_number_orifice"], _value_or_point_from_plain
+            ),
+            knudsen_number_chamber=None
+            if (regime_raw or {}).get("knudsen_number_chamber") is None
+            else _located_from_plain(
+                regime_raw["knudsen_number_chamber"], _value_or_point_from_plain
+            ),
         ),
         gauge=_located_mapping_from_plain(payload.get("gauge"), str),
         pumping=_located_mapping_from_plain(payload.get("pumping"), _any_from_plain),
         cell_internal_pressure_note=None
         if note is None
         else _located_from_plain(note, str),
+    )
+
+
+def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
+    if not isinstance(payload, Mapping):
+        return None
+    method = payload.get("method")
+    duration = payload.get("total_duration_s")
+    cooling = payload.get("cooling_or_quench")
+    ramps = []
+    for raw in payload.get("ramps") or ():
+        if not isinstance(raw, Mapping) or raw.get("rate_K_s") is None:
+            continue
+        ramps.append(
+            ThermalRamp(
+                rate_K_s=_located_from_plain(
+                    raw["rate_K_s"], _value_or_point_from_plain
+                ),
+                start_temperature_K=None
+                if raw.get("start_temperature_K") is None
+                else _located_from_plain(
+                    raw["start_temperature_K"], _value_or_point_from_plain
+                ),
+                end_temperature_K=None
+                if raw.get("end_temperature_K") is None
+                else _located_from_plain(
+                    raw["end_temperature_K"], _value_or_point_from_plain
+                ),
+            )
+        )
+    setpoints = []
+    for raw in payload.get("setpoints_and_holds") or ():
+        if not isinstance(raw, Mapping) or raw.get("temperature_K") is None:
+            continue
+        setpoints.append(
+            ThermalSetpoint(
+                temperature_K=_located_from_plain(
+                    raw["temperature_K"], _value_or_point_from_plain
+                ),
+                hold_duration_s=None
+                if raw.get("hold_duration_s") is None
+                else _located_from_plain(
+                    raw["hold_duration_s"], _value_or_point_from_plain
+                ),
+            )
+        )
+    points = None
+    if payload.get("points") is not None:
+        points = tuple(
+            ThermalPoint(
+                time_s=_located_from_plain(raw["time_s"], _value_or_point_from_plain),
+                temperature_K=_located_from_plain(
+                    raw["temperature_K"], _value_or_point_from_plain
+                ),
+            )
+            for raw in payload["points"]
+            if isinstance(raw, Mapping)
+            and raw.get("time_s") is not None
+            and raw.get("temperature_K") is not None
+        )
+    return ThermalSchedule(
+        method=None if method is None else _located_from_plain(method, str),
+        ramps=tuple(ramps) or None,
+        setpoints_and_holds=tuple(setpoints) or None,
+        total_duration_s=None
+        if duration is None
+        else _located_from_plain(duration, _value_or_point_from_plain),
+        cooling_or_quench=None
+        if cooling is None
+        else _located_from_plain(cooling, str),
+        points=points,
     )
 
 
@@ -1123,6 +1256,11 @@ def experiment_from_plain(payload: object) -> Experiment:
             buffer=None
             if fo2.get("buffer") is None
             else _located_from_plain(fo2["buffer"], str),
+            oxygen_partial_pressure_Pa=None
+            if fo2.get("oxygen_partial_pressure_Pa") is None
+            else _located_from_plain(
+                fo2["oxygen_partial_pressure_Pa"], _value_or_point_from_plain
+            ),
         )
     return Experiment(
         experiment_id=str(payload["experiment_id"]),
@@ -1136,6 +1274,8 @@ def experiment_from_plain(payload: object) -> Experiment:
         locator=_locator_from_plain(payload.get("locator")),
         apparatus=_apparatus_from_plain(payload.get("apparatus")),
         fO2_control=fo2_control,
+        bench_id=None if payload.get("bench_id") is None else str(payload["bench_id"]),
+        thermal_schedule=_thermal_schedule_from_plain(payload.get("thermal_schedule")),
     )
 
 

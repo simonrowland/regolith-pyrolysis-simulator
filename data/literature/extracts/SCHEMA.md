@@ -226,18 +226,20 @@ Every **equipment-metadata field** that is present requires its **own** `locator
 Derived geometry must set `inferred: true` (or any truthy inferred flag) and
 state the derivation in `inference` or `note`.
 
-## Equipment metadata
+## Equipment / bench metadata
 
-Optional block on an observation. Field names (owner-ratified 2026-08-01):
+Optional block on an observation during the compatibility window. The complete allowed
+printed-name set and each name's typed destination are defined only in
+`data/literature/lab_parameter_vocabulary.yaml`. The validator loads that file; do not
+maintain a second allowlist here or in Python. New extracts should prefer the top-level
+`benches:` / `experiments:` registries once their migrator lands, while legacy
+`equipment:` continues to validate against the same vocabulary.
 
-| Field | Meaning |
-|-------|---------|
-| `orifice_area` | Effusion orifice area (or diameter series for multi-orifice Motzfeldt) |
-| `clausing_factor` | Orifice Clausing factor |
-| `sample_surface_area` | Sample / melt free surface area \(A_s\) |
-| `cell_material` | Cell wall material (fixes effective pO₂ boundary) |
-| `chamber_pressure` | Ambient / chamber pressure during the run |
-| `multi_orifice_series` | Boolean or series descriptor for multi-orifice Motzfeldt studies |
+The vocabulary covers apparatus identity and method, cell/chamber/orifice geometry,
+pumping, gauges, detection/ionization, temperature measurement/calibration, heating,
+charge characterization, thermal schedules, and long-tail bench facts. It also assigns
+typed homes to the formerly dropped `furnace`, `heating_schedule`, `residue_analysis`,
+`oxygen_partial_pressure`, and `integrated_exposure` fields.
 
 Each present field is an object with **value + locator** (both required):
 

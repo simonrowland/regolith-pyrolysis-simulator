@@ -305,3 +305,190 @@ entries:
   - printed: cell_wall_thickness_cm
     field: apparatus.wall.cell_wall_thickness_m
     unit: cm
+
+  # Canonical Bench entity and FK/identity fields. Registry migration lands later;
+  # these rows make printed names and typed destinations one reviewed list now.
+  - printed: bench_id
+    field: bench.id
+    unit: null
+  - printed: bench_work_id
+    field: bench.work_id
+    unit: null
+  - printed: bench_identity_basis
+    field: bench.identity.basis
+    unit: null
+  - printed: cited_bench_work_id
+    field: bench.identity.ref.work_id
+    unit: null
+  - printed: cited_as
+    field: bench.identity.ref.cited_as
+    unit: null
+  - printed: cited_for_parameters
+    field: bench.identity.ref.for_parameters
+    unit: null
+  - printed: cited_bench_locator
+    field: bench.identity.ref.locator
+    unit: null
+  - printed: apparatus_family
+    field: bench.apparatus_family
+    unit: null
+  - printed: apparatus_method
+    field: bench.method
+    unit: null
+  - printed: cell_material_and_liner
+    field: bench.cell_material_and_liner
+    unit: null
+  - printed: bench_geometry
+    field: bench.geometry
+    unit: null
+  - printed: bench_orifice_area_m2
+    field: bench.geometry.orifice_area_m2
+    unit: m2
+  - printed: bench_orifice_diameter_m
+    field: bench.geometry.orifice_diameter_m
+    unit: m
+  - printed: bench_clausing_factor
+    field: bench.geometry.clausing_factor
+    unit: "1"
+  - printed: bench_orifice_to_sample_area_ratio
+    field: bench.geometry.orifice_to_sample_area_ratio
+    unit: "1"
+  - printed: bench_exposed_area_m2
+    field: bench.geometry.exposed_area_m2
+    unit: m2
+  - printed: bench_chamber_length_m
+    field: bench.geometry.chamber_length_m
+    unit: m
+  - printed: cell_internal_dimensions
+    field: bench.geometry.cell_internal_dimensions
+    unit: null
+  - printed: chamber_dimensions
+    field: bench.geometry.chamber_dimensions
+    unit: null
+  - printed: chamber_volume_m3
+    field: bench.geometry.chamber_volume_m3
+    unit: m3
+  - printed: orifice_channel_length_m
+    field: bench.geometry.orifice_channel_length_m
+    unit: m
+  - printed: orifice_count
+    field: bench.geometry.orifice_count
+    unit: "1"
+  - printed: orifice_shape
+    field: bench.geometry.orifice_shape
+    unit: null
+  - printed: pump_type
+    field: bench.pumping_type
+    unit: null
+  - printed: pumping_speed_m3_s
+    field: bench.pumping_speed_m3_s
+    unit: m3/s
+  - printed: gauges
+    field: bench.gauges
+    unit: null
+  - printed: detector
+    field: bench.detector
+    unit: null
+  - printed: bench_ionization
+    field: bench.ionization
+    unit: null
+  - printed: temperature_measurement
+    field: bench.temperature_measurement
+    unit: null
+  - printed: temperature_measurement_calibration
+    field: bench.temperature_calibration
+    unit: null
+  - printed: heating_method
+    field: bench.heating_method
+    unit: null
+  - printed: other_facts
+    field: bench.other_facts
+    unit: null
+  - printed: other_fact_name
+    field: bench.other_facts.name
+    unit: null
+  - printed: other_fact_value
+    field: bench.other_facts.value
+    unit: null
+  - printed: other_fact_unit
+    field: bench.other_facts.unit
+    unit: null
+
+  # Charge and thermal-schedule typed homes on Experiment.
+  - printed: sample
+    field: experiment.sample
+    unit: null
+  - printed: experiment_bench_id
+    field: experiment.bench_id
+    unit: null
+  - printed: composition_class
+    field: experiment.sample.composition_class
+    unit: null
+  - printed: charge_characterization
+    field: experiment.sample.characterization
+    unit: null
+  - printed: charge_surface_area_m2
+    field: experiment.sample.surface_area_m2
+    unit: m2
+  - printed: sample_pretreatment
+    field: experiment.sample.pretreatment
+    unit: null
+  - printed: thermal_schedule_method
+    field: experiment.thermal_schedule.method
+    unit: null
+  - printed: heating_ramps
+    field: experiment.thermal_schedule.ramps
+    unit: null
+  - printed: heating_rate_K_s
+    field: experiment.thermal_schedule.ramps.rate_K_s
+    unit: K/s
+  - printed: ramp_start_temperature_K
+    field: experiment.thermal_schedule.ramps.start_temperature_K
+    unit: K
+  - printed: ramp_end_temperature_K
+    field: experiment.thermal_schedule.ramps.end_temperature_K
+    unit: K
+  - printed: setpoints_and_holds
+    field: experiment.thermal_schedule.setpoints_and_holds
+    unit: null
+  - printed: setpoint_temperature_K
+    field: experiment.thermal_schedule.setpoints_and_holds.temperature_K
+    unit: K
+  - printed: hold_duration_s
+    field: experiment.thermal_schedule.setpoints_and_holds.hold_duration_s
+    unit: s
+  - printed: total_run_duration_s
+    field: experiment.thermal_schedule.total_duration_s
+    unit: s
+  - printed: cooling_or_quench
+    field: experiment.thermal_schedule.cooling_or_quench
+    unit: null
+  - printed: thermal_schedule_points
+    field: experiment.thermal_schedule.points
+    unit: null
+  - printed: thermal_point_time_s
+    field: experiment.thermal_schedule.points.time_s
+    unit: s
+  - printed: thermal_point_temperature_K
+    field: experiment.thermal_schedule.points.temperature_K
+    unit: K
+
+  # Harvested fields that previously validated as unknown and were dropped.
+  - printed: furnace
+    field: bench.apparatus_family
+    unit: null
+  - printed: heating_schedule
+    field: experiment.thermal_schedule
+    unit: null
+  - printed: residue_analysis
+    field: bench.detector
+    unit: null
+  - printed: oxygen_partial_pressure
+    field: experiment.fO2_control.oxygen_partial_pressure_Pa
+    unit: null
+  - printed: integrated_exposure
+    field: experiment.thermal_schedule
+    unit: null
+  - printed: multi_orifice_series
+    field: bench.geometry.orifice_count
+    unit: null

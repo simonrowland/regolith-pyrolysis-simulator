@@ -50,6 +50,7 @@ FIDELITY_GRADUATION_LEDGER_PATH = EXTRACTS_DIR / "_fidelity_graduation_ledger.ya
 FIDELITY_GRADUATION_LEDGER_SCHEMA = (
     "literature_extract_fidelity_graduation_ledger.v1"
 )
+LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vocabulary.yaml"
 
 OBSERVATION_TYPES = frozenset(
     {
@@ -64,16 +65,23 @@ OBSERVATION_TYPES = frozenset(
 
 REVIEW_STATUSES = frozenset({"draft", "reviewed", "rejected"})
 
-EQUIPMENT_FIELDS = frozenset(
-    {
-        "orifice_area",
-        "clausing_factor",
-        "sample_surface_area",
-        "cell_material",
-        "chamber_pressure",
-        "multi_orifice_series",
-    }
-)
+def equipment_fields_from_vocabulary(
+    path: Path = LAB_PARAMETER_VOCABULARY_PATH,
+) -> frozenset[str]:
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError(f"{path}: vocabulary root must be a mapping")
+    entries = payload.get("entries")
+    if not isinstance(entries, list):
+        raise ValueError(f"{path}: vocabulary entries must be a list")
+    return frozenset(
+        str(row["printed"])
+        for row in entries
+        if isinstance(row, Mapping) and row.get("printed")
+    )
+
+
+EQUIPMENT_FIELDS = equipment_fields_from_vocabulary()
 
 LOCATOR_KEYS = frozenset(
     {

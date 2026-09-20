@@ -1280,7 +1280,7 @@ def test_h03_pressure_conversion_keeps_derivation_trail() -> None:
     )
     assert tiny.total_pressure_Pa.inference is not None
     assert tiny.total_pressure_Pa.inference.relation == "Torr_to_Pa"
-    assert tiny.total_pressure_Pa.state.value == as_decimal("1.0e-05") * as_decimal(
+    assert tiny.total_pressure_Pa.state.value.point == as_decimal("1.0e-05") * as_decimal(
         "101325"
     ) / as_decimal("760")
 
