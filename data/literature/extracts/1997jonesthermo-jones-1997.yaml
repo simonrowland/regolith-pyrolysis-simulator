@@ -1,0 +1,255 @@
+schema_version: literature_extract.v1
+source_id: 1997jonesthermo
+source:
+  citation: Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997.
+  url: https://www.pyrometallurgy.co.za/Mintek/Files/1997JonesThermo.pdf
+  year: 1997
+extraction:
+  method: layout-preserving pdftotext review extraction; source-printed examples and figure captions only
+  date: '2026-09-19'
+  worker: w2-1997jonesthermo
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+review_status: draft
+scope_assessment:
+  document_type: teaching overview/review, not a primary experiment
+  measured_direct_observations: 0
+  absent_from_source:
+  - apparatus and cell geometry
+  - samples, compositions, and sample masses
+  - run conditions and durations
+  - experimental uncertainties
+  - numeric digitization of figures 1-11
+  note: Printed calculated examples and compiled/model statements are retained with their evidence class; no laboratory metadata is attached.
+species:
+  Fe:
+    observations:
+    - observation_id: jones_1997_fe_heating_enthalpy_example
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 7
+        figure: '2'
+        section: 3.3 Example 1 – Melting of iron
+        note: Text immediately below Figure 2 prints the values; Figure 2 is not digitized.
+      phase: pure_iron_standard_state
+      regime: standard_enthalpy_heating_example
+      units: mixed as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program / thermodynamic tabulation as described by the author
+        quantity: iron_heating_energy_example
+        reference_state: Fe at 25 C and 1 atm, enthalpy zero
+        enthalpy_25_C_kJ_per_mol: 0.00
+        enthalpy_1600_C_kJ_per_mol: 75.90
+        printed_difference_J_per_mol: 75.90
+        heating_energy_kWh_per_kg: 0.377
+        charge_mass_kg: 100.0
+        furnace_power_kW: 160.0
+        heating_time_minutes: 14.0
+        note: Source text also prints “37.7 / 160 hours”; the printed 14 minutes is retained without recomputation. The source calls the 75.90 kJ/mol difference “75.90 J/mol” in the next sentence; both printed units are retained as an internal source disagreement.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: jones_1997_fe_energy_temperature_example
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 8
+        figure: '3'
+        section: 3.3 Example 1 – Melting of iron
+      phase: pure_iron_standard_state
+      regime: standard_enthalpy_heating_example
+      units: kWh/kg and C as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program / thermodynamic tabulation
+        quantity: iron_energy_to_temperature_example
+        charge_mass_kg: 100.0
+        furnace_power_kW: 16.0
+        duration_hours: 1.0
+        energy_supply_kWh_per_kg: 0.16
+        final_temperature_C: 855.0
+        note: Final temperature is read from the source's tabulation statement, not digitized from Figure 3.
+      uncertainty:
+        reported_status: not_reported
+  CO2:
+    observations:
+    - observation_id: jones_1997_graphite_oxygen_energy_balance
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 8
+        figure: '4'
+        section: 3.4 Example 2 – Energy requirement for a simple reacting system
+      phase: gas_reaction_with_graphite
+      regime: idealized_energy_balance
+      units: mixed as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program / enthalpy balance
+        reaction: graphite plus oxygen to carbon dioxide
+        oxygen_in_moles: 100.0
+        oxygen_in_temperature_C: 200.0
+        graphite_in_mass_kg: 1.0
+        graphite_in_temperature_C: 25.0
+        carbon_in_moles: 83.3
+        carbon_dioxide_out_moles: 83.3
+        carbon_dioxide_out_temperature_C: 1200.0
+        oxygen_out_moles: 16.7
+        oxygen_out_temperature_C: 1200.0
+        delta_H_species_in_O2_kJ_per_mol: 5.32
+        delta_H_species_in_C_kJ_per_mol: 0.00
+        delta_H_species_out_CO2_kJ_per_mol: -334.51
+        delta_H_species_out_O2_kJ_per_mol: 39.11
+        energy_requirement_kJ: -27744.0
+        delta_H_reaction_1200_C_kJ_per_mol: -396.2
+      uncertainty:
+        reported_status: not_reported
+  ZnS:
+    observations:
+    - observation_id: jones_1997_zns_roasting_energy_balance
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 10
+        figure: '5'
+        section: 3.6 Example 3 – Roasting of zinc sulphide
+      phase: fluidized_bed_roasting_example
+      regime: idealized_energy_balance
+      units: mixed as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program / enthalpy balance
+        reaction: ZnS plus 3/2 O2 to ZnO plus SO2
+        feed_temperature_C: 25.0
+        air_temperature_C: 200.0
+        product_temperature_C: 900.0
+        excess_oxygen_factor: 1.5
+        nitrogen_to_oxygen_molar_ratio: 8.46 / 2.25
+        cooling_requirement_kWh_per_kg_ZnS: 0.448
+      uncertainty:
+        reported_status: not_reported
+  propane:
+    observations:
+    - observation_id: jones_1997_propane_adiabatic_flame_temperature
+      type: thermodynamic_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 11
+        figure: '6'
+        section: 3.7 Example 4 – Adiabatic flame temperature
+      phase: propane_combustion_with_air
+      regime: adiabatic_energy_balance
+      units: C as printed
+      values:
+        method_class: model_derived
+        generator: trial-and-error enthalpy balance using the Thermo program
+        quantity: adiabatic_flame_temperature
+        final_temperature_C: 2121.0
+      uncertainty:
+        reported_status: not_reported
+  CO_H2O_H2_CO2:
+    observations:
+    - observation_id: jones_1997_water_gas_shift_equilibrium
+      type: equilibrium_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 14
+        figure: '7'
+        section: 5.1 Example 5 – Gas phase reaction
+      phase: ideal_gas
+      regime: gas_phase_equilibrium
+      units: mixed as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program / ideal-gas equilibrium calculation
+        reaction: CO(g) plus H2O(g) to H2(g) plus CO2(g)
+        initial_CO_moles: 0.4
+        initial_H2O_moles: 1.0
+        temperature_C: 1200.0
+        total_pressure_atm: 2.0
+        delta_G_reaction_kJ_per_mol: 12.15
+        equilibrium_constant: 0.371
+        extent_moles: 0.225
+        equilibrium_CO_moles: 0.175
+        equilibrium_H2O_moles: 0.775
+        equilibrium_H2_moles: 0.225
+        equilibrium_CO2_moles: 0.225
+        energy_requirement_kJ: 98.8
+        energy_requirement_kWh: 0.0274
+        delta_Gf_CO_1200_C_J_per_mol: -437611.0
+        delta_Gf_H2O_1200_C_J_per_mol: -563553.0
+        delta_Gf_H2_1200_C_J_per_mol: -227024.0
+        delta_Gf_CO2_1200_C_J_per_mol: -761994.0
+        gas_constant_J_per_mol_K: 8.3143
+        calculation_temperature_K: 1473.15
+      uncertainty:
+        reported_status: not_reported
+  C_CO2_CO:
+    observations:
+    - observation_id: jones_1997_boudouard_equilibrium
+      type: equilibrium_example
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 17
+        section: 5.2 Example 4 – Gas-solid reaction
+      phase: pure_condensed_carbon_plus_ideal_gas
+      regime: gas_solid_equilibrium
+      units: mixed as printed
+      values:
+        method_class: model_derived
+        generator: Thermo computer program
+        reaction: C plus CO2 to 2 CO
+        initial_carbon_moles: 2.0
+        initial_CO2_moles: 1.0
+        temperature_C: 800.0
+        total_pressure_atm: 0.85
+        delta_G_reaction_kJ_per_mol: -17.470
+        equilibrium_constant: 7.085
+      uncertainty:
+        reported_status: not_reported
+  Mn:
+    observations:
+    - observation_id: jones_1997_mn_vapour_pressure_tabulation
+      type: vapor_pressure
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 18
+        figure: '10'
+        section: 5.3 Example 5 – Vapour pressure of manganese
+        note: Explicit value in prose; Figure 10 is not digitized.
+      phase: pure_condensed_manganese_plus_Mn_gas
+      regime: equilibrium_vapor_pressure
+      units: atm and C as printed
+      values:
+        method_class: compilation_assessed
+        generator: source tabulation of equilibrium constants; upstream compilation not named
+        quantity: manganese_vapor_pressure
+        normal_boiling_point_C_about: 2060.0
+        temperature_C: 1700.0
+        vapor_pressure_atm: 0.113
+      uncertainty:
+        reported_status: not_reported
+  MgO:
+    observations:
+    - observation_id: jones_1997_imcc_mgo_activity_comparison
+      type: activity_coefficient
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        published_page: 24
+        figure: '11'
+        section: 7.1 Ideal Mixing of Complex Components
+        note: Qualitative comparison only; curve coordinates and activity values are not digitized.
+      phase: CaO-MgO-SiO2_ternary_slag
+      regime: IMCC_model_and_experimental_comparison
+      units: mole percent and C as printed
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        generator: Ideal Mixing of Complex Components (IMCC), compared in source with experimentally determined activities
+        quantity: MgO_activity_vs_mole_fraction_relationship
+        constant_CaO_mole_percent: 30.0
+        temperature_C: 1600.0
+        model_status: qualitative_figure_only
+        reported_comparison: excellent agreement for CaO and MgO; reasonably good agreement for SiO2; ideal-solution assumption gives large discrepancies
+      uncertainty:
+        reported_status: not_reported
