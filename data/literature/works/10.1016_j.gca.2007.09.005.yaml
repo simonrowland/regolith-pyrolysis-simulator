@@ -108,6 +108,96 @@ experiments:
     tag: value
     value: langmuir_free_evaporation
   sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.115053442499515498138993548'
+          - - CaO
+            - '0.2494336382287350615602106598'
+          - - MgO
+            - '0.1723239739392145251219793444'
+          - - SiO2
+            - '0.463188945332534915178816448'
+          amount_basis: mole_fraction
+      locator:
+        figure: '2'
+        line_range: 183-191
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '19.39'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.12'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.48'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              figure: '2'
+              line_range: 183-191
+              source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value

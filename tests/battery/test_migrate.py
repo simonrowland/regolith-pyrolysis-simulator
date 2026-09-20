@@ -3973,15 +3973,15 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
         if "::point:" in o.observation_id
     ]
     assert len(points) == 2
-    by_formula = {o.identity.species.formula: o for o in points}
-    sio2 = by_formula["SiO2"]
+    by_value = {o.value.point: o for o in points}
+    sio2 = by_value[as_decimal("0.011")]
+    assert sio2.identity.species.formula == "SiO2"
     assert quantity_token(sio2.identity) is Quantity.MASS_LOSS_FRACTION
     assert sio2.value.kind is ValueKind.POINT
-    assert sio2.value.point == as_decimal("0.011")
     assert float(sio2.identity.temperature_K.value) == 1673.15
     assert sio2.admission.status is AdmissionStatus.ADMITTED
-    ms2 = by_formula["MS2"]
-    assert ms2.value.point == as_decimal("0.032")
+    ms2 = by_value[as_decimal("0.032")]
+    assert ms2.identity.species.formula == "unknown"
     assert float(ms2.identity.temperature_K.value) == 1836.15
     assert ms2.admission.status is AdmissionStatus.ADMITTED
 
@@ -4082,7 +4082,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
     assert len(points) == 3
     by_value = {float(o.value.point): o for o in points}
     mls = by_value[0.101]
-    assert mls.identity.species.formula == "MLS-1a"
+    assert mls.identity.species.formula == "unknown"
     assert float(mls.identity.temperature_K.value) == 1474.0 + 273.15
     assert mls.admission.status is AdmissionStatus.ADMITTED
     bound = by_value[0.16]

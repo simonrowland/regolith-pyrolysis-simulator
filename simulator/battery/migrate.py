@@ -631,6 +631,35 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     )
 
 
+def _point_condition_from_plain(payload: object) -> Located[Any]:
+    """Decimal lab axes, or a printed/derived composition map."""
+
+    if isinstance(payload, Located):
+        return payload
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        return _located_from_plain(payload, as_decimal)
+    state_payload = payload.get("state")
+    value = (
+        state_payload.get("value") if isinstance(state_payload, Mapping) else None
+    )
+    if isinstance(value, Mapping) and (
+        "amount_basis" in value or "components" in value
+    ):
+        return _located_from_plain(payload, _composition_from_plain)
+
+    def _as_printed_map(raw: object) -> dict[str, Any]:
+        assert isinstance(raw, Mapping)
+        out: dict[str, Any] = {}
+        for key, item in raw.items():
+            amount = _as_dec_or_none(item)
+            out[str(key)] = as_decimal(amount) if amount is not None else item
+        return out
+
+    if isinstance(value, Mapping):
+        return _located_from_plain(payload, _as_printed_map)
+    return _located_from_plain(payload, as_decimal)
+
+
 def _located_from_plain(payload: object, cast) -> Located:
     if isinstance(payload, Located):
         return payload
@@ -1082,7 +1111,7 @@ def observation_from_plain(payload: object) -> Observation:
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
         point_conditions = {
-            str(k): _located_from_plain(v, as_decimal) for k, v in raw_pc.items()
+            str(k): _point_condition_from_plain(v) for k, v in raw_pc.items()
         }
     derived_from = payload.get("derived_from")
     annotations = None
@@ -1455,6 +1484,225 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "percent",
     ),
 }
+
+
+_OXIDE_COMPONENT_KEYS = frozenset(
+    {
+        "SiO2",
+        "TiO2",
+        "Al2O3",
+        "FeO",
+        "Fe2O3",
+        "MgO",
+        "CaO",
+        "Na2O",
+        "K2O",
+        "Cr2O3",
+        "MnO",
+        "P2O5",
+        "NiO",
+        "CoO",
+    }
+)
+_PRINTED_COMPOSITION_MAP_KEYS = (
+    "oxides_wt_pct",
+    "major_oxide_wt_pct",
+    "composition_wt_pct",
+    "sample_oxide_composition_wt_pct",
+    "starting_glass_wt_pct",
+)
+_SAMPLE_CODE_FORMULA_RE = re.compile(r"(?i)^(MLS[-_]?|MS)\d")
+_BULK_PROPERTY_QUANTITIES = frozenset(
+    {
+        Quantity.MASS_LOSS_FRACTION,
+        Quantity.MASS_LOSS_FRACTION_VS_T,
+        Quantity.YIELD_FRACTION,
+        Quantity.O2_YIELD,
+        Quantity.EVOLVED_GAS_YIELD,
+        Quantity.MASS_LOSS_RATE,
+    }
+)
+_COMPOSITION_LOOKED_FOR = (
+    "oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / "
+    "sample_oxide_composition_wt_pct / starting_glass_wt_pct / "
+    "SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5"
+)
+_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC = "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+
+
+def oxide_molar_mass(oxide: str) -> Decimal:
+    """Molar mass (g/mol) from the CIAAW/NIST atomic-weight table."""
+
+    from simulator.state import MOLAR_MASS
+
+    if oxide in MOLAR_MASS:
+        return as_decimal(str(MOLAR_MASS[oxide]))
+    from simulator.accounting.formulas import parse_formula
+
+    return as_decimal(str(parse_formula(oxide, species=oxide).molar_mass_g_mol))
+
+
+def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
+    """Convert a printed oxide wt% map to mole fraction. Does not renormalize wt%."""
+
+    moles: list[tuple[str, Decimal]] = []
+    total = Decimal("0")
+    for oxide, weight in wt.items():
+        name = str(oxide)
+        if name not in _OXIDE_COMPONENT_KEYS:
+            continue
+        amount = as_decimal(weight)
+        if amount < 0:
+            raise ValueError(f"oxide {name!r} wt% is negative")
+        n = amount / oxide_molar_mass(name)
+        moles.append((name, n))
+        total += n
+    if total <= 0:
+        raise ValueError("printed oxide wt% map has no positive mass")
+    return Composition(
+        basis="printed_oxides",
+        components=tuple((oxide, n / total) for oxide, n in moles),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
+def is_sample_code_formula(text: str) -> bool:
+    return bool(_SAMPLE_CODE_FORMULA_RE.match(str(text).strip()))
+
+
+def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+    if not isinstance(obj, Mapping):
+        return None
+    for key in _PRINTED_COMPOSITION_MAP_KEYS:
+        nested = obj.get(key)
+        if isinstance(nested, Mapping):
+            got = _oxide_map_from_mapping(nested)
+            if got:
+                return got
+    comps: dict[str, Decimal] = {}
+    for key, value in obj.items():
+        name = str(key)
+        if name not in _OXIDE_COMPONENT_KEYS:
+            continue
+        amount = _as_dec_or_none(value)
+        if amount is None:
+            continue
+        comps[name] = amount
+    if len(comps) < 2:
+        return None
+    return comps
+
+
+def _initial_oxide_map_from_values(
+    values: object,
+) -> dict[str, Decimal] | None:
+    if not isinstance(values, Mapping):
+        return None
+    points = values.get("points")
+    if not isinstance(points, list):
+        points = values.get("tests")
+    if isinstance(points, list):
+        ranked: list[Mapping[str, Any]] = [
+            item for item in points if isinstance(item, Mapping)
+        ]
+        for item in ranked:
+            if item.get("T_C_is_initial_composition") is True:
+                got = _oxide_map_from_mapping(item)
+                if got:
+                    return got
+        for item in ranked:
+            t_c = _as_dec_or_none(item.get("T_C"))
+            loss = _as_dec_or_none(
+                item.get("mass_loss_pct") or item.get("mass_loss_wt_pct")
+            )
+            if t_c == 0 and loss == 0:
+                got = _oxide_map_from_mapping(item)
+                if got:
+                    return got
+        for item in ranked:
+            got = _oxide_map_from_mapping(item)
+            if got:
+                return got
+    return _oxide_map_from_mapping(values)
+
+
+def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
+    return {str(k): _dec_str(as_decimal(v)) for k, v in wt.items()}
+
+
+def wt_pct_to_mole_fraction_derivation(
+    wt: Mapping[str, Decimal],
+    locator: Locator | None,
+) -> Derivation:
+    params: list[tuple[str, Located[Decimal]]] = []
+    for oxide, weight in wt.items():
+        params.append(
+            (
+                f"original_{oxide}_wt_pct",
+                Located(State.of(as_decimal(weight)), locator=locator),
+            )
+        )
+        params.append(
+            (
+                f"M_{oxide}_g_mol",
+                Located(State.of(oxide_molar_mass(oxide)), locator=locator),
+            )
+        )
+    return Derivation(
+        relation="wt_pct_to_mole_fraction",
+        inputs=(_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC, "original_unit=wt_pct"),
+        parameters=tuple(params),
+        output_unit="mole_fraction",
+    )
+
+
+def composition_unknown_reason() -> str:
+    return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
+
+
+def bulk_property_species_formula(
+    *,
+    quantity: Quantity | None,
+    parent_formula: str,
+    sample_label: str | None,
+    oxide_map: Mapping[str, Decimal] | None,
+) -> str:
+    """Species formula for a bulk-property row.
+
+    A multi-oxide map is a mixture: no single formula is meaningful.
+    Sample codes (MLS-*, MS[0-9]) are not chemical formulas. A sample
+    that *is* ilmenite / enstatite / silica / O2 keeps that formula.
+    """
+
+    parent = str(parent_formula or "").strip() or "unknown"
+    if quantity in {Quantity.O2_YIELD, Quantity.YIELD_FRACTION, Quantity.EVOLVED_GAS_YIELD}:
+        if parent in {"O2", "O2(g)"}:
+            return parent
+    if oxide_map and len(oxide_map) >= 2:
+        return "unknown"
+    label = str(sample_label or "").strip()
+    if label:
+        if is_sample_code_formula(label):
+            return "unknown"
+        return label
+    if is_sample_code_formula(parent):
+        return "unknown"
+    return parent
+
+
+def _located_printed_and_initial(
+    wt: Mapping[str, Decimal] | None,
+    locator: Locator | None,
+) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
+    if not wt or len(wt) < 2:
+        return None, None
+    printed = located_value(_printed_map_payload(wt), locator)
+    initial = Located(
+        State.of(wt_pct_to_mole_fraction(wt)),
+        locator=locator,
+        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+    )
+    return printed, initial
 
 
 def conversion_derivation(
@@ -4153,11 +4401,26 @@ def sample_from_equipment(
     printed = _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
+    if printed is None:
+        oxide_map = _initial_oxide_map_from_values(values)
+        printed, _ = _located_printed_and_initial(oxide_map, locator)
+    initial = None
+    if printed is not None and printed.state.is_value:
+        raw = printed.state.value
+        if isinstance(raw, Mapping):
+            wt = {
+                str(k): as_decimal(v)
+                for k, v in raw.items()
+                if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
+            }
+            if len(wt) >= 2:
+                _, initial = _located_printed_and_initial(wt, printed.locator or locator)
     if (
         mass_located is None
         and form_located is None
         and container_located is None
         and printed is None
+        and initial is None
     ):
         return Sample()
     return Sample(
@@ -4165,6 +4428,7 @@ def sample_from_equipment(
         form=form_located,
         container=container_located,
         printed_composition=printed,
+        initial_composition=initial,
     )
 
 
@@ -4661,7 +4925,13 @@ class Migrator:
             )
         self.result.works = rebuilt
 
-    def _experiment_id(self, work_id: str, locator: Locator | None, fallback: str) -> str:
+    def _experiment_id(
+        self,
+        work_id: str,
+        locator: Locator | None,
+        fallback: str,
+        distinguisher: str | None = None,
+    ) -> str:
         if locator is not None:
             key = locator.table or locator.record or locator.figure
             if not key and locator.source_path:
@@ -4669,7 +4939,11 @@ class Migrator:
                 if not loc_path.startswith("data/literature/compilations/"):
                     key = locator.source_path
             if key:
+                if distinguisher:
+                    return f"{work_id}::{key}::{distinguisher}"
                 return f"{work_id}::{key}"
+        if distinguisher:
+            return f"{work_id}::{fallback}::{distinguisher}"
         return f"{work_id}::{fallback}"
 
     def _ensure_experiment(
@@ -4984,6 +5258,20 @@ class Migrator:
                 species = make_species(
                     suffix_formula, phase, polymorph=polymorph_from_extract(obs)
                 )
+        q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
+            quantity if isinstance(quantity, Quantity) else None
+        )
+        initial_oxide_map = _initial_oxide_map_from_values(values)
+        if q_token in _BULK_PROPERTY_QUANTITIES:
+            species_formula = bulk_property_species_formula(
+                quantity=q_token,
+                parent_formula=species.formula,
+                sample_label=None,
+                oxide_map=initial_oxide_map,
+            )
+            species = make_species(
+                species_formula, phase, polymorph=polymorph_from_extract(obs)
+            )
 
         t_payload = dict(values)
         if obs.get("T_K") is not None:
@@ -5096,6 +5384,12 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        if initial_oxide_map:
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(initial_oxide_map)
+            )
+        elif q_token in _BULK_PROPERTY_QUANTITIES:
+            ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         elif t_known is None and t_sel.condition_ranges:
@@ -5170,7 +5464,14 @@ class Migrator:
                 value_sel = t_as_value
         identity = fill_identity(quantity, species, **ident_kwargs)
 
-        experiment_id = self._experiment_id(work.work_id, locator, source_id)
+        distinguisher = None
+        if isinstance(values, Mapping):
+            cid = values.get("composition_id") or values.get("composition_name")
+            if cid not in (None, ""):
+                distinguisher = str(cid)
+        experiment_id = self._experiment_id(
+            work.work_id, locator, source_id, distinguisher=distinguisher
+        )
         rail_raw = obs.get("rail") or values.get("rail")
         if rail_raw:
             canonicalize_rail(str(rail_raw))
@@ -5278,6 +5579,7 @@ class Migrator:
                     derived_from=derived_from,
                     notices=point_notices,
                     equipment=obs.get("equipment"),
+                    parent_values=values,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -5300,6 +5602,7 @@ class Migrator:
                     read_from=read_from,
                     derived_from=derived_from,
                     equipment=obs.get("equipment"),
+                    parent_values=values,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -5382,6 +5685,7 @@ class Migrator:
         derived_from: tuple[str, ...] | None = None,
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
+        parent_values: object = None,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -5394,11 +5698,32 @@ class Migrator:
         t_trail: str | None = None
         t_original: object = None
         value_sel: SourceSelection | None = None
+        point_oxide_map: dict[str, Decimal] | None = None
         if isinstance(raw_item, Mapping):
+            q_for_species = (
+                quantity.value
+                if isinstance(quantity, State) and quantity.is_value
+                else (quantity if isinstance(quantity, Quantity) else None)
+            )
             sample = raw_item.get("sample") or raw_item.get("id")
-            if isinstance(sample, str) and sample.strip():
+            sample_label = sample.strip() if isinstance(sample, str) else None
+            point_oxide_map = _oxide_map_from_mapping(raw_item)
+            if q_for_species in _BULK_PROPERTY_QUANTITIES:
+                species_formula = bulk_property_species_formula(
+                    quantity=q_for_species,
+                    parent_formula=species.formula,
+                    sample_label=sample_label,
+                    oxide_map=point_oxide_map,
+                )
                 species = make_species(
-                    sample.strip(),
+                    species_formula,
+                    species.phase,
+                    polymorph=species.polymorph,
+                    charge=species.charge,
+                )
+            elif sample_label:
+                species = make_species(
+                    sample_label,
                     species.phase,
                     polymorph=species.polymorph,
                     charge=species.charge,
@@ -5456,6 +5781,21 @@ class Migrator:
         ident_kwargs = dict(ident_kwargs)
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
+        q_token_point = (
+            quantity.value
+            if isinstance(quantity, State) and quantity.is_value
+            else (quantity if isinstance(quantity, Quantity) else None)
+        )
+        if ident_kwargs.get("composition") is None:
+            initial_map = _initial_oxide_map_from_values(parent_values)
+            if initial_map:
+                ident_kwargs["composition"] = State.of(
+                    wt_pct_to_mole_fraction(initial_map)
+                )
+            elif q_token_point in _BULK_PROPERTY_QUANTITIES:
+                ident_kwargs["composition"] = State.unknown(
+                    composition_unknown_reason()
+                )
         identity = fill_identity(quantity, species, **ident_kwargs)
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
@@ -5514,6 +5854,17 @@ class Migrator:
         )
         if lab_pc:
             point_conditions = {**(point_conditions or {}), **lab_pc}
+        if point_oxide_map:
+            printed, residual = _located_printed_and_initial(
+                point_oxide_map, point_locator
+            )
+            extra_pc: dict[str, Located[Any]] = {}
+            if printed is not None:
+                extra_pc["printed_composition"] = printed
+            if residual is not None:
+                extra_pc["composition"] = residual
+            if extra_pc:
+                point_conditions = {**(point_conditions or {}), **extra_pc}
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
@@ -5648,6 +5999,13 @@ class Migrator:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
         if per is not None:
             ident_kwargs["per"] = per if isinstance(per, State) else State.of(per)
+        q_for_comp = (
+            quantity
+            if isinstance(quantity, Quantity)
+            else (quantity.value if isinstance(quantity, State) and quantity.is_value else None)
+        )
+        if q_for_comp in _BULK_PROPERTY_QUANTITIES and ident_kwargs.get("composition") is None:
+            ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         identity = fill_identity(quantity, species, **ident_kwargs)
         if species.phase.is_unknown:
             self.result.add_queue(
@@ -5963,6 +6321,12 @@ class Migrator:
                         or material.get("feedstock_id")
                         or "unknown"
                     )
+                formula = bulk_property_species_formula(
+                    quantity=quantity,
+                    parent_formula=formula,
+                    sample_label=formula,
+                    oxide_map=None,
+                )
                 self._generic_obs(
                     work=work,
                     source_id=str(meas_id),

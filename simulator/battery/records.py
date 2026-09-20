@@ -752,7 +752,7 @@ class Observation:
     source_id: str | None = None
     locator: Locator | None = None
     read_from: str | None = None
-    point_conditions: Mapping[str, Located[Decimal]] | None = None
+    point_conditions: Mapping[str, Located[Any]] | None = None
     derived_from: tuple[str, ...] | None = None
     derivation: Derivation | None = None
     annotations: Annotations | None = None

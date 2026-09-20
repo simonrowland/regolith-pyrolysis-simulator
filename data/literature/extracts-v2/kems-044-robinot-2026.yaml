@@ -364,6 +364,32 @@ observations:
       charge:
         tag: value
         value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.481171563495835276916359542'
+        - - Al2O3
+          - '0.08172418613024934270801085583'
+        - - Fe2O3
+          - '0.04973487812748101126287271137'
+        - - MgO
+          - '0.1952760312933907189956949069'
+        - - CaO
+          - '0.1274642390853425394307777478'
+        - - Na2O
+          - '0.03098499810301403912958973347'
+        - - TiO2
+          - '0.0198885957141252369511910215'
+        - - K2O
+          - '0.009122504867858886036952953072'
+        - - P2O5
+          - '0.002797615985667152686529558568'
+        - - MnO
+          - '0.001835387197035795882020968344'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number
@@ -647,7 +673,8 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition mapped from source
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -865,7 +892,8 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition mapped from source
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -963,7 +991,8 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition mapped from source
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source

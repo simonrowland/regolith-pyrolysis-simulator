@@ -567,13 +567,13 @@ observations:
     note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
   read_from: pdf:kems-026-markova-1984
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:0
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -608,8 +608,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -652,6 +665,152 @@ observations:
     note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
       of corpus PDF page 2; left panel = composition VI (lherzolite)
   read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '44.02'
+          Al2O3: '4.56'
+          FeO: '8.04'
+          MgO: '36.44'
+          CaO: '6.95'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3821173839269460708474485548'
+          - - Al2O3
+            - '0.02332561240102551057000802657'
+          - - FeO
+            - '0.05836653496472179772464472096'
+          - - MgO
+            - '0.4715509074964332951841453868'
+          - - CaO
+            - '0.06463956121087332567375331089'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.02'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.56'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '8.04'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.44'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.95'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -679,13 +838,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:1
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -720,8 +879,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -784,6 +956,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '44.4'
+          Al2O3: '4.62'
+          FeO: '7.01'
+          MgO: '36.92'
+          CaO: '7.05'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3841598977722195831268598448'
+          - - Al2O3
+            - '0.02355550867088090537104996398'
+          - - FeO
+            - '0.05072337937036638918332311086'
+          - - MgO
+            - '0.4762052822922803022168739162'
+          - - CaO
+            - '0.06535593189425282010189316423'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.4'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.62'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.01'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.92'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.05'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -811,13 +1128,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:10
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -852,8 +1169,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -916,6 +1246,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '79.28'
+          FeO: '0.08'
+          MgO: '0'
+          CaO: '21.64'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.6676788477046976000779872221'
+          - - FeO
+            - '0.0009561666984830267205482208759'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3313649855968193732014645571'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '79.28'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.08'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '21.64'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -943,13 +1418,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:11
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -984,8 +1459,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1048,6 +1536,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '74.65'
+          FeO: '0'
+          MgO: '0'
+          CaO: '25.36'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.6181685339419496378801242739'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3818314660580503621198757265'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '74.65'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25.36'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1075,13 +1708,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:2
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1116,8 +1749,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1180,6 +1826,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '44.9'
+          Al2O3: '4.75'
+          FeO: '5.33'
+          MgO: '37.72'
+          CaO: '7.25'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3865511766553059657127758401'
+          - - Al2O3
+            - '0.02409770717438332089916654324'
+          - - FeO
+            - '0.03837505162118994416171855047'
+          - - MgO
+            - '0.4841008015961287905163348812'
+          - - CaO
+            - '0.06687526295299197871000418506'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.9'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.75'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '5.33'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.72'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.25'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1207,13 +1998,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:3
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1248,8 +2039,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1312,6 +2116,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '44.9'
+          Al2O3: '5.05'
+          FeO: '3.23'
+          MgO: '39.06'
+          CaO: '7.7'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3835781182886695486834727884'
+          - - Al2O3
+            - '0.02542262058227153799014475286'
+          - - FeO
+            - '0.02307656219199882594984120464'
+          - - MgO
+            - '0.4974428367841240951828617385'
+          - - CaO
+            - '0.07047986215293599219367951566'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.9'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.05'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '3.23'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '39.06'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.7'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1339,13 +2288,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:4
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1380,8 +2329,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1444,6 +2406,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '41.77'
+          Al2O3: '5.83'
+          FeO: '1.57'
+          MgO: '41.95'
+          CaO: '8.79'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.352569216060572186992790664'
+          - - Al2O3
+            - '0.02899812542483504274865790047'
+          - - FeO
+            - '0.01108257482607348013652645901'
+          - - MgO
+            - '0.5278558499748337687026853927'
+          - - CaO
+            - '0.07949423371368552141933958396'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41.77'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.83'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.57'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '41.95'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '8.79'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1471,13 +2578,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:5
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1512,8 +2619,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1576,6 +2696,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '35.57'
+          Al2O3: '7.39'
+          FeO: '1.11'
+          MgO: '44.67'
+          CaO: '11.27'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.2976076871130985399727415676'
+          - - Al2O3
+            - '0.03643562070398962012401905229'
+          - - FeO
+            - '0.00776684008536867697877946695'
+          - - MgO
+            - '0.5571596938871437505885340889'
+          - - CaO
+            - '0.1010301582103994123359258246'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.57'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '7.39'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.11'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '44.67'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.27'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1603,13 +2868,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:6
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1644,8 +2909,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1708,6 +2986,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '13.6'
+          Al2O3: '13.09'
+          FeO: '1.79'
+          MgO: '46.61'
+          CaO: '16.34'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.1238597920303083581210723787'
+          - - Al2O3
+            - '0.07025100460532340457580595041'
+          - - FeO
+            - '0.01363344386014168420361070432'
+          - - MgO
+            - '0.6328109713588538981404358833'
+          - - CaO
+            - '0.1594447881453726549590750835'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '13.6'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '13.09'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.79'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '46.61'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.34'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1735,13 +3158,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:7
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1776,8 +3199,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1840,6 +3276,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '1.17'
+          Al2O3: '32.64'
+          FeO: '1.66'
+          MgO: '16.34'
+          CaO: '43.2'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.01265723896739386997110348332'
+          - - Al2O3
+            - '0.2080773089102374763115662644'
+          - - FeO
+            - '0.01501835310239323111431041683'
+          - - MgO
+            - '0.2635169948618132329764317896'
+          - - CaO
+            - '0.500730104158162189626588046'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.17'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '32.64'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.66'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '16.34'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '43.2'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1867,13 +3448,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:8
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -1908,8 +3489,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1972,6 +3566,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '1.09'
+          Al2O3: '42.1'
+          FeO: '0.41'
+          MgO: '0'
+          CaO: '56.4'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.01257634789068780571888687104'
+          - - Al2O3
+            - '0.2862408381063115719305422033'
+          - - FeO
+            - '0.003956152336556424326014605906'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.6972266616664441980245563195'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '42.1'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.41'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '56.4'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1999,13 +3738,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::point:9
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::VI
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_VI_lherzolite' is not in the closed automatic map
@@ -2040,8 +3779,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3821173839269460708474485548'
+        - - Al2O3
+          - '0.02332561240102551057000802657'
+        - - FeO
+          - '0.05836653496472179772464472096'
+        - - MgO
+          - '0.4715509074964332951841453868'
+        - - CaO
+          - '0.06463956121087332567375331089'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2104,6 +3856,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0.23'
+          Al2O3: '53.05'
+          FeO: '0.14'
+          MgO: '0'
+          CaO: '46.59'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.002821163715004858953565573518'
+          - - Al2O3
+            - '0.3834487233269355234735058951'
+          - - FeO
+            - '0.001436116242705158984017983984'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.6122939967153544585889105473'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; left panel = composition VI (lherzolite)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.23'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '53.05'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.14'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.59'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2131,13 +4028,13 @@ observations:
             of corpus PDF page 2; left panel = composition VI (lherzolite)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:0
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2172,8 +4069,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2216,6 +4126,152 @@ observations:
     note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
       of corpus PDF page 2; right panel = composition V (alumina basalt)
   read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.32'
+          Al2O3: '19.13'
+          FeO: '9.37'
+          MgO: '6.25'
+          CaO: '12.93'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5530662514490768651412607624'
+          - - Al2O3
+            - '0.1191642125515218052625040402'
+          - - FeO
+            - '0.08283428328675280554755471357'
+          - - MgO
+            - '0.09849017279993865859327900714'
+          - - CaO
+            - '0.1464450799127098654554014769'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.32'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '19.13'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '9.37'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.25'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.93'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2243,13 +4299,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:1
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2284,8 +4340,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2348,6 +4417,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.4'
+          Al2O3: '19.15'
+          FeO: '8.63'
+          MgO: '6.25'
+          CaO: '12.94'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5569519653479457509689992438'
+          - - Al2O3
+            - '0.1199434914489203710580531248'
+          - - FeO
+            - '0.07671112547830131897145612377'
+          - - MgO
+            - '0.09903071856064894562379820083'
+          - - CaO
+            - '0.1473626991641836133776933068'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.4'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '19.15'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '8.63'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.25'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.94'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2375,13 +4589,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:10
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2416,8 +4630,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2480,6 +4707,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '81.43'
+          FeO: '0'
+          MgO: '0'
+          CaO: '18.57'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.7068928365281523831152414714'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.2931071634718476168847585286'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '81.43'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.57'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2507,13 +4879,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:11
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2548,8 +4920,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2612,6 +4997,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '79.49'
+          FeO: '0'
+          MgO: '0'
+          CaO: '20.51'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.6806722845871321186366671466'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3193277154128678813633328538'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '79.49'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20.51'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2639,13 +5169,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:2
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2680,8 +5210,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2744,6 +5287,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.74'
+          Al2O3: '20.12'
+          FeO: '7.01'
+          MgO: '6.54'
+          CaO: '13.59'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5565107053540574811193209929'
+          - - Al2O3
+            - '0.1251073509949177035856630625'
+          - - FeO
+            - '0.06186037105159943408729755497'
+          - - MgO
+            - '0.1028761267994322242129340841'
+          - - CaO
+            - '0.1536454457999931569947843062'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.74'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '20.12'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.01'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.54'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.59'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2771,13 +5459,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:3
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2812,8 +5500,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2876,6 +5577,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          Al2O3: '22.35'
+          FeO: '4.46'
+          MgO: '7.17'
+          CaO: '15.11'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.537609681495329857899836787'
+          - - Al2O3
+            - '0.1391067745130055821948358205'
+          - - FeO
+            - '0.0393953771482083181921432493'
+          - - MgO
+            - '0.1128942735976936727922038859'
+          - - CaO
+            - '0.1709938932457625689209802569'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.9'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.35'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '4.46'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.17'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '15.11'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2903,13 +5749,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:4
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -2944,8 +5790,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3008,6 +5867,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '40.46'
+          Al2O3: '29.51'
+          FeO: '1.97'
+          MgO: '8.11'
+          CaO: '19.95'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4352303232896887813979974631'
+          - - Al2O3
+            - '0.1870612927622003182875453921'
+          - - FeO
+            - '0.01772232100284754627429076185'
+          - - MgO
+            - '0.1300521633093914752807530781'
+          - - CaO
+            - '0.2299338996358718787594133049'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.46'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '29.51'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.97'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.11'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '19.95'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -3035,13 +6039,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:5
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -3076,8 +6080,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3140,6 +6157,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '22.94'
+          Al2O3: '41.13'
+          FeO: '1.03'
+          MgO: '7.2'
+          CaO: '27.66'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.2594794054386971913701338268'
+          - - Al2O3
+            - '0.2741508801879319447755616312'
+          - - FeO
+            - '0.009743338935465984112509016581'
+          - - MgO
+            - '0.1214074775842733759970222442'
+          - - CaO
+            - '0.3352188978536315037447732815'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.94'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.13'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '1.03'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.2'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.66'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -3167,13 +6329,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:6
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -3208,8 +6370,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3272,6 +6447,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '4.43'
+          Al2O3: '56.29'
+          FeO: '0.32'
+          MgO: '1.69'
+          CaO: '37.27'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.05515438074872121216117515737'
+          - - Al2O3
+            - '0.4129799713356312827711570422'
+          - - FeO
+            - '0.003331864797631302826834501571'
+          - - MgO
+            - '0.03136652811604690378839224264'
+          - - CaO
+            - '0.4971672550019692984524410565'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '4.43'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '56.29'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0.32'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1.69'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '37.27'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -3299,13 +6619,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:7
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -3340,8 +6660,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3404,6 +6737,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0.15'
+          Al2O3: '62.13'
+          FeO: '0'
+          MgO: '0'
+          CaO: '37.72'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.001943595117523511790563927455'
+          - - Al2O3
+            - '0.474391991090803205469703658'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.5236644137916732827397324147'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.15'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '62.13'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '37.72'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -3431,13 +6909,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:8
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -3472,8 +6950,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3536,6 +7027,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '65.62'
+          FeO: '0'
+          MgO: '0'
+          CaO: '34.3'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.5127171529123637241026215086'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.4872828470876362758973784917'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '65.62'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '34.3'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -3563,13 +7199,13 @@ observations:
             of corpus PDF page 2; right panel = composition V (alumina basalt)
     output_unit: dimensionless
 - observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt::point:9
-  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2::V
   identity:
     quantity:
       tag: value
       value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: unknown
       phase:
         tag: unknown
         reason: phase string 'residual_silicate_melt_composition_V_alumina_basalt' is not in the closed automatic map
@@ -3604,8 +7240,21 @@ observations:
       tag: unknown
       reason: no reservoir mapped from source
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5530662514490768651412607624'
+        - - Al2O3
+          - '0.1191642125515218052625040402'
+        - - FeO
+          - '0.08283428328675280554755471357'
+        - - MgO
+          - '0.09849017279993865859327900714'
+        - - CaO
+          - '0.1464450799127098654554014769'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3668,6 +7317,151 @@ observations:
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '0'
+          Al2O3: '74.21'
+          FeO: '0'
+          MgO: '0'
+          CaO: '25.29'
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '0.6174253240167804940669942997'
+          - - FeO
+            - '0'
+          - - MgO
+            - '0'
+          - - CaO
+            - '0.3825746759832195059330057003'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        table: '2'
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+          of corpus PDF page 2; right panel = composition V (alumina basalt)
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '74.21'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25.29'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        output_unit: mole_fraction
   derivation:
     relation: percent_to_fraction
     inputs:

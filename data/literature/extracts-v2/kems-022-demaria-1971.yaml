@@ -797,6 +797,30 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier figure_digitization_rejected does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4907365012400076206880491387'
+        - - MgO
+          - '0.1220572612383703434509613227'
+        - - Al2O3
+          - '0.06200702926658935573310827424'
+        - - TiO2
+          - '0.02630843346455530792127123855'
+        - - FeO
+          - '0.173022050285844642027681695'
+        - - CaO
+          - '0.1203704733017293304583815388'
+        - - Na2O
+          - '0.00274048513484628247126932044'
+        - - K2O
+          - '0.000487525415712266909414167384'
+        - - MnO
+          - '0.002270240652344850339863304047'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_figure_digitization_rejected';

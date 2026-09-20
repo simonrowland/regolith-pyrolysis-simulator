@@ -22,6 +22,28 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1473.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to

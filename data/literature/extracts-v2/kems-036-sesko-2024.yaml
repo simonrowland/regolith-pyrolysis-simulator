@@ -240,6 +240,36 @@ observations:
       charge:
         tag: value
         value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.481171563495835276916359542'
+        - - FeO
+          - '0'
+        - - MgO
+          - '0.1952760312933907189956949069'
+        - - CaO
+          - '0.1274642390853425394307777478'
+        - - Al2O3
+          - '0.08172418613024934270801085583'
+        - - TiO2
+          - '0.0198885957141252369511910215'
+        - - Cr2O3
+          - '0'
+        - - MnO
+          - '0.001835387197035795882020968344'
+        - - Na2O
+          - '0.03098499810301403912958973347'
+        - - K2O
+          - '0.009122504867858886036952953072'
+        - - Fe2O3
+          - '0.04973487812748101126287271137'
+        - - P2O5
+          - '0.002797615985667152686529558568'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_sample_composition'; refusing to pick a number

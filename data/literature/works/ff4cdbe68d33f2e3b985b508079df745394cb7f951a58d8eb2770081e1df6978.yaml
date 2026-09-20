@@ -42,6 +42,242 @@ experiments:
     tag: unknown
     reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
   sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.06200702926658935573310827424'
+          - - CaO
+            - '0.1203704733017293304583815388'
+          - - FeO
+            - '0.173022050285844642027681695'
+          - - K2O
+            - '0.000487525415712266909414167384'
+          - - MgO
+            - '0.1220572612383703434509613227'
+          - - MnO
+            - '0.002270240652344850339863304047'
+          - - Na2O
+            - '0.00274048513484628247126932044'
+          - - SiO2
+            - '0.4907365012400076206880491387'
+          - - TiO2
+            - '0.02630843346455530792127123855'
+          amount_basis: mole_fraction
+      locator:
+        page: 1369
+        figure: '1'
+        paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points only
+        note: figure-digitized absolute P series; not tabulated in source
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.05'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.73'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.76'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.073'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.82'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.256'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.87'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.34'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed points
+                only
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
