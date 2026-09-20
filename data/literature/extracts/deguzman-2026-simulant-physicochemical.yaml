@@ -1,0 +1,243 @@
+schema_version: literature_extract.v1
+source_id: deguzman-2026-simulant-physicochemical
+source:
+  citation: De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou, Kyriaki & Gacesa, Marko (2026), "Physicochemical properties of lunar regolith simulant for in situ oxygen production", arXiv:2601.14719.
+  url: https://arxiv.org/abs/2601.14719
+  year: 2026
+extraction:
+  method: Born-digital 13-page PDF; pdftotext -layout; printed tables transcribed; figure curves not digitised.
+  date: '2026-09-19'
+  worker: extract-deguzman-physicochemical
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: LHS-2
+  observable: simulant_characterisation
+  observation_id: deguzman_2026_table2_lhs2_elemental_composition
+  field: elemental_composition_wt_pct
+  value: 23.818
+  locator:
+    pdf_page_index: 5
+    table: '2'
+- species: LHS-2
+  observable: rate_series
+  observation_id: deguzman_2026_table3_lhs2_bet_texture
+  field: surface_area_m2_g
+  value: 0.349
+  locator:
+    pdf_page_index: 7
+    table: '3'
+- species: LHS-2
+  observable: rate_series
+  observation_id: deguzman_2026_table4_lhs2_gas_adsorption
+  field: co2_uptake_mmol_g
+  value: 0.044
+  locator:
+    pdf_page_index: 9
+    table: '4'
+species:
+  LHS-1:
+    observations:
+    - observation_id: deguzman_2026_lhs1_table1_reported_mineral_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 2, table: '1', section: Materials and Methods}
+      phase: particulate_lunar_highlands_simulant
+      standard_state: manufacturer-reported mineral composition as printed
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: reported_mineral_composition
+        method_class: quoted_literature
+        quoted_from: Space Resource Technologies (2023a,b,c)
+        anorthosite_wt_pct: 74.4
+        glass_rich_basalt_wt_pct: 24.7
+        ilmenite_wt_pct: 0.4
+        olivine_wt_pct: 0.2
+        pyroxene_wt_pct: 0.3
+        particle_size_um_average: 100
+        particle_size_locator: {pdf_page_index: 2, section: Materials and Methods}
+      uncertainty: {note: no uncertainty printed}
+      equipment: {note: composition is manufacturer-reported, not a new measurement}
+    - observation_id: deguzman_2026_xrd_lhs1
+      type: gibbs_table
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+      phase: particulate_lunar_highlands_simulant
+      standard_state: untreated powder XRD; qualitative phase comparison
+      regime: xrd_characterisation
+      units: degrees 2theta as printed
+      values:
+        quantity: xrd_measurement_conditions
+        method_class: measured_direct
+        instrument: Malvern Panalytical diffractometer
+        scan_range_2theta_deg: 5 to 85
+        correction: constant 2theta offset for instrument drift
+        benchmark: Apollo 16 sample 64501
+      uncertainty: {note: no numerical uncertainty printed}
+  LHS-2:
+    observations:
+    - observation_id: deguzman_2026_lhs2_table1_reported_mineral_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 2, table: '1', section: Materials and Methods}
+      phase: particulate_lunar_highlands_simulant
+      standard_state: manufacturer-reported mineral composition as printed
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: reported_mineral_composition
+        method_class: quoted_literature
+        quoted_from: Space Resource Technologies (2023a,b)
+        anorthosite_wt_pct: 74.4
+        glass_rich_basalt_wt_pct: 24.7
+        ilmenite_wt_pct: 0.4
+        olivine_wt_pct: 0.2
+        pyroxene_wt_pct: 0.3
+        particle_size_um_average: 60
+        particle_size_locator: {pdf_page_index: 2, section: Materials and Methods}
+      uncertainty: {note: no uncertainty printed}
+      equipment: {note: composition is manufacturer-reported, not a new measurement}
+    - observation_id: deguzman_2026_table2_lhs2_elemental_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 5, table: '2', section: Simulant Validation Outcomes}
+      phase: particulate_lunar_highlands_simulant
+      standard_state: SEM-EDX elemental concentration as printed
+      regime: sem_edx_characterisation
+      units: at.% and wt% as printed
+      values:
+        quantity: elemental_concentration
+        method_class: measured_direct
+        method: SEM-EDX
+        rows:
+        - {element: O, at_pct: 74.418, wt_pct: 61.486}
+        - {element: Si, at_pct: 16.419, wt_pct: 23.818}
+        - {element: Al, at_pct: 5.458, wt_pct: 7.601}
+        - {element: Ca, at_pct: 2.529, wt_pct: 5.236}
+        - {element: K, at_pct: 0.502, wt_pct: 1.014}
+        - {element: Mg, at_pct: 0.673, wt_pct: 0.845}
+      uncertainty: {note: no uncertainty printed}
+      equipment:
+        instrument: ThermoFisher Phenom-XL Desktop SEM with integrated EDX detector
+        note: carbon and gold signals were identified as mounting-tape and sputter-coating artifacts; sample mass and beam settings are not stated
+    - observation_id: deguzman_2026_table3_bet_texture
+      type: rate_series
+      locator: {pdf_page_index: 7, table: '3', section: Textural Properties and Gas-Solid Accessibility}
+      phase: particulate_lunar_highlands_simulant_and_constituent_minerals
+      standard_state: N2 adsorption-desorption BET measurement at 77 K
+      regime: bet_nitrogen_adsorption
+      units: m2 g-1, cm3 g-1, and nm as printed
+      values:
+        quantity: textural_properties
+        method_class: measured_direct
+        rows:
+        - {sample: Anorthosite, surface_area_m2_g: 0.572, pore_volume_cm3_g: 0.0195, average_pore_size_nm: 136.53}
+        - {sample: Basalt, surface_area_m2_g: 0.599, pore_volume_cm3_g: 0.0133, average_pore_size_nm: 88.55}
+        - {sample: Ilmenite, surface_area_m2_g: 3.195, pore_volume_cm3_g: 0.0168, average_pore_size_nm: 21.05}
+        - {sample: LHS-2, surface_area_m2_g: 0.349, pore_volume_cm3_g: 0.0151, average_pore_size_nm: 26.83}
+        - {sample: Olivine, surface_area_m2_g: 1.056, pore_volume_cm3_g: 0.0107, average_pore_size_nm: 40.68}
+        - {sample: Pyroxene, surface_area_m2_g: 0.388, pore_volume_cm3_g: 0.0131, average_pore_size_nm: 135.52}
+      uncertainty: {note: no uncertainty printed}
+      equipment:
+        instrument: Micromeritics 3Flex Surface Analyzer
+        gas: N2
+        measurement_temperature_K: 77
+        activation_temperature_C: 200
+        activation_duration_h: 12
+        activation_environment: high vacuum
+        excluded_sample: LHS-1
+        excluded_sample_reason: compositionally similar to LHS-2
+    - observation_id: deguzman_2026_tpr_oxygen_yields_and_conditions
+      type: rate_series
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+      phase: LHS-2_and_LSP-2_simulant_mixtures_and_ilmenite_olivine_phases
+      standard_state: H2 temperature-programmed reduction with TCD integration
+      regime: hydrogen_tpr_reduction
+      units: degree C and wt% as printed
+      values:
+        quantity: reduction_program_and_oxygen_yield
+        method_class: measured_direct
+        instrument: Micromeritics AutoChem
+        pretreatment_gas: Ar
+        pretreatment_duration_h: 1
+        pretreatment_temperature: ambient
+        peak_temperature_C: 300
+        time_to_peak_min: 10
+        reduction_temperature_C: 900
+        simulants: LHS-2 and LSP-2
+        constituent_phases: ilmenite and olivine
+        oxygen_yield_wt_pct: {LHS: approximately 0.02, LSP: 0.01}
+        ilmenite_apparent_oxygen_yield_wt_pct: 1.10
+        yield_method: baseline-corrected TCD signal integrated over reduction interval and converted with calibrated response normalized by sample mass
+      uncertainty: {note: no numerical uncertainty printed; LHS yield explicitly approximate}
+      equipment:
+        note: sample mass, gas flow rate, H2 pressure, reduction ramp, and TCD calibration value are not stated
+    - observation_id: deguzman_2026_table4_gas_adsorption
+      type: rate_series
+      locator: {pdf_page_index: 9, table: '4', section: Gas Adsorption Behavior and ISRU-Relevant Implications}
+      phase: LHS-2_and_constituent_mineral_powders
+      standard_state: single-component gas adsorption at 25 degrees C and up to 1 bar
+      regime: gas_adsorption
+      units: mmol g-1 and dimensionless ratios as printed
+      values:
+        quantity: gas_adsorption_properties
+        method_class: measured_direct
+        rows:
+        - {sample: Anorthosite, CO2_mmol_g: 0.042, N2_mmol_g: 0.0019, H2_mmol_g: 0.0034, CH4_mmol_g: not reported, CO2_N2_ratio: 22.11, CO2_H2_ratio: 12.35, CO2_CH4_ratio: not reported}
+        - {sample: Basalt, CO2_mmol_g: 0.033, N2_mmol_g: 0.0018, H2_mmol_g: 0.0073, CH4_mmol_g: not reported, CO2_N2_ratio: 18.33, CO2_H2_ratio: 4.52, CO2_CH4_ratio: not reported}
+        - {sample: Ilmenite, CO2_mmol_g: 0.018, N2_mmol_g: 0.0083, H2_mmol_g: 0.0049, CH4_mmol_g: not reported, CO2_N2_ratio: 2.17, CO2_H2_ratio: 3.67, CO2_CH4_ratio: not reported}
+        - {sample: LHS-2, CO2_mmol_g: 0.044, N2_mmol_g: 0.0160, H2_mmol_g: 0.0063, CH4_mmol_g: 0.0142, CO2_N2_ratio: 2.75, CO2_H2_ratio: 6.98, CO2_CH4_ratio: 3.10}
+        - {sample: Olivine, CO2_mmol_g: 0.012, N2_mmol_g: 0.0029, H2_mmol_g: 0.0024, CH4_mmol_g: not reported, CO2_N2_ratio: 4.14, CO2_H2_ratio: 5.00, CO2_CH4_ratio: not reported}
+        - {sample: Pyroxene, CO2_mmol_g: 0.022, N2_mmol_g: 0.0063, H2_mmol_g: 0.0145, CH4_mmol_g: 0.0068, CO2_N2_ratio: 3.49, CO2_H2_ratio: 1.52, CO2_CH4_ratio: 3.24}
+        conditions: {temperature_C: 25, maximum_pressure_bar: 1, gas_identity: CO2, N2, H2, and CH4 single-component experiments}
+      uncertainty: {note: no uncertainty printed}
+      equipment: {note: instrument, activation, sample mass, gas flow, and equilibration duration are not stated}
+    - observation_id: deguzman_2026_figure_only_adsorption
+      type: rate_series
+      locator: {pdf_page_index: 8, figure: '6-7', section: Gas Adsorption Behavior and ISRU-Relevant Implications}
+      phase: regolith_simulant_and_constituent_minerals
+      standard_state: N2 and water adsorption isotherms
+      regime: adsorption
+      units: as plotted
+      values:
+        quantity: adsorption_curves
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: curves have no printed numeric table and were not read from axes
+  LSP-2:
+    observations:
+    - observation_id: deguzman_2026_table1_lsp2_reported_mineral_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 2, table: '1', section: Materials and Methods}
+      phase: particulate_lunar_south_pole_simulant
+      standard_state: manufacturer-reported mineral composition as printed
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: reported_mineral_composition
+        method_class: quoted_literature
+        quoted_from: Space Resource Technologies (2023c)
+        anorthosite_wt_pct: 90.0
+        glass_rich_basalt_wt_pct: 10.0
+        ilmenite_wt_pct: not reported
+        olivine_wt_pct: not reported
+        pyroxene_wt_pct: not reported
+      uncertainty: {note: em dashes retained as not reported, not zero; no uncertainty printed}
+    - observation_id: deguzman_2026_table2_lsp2_elemental_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 5, table: '2', section: Simulant Validation Outcomes}
+      phase: particulate_lunar_south_pole_simulant
+      standard_state: SEM-EDX elemental concentration as printed
+      regime: sem_edx_characterisation
+      units: at.% and wt% as printed
+      values:
+        quantity: elemental_concentration
+        method_class: measured_direct
+        method: SEM-EDX
+        rows:
+        - {element: O, at_pct: 74.749, wt_pct: 61.924}
+        - {element: Si, at_pct: 4.795, wt_pct: 6.695}
+        - {element: Al, at_pct: 17.836, wt_pct: 25.942}
+        - {element: Ca, at_pct: 2.621, wt_pct: 5.439}
+        - {element: K, at_pct: not detected or not reported, wt_pct: not detected or not reported}
+        - {element: Mg, at_pct: not detected or not reported, wt_pct: not detected or not reported}
+      uncertainty: {note: no uncertainty printed}
+      equipment: {instrument: ThermoFisher Phenom-XL Desktop SEM with integrated EDX detector, note: no beam settings or sample mass stated}
