@@ -1,0 +1,261 @@
+schema_version: literature_extract.v1
+source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+source:
+  citation: Wimpenny, J., Marks, N., Knight, K., Rolison, J. M., Borg, L., Eppich, G., Badro, J., Ryerson, F. J., Sanborn, M., Huyskens, M. H. & Yin, Q.-z. (2019), "Experimental determination of Zn isotope fractionation during evaporative loss at extreme temperatures", Geochimica et Cosmochimica Acta.
+  doi: 10.1016/j.gca.2019.06.016
+  year: 2019
+extraction:
+  method: manual transcription from clean pdftotext -layout plus PDF table renders; source PDF sha256 c6362194cc4313ed08194be4d2aff2d22bde0eb1f509e5831c6016215ceb1444
+  date: '2026-09-19'
+  worker: w3-wimpenny-2019-zn-isotope-evaporation-extreme-t
+  provenance_path: docs-private/research/2026-09-19-wimpenny-2019-zn-isotope-evaporation-extreme-t/
+review_status: draft
+species:
+  Zn:
+    observations:
+    - observation_id: wimpenny_2019_laser_levitation_apparatus
+      type: rate_series
+      class_tag: measured_direct
+      locator:
+        published_page: 5
+        pdf_page: 6
+        section: 2.1 Laser melting experiments
+        note: Apparatus and run schedule; pressure and imposed flow rate are not printed.
+      phase: glass
+      regime: containerless_laser_heating
+      units: as printed
+      values:
+        quantity: experimental_apparatus_and_conditions
+        method_class: measured_direct
+        evidence_class: measured_direct
+        apparatus: gas-mixing aerodynamic levitation laser furnace at IPGP
+        heating_source: CO2 laser
+        maximum_temperature_C: 2200
+        sample_materials:
+        - arkosic soil from Trinity test site
+        - rhyolitic soil from a second nuclear-test site
+        sample_preparation: crushed and homogenized with agate pestle and mortar; pelletized in Specac pellet die and hydraulic press
+        pellet_press_load_tons_about: 8
+        introduced_sample_mass_mg_range:
+        - 5
+        - 40
+        melting_duration_s_range:
+        - 20
+        - 60
+        target_temperature_C_range:
+        - 1600
+        - 2200
+        target_hold_duration_s_range:
+        - 1
+        - 120
+        carrier_gas: Ar
+        pressure: not_reported
+        imposed_flow_rate: not_reported
+        temperature_measurement: external_pyrometer
+        sample_geometry: freely levitated sphere; 0.8-3 mm diameter with varying vesicularity
+        low_temperature_shape_note: samples below 1800 C commonly did not form spheres
+        number_of_runs:
+          arkosic: 20
+          rhyolitic: 21
+      uncertainty:
+        trace_element_analysis: typically better than 5 percent based on BCR-2 and NIST 1640a standards
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows
+      type: rate_series
+      class_tag: measured_direct
+      locator:
+        table: '1'
+        published_page: 33
+        pdf_page: 35
+        note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns: [sample, diameter_mm, heating_time_s, temperature_C, delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm]
+        rows:
+        - {sample: Arkose soil, diameter_mm: null, heating_time_s: null, temperature_C: null, delta66Zn_permil: 0.22, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 51.46, Zn_2sigma_ppm: 0.78}
+        - {sample: Arkose soil-17, diameter_mm: 1.76, heating_time_s: 1, temperature_C: 1600, delta66Zn_permil: 0.36, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 19.40, Zn_2sigma_ppm: 0.34}
+        - {sample: Arkose soil-13, diameter_mm: 1.93, heating_time_s: 5, temperature_C: 1600, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 12.08, Zn_2sigma_ppm: 0.23}
+        - {sample: Arkose soil-9, diameter_mm: 1.81, heating_time_s: 10, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 17.18, Zn_2sigma_ppm: 0.37}
+        - {sample: Arkose soil-5, diameter_mm: 1.91, heating_time_s: 60, temperature_C: 1600, delta66Zn_permil: 0.95, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 17.88, Zn_2sigma_ppm: 0.39}
+        - {sample: Arkose soil-1, diameter_mm: 2.02, heating_time_s: 120, temperature_C: 1600, delta66Zn_permil: 1.20, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 14.50, Zn_2sigma_ppm: 0.42}
+        - {sample: Arkose soil-18, diameter_mm: 1.49, heating_time_s: 1, temperature_C: 1800, delta66Zn_permil: 0.62, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 15.86, Zn_2sigma_ppm: 0.40}
+        - {sample: Arkose soil-14, diameter_mm: 1.38, heating_time_s: 5, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 4.88, Zn_2sigma_ppm: 0.17}
+        - {sample: Arkose soil-10, diameter_mm: 1.37, heating_time_s: 10, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 7.74, Zn_2sigma_ppm: 0.49}
+        - {sample: Arkose soil-6, diameter_mm: 1.49, heating_time_s: 60, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 3.04, Zn_2sigma_ppm: 0.33}
+        - {sample: Arkose soil-2, diameter_mm: 1.47, heating_time_s: 120, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 4.78, Zn_2sigma_ppm: 0.35}
+        - {sample: Arkose soil-19, diameter_mm: 1.26, heating_time_s: 1, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 3.15, Zn_2sigma_ppm: 0.19}
+        - {sample: Arkose soil-15, diameter_mm: 1.63, heating_time_s: 5, temperature_C: 2000, delta66Zn_permil: 1.22, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 6.20, Zn_2sigma_ppm: 0.22}
+        - {sample: Arkose soil-11, diameter_mm: 1.86, heating_time_s: 10, temperature_C: 2000, delta66Zn_permil: 1.42, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 6.23, Zn_2sigma_ppm: 0.16}
+        - {sample: Arkose soil-7, diameter_mm: 1.51, heating_time_s: 60, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 2.73, Zn_2sigma_ppm: 0.22}
+        - {sample: Arkose soil-3, diameter_mm: 1.18, heating_time_s: 120, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 2.33, Zn_2sigma_ppm: 0.32}
+        - {sample: Arkose soil-16, diameter_mm: 1.72, heating_time_s: 5, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 5.90, Zn_2sigma_ppm: 0.18}
+        - {sample: Arkose soil-12, diameter_mm: 1.11, heating_time_s: 10, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 1.65, Zn_2sigma_ppm: 0.26}
+        - {sample: Arkose soil-8, diameter_mm: 0.82, heating_time_s: 60, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 7.18, Zn_2sigma_ppm: 0.64}
+        - {sample: Rhyolite soil, diameter_mm: null, heating_time_s: null, temperature_C: null, delta66Zn_permil: 0.28, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 153.0, Zn_2sigma_ppm: 6.0}
+        - {sample: Rhyolite soil-21, diameter_mm: 3.2, heating_time_s: 1, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 172.2, Zn_2sigma_ppm: 2.4}
+        - {sample: Rhyolite soil-20, diameter_mm: 3.2, heating_time_s: 5, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 161.6, Zn_2sigma_ppm: 4.5}
+        - {sample: Rhyolite soil-19, diameter_mm: 1.67, heating_time_s: 10, temperature_C: 1600, delta66Zn_permil: 0.57, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 135.4, Zn_2sigma_ppm: 3.2}
+        - {sample: Rhyolite soil-18, diameter_mm: 2.42, heating_time_s: 60, temperature_C: 1600, delta66Zn_permil: 0.42, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 143.2, Zn_2sigma_ppm: 4.8}
+        - {sample: Rhyolite soil-17, diameter_mm: 2.18, heating_time_s: 120, temperature_C: 1600, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 149.5, Zn_2sigma_ppm: 5.3}
+        - {sample: Rhyolite soil-2, diameter_mm: 2.79, heating_time_s: 1, temperature_C: 1800, delta66Zn_permil: 0.26, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 167.1, Zn_2sigma_ppm: 4.6}
+        - {sample: Rhyolite soil-5, diameter_mm: 3.08, heating_time_s: 5, temperature_C: 1800, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 172.4, Zn_2sigma_ppm: 2.7}
+        - {sample: Rhyolite soil-3, diameter_mm: 2.46, heating_time_s: 10, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 121.2, Zn_2sigma_ppm: 4.5}
+        - {sample: Rhyolite soil-1, diameter_mm: 1.81, heating_time_s: 60, temperature_C: 1800, delta66Zn_permil: 0.30, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 153.2, Zn_2sigma_ppm: 5.2}
+        - {sample: Rhyolite soil-4, diameter_mm: 1.74, heating_time_s: 120, temperature_C: 1800, delta66Zn_permil: 0.54, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 122.5, Zn_2sigma_ppm: 1.9}
+        - {sample: Rhyolite soil-11, diameter_mm: 1.95, heating_time_s: 5, temperature_C: 2000, delta66Zn_permil: 0.51, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 135.6, Zn_2sigma_ppm: 3.0}
+        - {sample: Rhyolite soil-7, diameter_mm: 1.26, heating_time_s: 60, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 166.6, Zn_2sigma_ppm: 4.6}
+        - {sample: Rhyolite soil-8, diameter_mm: 1.93, heating_time_s: 120, temperature_C: 2000, delta66Zn_permil: 0.85, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 102.7, Zn_2sigma_ppm: 2.6}
+        - {sample: Rhyolite soil-13, diameter_mm: 1.59, heating_time_s: 1, temperature_C: 2200, delta66Zn_permil: 0.65, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 119.3, Zn_2sigma_ppm: 3.5}
+        - {sample: Rhyolite soil-10, diameter_mm: 1.96, heating_time_s: 5, temperature_C: 2200, delta66Zn_permil: 0.70, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 116.5, Zn_2sigma_ppm: 1.2}
+        - {sample: Rhyolite soil-6, diameter_mm: 1.76, heating_time_s: 10, temperature_C: 2200, delta66Zn_permil: 0.79, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 117.7, Zn_2sigma_ppm: 3.7}
+        - {sample: Rhyolite soil-15, diameter_mm: 1.89, heating_time_s: 60, temperature_C: 2200, delta66Zn_permil: 1.49, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 83.33, Zn_2sigma_ppm: 2.98}
+        - {sample: Rhyolite soil-12, diameter_mm: 0.81, heating_time_s: 90, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 9.72, Zn_2sigma_ppm: 0.50}
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table2_fallout_tektite_zn_rows
+      type: rate_series
+      class_tag: measured_direct
+      locator:
+        table: '2'
+        published_page: 34
+        pdf_page: 36
+        note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.
+      phase: glass
+      regime: natural_or_impact_melt
+      units: Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        rows:
+        - {sample: Fallout-1, delta66Zn_permil: 0.59, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 45.77, Zn_2sigma_ppm: 1.08}
+        - {sample: Fallout-2, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 77.22, Zn_2sigma_ppm: 2.56}
+        - {sample: Fallout-3, delta66Zn_permil: 0.47, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 86.89, Zn_2sigma_ppm: 3.31}
+        - {sample: Fallout-4, delta66Zn_permil: 0.67, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 55.81, Zn_2sigma_ppm: 1.10}
+        - {sample: Fallout-5, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 89.99, Zn_2sigma_ppm: 1.62}
+        - {sample: Fallout-6, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 79.22, Zn_2sigma_ppm: 2.32}
+        - {sample: Fallout-7, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 75.09, Zn_2sigma_ppm: 1.94}
+        - {sample: Australite 1, delta66Zn_permil: 1.26, delta66Zn_2sigma_permil: 0.01, Zn_ppm: 22.22, Zn_2sigma_ppm: 0.22}
+        - {sample: Australite 2, delta66Zn_permil: 1.02, delta66Zn_2sigma_permil: 0.12, Zn_ppm: 25.78, Zn_2sigma_ppm: 1.43}
+        - {sample: Australite 3, delta66Zn_permil: 1.19, delta66Zn_2sigma_permil: 0.01, Zn_ppm: 20.00, Zn_2sigma_ppm: 1.28}
+        - {sample: Australite 4, delta66Zn_permil: 2.03, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 14.65, Zn_2sigma_ppm: 0.37}
+        - {sample: Australite 5, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 11.96, Zn_2sigma_ppm: 0.85}
+        - {sample: Australite 6, delta66Zn_permil: 2.04, delta66Zn_2sigma_permil: 0.16, Zn_ppm: 10.51, Zn_2sigma_ppm: 0.75}
+        - {sample: Australite 7, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 27.87, Zn_2sigma_ppm: 3.19}
+        - {sample: Australite 8, delta66Zn_permil: 1.30, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 20.30, Zn_2sigma_ppm: 0.54}
+        - {sample: Australite 9, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 28.19, Zn_2sigma_ppm: 1.94}
+        - {sample: Australite 10, delta66Zn_permil: 1.83, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 10.49, Zn_2sigma_ppm: 1.50}
+        - {sample: Australite 11, delta66Zn_permil: 1.94, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 9.98, Zn_2sigma_ppm: 0.86}
+        - {sample: Australite 12, delta66Zn_permil: 1.49, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 11.55, Zn_2sigma_ppm: 0.29}
+    - observation_id: wimpenny_2019_zn_fractionation_summary
+      type: alpha
+      class_tag: measured_direct
+      derived_from: wimpenny_2019_table1_experimental_zn_rows
+      derivation:
+        relation: Rayleigh isotope-fractionation reduction from measured Zn isotope ratios and Zn remaining fraction
+        inputs:
+        - wimpenny_2019_table1_experimental_zn_rows
+        output_unit: dimensionless alpha
+      locator:
+        published_page: 24
+        pdf_page: 25
+        section: 6 Conclusions
+      phase: glass
+      regime: atmospheric_pressure_containerless_heating
+      units: dimensionless alpha; per mil delta66Zn
+      values:
+        quantity: alpha
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        derived_from: wimpenny_2019_table1_experimental_zn_rows
+        derivation:
+          method: Rayleigh isotope-fractionation reduction from measured Zn isotope ratios and fraction of Zn remaining
+          source_equation: Equation 3 and surrounding text, published pages 16-17
+        alpha: 0.99879
+        rhyolitic_experiments_alpha: 0.99879
+        rhyolitic_experiments_alpha_uncertainty: 0.00013
+        arkosic_residual_silicate_alpha_about: 0.9988
+        fallout_glass_alpha_about: 0.9997
+        australite_alpha_range:
+        - 0.9988
+        - 0.9997
+        maximum_experimental_delta66Zn_permil: 1.49
+        maximum_experimental_delta66Zn_uncertainty_permil: 0.05
+        reported_arkosic_Zn_loss_percent:
+          at_1600C_1s:
+          - 67
+          - 76
+          at_2200C:
+          - 92
+          - 98
+        reported_table3_context: enrichment factors normalize each element/Al ratio to the precursor soil; Table 3 is on published page 35.
+        pressure_context: experiments at atmospheric pressure; abstract also discusses high-vacuum theoretical comparison
+    - observation_id: wimpenny_2019_zn_kinetic_theory_and_pressure_model
+      type: alpha
+      class_tag: model_derived
+      derived_from: wimpenny_2019_zn_fractionation_summary
+      derivation:
+        relation: kinetic isotope mass relation plus Richter et al. 2002 pressure/recondensation relation
+        inputs:
+        - wimpenny_2019_zn_fractionation_summary
+        output_unit: dimensionless alpha
+      locator:
+        published_page: 18
+        pdf_page: 19
+        section: 4.3.1 Suppression of Zn isotope fractionation factor
+      phase: g
+      regime: kinetic_evaporation_model
+      units: dimensionless alpha
+      values:
+        quantity: alpha
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: authors_kinetic_isotope_mass_relation_and_Richter_2002_pressure_relation
+        derived_from: wimpenny_2019_zn_fractionation_summary
+        derivation:
+          kinetic_alpha: square_root_of_64Zn_mass_divided_by_66Zn_mass (Equation 4)
+          pressure_relation: Richter et al. 2002 relation reproduced as Equation 5
+          interpretation: Pi/Pi_sat approaching 1 drives alpha_prime toward 1 through recondensation
+        alpha: 0.985
+        elemental_Zn_vacuum_alpha: 0.985
+        ZnCl2_vacuum_alpha: 0.993
+        ZnS_vacuum_alpha: 0.990
+        effective_pressure_relation: "alpha_prime - 1 approximately (alpha - 1) * (1 - Pi/Pi_sat)"
+        pressure_domain_discussed_bar:
+        - 1.0e-9
+        - 1.0
+        modeled_interpretation: increasing Pi/Pi_sat drives effective alpha toward 1 through recondensation
+        do_not_treat_as_measured: true
+      uncertainty:
+        note: model values and pressure relation are author calculations or quoted framework, not direct measurements.
+deepening:
+  class_ledger:
+  - measured_direct: apparatus, run conditions, Table 1 experimental Zn rows, Table 2 measured sample rows
+  - measured_reduced: experimentally inferred alpha values in Conclusions
+  - model_derived: kinetic alpha values and pressure/recondensation relation; generator named above
+  - figure_only: no figure-read numeric values admitted
+  - compilation_assessed: no independent compilation rows admitted from this paper
+  missing_or_unreported:
+  - chamber pressure during the laser experiments
+  - imposed argon flow rate and pressure-control setpoint
+  - sample mass for each individual run; only the introduced 5-40 mg range is printed
+  - exposed sample area and orifice/cell geometry; containerless apparatus has no crucible or effusion orifice
+  - fO2 control and temperature calibration details beyond external pyrometer
+  - run-specific Zn evaporation flux; authors state mass cannot be constrained quantitatively and use Al normalization
+  notes:
+  - null isotope cells preserve unanalysed rows; they are not zero
+  - Table 3 enrichment factors were reviewed as author-reduced data but not copied as point values because the rendered table's OCR did not preserve several minus signs and decimal points reliably; the narrative preserves its reported Zn-loss ranges and alpha summaries
+fidelity_samples:
+- path: species.Zn.observations[wimpenny_2019_zn_fractionation_summary].values.alpha
+  value: 0.99879
+  locator:
+    published_page: 24
+    section: 6 Conclusions
+    note: experimental rhyolitic-soil alpha printed as 0.99879 +/- 0.00013
