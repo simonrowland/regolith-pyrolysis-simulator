@@ -55,7 +55,7 @@ species:
       uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
     - observation_id: cooper_2007_jsc1a_glass_fraction
       type: condensate_composition
-      locator: {pdf_page_index: 1, section: What Is Sintering, and Why Is It a Concern?}
+      locator: {pdf_page_index: 1, section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: glass
       regime: simulant_characterisation
       units: wt% as printed
@@ -68,7 +68,7 @@ species:
       uncertainty: {note: approximate qualifier retained; no numerical uncertainty printed}
     - observation_id: cooper_2007_jsc1a_sintering_1100c_quoted
       type: transition_temperature
-      locator: {pdf_page_index: 2, section: What Is Sintering, and Why Is It a Concern?}
+      locator: {pdf_page_index: 2, section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: glass
       regime: sintering
       units: degree C and time as printed
@@ -84,7 +84,7 @@ species:
       equipment: {note: apparatus details of the cited experiment are not stated in this source}
     - observation_id: cooper_2007_jsc1a_sintering_1050c_three_hours
       type: transition_temperature
-      locator: {pdf_page_index: 2, section: What Is Sintering, and Why Is It a Concern?}
+      locator: {pdf_page_index: 2, section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: glass
       regime: sintering
       units: degree C and hours as printed
@@ -117,7 +117,7 @@ species:
       equipment: {instrument: Microtrac S3500 laser diffraction instrument, note: measurement courtesy of Microtrac Incorporated}
     - observation_id: cooper_2007_jsc1af_figure1_sintering_threshold
       type: transition_temperature
-      locator: {pdf_page_index: 2, figure: '1', section: What Is Sintering, and Why Is It a Concern?}
+      locator: {pdf_page_index: 2, figure: '1', section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: synthetic_apollo14_composition_glass
       regime: sintering
       units: degree C, micrometres, dyne/cm, and time as printed
@@ -152,7 +152,7 @@ species:
     observations:
     - observation_id: cooper_2007_apollo14_glass_sintering_minutes_800c
       type: transition_temperature
-      locator: {pdf_page_index: 1, figure: '1', section: What Is Sintering, and Why Is It a Concern?}
+      locator: {pdf_page_index: 1, figure: '1', section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: synthetic_apollo14_composition_glass
       regime: sintering
       units: degree C and time as printed
@@ -169,7 +169,7 @@ species:
     observations:
     - observation_id: cooper_2007_humid_air_channelization_sequence
       type: mass_loss_fraction_vs_T
-      locator: {pdf_page_index: 3, figure: '2', section: How Can Sintering Be Prevented?}
+      locator: {pdf_page_index: 3, figure: '2', section: 'How Can Sintering Be Prevented?'}
       phase: particulate_simulant
       regime: informal_fluidized_bed_mockup_observation
       units: seconds as printed
