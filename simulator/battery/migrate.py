@@ -3524,6 +3524,27 @@ def _selection_from_named_field(
             amount = amount / Decimal("100")
             trail = "percent_to_fraction"
         return _point_selection(amount, key, trail, payload, condition_ranges)
+    decorated_prefix = f"{q_token.value}_"
+    decorated = [
+        (key, _numeric_field(payload, key))
+        for key in payload
+        if isinstance(key, str)
+        and key.startswith(decorated_prefix)
+        and _numeric_field(payload, key) is not None
+    ]
+    if len(decorated) == 1:
+        key, amount = decorated[0]
+        assert amount is not None
+        trail = "as_published"
+        if q_token in {
+            Quantity.MASS_LOSS_FRACTION,
+            Quantity.MASS_LOSS_FRACTION_VS_T,
+            Quantity.YIELD_FRACTION,
+            Quantity.O2_YIELD,
+        } and _percent_named_fraction_field(key, units):
+            amount /= Decimal("100")
+            trail = "percent_to_fraction"
+        return _point_selection(amount, key, trail, payload, condition_ranges)
     range_key = None
     raw_range = None
     if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA and "alpha_range" in payload:

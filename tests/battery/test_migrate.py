@@ -48,6 +48,7 @@ from simulator.battery.migrate import (
     load_migrated_store,
     migrate,
     pressure_from_equipment,
+    select_declared_source,
     work_id_for,
     write_outputs,
 )
@@ -1789,6 +1790,16 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         return _num(item["activity"]) if "activity" in item else None
     if q_token == "evaporation_coefficient_alpha":
         return _num(item["alpha"]) if "alpha" in item else None
+    if q_token == "evaporation_rate":
+        candidates = [
+            (key, value)
+            for key, value in item.items()
+            if isinstance(key, str)
+            and (key == q_token or key.startswith(f"{q_token}_"))
+        ]
+        if len(candidates) != 1:
+            return None
+        return _num(candidates[0][1])
     if q_token in _CENSUS_PERCENT_FRACTION_QUANTITIES:
         candidates = [
             (key, value)
@@ -1950,11 +1961,22 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert n_numeric == sum(census.values())
     assert census.get("activity_coefficient") == 128
     assert census.get("p_partial") == 18
-    assert census.get("p_sat", 0) == 0
+    assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 12
+    assert census.get("evaporation_rate") == 21
     assert census.get("mass_loss_fraction") == 9
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 167, (n_numeric, census, n_unavailable)
+    assert n_numeric == 209, (n_numeric, census, n_unavailable)
+
+
+def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
+    selection = select_declared_source(
+        Quantity.EVAPORATION_RATE,
+        "mol/s/m2",
+        {"evaporation_rate_1200C": "4.6e-06"},
+    )
+    assert selection.amount == as_decimal("4.6e-06")
+    assert selection.field_name == "evaporation_rate_1200C"
 
 
 def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:

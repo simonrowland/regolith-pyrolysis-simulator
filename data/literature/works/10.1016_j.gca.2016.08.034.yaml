@@ -32,14 +32,14 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - MgO
-            - '0.4939703307923544594320550803'
           - - Al2O3
             - '0.05976372234900118543359010501'
-          - - SiO2
-            - '0.3750727285942844247092031078'
           - - CaO
             - '0.07119321826435993042515170709'
+          - - MgO
+            - '0.4939703307923544594320550803'
+          - - SiO2
+            - '0.3750727285942844247092031078'
           amount_basis: mole_fraction
       locator:
         pdf_page_index: 39
@@ -51,22 +51,6 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '37.9'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -79,22 +63,6 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '42.9'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -115,15 +83,47 @@ experiments:
               pdf_page_index: 39
               table: '1'
               note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
         output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
         value:
-          MgO: '37.9'
           Al2O3: '11.6'
-          SiO2: '42.9'
           CaO: '7.6'
+          MgO: '37.9'
+          SiO2: '42.9'
       locator:
         pdf_page_index: 39
         table: '1'
