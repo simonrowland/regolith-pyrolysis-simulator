@@ -1,0 +1,234 @@
+schema_version: literature_extract.v1
+source_id: fdm879
+source:
+  citation: >-
+    Kulcinski, Gerald L. (1992), "A Resource Assessment and Extraction of Lunar 3He",
+    UWFDM-879, Fusion Technology Institute, University of Wisconsin-Madison; presented
+    at the US-USSR Workshop on D-3He Reactor Studies, Moscow, 25 September-2 October 1991.
+  year: 1992
+  report_number: UWFDM-879
+extraction:
+  method: >-
+    Printed-text transcription from the clean 17-page corpus PDF using pdftotext -layout.
+    This is a secondary resource-assessment and engineering report, not a primary
+    vaporization experiment. Numerical primary results are retained as quoted_attributed
+    or compilation_calculated_table; author projections are retained as authors_estimate.
+    Figure axes were not digitized.
+  date: '2026-09-19'
+  worker: w2-fdm879
+  provenance_path: raw/fdm879/fdm879.pdf
+review_status: draft
+fidelity_samples:
+- species: He
+  observable: gibbs_table
+  observation_id: fdm879_table1_lunar_3he_reserves
+  field: maria_average_He_concentration_wtppm
+  value: 30
+  locator:
+    page: 3
+    table: '1'
+    note: Maria row, Average He Conc. wtppm column
+- species: He
+  observable: rate_series
+  observation_id: fdm879_pepin_3he_evolution
+  field: evolved_fraction_percent_as_printed
+  value: approximately 85
+  locator:
+    page: 5
+    figure: '3'
+    note: Printed prose states approximately 85% of 3He evolved at approximately 700 C
+species:
+  He:
+    observations:
+    - observation_id: fdm879_text_solar_wind_helium_inventory
+      type: gibbs_table
+      locator:
+        page: 2
+        section: '2. 3He Resource Estimates on the Lunar Surface'
+        note: Printed prose attributes the solar-wind source and exposure duration
+      phase: lunar_regolith
+      regime: quoted_prior_work
+      quote: >-
+        The source of the 3He comes from the solar wind which has been incident on the
+        lunar surface for approximately 4 billion years and has showered the moon with
+        approximately 500 million tonnes of 3He.
+      units: tonnes and years as published
+      values:
+        quantity: solar_wind_helium_inventory
+        schema_parking_note: Printed resource-inventory prose; parked as gibbs_table because the closed extract type set has no resource-inventory token.
+        method_class: quoted_unattributed
+        gas_species:
+        - 3He
+        value_tonnes: 500000000
+        exposure_duration_years: 4000000000
+        quote: >-
+          The source of the 3He comes from the solar wind which has been incident on the
+          lunar surface for approximately 4 billion years and has showered the moon with
+          approximately 500 million tonnes of 3He.
+        attribution: Cameron, Gibson, and Jordan studies cited in references 10-14
+      uncertainty:
+        note: Approximately signs are retained as prose; no uncertainty is printed.
+    - observation_id: fdm879_text_solar_wind_isotope_ratio
+      type: gibbs_table
+      locator:
+        page: 3
+        section: '2. 3He Resource Estimates on the Lunar Surface'
+        note: Prose immediately preceding Table 1
+      phase: lunar_samples
+      regime: quoted_prior_work
+      quote: The 3He/4He ratio was essentially the same as in the solar wind, approximately 480 ppm.
+      units: ppm as published
+      values:
+        quantity: 3He_to_4He_ratio
+        schema_parking_note: Printed isotope-ratio prose; parked as gibbs_table because the closed extract type set has no isotope-ratio token.
+        method_class: quoted_unattributed
+        ratio_ppm: 480
+        quote: The 3He/4He ratio was essentially the same as in the solar wind, approximately 480 ppm.
+        attribution: Apollo and Lunakhod sample studies cited by the report
+      uncertainty:
+        note: None printed.
+    - observation_id: fdm879_table1_lunar_3he_reserves
+      type: gibbs_table
+      locator:
+        page: 3
+        table: '1'
+        note: Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions
+      phase: lunar_regolith
+      regime: author_compiled_reserve_table
+      units: percent, wtppm, and tonnes as published
+      values:
+        quantity: lunar_3He_reserves_by_surface_region
+        schema_parking_note: Printed reserve table; parked as gibbs_table because the closed extract type set has no resource-inventory token.
+        method_class: compilation_calculated_table
+        source_basis: U.S. Apollo and Soviet LUNA missions
+        maria_average_He_concentration_wtppm: 30
+        rows:
+        - location: Maria
+          lunar_surface_percent: 20
+          average_He_concentration_wtppm: 30
+          3He_tonnes: 600000
+        - location: Highlands and Basin Ejecta
+          lunar_surface_percent: 80
+          average_He_concentration_wtppm: 7
+          3He_tonnes: 500000
+        - location: Total
+          lunar_surface_percent: null
+          average_He_concentration_wtppm: null
+          3He_tonnes: 1100000
+        quote: >-
+          Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions;
+          Maria | 20 | 30 | 600,000; Highlands and Basin Ejecta | 80 | 7 | 500,000;
+          Total | — | — | 1,100,000.
+      uncertainty:
+        note: No uncertainty is printed in Table 1.
+    - observation_id: fdm879_pepin_3he_evolution
+      type: rate_series
+      locator:
+        page: 5
+        section: '4. Extraction of the Lunar 3He'
+        figure: '3'
+        note: Prose description of early experiments; Fig. 3 is not digitized
+      phase: lunar_regolith
+      regime: quoted_heating_experiment
+      quote: >-
+        Pepin found that heating the lunar regolith to temperatures of approximately
+        700 C would cause approximately 85% of the 3He to be evolved.
+      units: degrees C and percent as published
+      values:
+        quantity: 3He_evolved_by_heating
+        schema_parking_note: Printed quoted extraction result; parked as rate_series because the closed extract type set has no extraction-yield token.
+        method_class: quoted_unattributed
+        temperature_C_as_printed: approximately 700
+        evolved_fraction_percent_as_printed: approximately 85
+        quote: >-
+          Pepin found that heating the lunar regolith to temperatures of approximately
+          700 C would cause approximately 85% of the 3He to be evolved.
+        attribution: R. O. Pepin et al., reference 15
+      uncertainty:
+        note: Approximately signs are retained; no numerical uncertainty is printed.
+    - observation_id: fdm879_uw_miner_grain_size_and_heat
+      type: rate_series
+      locator:
+        page: 5
+        section: '4. Extraction of the Lunar 3He'
+        figure: '4'
+        note: Description of the proposed University of Wisconsin miner
+      phase: lunar_regolith
+      regime: quoted_engineering_design
+      quote: >-
+        The equipment is capable of collecting loose regolith, separating the material
+        to grains less than 50 microns in diameter, and heating the regolith to
+        approximately 700 C.
+      units: micrometres and degrees C as published
+      values:
+        quantity: miner_feed_grain_size_and_heating_temperature
+        schema_parking_note: Printed engineering-design conditions; parked as rate_series because the closed extract type set has no process-condition token.
+        method_class: quoted_unattributed
+        maximum_grain_diameter_micrometres: less_than_50
+        heating_temperature_C_as_printed: approximately 700
+        quote: >-
+          The equipment is capable of collecting loose regolith, separating the material
+          to grains less than 50 microns in diameter, and heating the regolith to
+          approximately 700 C.
+        attribution: Sviatoslavsky and co-workers, references 16-18
+      uncertainty:
+        note: Bound and approximate notation are retained; no uncertainty is printed.
+  H2O:
+    observations:
+    - observation_id: fdm879_volatile_byproducts_mass_per_3he
+      type: gibbs_table
+      locator:
+        page: 7
+        section: '5. Important By-Products from Lunar 3He Mining'
+        note: Reported gas mass per tonne of collected 3He
+      phase: lunar_regolith_volatiles
+      regime: author_resource_estimate
+      units: tonnes gas per tonne 3He as published
+      values:
+        quantity: volatile_byproduct_mass
+        schema_parking_note: Printed byproduct inventory estimate; parked as gibbs_table because the closed extract type set has no inventory token.
+        method_class: authors_estimate
+        model: Kulcinski resource-assessment estimate
+        gas_mass_tonnes_per_tonne_3He: 18200
+        quote: The volatiles associated with 3He extraction are reported as 18,200 tonnes of gases generated per tonne of 3He collected.
+      uncertainty:
+        note: No uncertainty is printed.
+source_metadata:
+  document_class: secondary resource assessment and engineering proposal
+  pages: 17
+  figures:
+  - figure: '1'
+    page: 3
+    subject: helium content in returned lunar samples
+    numeric_digitization: not performed
+  - figure: '2'
+    page: 4
+    subject: correlation between TiO2 and He content
+    numeric_digitization: not performed
+  - figure: '3'
+    page: 5
+    subject: temperature required to evolve 3He
+    numeric_digitization: not performed; prose values captured separately
+  - figure: '4'
+    page: 6
+    subject: University of Wisconsin lunar volatiles miner
+    numeric_digitization: not applicable
+  - figure: '5'
+    page: 7
+    subject: volatile by-products of 3He extraction
+    numeric_digitization: not performed
+  - figure: '6'
+    page: 8
+    subject: mass required to mine 3He
+    numeric_digitization: not performed
+  - figure: '7'
+    page: 11
+    subject: development schedules
+    numeric_digitization: not performed
+  absent:
+  - primary apparatus dimensions, crucible or cell geometry
+  - vacuum level, pumping rate, gas identity or pressure during the quoted Pepin experiment
+  - temperature measurement method or calibration
+  - fO2 control and run duration
+  - oxide composition, mass, density, grain-size distribution, or surface area for a named sample
+  - printed numerical figure points beyond the prose and Table 1 values above
