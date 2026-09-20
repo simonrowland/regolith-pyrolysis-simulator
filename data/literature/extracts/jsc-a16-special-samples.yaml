@@ -1,0 +1,336 @@
+schema_version: literature_extract.v1
+source_id: jsc-a16-special-samples
+source:
+  citation: 'Horz, F., Carrier, W. D., Young, J. S., Duke, C. M., Nagle, J. S. and Fryxell, R., APOLLO 16 SPECIAL SAMPLES, NASA Manned Spacecraft Center, Houston, Texas.'
+  url: https://curator.jsc.nasa.gov/lunar/catalogs/other/a16_special_samples.pdf
+extraction:
+  method: pdftotext -layout transcription checked against the printed table and page text
+  date: '2026-09-19'
+  worker: w2-jsc-a16-special-samples
+  provenance_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+review_status: draft
+source_locators:
+  introduction: &introduction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 2
+    section: Introduction
+  surface_sampling: &surface_sampling
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 3
+    section: 'A.1 Regolith Materials'
+  cs_vc: &cs_vc
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 10
+    section: 'A.3 Core Sample Vacuum Container (CSVC)'
+  core_method: &core_method
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 11
+    section: 'B. Double Drive Tubes and Deep Drill Core'
+  table1: &table1
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 45
+    table: 'I'
+  core_log_60009_10: &core_log_60009_10
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 15
+    section: 'Detailed Core Log, drive tube 60009/60010'
+  core_log_60013_14: &core_log_60013_14
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    pdf_page_index: 19
+    section: 'Detailed Core Log, drive tube 60013/60014'
+laboratory_parameters:
+  sample_collection:
+    value:
+      surface_material_depth_as_printed: '<1 mm'
+      skim_max_penetration_estimated: 5 mm
+      scoop_penetration_estimated: 3 cm
+      nearby_drive_tube_penetration_estimated: 27 cm
+      core_material_total_length_returned_excluding_cs_vc: about 480 cm
+    locator: *surface_sampling
+    note: Depths are collection descriptions and estimates, not inferred sample dimensions.
+  contact_soil_sampling_device:
+    value:
+      box_dimensions_cm_as_printed: '12 x 10 x 2.5'
+      collector_plate_material: aluminum
+      collector_plate_cover: nylon fabrics, one beta-cloth-like
+      applied_load: own weight only, ideally
+      collected_layer_thickness_as_printed: about 100 microns
+      sealing: containers carefully sealed before and after deployment
+    locator:
+      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+      pdf_page_index: 46
+      figure: '1'
+  core_sample_vacuum_container:
+    value:
+      container: vacuum-sealed Core Sample Vacuum Container (CSVC)
+      drive_tube_caps: two teflon caps
+      seal: stainless-steel knife-edge screwed into an indium seal
+      storage_vacuum_as_printed: about 10^-4 torr
+      placement: drive-tube sample inserted immediately after extraction
+      receiving_atmosphere: sterile nitrogen atmosphere on LRL opening
+      additional_containment: two vacuum seals
+    locator:
+      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+      pdf_page_index: 53
+      section: 'Figure 38 caption and A.3 Core Sample Vacuum Container'
+    note: This is a storage/contamination-control condition, not a vaporization-run pressure.
+  core_tube_geometry:
+    value:
+      internal_diameter_cm_as_printed: 4.13
+      area: not computed
+    locator: *table1
+    note: The report prints the internal diameter in a Table I footnote; no area is inferred.
+  absent_parameters:
+    - thermal treatment or vaporization run
+    - furnace or heated cell
+    - crucible or container material for a thermal experiment
+    - effusion orifice geometry and exposed thermal area
+    - pumping mechanism and pumping speed
+    - run pressure history distinct from CSVC storage vacuum
+    - gas identity and pressure during a run
+    - temperature measurement, calibration and uncertainty
+    - fO2 control
+    - chemical composition analysis
+    - BET surface area
+sample_characterization:
+  core_table_I:
+    locator: *table1
+    note: Returned sample weights and lengths are measured tabulated values. Bulk density is retained as printed, including the authors' correction note and uncertainties.
+    rows: &table1_rows
+    - sample_number: '64002'
+      station: '4'
+      returned_sample_weight_g: 584.1
+      returned_sample_length_cm: 31.7
+      bulk_density_g_cm3: '1.38-1.40 c'
+      shared_tube_depth_cm: '32.6 +/- 0.5'
+      total_depth_cm: '65 +/- 6 d'
+      hammer_blows: '>3'
+      core_recovery_pct: '103 +/- 10'
+      evidence_class: measured_reduced
+    - sample_number: '64001'
+      station: '4'
+      returned_sample_weight_g: 752.3
+      returned_sample_length_cm: '33.9 b'
+      bulk_density_g_cm3: 1.66
+      shared_tube_depth_cm: '32.6 +/- 0.5'
+      total_depth_cm: '65 +/- 6 d'
+      hammer_blows: '>3'
+      core_recovery_pct: '103 +/- 10'
+      evidence_class: measured_reduced
+    - sample_number: '68002'
+      station: '8'
+      returned_sample_weight_g: 583.5
+      returned_sample_length_cm: 27.4
+      bulk_density_g_cm3: 1.59
+      shared_tube_depth_cm: '17.8 +/- 0.5'
+      total_depth_cm: '68.6 +/- 0.5'
+      hammer_blows: '~56'
+      core_recovery_pct: 91
+      evidence_class: measured_reduced
+    - sample_number: '68001'
+      station: '8'
+      returned_sample_weight_g: 840.7
+      returned_sample_length_cm: 34.9
+      bulk_density_g_cm3: 1.80
+      shared_tube_depth_cm: '17.8 +/- 0.5'
+      total_depth_cm: '68.6 +/- 0.5'
+      hammer_blows: '~56'
+      core_recovery_pct: 91
+      evidence_class: measured_reduced
+    - sample_number: '69001'
+      station: '9'
+      returned_sample_weight_g: 558.4
+      returned_sample_length_cm: '-'
+      bulk_density_g_cm3: '-'
+      tube_depth_cm: '20.6 +/- 0.5'
+      total_depth_cm: '27.5 +/- 2 d'
+      hammer_blows: 8
+      core_recovery_pct: '-'
+      evidence_class: measured_direct
+    - sample_number: '60010'
+      station: '10'
+      returned_sample_weight_g: 635.3
+      returned_sample_length_cm: 32.3
+      bulk_density_g_cm3: 1.47
+      shared_tube_depth_cm: '17.9 +/- 0.5'
+      total_depth_cm: '71 +/- 2 d'
+      hammer_blows: '~53'
+      core_recovery_pct: '95 +/- 3'
+      evidence_class: measured_reduced
+    - sample_number: '60009'
+      station: '10'
+      returned_sample_weight_g: 759.8
+      returned_sample_length_cm: '33.1 b'
+      bulk_density_g_cm3: 1.72
+      shared_tube_depth_cm: '17.9 +/- 0.5'
+      total_depth_cm: '71 +/- 2 d'
+      hammer_blows: '~53'
+      core_recovery_pct: '95 +/- 3'
+      evidence_class: measured_reduced
+    - sample_number: '60014'
+      station: "10'"
+      returned_sample_weight_g: 570.3
+      returned_sample_length_cm: '28.8-28.4 c'
+      bulk_density_g_cm3: 1.48
+      shared_tube_depth_cm: '28 +/- 2'
+      total_depth_cm: '70.5 +/- 1'
+      hammer_blows: 27
+      core_recovery_pct: '90 +/- 1'
+      evidence_class: measured_reduced
+    - sample_number: '60013'
+      station: "10'"
+      returned_sample_weight_g: 757.2
+      returned_sample_length_cm: '34.7 b'
+      bulk_density_g_cm3: 1.63
+      shared_tube_depth_cm: '28 +/- 2'
+      total_depth_cm: '70.5 +/- 1'
+      hammer_blows: 27
+      core_recovery_pct: '90 +/- 1'
+      evidence_class: measured_reduced
+    - sample_number: '60007'
+      station: '10'
+      returned_sample_weight_g: 105.7
+      returned_sample_length_cm: 22.2
+      bulk_density_g_cm3: 1.46
+      evidence_class: measured_reduced
+    - sample_number: '60006'
+      station: '10'
+      returned_sample_weight_g: 165.6
+      returned_sample_length_cm: '35.5 +/- 0.5'
+      bulk_density_g_cm3: '1.43 +/- 0.02'
+      evidence_class: measured_reduced
+    - sample_number: '60005'
+      station: '10'
+      returned_sample_weight_g: 76.1
+      returned_sample_length_cm: '-'
+      bulk_density_g_cm3: '-'
+      evidence_class: measured_direct
+    - sample_number: '60004'
+      station: '10'
+      returned_sample_weight_g: 202.7
+      returned_sample_length_cm: 39.9
+      bulk_density_g_cm3: 1.56
+      evidence_class: measured_reduced
+    - sample_number: '60003'
+      station: '10'
+      returned_sample_weight_g: 215.5
+      returned_sample_length_cm: 39.9
+      bulk_density_g_cm3: 1.66
+      evidence_class: measured_reduced
+    - sample_number: '60002'
+      station: '10'
+      returned_sample_weight_g: 211.9
+      returned_sample_length_cm: '42.5 shared with 60001 (bit)'
+      bulk_density_g_cm3: 1.75
+      evidence_class: measured_reduced
+    - sample_number: '60001 (bit)'
+      station: '10'
+      returned_sample_weight_g: 30.1
+      returned_sample_length_cm: '42.5 shared with 60002'
+      bulk_density_g_cm3: 1.75
+      evidence_class: measured_reduced
+    table_footnotes:
+      b: 'Nominal lower-core-tube sample length is 34.9 cm; shorter actual length may reflect sample loss or keeper compression, with sample loss considered more likely; densities calculated accordingly. Core-tube internal diameter is 4.13 cm.'
+      c: Corrected for void.
+      d: Measured from kinescopes.
+      e: In vacuum-sealed ALSRC No. 2; not exposed to spacecraft environment.
+      f: In open sample bags; exposed to spacecraft environment.
+  core_grain_size_and_stratigraphy: &grain_60009_10
+    locator: *core_log_60009_10
+    note: X-radiographic characterization; the report warns that grain-size distribution, sorting and density are not unambiguous because of low x-ray absorption and parallax.
+    values:
+      stated_uncertainty: grain-size distribution, sorting and density not unambiguous
+      units_1_depth_cm: '58-70'
+      units_1_opaque_pct: 2
+      units_1_opaque_diameter_mm: 'up to 5; mostly 0.5-1.0'
+      units_1_rock_fragment_pct: 5
+      units_1_rock_fragment_diameter_cm: '0.3-0.8, mostly about 0.5'
+      units_2_depth_cm: '51-58'
+      units_2_opaque_pct: 1
+      units_2_fragment_diameter_mm: 'up to 1.1, mostly 0.5-1.0'
+      units_3_depth_cm: '49-51'
+      units_3_opaque_pct: 1
+      units_3_opaque_diameter_mm: 'up to 0.8, mostly 0.3-0.5'
+      units_3_rock_fragment_diameter_cm: '0.3-1.6, most 0.5-1.1'
+      units_4_depth_cm: '42-49'
+      units_4_opaque_pct: 2
+      units_4_opaque_diameter_mm: 'up to 1.5'
+      units_5_depth_cm: '14.5-42'
+      units_5_opaque_pct: 2
+      units_5_opaque_diameter_mm: 'up to 2.0, mostly 0.2-0.5'
+      units_5_fragment_diameter_cm: 'mostly 0.5-1.0, up to 1.4'
+      units_6_depth_cm: '11-14.5'
+      units_6_opaque_pct: 1
+      units_6_opaque_diameter_mm: 'up to 0.8, mostly 0.3-0.8'
+      units_7_depth_cm: 'surface-11'
+      units_7_opaque_pct: 2
+      units_7_opaque_diameter_mm: 'under 1.2, mostly 0.5-1.0'
+      units_7_fragment_length_cm: '0.5-1.3, mostly about 1.0'
+      units_7_fragment_diameter_cm: '0.1-1.2, mostly 0.3-0.5'
+  core_grain_size_and_stratigraphy_60013_60014: &grain_60013_14
+    locator: *core_log_60013_14
+    values:
+      unit_1_matrix_pct: 40
+      unit_1_opaque_diameter_mm: 'limit of vision to 3.5'
+      unit_1_framework_fragment_length_cm: '0.3-2.6'
+      unit_1_indistinct_fragment_diameter_cm: '0.1-2.0'
+      unit_2_depth_cm: '38-42.5'
+      unit_2_matrix_pct: 70
+      unit_2_fragment_diameter_cm: '0.1-0.5, mostly 0.3'
+      unit_3_depth_cm: '34.2-38'
+      unit_3_matrix_pct: 80
+      unit_3_opaque_pct: 2
+      unit_3_opaque_diameter_mm: 'up to 1.5, median about 0.7'
+      unit_3_framework_fragment_diameter_cm: '0.2-0.6, mostly about 0.2'
+      unit_4_fracture_length_mm: 'up to 8'
+      unit_4_fracture_width_mm: 1
+      unit_5_depth_cm: '29.5-34.0'
+      unit_5_matrix_pct: 80
+      unit_5_opaque_pct: 3
+      unit_5_opaque_diameter_mm: 'limit of resolution to 2.5, median about 0.8'
+      unit_5_framework_fragment_diameter_cm: '0.2-0.5'
+      unit_5_indistinct_fragment_diameter_cm: '0.1-0.4, mostly about 0.3'
+fidelity_samples:
+  - path: species.regolith.observations[jsc_a16_special_samples_document_scope].values.quantity
+    value: sample_provenance_and_characterization
+    note: source-scope fidelity pin
+    locator: *introduction
+species:
+  regolith:
+    observations:
+    - observation_id: jsc_a16_special_samples_document_scope
+      type: rate_series
+      locator: *introduction
+      quote: 'The purpose of this report is to give the individual investigator documentary background information about these samples.'
+      units: as printed in the source
+      regime: sample_provenance_and_characterization
+      values:
+        quantity: sample_provenance_and_characterization
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        data_scope: sample collection, returned-core mass/geometry/density/recovery, and x-radiographic stratigraphy
+        vaporization_results: not_present
+        chemical_composition: not_present
+    - observation_id: jsc_a16_table_I_returned_core_characterization
+      type: rate_series
+      locator: *table1
+      units: as printed in Table I
+      regime: returned_core_characterization
+      values:
+        quantity: returned_core_characterization
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        rows: *table1_rows
+        uncertainty_policy: printed +/- values and ranges retained; unprinted cells omitted
+    - observation_id: jsc_a16_xradiographic_grain_size_characterization
+      type: rate_series
+      locator: *core_log_60009_10
+      units: as printed in core logs
+      regime: x_radiographic_core_log
+      values:
+        quantity: grain_size_and_stratigraphy
+        method_class: measured_direct
+        evidence_class: measured_direct
+        drive_tube_60009_60010: *grain_60009_10
+        drive_tube_60013_60014: *grain_60013_14
+        uncertainty_note: x-radiographic grain-size distribution, sorting and density are not unambiguous
