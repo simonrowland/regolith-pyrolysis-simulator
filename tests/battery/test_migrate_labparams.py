@@ -12,12 +12,133 @@ import yaml
 from simulator.battery.migrate import (
     REPO_ROOT,
     apparatus_from_equipment,
+    experiment_from_plain,
     migrate,
     pressure_from_equipment,
     sample_from_equipment,
+    to_plain,
 )
 from simulator.battery.records import as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+
+
+def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    derivation = "area = π (d/2)^2 from stated lid orifice diameter 0.3 mm"
+    row["equipment"] = {
+        "orifice_area": {
+            "value": 7.068583e-08,
+            "units": "m2",
+            "inferred": True,
+            "inference": derivation,
+        }
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    experiment = next(iter(result.experiments.values()))
+    area = experiment.apparatus.geometry.orifice_area_m2
+    assert area.state.value == as_decimal("7.068583e-08")
+    assert area.inference is not None
+    assert "inferred=true" in area.inference.inputs
+    assert derivation in area.inference.inputs
+    assert not area.inference.relation.startswith("identity:")
+    assert not any(s.startswith(("printed=", "as_published=")) for s in area.inference.inputs)
+    assert experiment_from_plain(to_plain(experiment)) == experiment
+
+
+@pytest.mark.parametrize("qualification", [
+    {"upper_bound": True},
+    {"lower_bound": True},
+    {"inference": "1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value"},
+    {"note": "vacuum better than 1e-6 Torr"},
+    {"note": "background pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar"},
+    {"qualifier": "~"},
+    {"note": "KC chamber (~10^-6 mbar) as printed; other compartments ~10^-9 mbar"},
+    {"inference": "about 1e-6 Torr converted to Pa"},
+])
+@pytest.mark.parametrize("inferred", [True, False])
+def test_labparam_limit_is_not_a_point(tmp_path: Path, qualification: dict, inferred: bool) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "chamber_pressure": {
+            "value": 1.33322e-4,
+            "units": "Pa",
+            "inferred": inferred,
+            **qualification,
+        }
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    experiment = next(iter(result.experiments.values()))
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    assert pressure.state.is_unknown
+    assert "not a point" in pressure.state.reason
+    for key in ("upper_bound", "lower_bound"):
+        if qualification.get(key):
+            assert f"{key}=true" in pressure.state.reason
+    assert ("inferred=true" in pressure.inference.inputs) is inferred
+    assert dict(pressure.inference.parameters)["original"].state.value == as_decimal("1.33322e-4")
+    assert experiment_from_plain(to_plain(experiment)) == experiment
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("separate_observation", [False, True])
+@pytest.mark.parametrize("limit", [False, True])
+def test_equal_lab_values_cannot_hide_inference(
+    tmp_path: Path, reverse: bool, separate_observation: bool, limit: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    printed = {"chamber_pressure": {"value": 1, "units": "Pa"}}
+    derived = {"chamber_pressure": {
+        "value": 1, "units": "Pa", "inferred": True,
+        "inference": "source limit converted" if limit else "source mbar converted",
+        "upper_bound": limit,
+    }}
+    items = [printed, derived] if not reverse else [derived, printed]
+    if separate_observation:
+        other = yaml.safe_load(yaml.safe_dump(row))
+        other["observation_id"] = "second"
+        row["equipment"], other["equipment"] = items
+        extract["species"]["Na"]["observations"].append(other)
+    else:
+        row["equipment"] = {"replicates": items}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    assert len(result.experiments) == 1
+    pressure = next(iter(result.experiments.values())).pressure_environment.total_pressure_Pa
+    assert "inferred=true" in pressure.inference.inputs
+    assert pressure.state.is_unknown if limit else pressure.state.is_value
+
+
+def test_inferred_unit_conversion_keeps_original_and_factor(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "chamber_pressure": {"value": 1, "units": "atm", "inferred": True,
+                             "inference": "atmospheric air token interpreted as 1 atm"}
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    pressure = next(iter(result.experiments.values())).pressure_environment.total_pressure_Pa
+    assert pressure.state.value == as_decimal("101325")
+    assert pressure.inference.relation == "extract_inference"
+    assert "unit_conversion=atm_to_Pa" in pressure.inference.inputs
+    params = dict(pressure.inference.parameters)
+    assert params["original"].state.value == 1
+    assert params["factor"].state.value == 101325
+
+
+@pytest.mark.parametrize("metadata", [
+    {"inferred": True, "inference": "A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2"},
+    {"note": "H2 series example; vacuum rows are <1e-9 bar"},
+])
+def test_derivation_arrows_and_other_rows_limits_do_not_refuse_points(
+    tmp_path: Path, metadata: dict,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "sample_surface_area": {"value": 0.0011341149, "units": "m2", **metadata}
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    area = next(iter(result.experiments.values())).apparatus.geometry.exposed_area_m2
+    assert area.state.is_value
 
 
 def _richter_weight_extract() -> dict:

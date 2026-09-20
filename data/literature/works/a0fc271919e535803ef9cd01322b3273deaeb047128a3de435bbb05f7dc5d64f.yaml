@@ -86,10 +86,13 @@ experiments:
           line_range: '315'
           source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.767146e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - 'from typical orifice diameter 1.5 mm: A=pi*(0.00075)^2'
+          - extract_value=1.767146e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -132,10 +135,13 @@ experiments:
           line_range: '315'
           source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.853982e-05 m2
-          - printed=sample_surface_area
+          - inferred=true
+          - cavity floor from diameter 10 mm
+          - extract_value=7.853982e-05 m2
+          - extract_field=sample_surface_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -189,10 +195,13 @@ experiments:
           line_range: '315'
           source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.767146e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated typical orifice diameter 1.5 mm; channel length 4.0 mm also stated
+          - extract_value=1.767146e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -235,10 +244,13 @@ experiments:
           line_range: '315'
           source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.853982e-05 m2
-          - printed=sample_surface_area
+          - inferred=true
+          - cavity floor area = π (d/2)^2 from stated cavity diameter 10 mm
+          - extract_value=7.853982e-05 m2
+          - extract_field=sample_surface_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

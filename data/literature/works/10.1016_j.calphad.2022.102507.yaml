@@ -52,15 +52,16 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.0001'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=1e-06 mbar; KC chamber
+          (~10^-6 mbar) as printed; other compartments ~10^-9 mbar
       locator:
         published_page: 2
         pdf_page_index: 3
         paragraph: experimental
         note: quote=evacuated through a turbo molecular pump to ~10-6 mbar
       inference:
-        relation: mbar_to_Pa
+        relation: extract_limit
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar
@@ -123,10 +124,13 @@ experiments:
           paragraph: experimental
           note: quote=a lid with a 0.4 mm orifice at its centre
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.256637e-07 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          - extract_value=1.256637e-07 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

@@ -316,10 +316,13 @@ experiments:
           paragraph: commercial alumina crucible CP-2 ID 38 mm
           source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=0.0011341149 m2
-          - printed=sample_surface_area
+          - inferred=true
+          - A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
+          - extract_value=0.0011341149 m2
+          - extract_field=sample_surface_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

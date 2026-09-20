@@ -189,10 +189,13 @@ experiments:
           page: 28
           paragraph: relatively small effusion orifice (0.34 mm diameter)
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=9.079226e-08 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          - extract_value=9.079226e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

@@ -148,10 +148,13 @@ experiments:
           paragraph: experimental
           note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.068583e-08 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
+          - extract_value=7.068583e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -527,10 +530,13 @@ experiments:
           line_range: '222'
           source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.068583e-08 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
+          - extract_value=7.068583e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -618,10 +624,13 @@ experiments:
           paragraph: experimental
           note: quote=The orifice in the lid of the cell had a diameter of 0.3 mm
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.068583e-08 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
+          - extract_value=7.068583e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

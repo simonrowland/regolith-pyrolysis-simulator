@@ -335,10 +335,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -424,10 +427,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -546,10 +552,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -635,10 +644,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -720,23 +732,26 @@ experiments:
           tag: value
           value: '0.000004154756'
         locator:
-          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
-          line_range: '32'
-          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+          published_page: 1368
+          pdf_page_index: 2
+          paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
                 tag: value
                 value: '0.000004154756'
               locator:
-                paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
-                line_range: '32'
-                source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+                published_page: 1368
+                pdf_page_index: 2
+                paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
           output_unit: m2
       orifice_diameter_m:
         state:
@@ -813,10 +828,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -902,10 +920,13 @@ experiments:
           line_range: '32'
           source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -1046,10 +1067,13 @@ experiments:
           pdf_page_index: 2
           paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=4.154756e-06 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from knife-edge effusion-hole diameter 2.3 mm (main Re containers)
+          - extract_value=4.154756e-06 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

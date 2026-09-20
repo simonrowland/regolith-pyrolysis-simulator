@@ -1,0 +1,5013 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-024-gibson-hubbard-1972.yaml
+observations:
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ba | 12022 | Initial | 59.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ba | 12022 | 1400°C 2 hr | 59.3
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Ba row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ba | 14163 | 1050°C 1 hr | 822
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Ba row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ba | 14163 | 1050°C 6 hr | 826
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Ba row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ba | 14163 | 1050°C 72 hr | 829
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Ba row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: Ba | 14163 | Initial† | 873
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ba row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Ba
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ce | 10017 | Initial | 77.3
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ce row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ce | 10073 | Initial | 46.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ce row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ce | 12022 | Initial | 17.4
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ce row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Ce | 12022 | 1400°C 2 hr | 17.7
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Ce row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Ce row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Ce
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Eu | 10017 | Initial | 2.14
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Eu row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Eu | 10073 | Initial | 1.70
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Eu row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Eu | 12022 | Initial | 1.28
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Eu row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Eu | 12022 | 1400°C 2 hr | 1.28
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Eu row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Eu row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Eu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Gd | 10017 | Initial | 27.4
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Gd row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Gd | 10073 | Initial | 15.9
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Gd row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Gd | 12022 | Initial | 7.90
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Gd row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Gd | 12022 | 1400°C 2 hr | 7.85
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Gd row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Gd row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Gd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 10017 | Initial | 2610
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10017_1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 10017 | 1400°C 2 hr | 641
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 10017 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 10017 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 10073 | Initial | 1200
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10073_3
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 10073 | 1400°C 2 hr | 385
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 10073 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 10073 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 12022 | Initial | 536
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_5
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 12022 | 950°C 2 hr | 449
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 12022 950°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 12022 950°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 12022 | 1050°C 2 hr | 360
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 12022 | 1200°C 2 hr | 300
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 12022 | 1400°C 2 hr | 179
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_10
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 14163 | 1050°C instantaneous | 4220
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 1050°C instantaneous column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C instantaneous column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 14163 | 1050°C 1 hr | 3027
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 14163 | 1050°C 6 hr | 1437
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 14163 | 1050°C 72 hr | 88
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: K | 14163 | Initial† | 4840
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 12022 | Initial | 9.0
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_5
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 12022 | 950°C 2 hr | 7.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 12022 950°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 12022 950°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 12022 | 1050°C 2 hr | 6.1
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 12022 | 1200°C 2 hr | 5.0
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 12022 | 1400°C 2 hr | 3.0
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_10
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 14163 | 1050°C instantaneous | ~5.1
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 14163 1050°C instantaneous column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 14163 1050°C instantaneous column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 14163 | 1050°C 1 hr | 3.7
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 14163 | 1050°C 6 hr | 1.7
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Ba | 14163 | 1050°C 72 hr | 0.1
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Ba row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: K/Ba | 14163 | Initial† | 5.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Ba row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 10017 | Initial | 464
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10017_1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 10017 | 1400°C 2 hr | 610
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 10017 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 10017 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 10073 | Initial | 422
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10073_3
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 10073 | 1400°C 2 hr | 558
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 10073 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 10073 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 12022 | Initial | 723
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_5
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 12022 | 950°C 2 hr | 932
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 12022 950°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 12022 950°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 12022 | 1050°C 2 hr | 1259
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 12022 | 1200°C 2 hr | 1041
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 12022 | 1400°C 2 hr | 1035
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_10
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 14163 | 1050°C instantaneous | 332
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 14163 1050°C instantaneous column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 14163 1050°C instantaneous column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 14163 | 1050°C 1 hr | 401
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 14163 | 1050°C 6 hr | 639
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K/Rb | 14163 | 1050°C 72 hr | 880
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K/Rb row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance_ratio'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: K/Rb | 14163 | Initial† | 316
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K/Rb row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the vaporization temperatures of K and Rb are below 950°C for lunar basalt 12022.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2006
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: Li | 10017 | Initial | 18.1*
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_10017_1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Li | 10017 | 1400°C 2 hr | 19.3
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 10017 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Li row; 10017 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Li | 12022 | Initial | 9.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Li | 12022 | 1050°C 2 hr | 9.0
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Li row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Li | 12022 | 1200°C 2 hr | 10.1
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Li row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Li | 12022 | 1400°C 2 hr | 11.8
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Li row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Li row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 10017 | Initial | 3800
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10017_1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 10017 | 1400°C 2 hr | 500
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 10017 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 10017 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 10073 | Initial | 3500
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 12022 | Initial | 1824
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_5
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 12022 | 950°C 2 hr | 1820
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 12022 950°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 12022 950°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 12022 | 1050°C 2 hr | 1800
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 12022 | 1200°C 2 hr | 1200
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 12022 | 1400°C 2 hr | 673
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_10
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 14163 | 1050°C instantaneous | 4660
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 1050°C instantaneous column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C instantaneous column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 14163 | 1050°C 1 hr | 4110
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 14163 | 1050°C 6 hr | 3140
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 14163 | 1050°C 72 hr | 1730
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: Na | 14163 | Initial† | 5100
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'qualitative_volatilization_bound'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: The vaporization temperature of Na in basaltic lunar samples is near 1050°C and Na is slowly lost from Apollo
+      14 soil at 1050°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Nd | 10017 | Initial | 59.5
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Nd row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Nd | 10073 | Initial | 35.4
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Nd row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Nd | 12022 | Initial | 14.8
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Nd row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Nd | 12022 | 1400°C 2 hr | 15.0
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Nd row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Nd row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Nd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 10017 | Initial | 5.63
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10017_1
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 10017 | 1400°C 2 hr | 1.05
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 10017 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 10017 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 10073 | Initial | 2.84
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10073_3
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 10073 | 1400°C 2 hr | 0.69
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 10073 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 10073 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 12022 | Initial | 0.738
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_5
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_950°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 12022 | 950°C 2 hr | 0.482
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 12022 950°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 12022 950°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_6
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1050°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 12022 | 1050°C 2 hr | 0.286
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 12022 1050°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 12022 1050°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_7
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1200°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 12022 | 1200°C 2 hr | 0.288
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 12022 1200°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 12022 1200°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 12022 | 1400°C 2 hr | 0.173
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_10
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C instantaneous
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 14163 | 1050°C instantaneous | 12.75
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 14163 1050°C instantaneous column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 14163 1050°C instantaneous column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_11
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 1 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 14163 | 1050°C 1 hr | 7.54
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 14163 1050°C 1 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 14163 1050°C 1 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_12
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 6 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 14163 | 1050°C 6 hr | 2.25
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 14163 1050°C 6 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 14163 1050°C 6 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_13
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_1050°C 72 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Rb | 14163 | 1050°C 72 hr | 0.10
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 14163 1050°C 72 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Rb row; 14163 1050°C 72 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_9
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::14163_Initial†
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: Rb | 14163 | Initial† | 15.3
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Rb row; 14163 Initial† column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the vaporization temperatures of K and Rb are below 950°C for lunar basalt 12022.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2006
+    figure: '1'
+    section: Results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_10017_0
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10017_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Sm | 10017 | Initial | 20.9
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Sm row; 10017 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_10073_2
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::10073_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Sm | 10073 | Initial | 12.4
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Sm row; 10073 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_12022_4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_Initial
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Sm | 12022 | Initial | 5.58
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Sm row; 12022 Initial column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_12022_8
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::2::12022_1400°C 2 hr
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_abundance'
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Sm | 12022 | 1400°C 2 hr | 5.59
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Sm row; 12022 1400°C 2 hr column
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Sm row; 12022 1400°C 2 hr column
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Sm
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sr_volatilization_statement
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::/Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_volatilization_bound'
+    species:
+      formula: Sr
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C.
+  admission:
+    status: pending
+    reason: source admission_status=pending_validation is not a closed v2.1 token
+  notices: []
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2003
+    section: Abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: unknown:kems-024-gibson-hubbard-1972

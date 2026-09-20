@@ -1579,6 +1579,14 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "composition_wt_pct",
     "sample_oxide_composition_wt_pct",
     "starting_glass_wt_pct",
+    "printed_composition",
+)
+_CHARGE_PRINTED_COMPOSITION_NAMES = frozenset(
+    {
+        "printed_composition",
+        "starting_glass_wt_pct",
+        "sample_oxide_composition_wt_pct",
+    }
 )
 _SAMPLE_CODE_FORMULA_RE = re.compile(r"(?i)^(MLS[-_]?|MS)\d")
 _BULK_PROPERTY_QUANTITIES = frozenset(
@@ -4302,25 +4310,48 @@ def collect_lab_hits(
 
 def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[Decimal]:
     converted = conversion_derivation(trail, hit.amount, hit.locator)
-    extra = (f"as_published={hit.as_published}", f"printed={hit.entry.printed}")
-    if converted is not None:
-        return Located(
-            State.of(si),
-            locator=hit.locator,
-            inference=Derivation(
-                relation=converted.relation,
-                inputs=converted.inputs + extra,
-                parameters=converted.parameters,
-                output_unit=converted.output_unit,
-            ),
+    mapping = hit.mapping or {}
+    inferred = mapping.get("inferred") is True
+    if inferred:
+        extra = (
+            "inferred=true",
+            str(mapping.get("inference") or "extract marks inferred; derivation not supplied"),
+            f"extract_value={hit.as_published}",
+            f"extract_field={hit.entry.printed}",
+        )
+    else:
+        extra = (f"as_published={hit.as_published}", f"printed={hit.entry.printed}")
+    qualification = " ".join(
+        [f"{key}=true" for key in ("upper_bound", "lower_bound") if mapping.get(key) is True]
+        + [str(mapping.get(key) or "") for key in ("inference", "qualifier", "note", "quote")]
+    )
+    non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
+        re.search(
+            r"\b(?:less than|better than|did not exceed|about|approximately)\b"
+            r"|[~≈]"
+            r"|^\s*(?:(?:pressure|vacuum)\s*)?[<>≤≥](?:\s*\d|\s*$)",
+            str(mapping.get(key) or ""), re.I,
+        )
+        for key in ("inference", "qualifier", "note", "quote")
+    )
+    state = State.of(si)
+    if non_point:
+        state = State.unknown(
+            f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
+            f"extract_value={hit.as_published}; {qualification.strip()}"
         )
     return Located(
-        State.of(si),
+        state,
         locator=hit.locator,
         inference=Derivation(
-            relation=str(trail or "identity"),
-            inputs=extra,
-            parameters=(
+            relation=(
+                "extract_limit" if non_point else
+                "extract_inference" if inferred else str(trail or "identity")
+            ),
+            inputs=(converted.inputs if converted else ()) + extra + (
+                (f"unit_conversion={trail}",) if inferred else ()
+            ),
+            parameters=converted.parameters if converted else (
                 ("original", Located(State.of(hit.amount), locator=hit.locator)),
             ),
             output_unit=_output_unit_for(hit.entry.field),
@@ -4348,8 +4379,10 @@ def _unique_located(
     values = {item[0] for item in converted}
     if len(values) > 1:
         return None
-    si, hit, trail = converted[0]
-    return _located_from_hit(hit, si, trail)
+    located = None
+    for si, hit, trail in converted:
+        located = _prefer_located(located, _located_from_hit(hit, si, trail))
+    return located
 
 
 def _hits_for(hits: list[LabHit], field: str) -> list[LabHit]:
@@ -4438,7 +4471,7 @@ def _printed_composition_from_roots(
     fallback_locator: Locator | None = None,
 ) -> Located[Mapping[str, Any]] | None:
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[tuple[tuple[str, str], ...], Locator]] = []
+    found: list[tuple[tuple[tuple[str, str], ...], Locator, str]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -4459,7 +4492,7 @@ def _printed_composition_from_roots(
                         fingerprint = tuple(
                             sorted((k, _dec_str(as_decimal(v))) for k, v in comps.items())
                         )
-                        found.append((fingerprint, loc))
+                        found.append((fingerprint, loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -4477,8 +4510,16 @@ def _printed_composition_from_roots(
         return None
     fingerprints = {item[0] for item in found}
     if len(fingerprints) > 1:
-        return None
-    fingerprint, loc = found[0]
+        # Charge keys beat residual composition_wt_pct of the same melt.
+        preferred = [
+            item for item in found if item[2] in _CHARGE_PRINTED_COMPOSITION_NAMES
+        ]
+        preferred_fps = {item[0] for item in preferred}
+        if len(preferred_fps) != 1:
+            return None
+        fingerprint, loc, _name = preferred[0]
+        return located_value({k: v for k, v in fingerprint}, loc)
+    fingerprint, loc, _name = found[0]
     return located_value({k: v for k, v in fingerprint}, loc)
 
 
@@ -4533,10 +4574,19 @@ def _prefer_located(
         return old
     if old is None:
         return new
+    if old.inference is not None and old.inference.relation == "extract_limit":
+        return old
+    if new.inference is not None and new.inference.relation == "extract_limit":
+        return new
     if old.state.is_unknown and new.state.is_value:
         return new
     if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
         return None
+    if (
+        old.state.is_value and new.state.is_value and new.inference is not None
+        and "inferred=true" in new.inference.inputs
+    ):
+        return new
     return old
 
 
@@ -8002,4 +8052,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -67,7 +67,64 @@ experiments:
   method:
     tag: unknown
     reason: regime 'open_furnace_apparent' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000025'
+      locator:
+        page: 5
+        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+        note: quote=around 25 mg of powder
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=25 mg
+        - printed=sample_mass
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 5
+              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+              note: quote=around 25 mg of powder
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 5
+              section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+              note: quote=around 25 mg of powder
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Powder mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide; silicate melt during evaporation.
+      locator:
+        page: 5
+        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+        note: quote=mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire
+          loop
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+    container:
+      state:
+        tag: value
+        value: Metal wire loop; Re where possible below FMQ, Pt (and one Ir loop) above FMQ. Per-run loop is recorded in Table
+          2.
+      locator:
+        page: 5
+        section: 2.1 Experimental Methods, lines 99-102 (PDF page; manuscript p. 4)
+        note: quote=mixed into a viscous slurry with 100,000 molecular weight polyethylene oxide and loaded onto a metal wire
+          loop
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
   conditions:
     temperature_K:
       state:
@@ -77,17 +134,18 @@ experiments:
     total_pressure_Pa:
       state:
         tag: value
-        value: '100000'
+        value: '101325'
       locator:
-        paragraph: 1-atm vertical tube gas-mixing furnaces
-        line_range: '408'
-        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+        page: 2
+        section: Abstract
+        note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
+        source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
       inference:
-        relation: bar_to_Pa
+        relation: atm_to_Pa
         inputs:
-        - P_Pa = P_bar × 1e5
-        - original_unit=bar
-        - as_published=1.0 bar
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1 atm
         - printed=chamber_pressure
         parameters:
         - - original
@@ -95,17 +153,19 @@ experiments:
               tag: value
               value: '1'
             locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+              page: 2
+              section: Abstract
+              note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         - - factor
           - state:
               tag: value
-              value: '100000'
+              value: '101325'
             locator:
-              paragraph: 1-atm vertical tube gas-mixing furnaces
-              line_range: '408'
-              source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
+              page: 2
+              section: Abstract
+              note: quote=silicate liquids are evaporated in one-atmosphere (1-atm) gas-mixing furnaces
+              source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
         output_unit: Pa
     sweep_gas:
       state:
@@ -158,6 +218,42 @@ experiments:
                 line_range: '71'
                 source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
           output_unit: m2
+      chamber_length_m:
+        state:
+          tag: value
+          value: '0.7'
+        locator:
+          page: 6
+          section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+          note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+          source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          - as_published=70 cm
+          - printed=chamber_length_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '70'
+              locator:
+                page: 6
+                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 6
+                section: 2.1 Experimental Methods, lines 113-119 (PDF page; manuscript p. 5)
+                note: quote=3-cm-long hotspot of a 42-mm internal-diameter, 70-cm-long GERO vertical alumina tube furnace
+                source_path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf
+          output_unit: m
 - experiment_id: 10.1016/j.gca.2019.06.021::2
   kind: literature
   method:
@@ -580,14 +676,16 @@ experiments:
     geometry:
       exposed_area_m2:
         state:
-          tag: value
-          value: '0.00002'
+          tag: unknown
+          reason: 'extract sample_surface_area is a bound or approximate value, not a point; extract_value=2e-05 m2; Source:
+            "surface areas (≈ 2×10^{-5} m)" (OCR units m; interpreted as m² for bead surface). Thermocouple bead radius 10^{-4}
+            m given same paragraph.'
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
           line_range: '71'
           source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         inference:
-          relation: identity:m2
+          relation: extract_limit
           inputs:
           - as_published=2e-05 m2
           - printed=sample_surface_area

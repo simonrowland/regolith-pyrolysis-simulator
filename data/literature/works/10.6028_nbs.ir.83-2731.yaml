@@ -85,13 +85,14 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '30397.5'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.3 atm; TMS N2 carrier
+          ~0.3 atm (Fig. 17 caption). KMS is vacuum effusion.
       locator:
         published_page: 45
         figure: '17'
       inference:
-        relation: atm_to_Pa
+        relation: extract_limit
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
@@ -190,10 +191,13 @@ experiments:
           line_range: '163'
           source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.963495e-05 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated effusion orifice diameter 0.5 cm
+          - extract_value=1.963495e-05 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

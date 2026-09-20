@@ -161,6 +161,9 @@ entries:
     field: pressure_environment.regime.knudsen_number_chamber
     unit: "1"
   # printed composition (as-published map; not a converted SI scalar)
+  - printed: printed_composition
+    field: sample.printed_composition
+    unit: wt_pct
   - printed: composition_wt_pct
     field: sample.printed_composition
     unit: wt_pct

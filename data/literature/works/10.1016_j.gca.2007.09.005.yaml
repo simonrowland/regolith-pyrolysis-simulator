@@ -218,17 +218,21 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.000133322'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.000133322 Pa; upper_bound=true
+          1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value
       locator:
         paragraph: pressure at run conditions was always less than 10^-6 Torr
         line_range: '105'
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
       inference:
-        relation: identity:Pa
+        relation: extract_limit
         inputs:
-        - as_published=0.000133322 Pa
-        - printed=chamber_pressure
+        - inferred=true
+        - 1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value
+        - extract_value=0.000133322 Pa
+        - extract_field=chamber_pressure
+        - unit_conversion=identity:Pa
         parameters:
         - - original
           - state:
