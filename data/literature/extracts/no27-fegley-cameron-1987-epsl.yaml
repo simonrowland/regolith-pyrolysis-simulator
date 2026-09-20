@@ -1,0 +1,250 @@
+schema_version: literature_extract.v1
+source_id: no27-fegley-cameron-1987-epsl
+source:
+  citation: Fegley, B. Jr. & Cameron, A. G. W. (1987), "A vaporization model for iron/silicate fractionation in the Mercury protoplanet", Earth and Planetary Science Letters 82, 207-222.
+  year: 1987
+extraction:
+  method: pdftotext -layout; printed tables and prose transcribed from the clean text layer; no OCR or figure digitization
+  date: '2026-09-19'
+  worker: w3-no27-fegley-cameron-1987-epsl
+  provenance_path: corpus/no27-fegley-cameron-1987-epsl/no27-fegley-cameron-1987-epsl.pdf
+review_status: draft
+fidelity_samples:
+- path: species.SiO2.observations[fegley_cameron_1987_table1_pure_liquid_oxide_vaporization].values.rows[0].A
+  value: 22.13
+  locator: {published_page: '209', table: '1', row: 'SiO2(liq) = Si(g) + 2O(g)'}
+- path: species.SiO2.observations[fegley_cameron_1987_table4_predicted_compositions].values.rows[0].mass_percent[2]
+  value: 25.9
+  locator: {published_page: '213', table: '4', row: 'SiO2', column: '3 nonideal 3000 K'}
+species:
+  SiO2:
+    observations:
+    - observation_id: fegley_cameron_1987_model_setup_initial_oxide_magma
+      type: rate_series
+      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table1_pure_liquid_oxide_vaporization, no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table2_gas_formation_data]
+      locator: {published_page: '208', section: '2.1 Description of thermodynamic model'}
+      phase: condensed_liquid
+      regime: thermodynamic_model
+      units: wt_fraction_relative_solar_proportions
+      values:
+        quantity: starting_magma_composition_and_model_scope
+        evidence_class: model_derived
+        method_class: model_derived
+        derivation: {relation: MAGMA model setup and equilibrium calculation, output_unit: as_printed}
+        model_generator: MAGMA multicomponent gas-melt chemical-equilibrium code with ideal and IMCC nonideal magma models
+        oxides_as_printed: [SiO2, MgO, CaO, Al2O3, TiO2, Na2O, K2O, FeO, UO2, ThO2, PuO2]
+        composition_basis: relative solar proportions from Anders and Ebihara (1982), except FeO initially set to 0.1 times MgO; remainder of solar Fe assigned to the core
+        temperature_range_K_as_printed: 2500-3500
+        vapor_species_count: 37
+        pseudo_species_count: 36
+        hydrogen_bearing_gases: not included; anhydrous magma assumed
+        calculation_method: vapor removed stepwise; most rapidly depleted oxide with x_oxide greater than 10^-6 depleted by no more than 6 percent per step
+        oxygen_constraint: gas oxygen-to-metal ratio equals that in vaporized mantle material
+        activity_constraint: metal-oxide activities fitted in the melt
+        locator_values: p. 208, section 2.1, paragraphs beginning "The initial composition" and "A total of 37 gases"; p. 210, section 2.2
+      uncertainty: {reported_status: not_reported, note: model input and method description; no experimental uncertainty applies}
+    - observation_id: fegley_cameron_1987_table1_pure_liquid_oxide_vaporization
+      type: gibbs_table
+      locator: {published_page: '209', table: '1', section: 'Thermodynamic data for pure liquid oxide vaporization to constituent atoms'}
+      phase: condensed_liquid
+      regime: thermodynamic_model_input
+      units: log10_K = A + B/T; T in K
+      values:
+        quantity: log10_Kf
+        evidence_class: compilation_assessed
+        method_class: compilation_calculated_table
+        source_generators: [JANAF Tables and Supplements, Glushko et al. thermodynamic properties, Oetting et al. actinide thermodynamics]
+        rows:
+        - {reaction: 'SiO2(liq) = Si(g) + 2O(g)', A: 22.13, B: -94311, sources: '[19,20]'}
+        - {reaction: 'MgO(liq) = Mg(g) + O(g)', A: 12.56, B: -46992, sources: '[19,20]'}
+        - {reaction: 'FeO(liq) = Fe(g) + O(g)', A: 12.06, B: -44992, sources: '[19,20]'}
+        - {reaction: 'CaO(liq) = Ca(g) + O(g)', A: 11.88, B: -49586, sources: '[19,20]'}
+        - {reaction: 'Al2O3(liq) = 2Al(g) + 3O(g)', A: 35.83, B: -153255, sources: '[20]'}
+        - {reaction: 'TiO2(liq) = Ti(g) + 2O(g)', A: 21.07, B: -95362, sources: '[19,20]'}
+        - {reaction: 'Na2O(liq) = 2Na(g) + O(g)', A: 15.56, B: -40286, sources: '[19,20]'}
+        - {reaction: 'K2O(liq) = 2K(g) + O(g)', A: 15.33, B: -36735, sources: '[19,21]'}
+        - {reaction: 'ThO2(liq) = Th(g) + 2O(g)', A: 20.43, B: -112807, sources: '[20-23]'}
+        - {reaction: 'UO2(liq) = U(g) + 2O(g)', A: 19.18, B: -100627, sources: '[20,22,24]'}
+        - {reaction: 'PuO2(liq) = Pu(g) + 2O(g)', A: 18.67, B: -91886, sources: '[20,22,25]'}
+      note: These are compiled thermodynamic inputs, not measurements made in this paper.
+    - observation_id: fegley_cameron_1987_table3_imcc_pseudo_species
+      type: activity_coefficient
+      locator: {published_page: '211', table: '3', section: 'Thermodynamic data relating the activities of pseudospecies'}
+      phase: condensed_liquid
+      regime: imcc_nonideal_magma
+      units: log10_K = A + B/T; T in K
+      values:
+        quantity: interaction_parameter
+        evidence_class: author_estimate
+        method_class: authors_estimate
+        model_generator: IMCC ideal mixing of complex components model; coefficients compiled, extrapolated, or estimated as detailed in Appendix 1
+        rows:
+        - {reaction: '2MgO + SiO2 = Mg2SiO4', A: -0.94, B: 7434}
+        - {reaction: 'MgO + SiO2 = MgSiO3', A: 0.42, B: 2329}
+        - {reaction: 'MgO + Al2O3 = MgAl2O4', A: 1.18, B: 464}
+        - {reaction: 'MgO + TiO2 = MgTiO3', A: -0.13, B: 3246}
+        - {reaction: 'MgO + 2TiO2 = MgTi2O5', A: 0.51, B: 2845}
+        - {reaction: '2MgO + TiO2 = Mg2TiO4', A: 0.67, B: 3812}
+        - {reaction: '3Al2O3 + 2SiO2 = Al6Si2O13', A: -2.94, B: 9375}
+        - {reaction: 'CaO + Al2O3 = CaAl2O4', A: -1.89, B: 10060}
+        - {reaction: 'CaO + 2Al2O3 = CaAl4O7', A: -0.59, B: 9713}
+        - {reaction: '12CaO + 7Al2O3 = Ca12Al14O33', A: -6.30, B: 72239}
+        - {reaction: 'CaO + SiO2 = CaSiO3', A: 0.54, B: 5568}
+        - {reaction: 'CaO + Al2O3 + 2SiO2 = CaAl2Si2O8', A: 2.63, B: 5326}
+        - {reaction: 'CaO + MgO + 2SiO2 = CaMgSi2O6', A: 1.46, B: 8485}
+        - {reaction: '2CaO + MgO + 2SiO2 = Ca2MgSi2O7', A: 0.63, B: 15327}
+        - {reaction: '2CaO + Al2O3 + SiO2 = Ca2Al2SiO7', A: 2.01, B: 10710}
+        - {reaction: 'CaO + TiO2 = CaTiO3', A: 0.08, B: 7055}
+        - {reaction: '2CaO + SiO2 = Ca2SiO4', A: 0.63, B: 8416}
+        - {reaction: 'CaO + TiO2 + SiO2 = CaTiSiO5', A: -0.18, B: 10071}
+        - {reaction: 'FeO + TiO2 = FeTiO3', A: -0.51, B: 3569}
+        - {reaction: '2FeO + SiO2 = Fe2SiO4', A: -0.63, B: 3103}
+        - {reaction: 'FeO + Al2O3 = FeAl2O4', A: -1.76, B: 5692}
+        - {reaction: 'CaO + 6Al2O3 = CaAl12O19', A: -3.79, B: 22612}
+        - {reaction: '2MgO + 2Al2O3 + 5SiO2 = Mg2Al4Si5O18', A: 7.48, B: 0}
+        - {reaction: 'Na2O + SiO2 = Na2SiO3', A: -1.33, B: 13870}
+        - {reaction: 'Na2O + 2SiO2 = Na2Si2O5', A: 1.39, B: 15350}
+        - {reaction: 'Na2O + Al2O3 + SiO2 = NaAlSiO4', A: 0.65, B: 6997}
+        - {reaction: 'Na2O + Al2O3 + 3SiO2 = NaAlSi3O8', A: 1.29, B: 8788}
+        - {reaction: 'Na2O + Al2O3 = NaAlO2', A: 0.55, B: 3058}
+        - {reaction: 'Na2O + TiO2 = Na2TiO3', A: -1.38, B: 15445}
+        - {reaction: 'Na2O + Al2O3 + 2SiO2 = NaAlSi2O6', A: -1.02, B: 9607}
+        - {reaction: 'K2O + SiO2 = K2SiO3', A: 0.15, B: 14600}
+        - {reaction: 'K2O + 2SiO2 = K2Si2O5', A: -0.73, B: 18466}
+        - {reaction: 'K2O + Al2O3 + SiO2 = KAlSiO4', A: 0.97, B: 8675}
+        - {reaction: 'K2O + Al2O3 + 3SiO2 = KAlSi3O8', A: 1.11, B: 11229}
+        - {reaction: 'K2O + Al2O3 = KAlO2', A: 0.72, B: 4679}
+        - {reaction: 'K2O + Al2O3 + 2SiO2 = KAlSi2O6', A: 1.53, B: 10125}
+        note: Table 3 prints 36 pseudo-reactions. The reaction formulas and A/B coefficients are retained as printed; no equilibrium values are inferred.
+    - observation_id: fegley_cameron_1987_table2_gas_formation_data
+      type: gibbs_table
+      locator: {published_page: '209', table: '2', section: 'Thermodynamic data for formation of gases included in the vaporization calculations'}
+      phase: gas
+      regime: thermodynamic_model_input
+      units: log10_K = A + B/T; T in K
+      values:
+        quantity: log10_Kf
+        evidence_class: compilation_assessed
+        method_class: compilation_calculated_table
+        source_generators: [JANAF Tables and Supplements, Glushko et al. thermodynamic properties, Oetting et al. actinide thermodynamics]
+        rows:
+        - {reaction: '1/2O2(g) = O(g)', A: 3.47, B: -13282, source: '[20]'}
+        - {reaction: 'Si(liq) = Si(g)', A: 6.00, B: -20919, source: '[19]'}
+        - {reaction: 'Si(liq) + 1/2O2(g) = SiO(g)', A: 2.51, B: 8207, source: '[19]'}
+        - {reaction: 'Si(liq) + O2(g) = SiO2(g)', A: -1.44, B: 18326, source: '[19]'}
+        - {reaction: 'Mg(g) = Mg(g)', A: 0, B: 0, source: '[19]'}
+        - {reaction: 'Mg(g) + 1/2O2(g) = MgO(g)', A: -1.19, B: 3794, source: '[20]'}
+        - {reaction: 'Fe(liq) = Fe(g)', A: 6.35, B: -19704, source: '[20]'}
+        - {reaction: 'Fe(liq) + 1/2O2(g) = FeO(g)', A: 3.39, B: -9951, source: '[19]'}
+        - {reaction: 'Ca(g) = Ca(g)', A: 0, B: 0, source: '[19]'}
+        - {reaction: 'Ca(g) + 1/2O2(g) = CaO(g)', A: -1.61, B: 6128, source: '[20]'}
+        - {reaction: 'Al(liq) = Al(g)', A: 5.70, B: -15862, source: '[20]'}
+        - {reaction: 'Al(liq) + 1/2O2(g) = AlO(g)', A: 3.04, B: -2143, source: '[20]'}
+        - {reaction: 'Al(liq) + O2(g) = AlO2(g)', A: -0.09, B: 5523, source: '[20]'}
+        - {reaction: '2Al(liq) + 1/2O2(g) = Al2O(g)', A: 2.04, B: 10232, source: '[20]'}
+        - {reaction: '2Al(liq) + O2(g) = Al2O2(g)', A: -1.53, B: 23021, source: '[20]'}
+        - {reaction: 'Ti(liq) = Ti(g)', A: 6.46, B: -23025, source: '[19]'}
+        - {reaction: 'Ti(liq) + 1/2O2(g) = TiO(g)', A: 4.31, B: -2101, source: '[20]'}
+        - {reaction: 'Ti(liq) + O2(g) = TiO2(g)', A: -0.41, B: 17926, source: '[20]'}
+        - {reaction: 'Na(g) = Na(g)', A: 0, B: 0, source: '[19]'}
+        - {reaction: 'Na(g) + 1/2O2(g) = NaO(g)', A: -1.43, B: 1287, source: '[19]'}
+        - {reaction: '2Na(g) = Na2(g)', A: -4.31, B: 4281, source: '[19]'}
+        - {reaction: '2Na(g) + 1/2O2(g) = Na2O(g)', A: -7.00, B: 11898, source: '[21]'}
+        - {reaction: 'K(g) = K(g)', A: 0, B: 0, source: '[19]'}
+        - {reaction: 'K(g) + 1/2O2(g) = KO(g)', A: -1.28, B: 959, source: '[19]'}
+        - {reaction: '2K(g) = K2(g)', A: -3.94, B: 2852, source: '[19]'}
+        - {reaction: '2K(g) + 1/2O2(g) = K2O(g)', A: -7.29, B: 13340, source: '[21]'}
+        - {reaction: 'Th(liq) = Th(g)', A: 5.96, B: -29600, source: '[22]'}
+        - {reaction: 'Th(liq) + 1/2O2(g) = ThO(g)', A: 2.75, B: 3497, source: '[23]'}
+        - {reaction: 'Th(liq) + O2(g) = ThO2(g)', A: -1.58, B: 28875, source: '[23]'}
+        - {reaction: 'U(liq) = U(g)', A: 5.75, B: -25470, source: '[22]'}
+        - {reaction: 'U(liq) + 1/2O2(g) = UO(g)', A: 3.02, B: 1705, source: '[23]'}
+        - {reaction: 'U(liq) + O2(g) = UO2(g)', A: -1.19, B: 26554, source: '[23]'}
+        - {reaction: 'U(liq) + 3/2O2(g) = UO3(g)', A: -4.24, B: 43710, source: '[23]'}
+        - {reaction: 'Pu(liq) = Pu(g)', A: 4.79, B: -17316, source: '[22]'}
+        - {reaction: 'Pu(liq) + 1/2O2(g) = PuO(g)', A: 2.40, B: 6875, source: '[26]'}
+        - {reaction: 'Pu(liq) + O2(g) = PuO2(g)', A: -1.76, B: 25984, source: '[26]'}
+        - {reaction: 'O2(g) = O2(g)', A: 0, B: 0, source: '[19]'}
+      note: 'Table 2 footnotes retain the printed reference-state conditions: Mg(g) reference above 1378 K, Ca(g) above 1767.4 K, Na(g) above 1177 K, K(g) above 1044 K, and O2(g) at all temperatures.'
+    - observation_id: fegley_cameron_1987_table4_predicted_compositions
+      type: rate_series
+      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma]
+      locator: {published_page: '213', table: '4', section: 'Predicted mantle and crust compositions from different vaporization models'}
+      phase: condensed_liquid
+      regime: thermodynamic_model
+      units: mass_percent_oxide; radionuclides_ppb
+      values:
+        quantity: condensate_composition
+        evidence_class: model_derived
+        method_class: model_derived
+        derivation: {relation: MAGMA vaporization calculation at stated temperature and model column, output_unit: mass_percent_oxide}
+        model_generator: MAGMA; ideal solution at 3000 K and nonideal IMCC solution at 2500, 3000, and 3500 K
+        condition: mean uncompressed planetary density = 5.3 g/cm3
+        model_columns: ['1 ideal 3000 K', '2 nonideal 2500 K', '3 nonideal 3000 K', '4 nonideal 3500 K']
+        rows:
+        - {oxide: SiO2, mass_percent: [1.2, 32.1, 25.9, 19.9]}
+        - {oxide: CaO, mass_percent: [9.9, 14.6, 13.7, 11.7]}
+        - {oxide: MgO, mass_percent: [67.7, 34.5, 42.3, 50.0]}
+        - {oxide: Al2O3, mass_percent: [12.4, 18.1, 17.0, 14.4]}
+        - {oxide: FeO, mass_percent: [8.3, 0.0, 0.4, 3.4]}
+        - {oxide: TiO2, mass_percent: [0.5, 0.7, 0.8, 0.6]}
+        - {oxide: K, units: ppb, value: [0.0, 0.0, 0.0, 0.0]}
+        - {oxide: U, units: ppb, value: [0.0, 0.0, 0.0, 0.3], note: primordial abundance 4.55 x 10^9 years ago}
+        - {oxide: Th, units: ppb, value: [278, 401, 377, 322], note: primordial abundance 4.55 x 10^9 years ago}
+    - observation_id: fegley_cameron_1987_printed_model_results
+      type: rate_series
+      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table4_predicted_compositions]
+      locator: {published_page: '212-215', figures: ['1', '2', '3', '4', '5', '6', '7', '8', '9'], sections: ['2.3', '2.4']}
+      phase: condensed_liquid
+      regime: thermodynamic_model
+      units: as_printed
+      values:
+        quantity: vaporization_model_results
+        evidence_class: model_derived
+        method_class: model_derived
+        derivation: {relation: MAGMA vaporization calculation and printed prose summary, output_unit: as_printed}
+        model_generator: MAGMA with ideal solution and IMCC nonideal solution models
+        printed_results:
+        - {result: ideal_magma_first_elements_lost, value: 'Na and K; K more volatile; Si follows, then Fe and Mg', locator: 'p. 212, section 2.3'}
+        - {result: ideal_magma_at_approximately_4.6_percent_residual_mantle_mass, value: 'approximately 95% of Al, 40% of Ca, and 15% of Ti remain', locator: 'p. 212, section 2.3'}
+        - {result: ideal_magma_maximum_mantle_density, value: '3.71 g/cm3 at approximately 28% of original silicate remaining', locator: 'p. 212, Fig. 3 discussion'}
+        - {result: mercury_density_match, value: '5.3 g/cm3 reached after about 72% of mantle vaporized', locator: 'p. 212, Fig. 4 discussion'}
+        - {result: nonideal_runs, value: '2500, 3000, and 3500 K; highest plotted vaporization is 96% of original silicate lost', locator: 'p. 213, section 2.4'}
+        - {result: nonideal_high_vaporization, value: 'more Si than Mg remains; more Ti (53%) and less Ca (33%) remain relative to ideal case', locator: 'p. 213, section 2.4'}
+        - {result: oxygen_fugacity_range, value: 'log10 fO2 = -0.8 at 3500 K to -3.6 at 2500 K', locator: 'p. 216, section 3.2'}
+        - {result: figure_only_data, value: 'Figures 1-9 contain plotted composition, density, and pseudo-species curves; coordinates were not digitized', locator: 'pp. 212-215, figure captions'}
+      uncertainty: {reported_status: not_reported, note: model outputs; no model uncertainty is printed}
+  MgO:
+    observations:
+    - observation_id: fegley_cameron_1987_mgo_model_scope
+      type: rate_series
+      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma]
+      locator: {published_page: '208', section: '2.1 Description of thermodynamic model'}
+      phase: condensed_liquid
+      regime: thermodynamic_model
+      units: as_printed
+      values:
+        quantity: oxide_in_model
+        evidence_class: model_derived
+        method_class: model_derived
+        derivation: {relation: MAGMA model component selection, output_unit: as_printed}
+        model_generator: MAGMA/IMCC
+        value: MgO included as one of the eight oxide components treated with IMCC nonideal melt chemistry
+        note: No MgO apparatus measurement or direct MgO vapor pressure measurement is reported in this paper.
+  FeO:
+    observations:
+    - observation_id: fegley_cameron_1987_feo_model_scope
+      type: rate_series
+      derived_from: [no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma]
+      locator: {published_page: '208', section: '2.1 Description of thermodynamic model'}
+      phase: condensed_liquid
+      regime: thermodynamic_model
+      units: relative_initial_abundance
+      values:
+        quantity: oxide_in_model
+        evidence_class: model_derived
+        method_class: model_derived
+        derivation: {relation: MAGMA model initial-condition selection, output_unit: as_printed}
+        model_generator: MAGMA/IMCC
+        value: FeO initially set to 0.1 times MgO; remaining solar Fe assigned to core
+        note: This is an explicit model assumption, not a measured composition.
