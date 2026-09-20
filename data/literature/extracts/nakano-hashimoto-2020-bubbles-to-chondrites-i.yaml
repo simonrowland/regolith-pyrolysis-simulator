@@ -1,0 +1,176 @@
+schema_version: literature_extract.v1
+source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+source:
+  citation: 'Nakano, A. & Hashimoto, A. (2020), "Bubbles to Chondrites-I. Evaporation and condensation experiments, and chemical evolution of chondritic melts", Progress in Earth and Planetary Science 7:47.'
+  doi: 10.1186/s40645-020-00354-0
+  year: 2020
+extraction:
+  method: manual_from_layout_text
+  date: '2026-09-19'
+  worker: w1-nakano-hashimoto-2020-bubbles-to-chondrites-i
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: rate_series
+    observation_id: nakano_2020_starting_compositions
+    field: composition_mol_pct
+    value:
+      Lsil:
+        NaO0.5: 1.82
+        MgO: 37.29
+        AlO1.5: 2.88
+        SiO2: 40.98
+        KO0.5: 0.68
+        CaO: 2.22
+        TiO2: 0.78
+        CrO1.5: 0.41
+        MnO: 0.46
+        FeO: 12.48
+      Allende:
+        NaO0.5: 0.84
+        MgO: 35.19
+        AlO1.5: 3.40
+        SiO2: 32.82
+        KO0.5: 0.04
+        CaO: 2.47
+        TiO2: 0.10
+        CrO1.5: 0.39
+        MnO: 0.15
+        FeO: 24.60
+    locator: {page: 2, table: '1'}
+species:
+  SiO2:
+    observations:
+      - observation_id: nakano_2020_starting_compositions
+        type: rate_series
+        locator: {page: 2, table: '1'}
+        phase: pulverized_sintered_silicate_then_boiling_melt
+        regime: laser_boiling_with_inert_gas_cooling
+        units: mol_pct
+        values:
+          quantity: starting_material_composition
+          composition_mol_pct:
+            Lsil: {NaO0.5: 1.82, MgO: 37.29, AlO1.5: 2.88, SiO2: 40.98, KO0.5: 0.68, CaO: 2.22, TiO2: 0.78, CrO1.5: 0.41, MnO: 0.46, FeO: 12.48}
+            Allende: {NaO0.5: 0.84, MgO: 35.19, AlO1.5: 3.40, SiO2: 32.82, KO0.5: 0.04, CaO: 2.47, TiO2: 0.10, CrO1.5: 0.39, MnO: 0.15, FeO: 24.60}
+          total: 100
+          preparation: pulverized_homogenized_Allende_powder_or_ten_reagent_Lsil
+          grain_size_um: '<5'
+          sintering: '12 h at 1100 °C (Lsil) or 1000 °C (Allende), H2/CO2 = 1 or 1/2'
+      - observation_id: nakano_2020_mass_loss_selected_runs
+        type: rate_series
+        locator: {page: 6, table: '2'}
+        phase: boiling_silicate_melt
+        regime: laser_boiling_with_inert_gas_cooling
+        units: wt_pct_mass_loss
+        values:
+          quantity: assembly_mass_loss_relative_to_initial_mass
+          note: 'Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.'
+          runs:
+            - {run: 114, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2603, heating_duration_s: 14, sample_initial_weight_g: 0.01480, mass_loss_wt_pct: 9.3}
+            - {run: 115, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2928, heating_duration_s: 20, sample_initial_weight_g: 0.01407, mass_loss_wt_pct: '?'}
+            - {run: 132, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2183, heating_duration_s: 8, sample_initial_weight_g: 0.01497, mass_loss_wt_pct: 97.4}
+            - {run: 138, group: L200, material: Lsil, laser_power_W: 200, ambient_gas: '0.3Ar bar', Tmax_C: 2799, heating_duration_s: 24, sample_initial_weight_g: 0.01501, mass_loss_wt_pct: 104.0}
+            - {run: 117, group: L50, material: Lsil, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2613, heating_duration_s: 31, sample_initial_weight_g: 0.01508, mass_loss_wt_pct: 32.7}
+            - {run: 123, group: L50, material: Lsil, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2695, heating_duration_s: 140, sample_initial_weight_g: 0.01481, mass_loss_wt_pct: 41.9}
+            - {run: 91, group: A200, material: Allende, laser_power_W: 200, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2608, heating_duration_s: 8, sample_initial_weight_g: 0.01437, mass_loss_wt_pct: 117.0}
+            - {run: 103, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2177, heating_duration_s: 34, sample_initial_weight_g: 0.01429, mass_loss_wt_pct: 23.1}
+            - {run: 109, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2559, heating_duration_s: 417, sample_initial_weight_g: 0.01419, mass_loss_wt_pct: 53.1}
+      - observation_id: nakano_2020_corrected_temperature_groups
+        type: transition_point
+        locator: {page: 8, table: '3'}
+        phase: boiling_silicate_melt
+        regime: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+        units: degC
+        values:
+          quantity: measured_and_corrected_mlb_surface_temperature
+          transmittance: 0.95
+          rows:
+            - {group: L200, emissivity: 1.0, TB_C: 2217, Tmax_C: 2865}
+            - {group: L200, emissivity: 0.9, TB_C: 2395, Tmax_C: 3088}
+            - {group: A200, emissivity: 1.0, TB_C: 2217, Tmax_C: 2673}
+            - {group: A200, emissivity: 0.9, TB_C: 2395, Tmax_C: 2883}
+            - {group: L50, emissivity: 1.0, TB_C: 2202, Tmax_C: 2693}
+            - {group: L50, emissivity: 0.9, TB_C: 2379, Tmax_C: 2904}
+            - {group: A50, emissivity: 1.0, TB_C: 2202, Tmax_C: 2576}
+            - {group: A50, emissivity: 0.9, TB_C: 2379, Tmax_C: 2778}
+          caveat: 'Tmax is a lower limit because the pyrometer was not always on the hot spot.'
+      - observation_id: nakano_2020_relative_volatility_table4
+        type: rate_series
+        locator: {page: 12, table: '4'}
+        phase: boiling_chondritic_silicate_melt
+        regime: relative_volatility_from_measured_droplet_composition_ensembles
+        units: dimensionless
+        values:
+          quantity: relative_volatility_Zj_over_ZSi
+          reference: Si
+          semantics: derived_from_measured_chemical_compositions_not_direct_HKL_flux
+          measured_ensemble_pair_rows:
+            L200:
+              - {pair: 0-1, Na: 5.899, Mg: 0.090, K: 5.878, Ca: '(0.021)', Ti: 0.060, Cr: 1.908, Mn: 0.977, Fe: 1.038}
+              - {pair: 4-5, Na: 3.772, Mg: 0.497, K: 1.354, Ca: '(0.012)', Ti: 0.046, Cr: 2.120, Mn: 1.866, Fe: 2.061}
+              - {pair: 8-9, Na: 0.753, Mg: 0.823, K: 0.377, Ca: 0.025, Ti: 0.067, Cr: 1.412, Mn: 1.966, Fe: 1.894}
+              - {pair: 12-13, Na: '(0.332)', Mg: 1.505, K: '(0.877)', Ca: 0.008, Ti: 0.125, Cr: '(0.671)', Mn: 4.096, Fe: 3.345}
+            A200:
+              - {pair: 0-1, Na: 7.066, Mg: 0.259, K: 4.279, Ca: '(0.116)', Ti: 0.065, Cr: 1.683, Mn: 0.966, Fe: 1.604}
+              - {pair: 4-5, Na: 2.659, Mg: 0.547, K: 0.770, Ca: '(0.006)', Ti: 0.059, Cr: 2.072, Mn: 2.455, Fe: 2.630}
+              - {pair: 8-9, Na: 1.661, Mg: 1.073, K: 0.318, Ca: 0.063, Ti: 0.083, Cr: 1.174, Mn: 2.327, Fe: 1.968}
+              - {pair: 12-13, Na: '(0.283)', Mg: 3.585, K: '(0.575)', Ca: 0.405, Ti: '(0.131)', Cr: '(0.749)', Mn: 3.585, Fe: '(0.599)'}
+          note: 'Parenthesized values are negative values as printed; they are not replaced with zero.'
+      - observation_id: nakano_2020_apparatus_and_run_conditions
+        type: rate_series
+        locator: {page: 3, section: Experimental methods, figure: '1'}
+        phase: boiling_silicate_melt
+        regime: laser_boiling_with_inert_gas_cooling
+        units: as_published
+        values:
+          apparatus:
+            laser: 'cw CO2, 10.6 um, 20-210 W, NIIC NC-3010-M, ZnSe lens focal distance 127 mm'
+            chamber: 'stainless steel, 97 mm ID x 310 mm H'
+            pumps: '50 L/s turbomolecular pump plus oil-free roughing pump'
+            evacuation: '10^-5 Torr before filling; valves closed during run'
+            gas: 'H2 to 10^-2 bar, then Ar to 0.3 bar; stated purities H2 99.99%, Ar 99.9%'
+            holder: '0.5 mm Re wire and graphite disk with 0.5-1 mm gap'
+            sample: 'about 15 mg, approximately 3 mm high x 2.3 mm diameter; miniature cylinder'
+            temperature: 'IMPAC IS-12 automated pyrometer, 0.7-1.1 um, 700-3500 °C, effective spot about 0.7 mm; quartz/prism absorption correction'
+            collection: '7 um mesh paper filter; five Cu plates and chamber wall for droplets'
+          timing: '200 W: melts in about 0.2 s and begins boiling in about 0.5 s; 50 W timing varies by run'
+          vapor_handling: 'authors state vapor was 100% converted to solid condensates by collision with cold ambient gas; condensates recovered by vacuum suction'
+          temperature_profile_example: 'run 3 reaches 2200 °C in 1 s and about 2600 °C in 14 s (Fig. 4)'
+      - observation_id: nakano_2020_droplet_and_condensate_characterization
+        type: rate_series
+        locator: {page: 10, section: Characteristics of the droplets and the condensed particles, figures: '2-3'}
+        phase: boiling_chondritic_silicate_melt
+        regime: laser_boiling_with_inert_gas_cooling
+        units: as_published
+        values:
+          droplet_ejection_speed_m_per_s: '1-3, or possibly faster due to video limitation'
+          condensate_particle_diameter_nm: '50-100'
+          analyzed_droplets_per_collection: '<200-5000 collected; 100-500 randomly selected for analysis'
+          droplet_mass_fraction_examples_pct: {run_SZ6: 11.9, run_138: 11.0}
+          gas_mean_free_path_nm: 300
+          gas_mean_free_path_conditions: 'Ar at 0.3 bar and 300 K'
+          analysis: 'FE-SEM-EDS, JEOL JSM-7001F, 15 kV, 3 nA'
+  Na:
+    observations:
+      - observation_id: nakano_2020_relative_volatility_na
+        type: rate_series
+        locator: {page: 12, table: '4'}
+        regime: relative_volatility_from_measured_droplet_composition_ensembles
+        units: dimensionless
+        values: {quantity: relative_volatility_ZNa_over_ZSi, L200_selected_pairs: {0-1: 5.899, 4-5: 3.772, 8-9: 0.753, 12-13: '(0.332)'}, A200_selected_pairs: {0-1: 7.066, 4-5: 2.659, 8-9: 1.661, 12-13: '(0.283)'}, semantics: parenthesized_negative_as_printed}
+  K:
+    observations:
+      - observation_id: nakano_2020_relative_volatility_k
+        type: rate_series
+        locator: {page: 12, table: '4'}
+        regime: relative_volatility_from_measured_droplet_composition_ensembles
+        units: dimensionless
+        values: {quantity: relative_volatility_ZK_over_ZSi, L200_selected_pairs: {0-1: 5.878, 4-5: 1.354, 8-9: 0.377, 12-13: '(0.877)'}, A200_selected_pairs: {0-1: 4.279, 4-5: 0.770, 8-9: 0.318, 12-13: '(0.575)'}, semantics: parenthesized_negative_as_printed}
+  Fe:
+    observations:
+      - observation_id: nakano_2020_relative_volatility_fe
+        type: rate_series
+        locator: {page: 12, table: '4'}
+        regime: relative_volatility_from_measured_droplet_composition_ensembles
+        units: dimensionless
+        values: {quantity: relative_volatility_ZFe_over_ZSi, L200_selected_pairs: {0-1: 1.038, 4-5: 2.061, 8-9: 1.894, 12-13: 3.345}, A200_selected_pairs: {0-1: 1.604, 4-5: 2.630, 8-9: 1.968, 12-13: '(0.599)'}, semantics: parenthesized_negative_as_printed}
