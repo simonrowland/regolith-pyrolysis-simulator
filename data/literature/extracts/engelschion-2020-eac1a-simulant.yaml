@@ -1,0 +1,319 @@
+schema_version: literature_extract.v1
+source_id: engelschion-2020-eac1a-simulant
+source:
+  citation: >-
+    Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A.,
+    Kueppers, U. & Sperl, M. (2020), "EAC-1A: A novel large-volume lunar
+    regolith simulant", Scientific Reports 10:5473, DOI 10.1038/s41598-020-62312-4.
+  doi: 10.1038/s41598-020-62312-4
+  year: 2020
+  url: https://doi.org/10.1038/s41598-020-62312-4
+extraction:
+  method: >-
+    Manual transcription from the clean-text-layer publisher PDF with
+    pdftotext -layout. Printed values, ranges, approximations, and apparatus
+    conditions retained; no figure values were digitised and no derived values
+    were calculated.
+  date: '2026-09-19'
+  worker: w1-engelschion-2020-eac1a-simulant
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/engelschion-2020-eac1a-simulant/
+review_status: draft
+corrections: []
+species:
+  EAC-1A:
+    observations:
+    - observation_id: engelschion_2020_eac1a_grain_size_distribution
+      type: characterization
+      locator:
+        page: 2
+        section: Grain size distribution
+        figure: '1'
+      phase: granular_lunar_regolith_simulant
+      regime: ambient_characterization
+      units: as printed (phi, micrometres)
+      values:
+        quantity: grain_size_distribution
+        method_class: measured
+        evidence_class: authors_own_measurement
+        instrument: Beckman Coulter LS 13 320 Laser Diffraction Particle Size Analyzer
+        classification_as_printed: silty sand (Wentworth)
+        phi_range_as_printed: 14.6 to -1
+        median_phi_as_printed: 6.47
+        median_grain_size_um_as_printed: '~11'
+        comparison_note: >-
+          EAC-1A distribution mainly lies within the upper and lower Apollo
+          boundary; the paper notes a lower weight percent between ~180 and
+          70 micrometres than the lower Apollo limit.
+        no_digitized_figure_values: true
+      uncertainty:
+        note: >-
+          The median grain size is printed as approximately 11 micrometres;
+          the source does not print a numeric uncertainty.
+    - observation_id: engelschion_2020_eac1a_water_release
+      type: mass_loss
+      locator:
+        page: 2
+        section: Density
+        standard: ASTM D4442
+      phase: granular_lunar_regolith_simulant
+      regime: air_drying_before_density_measurement
+      units: wt percent, as printed
+      values:
+        quantity: water_released_during_drying
+        method_class: measured
+        evidence_class: authors_own_measurement
+        water_released_wt_pct_as_printed: '~0.8'
+        drying_atmosphere: air
+        procedure: heating and drying before density measurement
+      uncertainty:
+        note: approximate value; no numeric uncertainty printed.
+    - observation_id: engelschion_2020_eac1a_density
+      type: characterization
+      locator:
+        page: 3
+        section: Density
+      phase: granular_lunar_regolith_simulant
+      regime: ambient_characterization
+      units: g/cm3, as printed
+      values:
+        quantity: bulk_and_absolute_density
+        method_class: measured
+        evidence_class: authors_own_measurement
+        bulk_density_method: weighing a specific volume; density at optimal packing
+        bulk_density_g_cm3:
+          EAC-1A: 1.45
+          JSC-1A: 1.56
+          JSC-2A: 1.44
+          DNA: 1.27
+          NU-LHT-3M: 1.54
+        absolute_density_method: gas pycnometer, volume excluding pore space
+        absolute_density_g_cm3:
+          EAC-1: 2.90
+          JSC-1A: 2.92
+          JSC-2A: 2.89
+          DNA: 2.79
+          NU-LHT-3M: 3.08
+        instrument: Micromeritic AccuPyc II gas pycnometer for absolute density
+      uncertainty:
+        note: no numeric uncertainty printed.
+    - observation_id: engelschion_2020_eac1a_cohesion
+      type: characterization
+      locator:
+        page: 3
+        section: Cohesion
+      phase: granular_lunar_regolith_simulant
+      regime: ambient_characterization
+      units: kPa and g/cm3, as printed
+      values:
+        quantity: cohesion
+        method_class: measured
+        evidence_class: authors_own_measurement
+        eac1a_cohesion_kPa_at_density_1p95_g_cm3: 0.38
+        test_method: lowering a plastic plate into a box filled with EAC-1A
+        repeats_as_printed: 8
+        density_variation: different densities; increased using a shaking machine
+        shaking_machine_amplitude_as_printed: 20
+        relationship_with_density: not established
+      uncertainty:
+        note: no numeric uncertainty printed.
+    - observation_id: engelschion_2020_eac1a_sphericity
+      type: characterization
+      locator:
+        page: 3
+        section: Sphericity
+      phase: granular_lunar_regolith_simulant
+      regime: ambient_characterization
+      units: dimensionless Phi and mm, as printed
+      values:
+        quantity: particle_sphericity
+        method_class: measured
+        evidence_class: authors_own_measurement
+        particles_selected: 80
+        instrument: Zeiss Axio Imager A2 optical microscope
+        calculation_method: Krumbein method
+        fractions_mm:
+        - 0.2-0.5
+        - 0.5-1
+        excluded_fraction_mm: 0.02-0.2
+        average_sphericity_Phi:
+          0.2-0.5_mm: 0.601
+          0.5-1_mm: 0.591
+        observed_shapes: elongated, spherical, and platy
+      uncertainty:
+        note: no numeric uncertainty printed.
+    - observation_id: engelschion_2020_eac1_host_mineralogy
+      type: characterization
+      locator:
+        page: 3
+        section: Mineralogical analysis / Thin sections
+        figure: '2'
+      phase: EAC-1_basanite_host
+      regime: petrographic_characterization
+      units: percent, micrometres, centimetres, as printed
+      values:
+        quantity: thin_section_mineralogy_and_crystal_sizes
+        method_class: measured_and_visual_classification
+        evidence_class: authors_own_measurement
+        sample_preparation: cut, glued to glass, polished to 30 micrometres
+        mineralogical_units: homogenously aphanitic; aphanitic matrix with olivine glomerocrysts and larger xenoliths
+        xenolith_size_cm_as_printed: '>10'
+        xenolith_composition: dunite (>90% olivine) to olivine-rich lherzolite (~40-90% olivine)
+        major_minerals: plagioclase, olivine, pyroxene
+        pyroxene_percent_both_units_as_printed: '~10'
+        olivine_percent:
+          glomerocryst_containing_unit: '~30'
+          aphanitic_unit: '~25'
+        plagioclase_percent:
+          glomerocryst_containing_unit: '~55'
+          aphanitic_unit: '~65'
+        plagioclase_crystal_size_um: '<100'
+        primary_olivine_crystal_size_um: '~20 to ~500'
+        olivine_glomerocryst_size_um: '~600-1300'
+        pyroxene_crystal_size_um: 100-600
+        amphibole_size_um: '~100-200'
+        minor_minerals: amphibole and quartz; possible chlorite cluster
+        no_petrographic_fabric: true
+      uncertainty:
+        note: tilde values and visual classifications retained as printed.
+    - observation_id: engelschion_2020_eac1_xrd
+      type: characterization
+      locator:
+        page: 4
+        section: Mineralogical analysis / XRD
+        figure: Supplemental Fig. 1
+      phase: EAC-1_and_EAC-1A_solid_samples
+      regime: powder_and_solid_xrd
+      units: as printed
+      values:
+        quantity: xrd_mineral_identification_and_scan_parameters
+        method_class: measured
+        evidence_class: authors_own_measurement
+        samples: EAC-1 aphanitic unit, EAC-1 glomerocryst-containing unit, EAC-1A simulant
+        minerals_identified: fosterite, fayalite, Ca-plagioclase, diopside, augite, titanite
+        possible_minerals: nepheline; clinochlore and additional feldspathoid peaks in aphanitic unit
+        EAC1A_difference: similar to two basanite units, with weaker ilmenite and titanite signatures
+        instrument: Siemens D5000 Powder diffractometer
+        wavelength_as_printed: '15 406 nm'
+        sample_thickness_mm: 1-2
+        sample_diameter_mm: 18
+        scan_range_degree: 10-100
+        step_degree: 0.02
+        acquisition_time_s: 6
+        grinding_papers_micron: 500 and 800
+      uncertainty:
+        note: possible phases are explicitly uncertain; wavelength retained exactly as printed in extracted text.
+    - observation_id: engelschion_2020_eac_xrf_composition
+      type: composition
+      locator:
+        page: 4
+        section: Mineralogical analysis / XRF
+        figure: '3'
+      phase: EAC-1_basanite_host
+      regime: xrf_bulk_composition
+      units: wt percent and degrees Celsius, as printed
+      values:
+        quantity: bulk_major_element_composition
+        method_class: measured
+        evidence_class: authors_own_measurement
+        representative_samples: 2
+        powder_mass_g: 3
+        drying_temperature_C: 110
+        drying_duration_h: 6
+        loss_on_ignition_temperature_C: 1050
+        loss_on_ignition_duration_h: 2
+        glass_tablet_mix:
+          remaining_powder_g: 1
+          dilithium_tetraborate_g: 9
+          reagent_formula: Li2B4O7
+          preparation: melting and quenching
+        instrument: Philips MagiX Pro WD-XRF
+        composition_wt_pct:
+          MgO: 11.9
+          TiO2: 2.4
+          SiO2: 43.7
+          Na2O_plus_K2O: 4.2
+        composition_note: EAC-1 values; text says EAC-1A is most similar to intermediate Apollo 17 compositions.
+      uncertainty:
+        note: no numeric uncertainty printed; Na2O plus K2O is a combined value, not separate oxide measurements.
+    - observation_id: engelschion_2020_eac_edx
+      type: composition
+      locator:
+        page: 4
+        section: Mineralogical analysis / EDX during SEM imaging
+        figure: '5'
+      phase: EAC-1_basanite_host
+      regime: sem_edx_characterization
+      units: nm, kV, seconds, Kc/s, percent, micrometres, as printed
+      values:
+        quantity: endmember_composition_and_sem_conditions
+        method_class: measured
+        evidence_class: authors_own_measurement
+        instrument: Zeiss Ultra 55 scanning electron microscope
+        resolution_nm: 1-2
+        accelerating_voltage_kV: 15
+        systems: Oxford INCA EDX and Oxford Channel5/NordlysII EBSD
+        running_time_s: 50
+        counting_rate_Kc_s: 2.65
+        dead_time_percent: '<30'
+        samples: one olivine-poor OP-1 and one olivine-rich OR-1
+        point_measurements: 3 locations including 3 unique particles
+        particle_size_um: 50-300
+        plagioclase_Ca_wt_pct_comparison: '~50-70 in EAC-1 versus ~65-95 in lunar regolith'
+        pyroxenes: mainly Mg-rich augite; no enstatite in EAC-1
+      uncertainty:
+        note: comparative plagioclase ranges and the EDX dead-time bound retained as printed.
+    - observation_id: engelschion_2020_eac1_dsc
+      type: thermal_transition
+      locator:
+        page: 5
+        section: DSC
+        figure: '6'
+      phase: EAC-1A_and_comparison_simulants
+      regime: argon_dsc
+      units: degrees Celsius, K/minute, mm, as printed
+      values:
+        quantity: dsc_thermal_characterization
+        method_class: measured
+        evidence_class: authors_own_measurement
+        simulants_tested: 6, including EAC-1
+        instrument: Pegasus DSC 404 C
+        atmosphere: argon
+        crucible_diameter_mm: 5
+        crucible_height_mm: 5
+        heating_rate_K_per_min: 10
+        temperature_start: room temperature
+        temperature_end_C: 1200
+        EAC1A_phase_description: fully crystallised
+        EAC1A_endothermic_peak_C: 1080-1250
+        EAC1A_major_exothermic_transformations: none
+        comparison_materials_fully_crystallised: EAC-1, NU-LHT-3M, FJS-1, DNA
+      uncertainty:
+        note: peak is printed as a range; no numeric uncertainty printed.
+  EAC-1:
+    observations:
+    - observation_id: engelschion_2020_eac1_provenance
+      type: characterization
+      locator:
+        page: 1
+        section: Abstract and sample description
+      phase: basanitic_rock_host
+      regime: material_provenance
+      units: as printed (square metres, tonnes, millimetres)
+      values:
+        quantity: simulant_provenance_and_available_grain_fractions
+        method_class: reported_material_description
+        evidence_class: authors_own_description
+        source_material: intracontinental basanite from the Siebengebirge Volcanic Field, Königswinter, Germany
+        producer: Rheinische Provinzial-Basalt-u. Lavawerke GmbH & Co. oHG, Königswinter
+        LUNA_main_testbed_area_m2_as_printed: '~660'
+        LUNA_dust_chamber_area_m2_as_printed: '~50'
+        bulk_availability_tonnes_as_printed: 600-1000
+        available_grain_size_ranges_mm:
+        - 0.02-0.2
+        - 0.2-0.5
+        - 0.5-1.0
+        EAC1_vs_EAC1A_naming: >-
+          EAC-1 denotes the material/rock; EAC-1A labels properties measured
+          on the dusty simulant where grain size matters.
+      uncertainty:
+        note: approximate areas and stated availability constraints retained as printed.
