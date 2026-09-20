@@ -1,0 +1,329 @@
+schema_version: literature_extract.v1
+source_id: hendrix-2024-reactivity-reduced-simulants
+source:
+  citation: 'Hendrix, D. A., Catalano, T., Nekvasil, H., Glotch, T. D., Legett, C. IV, and Hurowitz, J. A. (2024), "The reactivity of experimentally reduced lunar regolith simulants: Health implications for future crewed missions to the lunar surface", Meteoritics & Planetary Science 59:2487-2504, DOI 10.1111/maps.14228'
+  doi: 10.1111/maps.14228
+  url: https://doi.org/10.1111/maps.14228
+  year: 2024
+extraction:
+  method: pdftotext -layout transcription of the 19-page accepted-manuscript/published article PDF; values were taken from printed tables, captions, and methods prose; no figure digitization
+  date: '2026-09-19'
+  worker: w1-hendrix-2024-reactivity-reduced-simulants
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: JSC-1A
+  observable: rate_series
+  observation_id: hendrix_2024_table1_jsc1a_composition_and_mineralogy
+  field: composition_wt_pct
+  value: 46.2
+  locator:
+    pdf_page_index: 4
+    published_page: 2489
+    table: '1'
+    note: Table 1 JSC-1A SiO2 bulk composition, wt. %.
+species:
+  JSC-1A:
+    observations:
+    - observation_id: hendrix_2024_table1_jsc1a_composition_and_mineralogy
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        published_page: 2489
+        table: '1'
+        section: Lunar Simulants Used in this Study
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: Developed to replicate some Apollo 14 low-Ti mare-soil properties; parent material quarried from glass-rich basaltic tuff near Flagstaff, Arizona.
+      standard_state: as printed in Table 1; oxide values are bulk composition wt. % and mineral abundances are percent
+      regime: simulant_characterization
+      units: wt. % and percent as printed
+      values:
+        quantity: bulk_composition_and_mineralogy
+        method_class: measured_or_compiled_characterization
+        evidence_class: authors_own_table_with_cited_sources
+        composition_wt_pct:
+          SiO2: 46.2
+          TiO2: 1.85
+          Al2O3: 17.9
+          FeO: 11.2
+          MnO: 0.19
+          MgO: 6.87
+          CaO: 9.43
+          Na2O: 3.33
+          K2O: 0.85
+          P2O5: 0.62
+        mineral_abundance_pct:
+          glass-rich_basalt: 49.3
+          pyroxene: 0.01
+          plagioclase: 38.8
+          olivine: 9.0
+          ilmenite: 0.01
+          quartz: 0.2
+          amphibole: 0.0
+          Fe-Ti_oxide: 0.4
+          chrome_spinel: 1.1
+          sulfide: 1.0
+          apatite: 0.03
+          clay_minerals: 0.1
+          biotite: 0.0
+        omitted_table_cells: Cr2O3 and SO3 not printed for JSC-1A
+      refused:
+      - what: OH* generation measurements in DI water, SLF, and ALF
+        reason: biological-reactivity assay, not a silicate/oxide vaporization or thermal-process measurement
+    - observation_id: hendrix_2024_jsc1a_reduction_apparatus_and_conditions
+      type: rate_series
+      locator:
+        pdf_page_index: 6
+        published_page: 2491
+        section: Methods - Milling and Reduction of Lunar Simulants
+        figure: '1'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: hydrogen reduction treatment as printed
+      regime: hydrogen_reduction_in_horizontal_silica_tube
+      units: g, micrometers, rpm, min, degrees C, and gas identity as printed
+      values:
+        quantity: simulant_milling_and_reduction_conditions
+        method_class: measured_or_controlled_laboratory_condition
+        evidence_class: authors_own_experiment
+        sieve_mesh_um: 63
+        milled_sample_mass_g: 10
+        mill: Retsch PM 100 ball mill grinder
+        milling_duration_h: 2
+        milling_speed_rpm: 350
+        milling_balls: 7 agate balls, 20-mm diameter
+        milling_vessel: 125-mL agate mortar
+        milling_intervals: four 30-min intervals with approximately 5 min rest between intervals
+        reduction_sample_mass_g: 3
+        reduction_container: silica boat in the middle of a horizontal silica glass tube
+        tube_sealing: one-hole rubber stoppers at both ends
+        reduction_gas: pure H2
+        gas_purge_duration_min: 10
+        furnace: furnace, model not printed
+        temperature_measurement: monitoring Type K thermocouple
+        temperature_control: furnace voltage controlled by a Variac voltage regulator
+        target_temperature_C: 950
+        hold_duration_min: 15
+        cooling: furnace turned off; silica glass tube immediately removed; pressurized air until sample no longer glowing (roughly 650 degrees C), then wet towels
+        post_cooling_storage: Thermo Scientific Lab-Line vacuum desiccator at approximately 25 mmHg
+        gas_flow_check: H2 bubbled through vacuum pump oil at the vent; flow rate not printed
+        chamber_pressure: not printed
+        exposed_area: not printed
+        fO2_control: not printed
+      equipment:
+        cell_material:
+          value: silica boat inside horizontal silica glass tube
+          locator:
+            pdf_page_index: 6
+            published_page: 2491
+            section: Methods - Milling and Reduction of Lunar Simulants
+      refused:
+      - what: reduction-gas pressure or flow rate
+        reason: not printed
+      - what: furnace calibration
+        reason: Type K monitoring thermocouple is named, but calibration is not printed
+    - observation_id: hendrix_2024_table4_jsc1a_grain_size_and_bet_area
+      type: rate_series
+      locator:
+        pdf_page_index: 15
+        published_page: 2500
+        table: '4'
+        section: Solid Phase Characterization
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: Table 4 values as printed; R denotes reduced
+      regime: particle_size_and_bet_characterization
+      units: m2/g and micrometers as printed
+      values:
+        quantity: median_grain_size_and_surface_area
+        method_class: measured
+        evidence_class: authors_own_measurement
+        untreated:
+          surface_area_m2_g: 2.979
+          median_grain_size_um: 5.771
+          median_grain_size_sd_um: 0.023
+        reduced:
+          surface_area_m2_g: 1.626
+          median_grain_size_um: 6.356
+          median_grain_size_sd_um: 0.435
+        replicates: 3 runs; standard deviations are for three runs
+        instruments: Malvern Instruments Mastersizer 2000 for grain-size distribution; Quantachrome Instruments Nova 2200e using BET N2 adsorption for surface area
+      refused:
+      - what: raw particle-size and surface-area values from Tables S4-S6
+        reason: supporting tables were listed but are not present in the supplied 19-page article PDF
+    - observation_id: hendrix_2024_reduced_jsc1a_alpha_fe_and_bleb_characterization
+      type: rate_series
+      locator:
+        pdf_page_index: 8
+        published_page: 2493
+        figure: '2'
+        section: Results - Experimental Reduction of Lunar Simulants - Solid Phase Characterization
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: reduced versus non-reduced solid-phase characterization
+      regime: XRD_and_SEM_characterization
+      units: degrees 2-theta and nanometers as printed
+      values:
+        quantity: reduction_products
+        method_class: measured
+        evidence_class: authors_own_measurement
+        alpha_Fe_xrd_peak_positions_2theta_deg: [45, 65, 82]
+        reduced_surface_bleb_diameter_nm: approximately 100
+        reduced_surface_bleb_diameter_locator:
+          pdf_page_index: 10
+          published_page: 2495
+          figure: '4'
+        non_reduced_alpha_Fe_peaks: absent in the reported comparison
+        note: Figure 2 caption identifies alpha-Fe peak positions; Figure 4 caption identifies approximately 100-nm spherical surface blebs on reduced JSC-1A, LMS-1, and LHS-1.
+      refused:
+      - what: numerical EDS composition of the blebs
+        reason: the paper shows spectra and qualitative element associations, not a printed numerical composition table
+  LMS-1:
+    observations:
+    - observation_id: hendrix_2024_table1_lms1_composition_and_mineralogy
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        published_page: 2489
+        table: '1'
+      phase: LMS-1_lunar_mare_simulant_powder
+      standard_state: as printed in Table 1; oxide values are bulk composition wt. % and mineral abundances are percent
+      regime: simulant_characterization
+      units: wt. % and percent as printed
+      values:
+        quantity: bulk_composition_and_mineralogy
+        method_class: measured_or_compiled_characterization
+        evidence_class: authors_own_table_with_cited_sources
+        composition_wt_pct:
+          SiO2: 42.81
+          TiO2: 4.62
+          Al2O3: 14.13
+          Cr2O3: 0.21
+          FeO: 7.87
+          MnO: 0.15
+          MgO: 18.89
+          CaO: 5.94
+          Na2O: 4.92
+          K2O: 0.57
+          P2O5: 0.44
+          SO3: 0.11
+        mineral_abundance_pct:
+          glass-rich_basalt: 32.0
+          pyroxene: 32.8
+          plagioclase: 19.8
+          olivine: 11.1
+          ilmenite: 4.3
+        source_note: Table 1 footnote a attributes LMS-1 data to the CLASS Exolith Lab.
+    - observation_id: hendrix_2024_table4_lms1_grain_size_and_bet_area
+      type: rate_series
+      locator:
+        pdf_page_index: 15
+        published_page: 2500
+        table: '4'
+        section: Solid Phase Characterization
+      phase: LMS-1_lunar_mare_simulant_powder
+      standard_state: Table 4 values as printed; R denotes reduced
+      regime: particle_size_and_bet_characterization
+      units: m2/g and micrometers as printed
+      values:
+        quantity: median_grain_size_and_surface_area
+        method_class: measured
+        evidence_class: authors_own_measurement
+        untreated:
+          surface_area_m2_g: 8.755
+          median_grain_size_um: 5.343
+          median_grain_size_sd_um: 0.369
+        reduced:
+          surface_area_m2_g: 2.957
+          median_grain_size_um: 4.253
+          median_grain_size_sd_um: 0.014
+        replicates: 3 runs; standard deviations are for three runs
+        instruments: Malvern Instruments Mastersizer 2000; Quantachrome Instruments Nova 2200e using BET N2 adsorption
+  LHS-1:
+    observations:
+    - observation_id: hendrix_2024_table1_lhs1_composition_and_mineralogy
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        published_page: 2489
+        table: '1'
+      phase: LHS-1_lunar_highland_simulant_powder
+      standard_state: as printed in Table 1; oxide values are bulk composition wt. % and mineral abundances are percent
+      regime: simulant_characterization
+      units: wt. % and percent as printed
+      values:
+        quantity: bulk_composition_and_mineralogy
+        method_class: measured_or_compiled_characterization
+        evidence_class: authors_own_table_with_cited_sources
+        composition_wt_pct:
+          SiO2: 44.18
+          TiO2: 0.79
+          Al2O3: 26.24
+          Cr2O3: 0.02
+          FeO: 3.04
+          MnO: 0.05
+          MgO: 11.22
+          CaO: 11.62
+          Na2O: 2.30
+          K2O: 0.46
+          SO3: 0.1
+        mineral_abundance_pct:
+          glass-rich_basalt: 24.7
+          pyroxene: 0.3
+          plagioclase: 74.4
+          olivine: 0.2
+          ilmenite: 0.4
+        source_note: Table 1 footnote a attributes LHS-1 data to the CLASS Exolith Lab.
+    - observation_id: hendrix_2024_table4_lhs1_grain_size_and_bet_area
+      type: rate_series
+      locator:
+        pdf_page_index: 15
+        published_page: 2500
+        table: '4'
+        section: Solid Phase Characterization
+      phase: LHS-1_lunar_highland_simulant_powder
+      standard_state: Table 4 values as printed; R denotes reduced
+      regime: particle_size_and_bet_characterization
+      units: m2/g and micrometers as printed
+      values:
+        quantity: median_grain_size_and_surface_area
+        method_class: measured
+        evidence_class: authors_own_measurement
+        untreated:
+          surface_area_m2_g: 5.038
+          median_grain_size_um: 4.342
+          median_grain_size_sd_um: 0.072
+        reduced:
+          surface_area_m2_g: 2.747
+          median_grain_size_um: 3.501
+          median_grain_size_sd_um: 0.011
+        replicates: 3 runs; standard deviations are for three runs
+        instruments: Malvern Instruments Mastersizer 2000; Quantachrome Instruments Nova 2200e using BET N2 adsorption
+notes:
+- The paper is a primary experimental reduction and characterization study, not a review or equilibrium model.
+- It contains no measured vapour pressures, activities, evaporation or sublimation rates/fluxes, mass-loss series, condensation temperatures, or thermodynamic tables for relevant gas species.
+- OH* concentration assays and biological-fluid recipes were read for triage but excluded as unrelated to the battery rails.
+- Table 1 composition values are a mixture of the authors' table and cited source data; the footnotes are retained rather than treated as new primary measurements.
+- The reduction treatment is not a vacuum experiment: chamber pressure, H2 pressure/flow, exposed area, fO2, and furnace calibration are not printed.
+vocabulary_names_not_present:
+- simulant_characterization
+- mineral_abundance_pct
+- milled_sample_mass_g
+- reduction_sample_mass_g
+- sieve_mesh_um
+- milling_duration_h
+- milling_speed_rpm
+- target_temperature_C
+- hold_duration_min
+- median_grain_size_um
+- median_grain_size_sd_um
+- surface_area_m2_g
+- alpha_Fe_xrd_peak_positions_2theta_deg
+- reduced_surface_bleb_diameter_nm
+refused:
+- what: battery thermodynamic or vaporization measurements
+  reason: none present in the paper
+- what: figure-derived numerical curves
+  reason: figures were not digitized; only printed caption values and peak positions were retained
