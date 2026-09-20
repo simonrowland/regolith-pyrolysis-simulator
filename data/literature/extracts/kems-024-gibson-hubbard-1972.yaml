@@ -1,0 +1,2218 @@
+schema_version: literature_extract.v1
+source_id: kems-024-gibson-hubbard-1972
+source:
+  citation: 'Gibson, E. K., Jr. and Hubbard, N. J. (1972). Thermal volatilization studies on lunar samples. Proceedings of the Third Lunar Science Conference, Geochimica et Cosmochimica Acta Supplement 3, Vol. 2, pp. 2003-2014.'
+  year: 1972
+  bibcode: 1972LPSC....3.2003G
+extraction:
+  method: MinerU text transcription checked against rendered original PDF pages, not MinerU image crops
+  date: '2026-09-19'
+  worker: extract-gibson-hubbard-1972
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/ocr-mineru/gibson-hubbard-1972-p001-p013/out/gibson-hubbard-1972-p001-p013/vlm/gibson-hubbard-1972-p001-p013.md
+  original_scan: &scan /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+review_status: draft
+# Shared locators and conditions apply only where explicitly referenced below.
+source_locators:
+  abstract: &abstract {source_path: *scan, published_page: 2003, section: Abstract}
+  procedures: &procedures {source_path: *scan, published_page: 2004, section: Experimental procedures}
+  table2: &table2 {source_path: *scan, published_page: 2005, table: '2'}
+  results: &results {source_path: *scan, published_page: 2006, section: Results, figure: '1'}
+laboratory_parameters:
+  heated_equipment: &heated
+    chamber_pressure:
+      value: 2.0e-6
+      units: Torr
+      locator: *procedures
+      quote: Samples were evacuated to 2 × 10⁻⁶ Torr
+      note: Evacuation pressure; also described as study vacuum in introduction and figure captions. No independent base-versus-running pressure history stated.
+    oxygen_partial_pressure:
+      value: '<10^-10'
+      units: atm
+      semantics: upper_bound_not_point
+      method: calculated from mass spectra during each volatilization experiment
+      locator: {source_path: *scan, published_page: 2004, section: Introduction and Experimental procedures}
+    furnace:
+      value: Mettler recording vacuum thermal analyzer
+      locator: *procedures
+    sample:
+      form: powdered samples
+      container: platinum crucible
+      locator: *procedures
+    heating_schedule:
+      value:
+        heating_rates_C_per_min: [4, 6]
+        target_temperatures_C: [950, 1050, 1200, 1400]
+        usual_hold_time_hr: 2
+        variable_time_temperatures_C: [950, 1050]
+        variable_hold_time_hr_range: [1, 72]
+        cooling_from_C: 1400
+        cooling_to: room temperature
+        cooling_time_hr: 4
+      locator: *procedures
+      note: Two stated ramp rates, not a continuous range; no per-run assignment. Hold-time range is not collapsed. Furnace cooled along normal cooling curve.
+    temperature_measurement:
+      value: sample temperature continuously recorded
+      locator: *procedures
+      note: Sensor type, calibration, accuracy and uncertainty not stated.
+    residue_analysis:
+      value: stable isotope dilution mass spectrometry; atomic absorption for Na only
+      locator: *procedures
+    integrated_exposure:
+      value:
+        region_above_C: 900
+        heating_crossing_time_min_as_printed: about 150
+        heating_rate_C_per_min: 6
+        cooling_crossing_time_min_as_printed: about 60
+      locator: {source_path: *scan, published_page: 2007, section: Results, note: Sentence continues on printed page 2008}
+      note: Authors warn that hold plus heating and cooling integrate loss over a range of temperatures. Retain printed crossing times without recalculation.
+  soil_preparation:
+    value: homogenized by grinding to 74 μ
+    locator: *results
+    sample_number: '14163'
+  absent_parameters:
+    - sample mass (weight was recorded, but no numerical mass is printed)
+    - exposed surface area and crucible dimensions
+    - pumping mechanism and pumping speed
+    - distinct base pressure and time-resolved run pressure
+    - temperature sensor, calibration and accuracy
+    - per-run ramp-rate assignment
+    - analytical uncertainties for Table 2
+    - bulk oxide weight-percent composition
+sample_catalogue:
+  '10017':
+    sample_number: '10017'
+    sample_form: basalt
+    locator: {<<: *table2, paragraph: "10017 basalt / Initial column"}
+    initial_elemental_composition_ppm: {"K":"2610","Rb":"5.63","Na":"3800","Li":"18.1","Ce":"77.3","Nd":"59.5","Sm":"20.9","Eu":"2.14","Gd":"27.4"}
+    composition_basis: Table 2 initial elemental abundances; not oxide wt%
+    composition_note: Initial Li 18.1 ppm is attributed to Tera et al. (1970) by Table 2 asterisk footnote.
+    apollo_mission_status: Not explicitly assigned to this sample number in this paper; mission not inferred from numbering.
+  '10073':
+    sample_number: '10073'
+    sample_form: breccia
+    locator: {<<: *table2, paragraph: "10073 breccia / Initial column"}
+    initial_elemental_composition_ppm: {"K":"1200","Rb":"2.84","Na":"3500","Ce":"46.5","Nd":"35.4","Sm":"12.4","Eu":"1.70","Gd":"15.9"}
+    composition_basis: Table 2 initial elemental abundances; not oxide wt%
+    apollo_mission_status: Not explicitly assigned to this sample number in this paper; mission not inferred from numbering.
+  '12022':
+    sample_number: '12022'
+    sample_form: basalt
+    locator: {<<: *table2, paragraph: "12022 basalt / Initial column"}
+    initial_elemental_composition_ppm: {"K":"536","Rb":"0.738","Na":"1824","Ba":"59.5","Li":"9.5","Ce":"17.4","Nd":"14.8","Sm":"5.58","Eu":"1.28","Gd":"7.90"}
+    composition_basis: Table 2 initial elemental abundances; not oxide wt%
+    apollo_mission: Apollo 12
+    mission_locator: {source_path: *scan, published_page: 2003, section: Introduction, note: DeMaria sample 12022; cited work titled Apollo 12 lunar samples in References on p2012}
+  '14163':
+    sample_number: '14163'
+    sample_form: soil
+    locator: {<<: *table2, paragraph: "14163 soil / Initial† column"}
+    initial_elemental_composition_ppm: {"K":"4840","Rb":"15.3","Na":"5100","Ba":"873"}
+    composition_basis: separate initial aliquot; Hubbard et al. (1972), Table 2 dagger footnote
+    apollo_mission: Apollo 14
+    mission_locator: {source_path: *scan, published_page: 2009, section: Discussion, paragraph: Apollo 14 soil samples 14163}
+table2_policy:
+  locator: *table2
+  column_order_as_printed:
+    - "10017 | Initial"
+    - "10017 | 1400°C 2 hr"
+    - "10073 | Initial"
+    - "10073 | 1400°C 2 hr"
+    - "12022 | Initial"
+    - "12022 | 950°C 2 hr"
+    - "12022 | 1050°C 2 hr"
+    - "12022 | 1200°C 2 hr"
+    - "12022 | 1400°C 2 hr"
+    - "14163 | Initial†"
+    - "14163 | 1050°C instantaneous"
+    - "14163 | 1050°C 1 hr"
+    - "14163 | 1050°C 6 hr"
+    - "14163 | 1050°C 72 hr"
+  missing_cells: Printed dashes omitted from observations; never measured zeros.
+  initial_conditions: Initial is a composition reference, not a temperature or zero-duration measurement.
+  instantaneous_condition: Printed hold label retained; no zero exposure or instantaneous quench inferred.
+  numeric_basis: Elemental abundances in ppm and printed K/Rb and K/Ba ratios; no oxide conversion, depletion calculation, or ratio recomputation.
+  trace_species_status: Li, Rb, Ba, Sr and measured REEs retained as evidence regardless of engine support.
+  uncertainty: No Table 2 analytical uncertainty printed; none assigned.
+species:
+  K:
+    observations:
+    - observation_id: gibson_hubbard_1972_k_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 10017 Initial column"}
+      quote: "K | 10017 | Initial | 2610"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "2610"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_k_10017_1
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 10017 1400°C 2 hr column"}
+      quote: "K | 10017 | 1400°C 2 hr | 641"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_1400°C 2 hr"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "641"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 10073 Initial column"}
+      quote: "K | 10073 | Initial | 1200"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "K"
+        abundance_ppm: "1200"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_k_10073_3
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 10073 1400°C 2 hr column"}
+      quote: "K | 10073 | 1400°C 2 hr | 385"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_1400°C 2 hr"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "K"
+        abundance_ppm: "385"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 12022 Initial column"}
+      quote: "K | 12022 | Initial | 536"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "536"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_k_12022_5
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 12022 950°C 2 hr column"}
+      quote: "K | 12022 | 950°C 2 hr | 449"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_950°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "449"
+        condition_as_printed: "950°C 2 hr"
+        T_C: 950
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 12022 1050°C 2 hr column"}
+      quote: "K | 12022 | 1050°C 2 hr | 360"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "360"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 12022 1200°C 2 hr column"}
+      quote: "K | 12022 | 1200°C 2 hr | 300"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "300"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 12022 1400°C 2 hr column"}
+      quote: "K | 12022 | 1400°C 2 hr | 179"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K"
+        abundance_ppm: "179"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_k_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "K row; 14163 Initial† column"}
+      quote: "K | 14163 | Initial† | 4840"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K"
+        abundance_ppm: "4840"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+    - observation_id: gibson_hubbard_1972_k_14163_10
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 14163 1050°C instantaneous column"}
+      quote: "K | 14163 | 1050°C instantaneous | 4220"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C instantaneous"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K"
+        abundance_ppm: "4220"
+        condition_as_printed: "1050°C instantaneous"
+        T_C: 1050
+    - observation_id: gibson_hubbard_1972_k_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 1 hr column"}
+      quote: "K | 14163 | 1050°C 1 hr | 3027"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K"
+        abundance_ppm: "3027"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+    - observation_id: gibson_hubbard_1972_k_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 6 hr column"}
+      quote: "K | 14163 | 1050°C 6 hr | 1437"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K"
+        abundance_ppm: "1437"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+    - observation_id: gibson_hubbard_1972_k_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 72 hr column"}
+      quote: "K | 14163 | 1050°C 72 hr | 88"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K"
+        abundance_ppm: "88"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+    - observation_id: gibson_hubbard_1972_k_rb_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 10017 Initial column"}
+      quote: "K/Rb | 10017 | Initial | 464"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "464"
+        condition_as_printed: "Initial"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_10017_1
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 10017 1400°C 2 hr column"}
+      quote: "K/Rb | 10017 | 1400°C 2 hr | 610"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_1400°C 2 hr"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "610"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 10073 Initial column"}
+      quote: "K/Rb | 10073 | Initial | 422"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "K/Rb"
+        ratio_as_printed: "422"
+        condition_as_printed: "Initial"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_10073_3
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 10073 1400°C 2 hr column"}
+      quote: "K/Rb | 10073 | 1400°C 2 hr | 558"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_1400°C 2 hr"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "K/Rb"
+        ratio_as_printed: "558"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 12022 Initial column"}
+      quote: "K/Rb | 12022 | Initial | 723"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "723"
+        condition_as_printed: "Initial"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_12022_5
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 12022 950°C 2 hr column"}
+      quote: "K/Rb | 12022 | 950°C 2 hr | 932"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_950°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "932"
+        condition_as_printed: "950°C 2 hr"
+        T_C: 950
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 12022 1050°C 2 hr column"}
+      quote: "K/Rb | 12022 | 1050°C 2 hr | 1259"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "1259"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 12022 1200°C 2 hr column"}
+      quote: "K/Rb | 12022 | 1200°C 2 hr | 1041"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "1041"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 12022 1400°C 2 hr column"}
+      quote: "K/Rb | 12022 | 1400°C 2 hr | 1035"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Rb"
+        ratio_as_printed: "1035"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "K/Rb row; 14163 Initial† column"}
+      quote: "K/Rb | 14163 | Initial† | 316"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Rb"
+        ratio_as_printed: "316"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_14163_10
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C instantaneous column"}
+      quote: "K/Rb | 14163 | 1050°C instantaneous | 332"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C instantaneous"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Rb"
+        ratio_as_printed: "332"
+        condition_as_printed: "1050°C instantaneous"
+        T_C: 1050
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 1 hr column"}
+      quote: "K/Rb | 14163 | 1050°C 1 hr | 401"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Rb"
+        ratio_as_printed: "401"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 6 hr column"}
+      quote: "K/Rb | 14163 | 1050°C 6 hr | 639"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Rb"
+        ratio_as_printed: "639"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_rb_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 72 hr column"}
+      quote: "K/Rb | 14163 | 1050°C 72 hr | 880"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Rb"
+        ratio_as_printed: "880"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 12022 Initial column"}
+      quote: "K/Ba | 12022 | Initial | 9.0"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Ba"
+        ratio_as_printed: "9.0"
+        condition_as_printed: "Initial"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_12022_5
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 12022 950°C 2 hr column"}
+      quote: "K/Ba | 12022 | 950°C 2 hr | 7.5"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_950°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Ba"
+        ratio_as_printed: "7.5"
+        condition_as_printed: "950°C 2 hr"
+        T_C: 950
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 12022 1050°C 2 hr column"}
+      quote: "K/Ba | 12022 | 1050°C 2 hr | 6.1"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Ba"
+        ratio_as_printed: "6.1"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 12022 1200°C 2 hr column"}
+      quote: "K/Ba | 12022 | 1200°C 2 hr | 5.0"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Ba"
+        ratio_as_printed: "5.0"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 12022 1400°C 2 hr column"}
+      quote: "K/Ba | 12022 | 1400°C 2 hr | 3.0"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "K/Ba"
+        ratio_as_printed: "3.0"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "K/Ba row; 14163 Initial† column"}
+      quote: "K/Ba | 14163 | Initial† | 5.5"
+      units: dimensionless
+      regime: tabulation
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Ba"
+        ratio_as_printed: "5.5"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_14163_10
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C instantaneous column"}
+      quote: "K/Ba | 14163 | 1050°C instantaneous | ~5.1"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C instantaneous"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Ba"
+        ratio_as_printed: "~5.1"
+        condition_as_printed: "1050°C instantaneous"
+        T_C: 1050
+        semantics: approximate_as_printed_not_exact_point
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 1 hr column"}
+      quote: "K/Ba | 14163 | 1050°C 1 hr | 3.7"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Ba"
+        ratio_as_printed: "3.7"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 6 hr column"}
+      quote: "K/Ba | 14163 | 1050°C 6 hr | 1.7"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Ba"
+        ratio_as_printed: "1.7"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_ba_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 72 hr column"}
+      quote: "K/Ba | 14163 | 1050°C 72 hr | 0.1"
+      units: dimensionless
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance_ratio
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "K/Ba"
+        ratio_as_printed: "0.1"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+        evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
+    - observation_id: gibson_hubbard_1972_k_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *results
+      quote: "the vaporization temperatures of K and Rb are below 950°C for lunar basalt 12022."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: K
+        semantics: bound_not_point
+        temperature_statement_C: "below 950 in lunar basalt 12022"
+  Rb:
+    observations:
+    - observation_id: gibson_hubbard_1972_rb_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 10017 Initial column"}
+      quote: "Rb | 10017 | Initial | 5.63"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "5.63"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_rb_10017_1
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 10017 1400°C 2 hr column"}
+      quote: "Rb | 10017 | 1400°C 2 hr | 1.05"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_1400°C 2 hr"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "1.05"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 10073 Initial column"}
+      quote: "Rb | 10073 | Initial | 2.84"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Rb"
+        abundance_ppm: "2.84"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_rb_10073_3
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 10073 1400°C 2 hr column"}
+      quote: "Rb | 10073 | 1400°C 2 hr | 0.69"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_1400°C 2 hr"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Rb"
+        abundance_ppm: "0.69"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 12022 Initial column"}
+      quote: "Rb | 12022 | Initial | 0.738"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "0.738"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_rb_12022_5
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 12022 950°C 2 hr column"}
+      quote: "Rb | 12022 | 950°C 2 hr | 0.482"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_950°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "0.482"
+        condition_as_printed: "950°C 2 hr"
+        T_C: 950
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 12022 1050°C 2 hr column"}
+      quote: "Rb | 12022 | 1050°C 2 hr | 0.286"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "0.286"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 12022 1200°C 2 hr column"}
+      quote: "Rb | 12022 | 1200°C 2 hr | 0.288"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "0.288"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 12022 1400°C 2 hr column"}
+      quote: "Rb | 12022 | 1400°C 2 hr | 0.173"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Rb"
+        abundance_ppm: "0.173"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_rb_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "Rb row; 14163 Initial† column"}
+      quote: "Rb | 14163 | Initial† | 15.3"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Rb"
+        abundance_ppm: "15.3"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+    - observation_id: gibson_hubbard_1972_rb_14163_10
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C instantaneous column"}
+      quote: "Rb | 14163 | 1050°C instantaneous | 12.75"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C instantaneous"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Rb"
+        abundance_ppm: "12.75"
+        condition_as_printed: "1050°C instantaneous"
+        T_C: 1050
+    - observation_id: gibson_hubbard_1972_rb_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 1 hr column"}
+      quote: "Rb | 14163 | 1050°C 1 hr | 7.54"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Rb"
+        abundance_ppm: "7.54"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+    - observation_id: gibson_hubbard_1972_rb_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 6 hr column"}
+      quote: "Rb | 14163 | 1050°C 6 hr | 2.25"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Rb"
+        abundance_ppm: "2.25"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+    - observation_id: gibson_hubbard_1972_rb_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 72 hr column"}
+      quote: "Rb | 14163 | 1050°C 72 hr | 0.10"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Rb"
+        abundance_ppm: "0.10"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+    - observation_id: gibson_hubbard_1972_rb_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *results
+      quote: "the vaporization temperatures of K and Rb are below 950°C for lunar basalt 12022."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Rb
+        semantics: bound_not_point
+        temperature_statement_C: "below 950 in lunar basalt 12022"
+        abstract_statement: Rb is lost at 950°C or less.
+        abstract_locator: *abstract
+  Na:
+    observations:
+    - observation_id: gibson_hubbard_1972_na_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 10017 Initial column"}
+      quote: "Na | 10017 | Initial | 3800"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "3800"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_na_10017_1
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 10017 1400°C 2 hr column"}
+      quote: "Na | 10017 | 1400°C 2 hr | 500"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_1400°C 2 hr"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "500"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_na_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 10073 Initial column"}
+      quote: "Na | 10073 | Initial | 3500"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Na"
+        abundance_ppm: "3500"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_na_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 12022 Initial column"}
+      quote: "Na | 12022 | Initial | 1824"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "1824"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_na_12022_5
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 12022 950°C 2 hr column"}
+      quote: "Na | 12022 | 950°C 2 hr | 1820"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_950°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "1820"
+        condition_as_printed: "950°C 2 hr"
+        T_C: 950
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_na_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 12022 1050°C 2 hr column"}
+      quote: "Na | 12022 | 1050°C 2 hr | 1800"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "1800"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_na_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 12022 1200°C 2 hr column"}
+      quote: "Na | 12022 | 1200°C 2 hr | 1200"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "1200"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_na_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 12022 1400°C 2 hr column"}
+      quote: "Na | 12022 | 1400°C 2 hr | 673"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Na"
+        abundance_ppm: "673"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_na_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "Na row; 14163 Initial† column"}
+      quote: "Na | 14163 | Initial† | 5100"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Na"
+        abundance_ppm: "5100"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+    - observation_id: gibson_hubbard_1972_na_14163_10
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C instantaneous column"}
+      quote: "Na | 14163 | 1050°C instantaneous | 4660"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C instantaneous"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Na"
+        abundance_ppm: "4660"
+        condition_as_printed: "1050°C instantaneous"
+        T_C: 1050
+    - observation_id: gibson_hubbard_1972_na_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 1 hr column"}
+      quote: "Na | 14163 | 1050°C 1 hr | 4110"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Na"
+        abundance_ppm: "4110"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+    - observation_id: gibson_hubbard_1972_na_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 6 hr column"}
+      quote: "Na | 14163 | 1050°C 6 hr | 3140"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Na"
+        abundance_ppm: "3140"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+    - observation_id: gibson_hubbard_1972_na_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 72 hr column"}
+      quote: "Na | 14163 | 1050°C 72 hr | 1730"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Na"
+        abundance_ppm: "1730"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+    - observation_id: gibson_hubbard_1972_na_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "The vaporization temperature of Na in basaltic lunar samples is near 1050°C and Na is slowly lost from Apollo 14 soil at 1050°C."
+      units: qualitative temperature approximation in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Na
+        semantics: approximate_not_exact
+        temperature_statement_C: "near 1050; slow loss at 1050 in Apollo 14 soil"
+  Ba:
+    observations:
+    - observation_id: gibson_hubbard_1972_ba_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ba row; 12022 Initial column"}
+      quote: "Ba | 12022 | Initial | 59.5"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Ba"
+        abundance_ppm: "59.5"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_ba_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ba row; 12022 1400°C 2 hr column"}
+      quote: "Ba | 12022 | 1400°C 2 hr | 59.3"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Ba"
+        abundance_ppm: "59.3"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_ba_14163_9
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "Ba row; 14163 Initial† column"}
+      quote: "Ba | 14163 | Initial† | 873"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "14163_Initial†"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Ba"
+        abundance_ppm: "873"
+        condition_as_printed: "Initial†"
+        attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
+    - observation_id: gibson_hubbard_1972_ba_14163_11
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 1 hr column"}
+      quote: "Ba | 14163 | 1050°C 1 hr | 822"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 1 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Ba"
+        abundance_ppm: "822"
+        condition_as_printed: "1050°C 1 hr"
+        T_C: 1050
+        hold_time_hr: 1
+    - observation_id: gibson_hubbard_1972_ba_14163_12
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 6 hr column"}
+      quote: "Ba | 14163 | 1050°C 6 hr | 826"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 6 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Ba"
+        abundance_ppm: "826"
+        condition_as_printed: "1050°C 6 hr"
+        T_C: 1050
+        hold_time_hr: 6
+    - observation_id: gibson_hubbard_1972_ba_14163_13
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 72 hr column"}
+      quote: "Ba | 14163 | 1050°C 72 hr | 829"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "14163_1050°C 72 hr"
+        sample_number: '14163'
+        sample_form: soil
+        component: "Ba"
+        abundance_ppm: "829"
+        condition_as_printed: "1050°C 72 hr"
+        T_C: 1050
+        hold_time_hr: 72
+    - observation_id: gibson_hubbard_1972_ba_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Ba
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+  Li:
+    observations:
+    - observation_id: gibson_hubbard_1972_li_10017_0
+      type: rate_series
+      class_tag: compiled
+      locator: {<<: *table2, paragraph: "Li row; 10017 Initial column"}
+      quote: "Li | 10017 | Initial | 18.1*"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: secondary_compilation
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "18.1"
+        condition_as_printed: "Initial"
+        attribution: "Tera et al. (1970), Table 2 asterisk footnote"
+    - observation_id: gibson_hubbard_1972_li_10017_1
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Li row; 10017 1400°C 2 hr column"}
+      quote: "Li | 10017 | 1400°C 2 hr | 19.3"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_1400°C 2 hr"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "19.3"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_li_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Li row; 12022 Initial column"}
+      quote: "Li | 12022 | Initial | 9.5"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "9.5"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_li_12022_6
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Li row; 12022 1050°C 2 hr column"}
+      quote: "Li | 12022 | 1050°C 2 hr | 9.0"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1050°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "9.0"
+        condition_as_printed: "1050°C 2 hr"
+        T_C: 1050
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_li_12022_7
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Li row; 12022 1200°C 2 hr column"}
+      quote: "Li | 12022 | 1200°C 2 hr | 10.1"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1200°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "10.1"
+        condition_as_printed: "1200°C 2 hr"
+        T_C: 1200
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_li_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Li row; 12022 1400°C 2 hr column"}
+      quote: "Li | 12022 | 1400°C 2 hr | 11.8"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Li"
+        abundance_ppm: "11.8"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_li_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Li
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+  Ce:
+    observations:
+    - observation_id: gibson_hubbard_1972_ce_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ce row; 10017 Initial column"}
+      quote: "Ce | 10017 | Initial | 77.3"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Ce"
+        abundance_ppm: "77.3"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_ce_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ce row; 10073 Initial column"}
+      quote: "Ce | 10073 | Initial | 46.5"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Ce"
+        abundance_ppm: "46.5"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_ce_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ce row; 12022 Initial column"}
+      quote: "Ce | 12022 | Initial | 17.4"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Ce"
+        abundance_ppm: "17.4"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_ce_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Ce row; 12022 1400°C 2 hr column"}
+      quote: "Ce | 12022 | 1400°C 2 hr | 17.7"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Ce"
+        abundance_ppm: "17.7"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_ce_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Ce
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Abstract states REE collectively; this element is a measured member in Table 2, not a separately measured onset temperature.
+  Nd:
+    observations:
+    - observation_id: gibson_hubbard_1972_nd_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Nd row; 10017 Initial column"}
+      quote: "Nd | 10017 | Initial | 59.5"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Nd"
+        abundance_ppm: "59.5"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_nd_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Nd row; 10073 Initial column"}
+      quote: "Nd | 10073 | Initial | 35.4"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Nd"
+        abundance_ppm: "35.4"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_nd_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Nd row; 12022 Initial column"}
+      quote: "Nd | 12022 | Initial | 14.8"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Nd"
+        abundance_ppm: "14.8"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_nd_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Nd row; 12022 1400°C 2 hr column"}
+      quote: "Nd | 12022 | 1400°C 2 hr | 15.0"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Nd"
+        abundance_ppm: "15.0"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_nd_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Nd
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Abstract states REE collectively; this element is a measured member in Table 2, not a separately measured onset temperature.
+  Sm:
+    observations:
+    - observation_id: gibson_hubbard_1972_sm_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Sm row; 10017 Initial column"}
+      quote: "Sm | 10017 | Initial | 20.9"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Sm"
+        abundance_ppm: "20.9"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_sm_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Sm row; 10073 Initial column"}
+      quote: "Sm | 10073 | Initial | 12.4"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Sm"
+        abundance_ppm: "12.4"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_sm_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Sm row; 12022 Initial column"}
+      quote: "Sm | 12022 | Initial | 5.58"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Sm"
+        abundance_ppm: "5.58"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_sm_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Sm row; 12022 1400°C 2 hr column"}
+      quote: "Sm | 12022 | 1400°C 2 hr | 5.59"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Sm"
+        abundance_ppm: "5.59"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_sm_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Sm
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Abstract states REE collectively; this element is a measured member in Table 2, not a separately measured onset temperature.
+  Eu:
+    observations:
+    - observation_id: gibson_hubbard_1972_eu_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Eu row; 10017 Initial column"}
+      quote: "Eu | 10017 | Initial | 2.14"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Eu"
+        abundance_ppm: "2.14"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_eu_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Eu row; 10073 Initial column"}
+      quote: "Eu | 10073 | Initial | 1.70"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Eu"
+        abundance_ppm: "1.70"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_eu_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Eu row; 12022 Initial column"}
+      quote: "Eu | 12022 | Initial | 1.28"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Eu"
+        abundance_ppm: "1.28"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_eu_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Eu row; 12022 1400°C 2 hr column"}
+      quote: "Eu | 12022 | 1400°C 2 hr | 1.28"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Eu"
+        abundance_ppm: "1.28"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_eu_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Eu
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Abstract states REE collectively; this element is a measured member in Table 2, not a separately measured onset temperature.
+  Gd:
+    observations:
+    - observation_id: gibson_hubbard_1972_gd_10017_0
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Gd row; 10017 Initial column"}
+      quote: "Gd | 10017 | Initial | 27.4"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10017_Initial"
+        sample_number: '10017'
+        sample_form: basalt
+        component: "Gd"
+        abundance_ppm: "27.4"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_gd_10073_2
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Gd row; 10073 Initial column"}
+      quote: "Gd | 10073 | Initial | 15.9"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "10073_Initial"
+        sample_number: '10073'
+        sample_form: breccia
+        component: "Gd"
+        abundance_ppm: "15.9"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_gd_12022_4
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Gd row; 12022 Initial column"}
+      quote: "Gd | 12022 | Initial | 7.90"
+      units: ppm
+      regime: tabulation
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_Initial"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Gd"
+        abundance_ppm: "7.90"
+        condition_as_printed: "Initial"
+    - observation_id: gibson_hubbard_1972_gd_12022_8
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table2, paragraph: "Gd row; 12022 1400°C 2 hr column"}
+      quote: "Gd | 12022 | 1400°C 2 hr | 7.85"
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: elemental_abundance
+        method_class: measured_direct
+        admission_status: pending_validation
+        composition_id: "12022_1400°C 2 hr"
+        sample_number: '12022'
+        sample_form: basalt
+        component: "Gd"
+        abundance_ppm: "7.85"
+        condition_as_printed: "1400°C 2 hr"
+        T_C: 1400
+        hold_time_hr: 2
+    - observation_id: gibson_hubbard_1972_gd_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Gd
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Abstract states REE collectively; this element is a measured member in Table 2, not a separately measured onset temperature.
+  Sr:
+    observations:
+    - observation_id: gibson_hubbard_1972_sr_volatilization_statement
+      type: rate_series
+      class_tag: measured
+      locator: *abstract
+      quote: "the refractory elements (Li, Ba, Sr, REE) are not volatilized below 1400°C."
+      units: qualitative temperature bound in °C; no numerical loss rate
+      regime: vacuum_chamber_pyrolysis
+      equipment: *heated
+      values:
+        quantity: qualitative_volatilization_bound
+        method_class: measured_direct_qualitative
+        admission_status: pending_validation
+        component: Sr
+        semantics: bound_not_point
+        temperature_statement_C: "not volatilized below 1400"
+        evidence_note: Qualitative refractory statement and Fig. 1 only; no numerical Sr abundance in Table 2. No figure point digitized.
+source_caveats:
+  - locator: *results
+    quote: only 30% of the original Rb concentration remains
+    note: Narrative for 12022 at 1050°C after 2 hours disagrees with Table 2 initial 0.738 and residue 0.286 ppm. No percentage recomputed or substituted into the observations.
+  - locator: {source_path: *scan, published_page: 2004, table: '1'}
+    note: Table 1 is after Brewer (1953), for simple oxides at specified pressures; excluded from lunar measured observations.
+  - locator: {source_path: *scan, published_page: 2008, figure: '3'}
+    quote: due to 10% interlab difference in K
+    note: External comparison datasets, not a Table 2 error bar.
+  - locator: {source_path: *scan, published_page: 2007, figure: '2'}
+    note: OCR reconstructed figure table rejected; temperature annotations are not concentration measurements. No figure-derived numerical points entered.
+  - locator: {source_path: *scan, published_page: 2009, section: Discussion, note: Pb-loss calculations on printed page 2010}
+    note: Inferred natural metamorphic histories and Pb-loss calculations are not laboratory abundance measurements; excluded.
+  - locator: *abstract
+    note: Refractory retention is bounded by the studied temperature domain; it does not establish retention at every furnace-survivable temperature.
+verification:
+  numerical_review: Every Table 2 non-dash cell, column header and footnote checked against original PDF page 3 rendered at 300 dpi. All agree with markdown transcription.
+  narrative_review: Apparatus and schedule on original page 2; thresholds on pages 1 and 4; integrated exposure on pages 5-6 checked visually.
+  image_warning: MinerU table crop disagrees with original scan at Sm 20.9, Eu 2.14 and Ce 17.7. Original scan controls; no crop-based corrections applied.
+  scope: 97 Table 2 observations (73 abundance cells, 24 ratios) plus 11 qualitative element statements. No numerical figure points.
+  schema_limitation: Current migrator has no elemental-abundance or elemental-ratio quantity and no ppm-composition vocabulary. Preserve printed data here; fail-closed unknown quantities in v2 are not executable measurements. No schema or vocabulary change in this extract-only task.
+  vocabulary_gaps:
+    - initial_elemental_composition_ppm
+    - hold_time_hr
+    - oxygen_partial_pressure
+    - furnace
+    - heating_schedule
+    - temperature_measurement
+    - residue_analysis
+    - integrated_exposure
+    - soil_preparation
