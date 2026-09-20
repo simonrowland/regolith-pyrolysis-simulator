@@ -31,6 +31,7 @@ and queued; they are never stored as gas.
 
 from __future__ import annotations
 
+import collections.abc
 import fnmatch
 import hashlib
 import inspect
@@ -43,7 +44,8 @@ from decimal import Decimal
 from enum import Enum
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Mapping
+from types import UnionType
+from typing import Any, Iterable, Iterator, Mapping, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -1036,6 +1038,23 @@ def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
     return ApparatusGeometry(**kwargs) if kwargs else None
 
 
+def _any_from_plain(value: object) -> object:
+    if isinstance(value, Mapping):
+        return dict(value)
+    amount = _as_dec_or_none(value)
+    if amount is not None:
+        return amount
+    if value is None:
+        return None
+    return str(value)
+
+
+def _located_mapping_from_plain(payload: object, cast) -> dict[str, Located] | None:
+    if not isinstance(payload, Mapping) or not payload:
+        return None
+    return {str(k): _located_from_plain(v, cast) for k, v in payload.items()}
+
+
 def _apparatus_from_plain(payload: object) -> Apparatus | None:
     if not isinstance(payload, Mapping) or not payload:
         return None
@@ -1045,6 +1064,16 @@ def _apparatus_from_plain(payload: object) -> Apparatus | None:
         if cell is None
         else _located_from_plain(cell, str),
         geometry=_geometry_from_plain(payload.get("geometry")),
+        ionization=_located_mapping_from_plain(
+            payload.get("ionization"), _any_from_plain
+        ),
+        calibration=_located_mapping_from_plain(
+            payload.get("calibration"), _any_from_plain
+        ),
+        temperature_measurement=_located_mapping_from_plain(
+            payload.get("temperature_measurement"), str
+        ),
+        wall=_located_mapping_from_plain(payload.get("wall"), _any_from_plain),
     )
 
 
@@ -1060,6 +1089,7 @@ def _sweep_gas_from_plain(payload: object) -> SweepGas:
 def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
     assert isinstance(payload, Mapping)
     regime_raw = payload.get("regime") or {}
+    note = payload.get("cell_internal_pressure_note")
     return PressureEnvironment(
         total_pressure_Pa=_located_from_plain(payload["total_pressure_Pa"], as_decimal),
         sweep_gas=_located_from_plain(
@@ -1072,6 +1102,11 @@ def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
                 lambda v: RegimeClass(str(v)),
             )
         ),
+        gauge=_located_mapping_from_plain(payload.get("gauge"), str),
+        pumping=_located_mapping_from_plain(payload.get("pumping"), _any_from_plain),
+        cell_internal_pressure_note=None
+        if note is None
+        else _located_from_plain(note, str),
     )
 
 
@@ -1448,6 +1483,34 @@ def convert_length_to_m(
     return None, f"unmapped length unit {units!r}"
 
 
+def convert_volumetric_flow_to_m3_s(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Return (m³/s, conversion relation name) or (None, why).
+
+    Premise: 1 L = 1 dm³ = 10⁻³ m³ exactly (SI litre).
+    """
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "volumetric-flow value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing volumetric-flow unit"
+    lowered = (
+        str(units)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("³", "3")
+        .replace("^3", "3")
+    )
+    if lowered in {"m3/s", "m3s", "m3_s", "m^3/s", "m3s-1", "m3s^-1"}:
+        return amount, "identity:m3/s"
+    if lowered in {"l/s", "l_s", "ls", "liter/s", "litre/s", "l/sec"}:
+        return amount / Decimal("1000"), "L_s_to_m3_s"
+    return None, f"unmapped volumetric-flow unit {units!r}"
+
+
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "Torr_to_Pa": (
@@ -1477,6 +1540,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
     "cm_to_m": (Decimal("100"), "L_m = L_cm / 100", "m", "cm"),
     "mm_to_m": (Decimal("1000"), "L_m = L_mm / 1000", "m", "mm"),
+    "L_s_to_m3_s": (
+        Decimal("1000"),
+        "Q_m3_s = Q_L_s / 1000",
+        "m3/s",
+        "L/s",
+    ),
     "percent_to_fraction": (
         Decimal("100"),
         "x = pct / 100",
@@ -3877,12 +3946,13 @@ class VocabEntry:
 @dataclass(frozen=True)
 class LabHit:
     entry: VocabEntry
-    amount: Decimal
+    amount: Decimal | None
     units: str
     locator: Locator
     as_published: str
     path: str
     mapping: Mapping[str, Any] | None = None
+    text: str | None = None
 
 
 def load_lab_parameter_vocabulary(path: Path | None = None) -> tuple[VocabEntry, ...]:
@@ -3936,7 +4006,13 @@ def _lab_kind(field: str) -> str:
         return "area"
     if field.endswith("_Pa"):
         return "pressure"
-    if field.endswith("diameter_m") or field.endswith("length_m"):
+    if field.endswith("_m3_s"):
+        return "volumetric_flow"
+    if (
+        field.endswith("diameter_m")
+        or field.endswith("length_m")
+        or field.endswith("thickness_m")
+    ):
         return "length"
     return "factor"
 
@@ -3953,6 +4029,8 @@ def _convert_lab_value(
         return convert_length_to_m(amount, units)
     if kind == "pressure":
         return convert_pressure_to_pa(amount, units)
+    if kind == "volumetric_flow":
+        return convert_volumetric_flow_to_m3_s(amount, units)
     if kind == "factor":
         value = _as_dec_or_none(amount)
         if value is None:
@@ -3968,6 +4046,7 @@ def _output_unit_for(field: str) -> str:
         "area": "m2",
         "length": "m",
         "pressure": "Pa",
+        "volumetric_flow": "m3/s",
         "factor": "1",
         "composition": "as_published",
     }.get(kind, "as_published")
@@ -3992,13 +4071,112 @@ def _looked_for_reason(field: str, vocabulary: tuple[VocabEntry, ...]) -> str:
     return f"no {noun} field under keys {listed} in this extract"
 
 
+_DEST_CACHE: dict[str, tuple[str, str | None]] = {}
+_EXPERIMENT_SECTIONS: dict[str, type] = {
+    "apparatus": Apparatus,
+    "sample": Sample,
+    "pressure_environment": PressureEnvironment,
+}
+
+
+def _unwrap_optional(tp: object) -> object:
+    origin = get_origin(tp)
+    if origin is Union or origin is UnionType:
+        args = [item for item in get_args(tp) if item is not type(None)]
+        if len(args) == 1:
+            return args[0]
+    return tp
+
+
+def _is_located_type(tp: object) -> bool:
+    origin = get_origin(tp) or tp
+    return origin is Located
+
+
+def _located_inner_type(tp: object) -> object:
+    args = get_args(tp)
+    return args[0] if args else Any
+
+
+def _is_mapping_of_located(tp: object) -> bool:
+    origin = get_origin(tp)
+    if origin is None:
+        return False
+    try:
+        if not issubclass(origin, collections.abc.Mapping):
+            return False
+    except TypeError:
+        return False
+    args = get_args(tp)
+    return len(args) == 2 and _is_located_type(args[1])
+
+
+def _destination_spec(field: str) -> tuple[str, str | None]:
+    """Classify a vocab field path: scalar, string, mapping leaf, or composition."""
+
+    cached = _DEST_CACHE.get(field)
+    if cached is not None:
+        return cached
+    parts = field.split(".")
+    if len(parts) < 2:
+        _DEST_CACHE[field] = ("unknown", None)
+        return _DEST_CACHE[field]
+    section = _EXPERIMENT_SECTIONS.get(parts[0])
+    if section is None:
+        _DEST_CACHE[field] = ("unknown", None)
+        return _DEST_CACHE[field]
+    current: type = section
+    path_so_far = [parts[0]]
+    for index, name in enumerate(parts[1:]):
+        hints = get_type_hints(current)
+        if name not in hints:
+            _DEST_CACHE[field] = ("unknown", None)
+            return _DEST_CACHE[field]
+        tp = _unwrap_optional(hints[name])
+        path_so_far.append(name)
+        if _is_mapping_of_located(tp):
+            leaf = parts[index + 2 :]
+            if not leaf:
+                _DEST_CACHE[field] = ("unknown", None)
+                return _DEST_CACHE[field]
+            container = ".".join(path_so_far)
+            inner = _located_inner_type(get_args(tp)[1])
+            kind = "mapping_string_leaf" if inner is str else "mapping_any_leaf"
+            _DEST_CACHE[field] = (kind, container)
+            return _DEST_CACHE[field]
+        if _is_located_type(tp):
+            if index != len(parts) - 2:
+                _DEST_CACHE[field] = ("unknown", None)
+                return _DEST_CACHE[field]
+            inner = _located_inner_type(tp)
+            if field.endswith("printed_composition") or field.endswith(
+                "initial_composition"
+            ):
+                kind = "composition"
+            elif inner is str:
+                kind = "string"
+            else:
+                kind = "scalar"
+            _DEST_CACHE[field] = (kind, None)
+            return _DEST_CACHE[field]
+        origin = get_origin(tp) or tp
+        if isinstance(origin, type) and is_dataclass(origin):
+            current = origin
+            continue
+        _DEST_CACHE[field] = ("unknown", None)
+        return _DEST_CACHE[field]
+    _DEST_CACHE[field] = ("unknown", None)
+    return _DEST_CACHE[field]
+
+
 def _hit_from_value(
     entry: VocabEntry,
     value: object,
     parent_locator: Locator | None,
     path: str,
 ) -> LabHit | None:
-    if _lab_kind(entry.field) == "composition":
+    kind, _container = _destination_spec(entry.field)
+    if kind == "composition" or _lab_kind(entry.field) == "composition":
         return None
     units = entry.unit
     loc = parent_locator
@@ -4006,16 +4184,41 @@ def _hit_from_value(
     mapping: Mapping[str, Any] | None = None
     if isinstance(value, Mapping):
         mapping = value
-        if value.get("value") is None:
+        if "value" not in value or value.get("value") is None:
             return None
         raw = value.get("value")
         if value.get("units") not in (None, ""):
             units = str(value.get("units"))
         loc = locator_from_mapping(value.get("locator")) or loc
-    amount = _as_dec_or_none(raw)
-    if amount is None or loc is None:
+    if loc is None:
         return None
+    wants_string = kind in {"string", "mapping_string_leaf"}
+    if kind == "mapping_any_leaf" and _as_dec_or_none(raw) is None:
+        wants_string = True
     unit_text = str(units) if units else ""
+    if wants_string:
+        if raw is None or isinstance(raw, (bool, Mapping)):
+            return None
+        if isinstance(raw, (list, tuple)):
+            text = "; ".join(str(item) for item in raw if item not in (None, ""))
+        else:
+            text = str(raw).strip()
+        if not text:
+            return None
+        published = text if not unit_text else f"{text} {unit_text}".strip()
+        return LabHit(
+            entry=entry,
+            amount=None,
+            units=unit_text,
+            locator=loc,
+            as_published=published,
+            path=path,
+            mapping=mapping,
+            text=text,
+        )
+    amount = _as_dec_or_none(raw)
+    if amount is None:
+        return None
     published = f"{raw} {unit_text}".strip()
     return LabHit(
         entry=entry,
@@ -4085,8 +4288,14 @@ def collect_lab_hits(
     by_printed = {e.printed: e for e in vocabulary}
     hits: list[LabHit] = []
     for root in roots:
+        prefix = ""
+        obj = root
+        if isinstance(root, tuple) and len(root) == 2 and isinstance(root[0], str):
+            prefix, obj = root
         hits.extend(
-            _walk_lab_hits(root, by_printed, parent_locator=fallback_locator)
+            _walk_lab_hits(
+                obj, by_printed, parent_locator=fallback_locator, path=prefix
+            )
         )
     return hits
 
@@ -4123,15 +4332,18 @@ def _unique_located(
     hits: list[LabHit],
 ) -> Located[Decimal] | None:
     converted: list[tuple[Decimal, LabHit, str | None]] = []
-    for hit in hits:
+    numeric_hits = [hit for hit in hits if hit.amount is not None]
+    for hit in numeric_hits:
         si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
         if si is None:
             continue
         converted.append((si, hit, trail))
     if not converted:
-        if not hits:
+        if not numeric_hits:
             return None
-        _, why = _convert_lab_value(hits[0].entry.field, hits[0].amount, hits[0].units)
+        _, why = _convert_lab_value(
+            numeric_hits[0].entry.field, numeric_hits[0].amount, numeric_hits[0].units
+        )
         return located_unknown(why or "missing unit")
     values = {item[0] for item in converted}
     if len(values) > 1:
@@ -4142,6 +4354,81 @@ def _unique_located(
 
 def _hits_for(hits: list[LabHit], field: str) -> list[LabHit]:
     return [h for h in hits if h.entry.field == field]
+
+
+def _unique_text_located(hits: list[LabHit]) -> Located[str] | None:
+    ordered: list[tuple[str, LabHit]] = []
+    for hit in hits:
+        if hit.text is None:
+            continue
+        ordered.append((hit.text, hit))
+    if not ordered:
+        return None
+    by_printed: dict[str, list[tuple[str, LabHit]]] = {}
+    order: list[str] = []
+    for text, hit in ordered:
+        name = hit.entry.printed
+        if name not in by_printed:
+            order.append(name)
+            by_printed[name] = []
+        by_printed[name].append((text, hit))
+    for name in order:
+        group = by_printed[name]
+        values = {item[0] for item in group}
+        if len(values) == 1:
+            text, hit = group[0]
+            return located_value(text, hit.locator)
+        equipment_group = [
+            item for item in group if item[1].path.startswith("equipment.")
+        ]
+        equipment_values = {item[0] for item in equipment_group}
+        if len(equipment_values) == 1:
+            text, hit = equipment_group[0]
+            return located_value(text, hit.locator)
+    return None
+
+
+def _mapping_located_from_hits(
+    hits: list[LabHit], container: str
+) -> dict[str, Located[Any]] | None:
+    prefix = container + "."
+    grouped: dict[str, list[LabHit]] = defaultdict(list)
+    for hit in hits:
+        field = hit.entry.field
+        if field.startswith(prefix) and field != container:
+            leaf = field[len(prefix) :]
+            if leaf:
+                grouped[leaf].append(hit)
+    out: dict[str, Located[Any]] = {}
+    for leaf, leaf_hits in grouped.items():
+        text_hits = [hit for hit in leaf_hits if hit.text is not None]
+        num_hits = [hit for hit in leaf_hits if hit.amount is not None]
+        located: Located[Any] | None
+        if text_hits and not num_hits:
+            located = _unique_text_located(text_hits)
+        elif num_hits and not text_hits:
+            located = _unique_located(num_hits)
+        else:
+            located = None
+        if located is not None:
+            out[leaf] = located
+    return out or None
+
+
+def _merge_located_mapping(
+    old: Mapping[str, Located[Any]] | None,
+    new: Mapping[str, Located[Any]] | None,
+) -> dict[str, Located[Any]] | None:
+    if old is None:
+        return dict(new) if new else None
+    if new is None:
+        return dict(old)
+    out: dict[str, Located[Any]] = {}
+    for key in set(old) | set(new):
+        merged = _prefer_located(old.get(key), new.get(key))
+        if merged is not None:
+            out[key] = merged
+    return out or None
 
 
 def _printed_composition_from_roots(
@@ -4180,7 +4467,12 @@ def _printed_composition_from_roots(
                 walk(item, parent_loc, depth + 1)
 
     for root in roots:
-        walk(root, fallback_locator, 0)
+        obj = (
+            root[1]
+            if isinstance(root, tuple) and len(root) == 2 and isinstance(root[0], str)
+            else root
+        )
+        walk(obj, fallback_locator, 0)
     if not found:
         return None
     fingerprints = {item[0] for item in found}
@@ -4197,11 +4489,11 @@ def _lab_roots(
 ) -> list[object]:
     roots: list[object] = []
     if isinstance(equipment, Mapping) and equipment:
-        roots.append(equipment)
+        roots.append(("equipment", equipment))
     if isinstance(values, Mapping) and values:
-        roots.append(values)
+        roots.append(("values", values))
     if extra is not None and extra is not equipment and extra is not values:
-        roots.append(extra)
+        roots.append(("extra", extra))
     return roots
 
 
@@ -4232,16 +4524,6 @@ def _form_and_container(
             locator_from_mapping(container.get("locator")) or loc,
         )
     return form_located, container_located
-
-
-def _cell_from_equipment(equipment: object) -> Located[str] | None:
-    if not isinstance(equipment, Mapping):
-        return None
-    raw_cell = equipment.get("cell_material")
-    if isinstance(raw_cell, Mapping) and raw_cell.get("value") is not None:
-        loc = locator_from_mapping(raw_cell.get("locator"))
-        return located_value(str(raw_cell["value"]), loc)
-    return None
 
 
 def _prefer_located(
@@ -4290,9 +4572,32 @@ def _merge_apparatus(
         return old
     cell = _prefer_located(old.cell_material_and_liner, new.cell_material_and_liner)
     geometry = _merge_geometry(old.geometry, new.geometry)
-    if cell is None and geometry is None:
+    ionization = _merge_located_mapping(old.ionization, new.ionization)
+    calibration = _merge_located_mapping(old.calibration, new.calibration)
+    temperature_measurement = _merge_located_mapping(
+        old.temperature_measurement, new.temperature_measurement
+    )
+    wall = _merge_located_mapping(old.wall, new.wall)
+    if all(
+        item is None
+        for item in (
+            cell,
+            geometry,
+            ionization,
+            calibration,
+            temperature_measurement,
+            wall,
+        )
+    ):
         return None
-    return Apparatus(cell_material_and_liner=cell, geometry=geometry)
+    return Apparatus(
+        cell_material_and_liner=cell,
+        geometry=geometry,
+        ionization=ionization,
+        calibration=calibration,
+        temperature_measurement=temperature_measurement,
+        wall=wall,
+    )
 
 
 def _merge_pressure(
@@ -4321,9 +4626,9 @@ def _merge_pressure(
             knudsen_number_orifice=_prefer_located(kn_old, kn_new),
             knudsen_number_chamber=_prefer_located(knc_old, knc_new),
         ),
-        gauge=old.gauge or new.gauge,
+        gauge=_merge_located_mapping(old.gauge, new.gauge),
         pressure_profile=_prefer_located(old.pressure_profile, new.pressure_profile),
-        pumping=old.pumping or new.pumping,
+        pumping=_merge_located_mapping(old.pumping, new.pumping),
         cell_internal_pressure_note=_prefer_located(
             old.cell_internal_pressure_note, new.cell_internal_pressure_note
         ),
@@ -4377,11 +4682,34 @@ def apparatus_from_equipment(
         located = _unique_located(_hits_for(hits, field))
         if located is not None:
             geometry_kwargs[dest] = located
-    cell = _cell_from_equipment(equipment)
+    cell = _unique_text_located(_hits_for(hits, "apparatus.cell_material_and_liner"))
+    ionization = _mapping_located_from_hits(hits, "apparatus.ionization")
+    calibration = _mapping_located_from_hits(hits, "apparatus.calibration")
+    temperature_measurement = _mapping_located_from_hits(
+        hits, "apparatus.temperature_measurement"
+    )
+    wall = _mapping_located_from_hits(hits, "apparatus.wall")
     geometry = ApparatusGeometry(**geometry_kwargs) if geometry_kwargs else None
-    if cell is None and geometry is None:
+    if all(
+        item is None
+        for item in (
+            cell,
+            geometry,
+            ionization,
+            calibration,
+            temperature_measurement,
+            wall,
+        )
+    ):
         return None
-    return Apparatus(cell_material_and_liner=cell, geometry=geometry)
+    return Apparatus(
+        cell_material_and_liner=cell,
+        geometry=geometry,
+        ionization=ionization,
+        calibration=calibration,
+        temperature_measurement=temperature_measurement,
+        wall=wall,
+    )
 
 
 def sample_from_equipment(
@@ -4397,7 +4725,11 @@ def sample_from_equipment(
     roots = _lab_roots(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
-    form_located, container_located = _form_and_container(equipment)
+    form_located = _unique_text_located(_hits_for(hits, "sample.form"))
+    container_located = _unique_text_located(_hits_for(hits, "sample.container"))
+    hard_form, hard_container = _form_and_container(equipment)
+    form_located = _prefer_located(form_located, hard_form)
+    container_located = _prefer_located(container_located, hard_container)
     printed = _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
@@ -4445,28 +4777,53 @@ def pressure_from_equipment(
     field = "pressure_environment.total_pressure_Pa"
     pressure_hits = _hits_for(hits, field)
     located = _unique_located(pressure_hits)
-    if located is None:
-        converted_si = []
-        unit_why = None
-        for hit in pressure_hits:
-            si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
-            if si is None:
-                unit_why = trail
-            else:
-                converted_si.append(si)
-        if len(set(converted_si)) > 1:
-            return unknown_pressure_environment(
-                "conflicting printed pressures; not collapsed into one number"
-            )
-        if unit_why:
-            return unknown_pressure_environment(unit_why)
-        return unknown_pressure_environment(_looked_for_reason(field, vocab))
+    pumping = _mapping_located_from_hits(hits, "pressure_environment.pumping")
+    gauge = _mapping_located_from_hits(hits, "pressure_environment.gauge")
+    note = _unique_text_located(
+        _hits_for(hits, "pressure_environment.cell_internal_pressure_note")
+    )
     kn_orifice = _unique_located(
         _hits_for(hits, "pressure_environment.regime.knudsen_number_orifice")
     )
     kn_chamber = _unique_located(
         _hits_for(hits, "pressure_environment.regime.knudsen_number_chamber")
     )
+
+    def _with_mappings(env: PressureEnvironment) -> PressureEnvironment:
+        return replace(
+            env,
+            pumping=pumping,
+            gauge=gauge,
+            cell_internal_pressure_note=note,
+            regime=FlowRegime(
+                regime_class=env.regime.regime_class,
+                knudsen_number_orifice=kn_orifice or env.regime.knudsen_number_orifice,
+                knudsen_number_chamber=kn_chamber or env.regime.knudsen_number_chamber,
+            ),
+        )
+
+    if located is None:
+        converted_si = []
+        unit_why = None
+        for hit in pressure_hits:
+            if hit.amount is None:
+                continue
+            si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
+            if si is None:
+                unit_why = trail
+            else:
+                converted_si.append(si)
+        if len(set(converted_si)) > 1:
+            return _with_mappings(
+                unknown_pressure_environment(
+                    "conflicting printed pressures; not collapsed into one number"
+                )
+            )
+        if unit_why:
+            return _with_mappings(unknown_pressure_environment(unit_why))
+        return _with_mappings(
+            unknown_pressure_environment(_looked_for_reason(field, vocab))
+        )
     return PressureEnvironment(
         total_pressure_Pa=located,
         sweep_gas=located_unknown(
@@ -4480,6 +4837,9 @@ def pressure_from_equipment(
             knudsen_number_orifice=kn_orifice,
             knudsen_number_chamber=kn_chamber,
         ),
+        gauge=gauge,
+        pumping=pumping,
+        cell_internal_pressure_note=note,
     )
 
 

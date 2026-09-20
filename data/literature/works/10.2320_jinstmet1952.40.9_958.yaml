@@ -119,6 +119,32 @@ experiments:
                 figure: '1'
                 note: NAG-530 mass filter; quartz Knudsen cell; orifice 0.25 mm; 55 V
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '55'
+        locator:
+          published_page: 959
+          pdf_page_index: 2
+          figure: '1'
+          note: NAG-530 mass filter; quartz Knudsen cell; orifice 0.25 mm; 55 V
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=55.0 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '55'
+              locator:
+                published_page: 959
+                pdf_page_index: 2
+                figure: '1'
+                note: NAG-530 mass filter; quartz Knudsen cell; orifice 0.25 mm; 55 V
+          output_unit: '1'
 - experiment_id: 10.2320/jinstmet1952.40.9_958::7
   kind: literature
   method:

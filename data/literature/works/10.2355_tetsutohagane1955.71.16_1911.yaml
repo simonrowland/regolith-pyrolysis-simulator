@@ -118,6 +118,17 @@ experiments:
     pdf_page_index: 3
     figure: '2'
     note: Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem
+  apparatus:
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: corrected using literature AP of H2O+ 12.67 eV (ref 4) and Ar+ 15.74 eV (ref 5)
+        locator:
+          published_page: 1913
+          pdf_page_index: 3
+          table: '2'
+          note: Table 2 appearance potentials of the ionic species
 - experiment_id: 10.2355/tetsutohagane1955.71.16_1911::3
   kind: literature
   method:

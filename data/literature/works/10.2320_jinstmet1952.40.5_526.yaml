@@ -64,6 +64,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: 10^-5 Pa range; Fig. 5 ~= 3e-5 Pa
+      locator:
+        published_page: 527
+        pdf_page_index: 2
+        figure: '1'
+        note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
   work_id: 10.2320/jinstmet1952.40.5_526
   locator:
     published_page: 527
@@ -120,6 +129,67 @@ experiments:
                 figure: '1'
                 note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '70'
+        locator:
+          published_page: 527
+          pdf_page_index: 2
+          figure: '1'
+          note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=70.0 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '70'
+              locator:
+                published_page: 527
+                pdf_page_index: 2
+                figure: '1'
+                note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+          output_unit: '1'
+      ionizing_current_mA:
+        state:
+          tag: value
+          value: '0.1'
+        locator:
+          published_page: 527
+          pdf_page_index: 2
+          figure: '1'
+          note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=0.1 mA
+          - printed=ionizing_current_mA
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.1'
+              locator:
+                published_page: 527
+                pdf_page_index: 2
+                figure: '1'
+                note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+          output_unit: '1'
+    temperature_measurement:
+      thermocouple:
+        state:
+          tag: value
+          value: alumel-chromel
+        locator:
+          published_page: 527
+          pdf_page_index: 2
+          figure: '1'
+          note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
 - experiment_id: 10.2320/jinstmet1952.40.5_526::7
   kind: literature
   method:

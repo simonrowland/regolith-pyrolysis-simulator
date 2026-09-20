@@ -121,6 +121,34 @@ experiments:
         pdf_page_index: 1
         figure: '1'
         note: Alumina Knudsen cell; orifice labelled 6
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '22'
+        locator:
+          published_page: 244
+          pdf_page_index: 1
+          figure: '1'
+          section: II
+          note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=22.0 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '22'
+              locator:
+                published_page: 244
+                pdf_page_index: 1
+                figure: '1'
+                section: II
+                note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+          output_unit: '1'
 - experiment_id: 10.2355/isijinternational1966.20.244::10
   kind: literature
   method:
