@@ -141,6 +141,27 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    pumping:
+      backing_pump:
+        state:
+          tag: value
+          value: Leybold Scrollvac SC 5 D
+        locator:
+          page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+      high_vacuum_pump:
+        state:
+          tag: value
+          value: Leybold Turbovac SL 80
+        locator:
+          page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
   work_id: 10.1016/j.pss.2019.05.001
   locator:
     page: 5
@@ -157,6 +178,18 @@ experiments:
         pdf_page_index: 5
         figure: '4'
         paragraph: 72-78
+    temperature_measurement:
+      thermocouple:
+        state:
+          tag: value
+          value: 0.5 mm diameter Type K mantle thermocouple inserted into the heater to measure the temperature of the sample
+            holder
+        locator:
+          page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
 - experiment_id: 10.1016/j.pss.2019.05.001::5
   kind: literature
   method:
@@ -379,6 +412,52 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    pumping:
+      pumping_speed_m3_s:
+        state:
+          tag: value
+          value: '0.065'
+        locator:
+          page: 17
+          pdf_page_index: 17
+          paragraph: 297-318
+          note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+        inference:
+          relation: L_s_to_m3_s
+          inputs:
+          - Q_m3_s = Q_L_s / 1000
+          - original_unit=L/s
+          - as_published=65 L/s
+          - printed=q_pump_l_s_assumed_as_printed
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '65'
+              locator:
+                page: 17
+                pdf_page_index: 17
+                paragraph: 297-318
+                note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 17
+                pdf_page_index: 17
+                paragraph: 297-318
+                note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+          output_unit: m3/s
+      q_pump_source:
+        state:
+          tag: value
+          value: matching the manufacturer value for N2 (60 l/s for Ar, 55 l/s for He, and 49 l/s for H2) (Leybold GmbH 2009)
+        locator:
+          page: 17
+          pdf_page_index: 17
+          paragraph: 297-318
+          note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
   work_id: 10.1016/j.pss.2019.05.001
   locator:
     page: 17

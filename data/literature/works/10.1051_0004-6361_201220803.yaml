@@ -325,14 +325,15 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.0000001'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=1e-09 mbar; background
+          pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar
       locator:
         paragraph: background pressure measured during evaporation
         line_range: 51-53
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
       inference:
-        relation: mbar_to_Pa
+        relation: extract_limit
         inputs:
         - P_Pa = P_mbar × 100
         - original_unit=mbar

@@ -87,10 +87,13 @@ experiments:
           page: 1277
           paragraph: The diameter of the effusion orifice was 0.5 mm
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.963495e-07 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          - extract_value=1.963495e-07 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -171,10 +174,13 @@ experiments:
           page: 1277
           paragraph: The diameter of the effusion orifice was 0.5 mm
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=1.963495e-07 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = pi (d/2)^2 from stated effusion orifice diameter 0.5 mm
+          - extract_value=1.963495e-07 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

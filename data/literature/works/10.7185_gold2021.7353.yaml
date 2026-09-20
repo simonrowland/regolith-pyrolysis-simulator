@@ -81,3 +81,31 @@ experiments:
         pdf_page_index: 1
         paragraph: experimental
         note: placed in iridium Knudsen cells
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '60'
+        locator:
+          page: 1
+          pdf_page_index: 1
+          paragraph: experimental
+          note: Ir Knudsen cells, tungsten-wire furnace, 60 eV, Finnigan MAT 271. Orifice diameter, Clausing factor, chamber
+            pressure, and sample mass are not printed on this 1-page abstract (do not copy from kems-137/138).
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=60 eV
+          - printed=electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 1
+                pdf_page_index: 1
+                paragraph: experimental
+                note: Ir Knudsen cells, tungsten-wire furnace, 60 eV, Finnigan MAT 271. Orifice diameter, Clausing factor,
+                  chamber pressure, and sample mass are not printed on this 1-page abstract (do not copy from kems-137/138).
+          output_unit: '1'

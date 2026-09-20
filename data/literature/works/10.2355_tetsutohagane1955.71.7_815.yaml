@@ -192,10 +192,14 @@ experiments:
           published_page: 816
           paragraph: 3-2 実験方法 inner diameter 15 mm
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=0.0001767 m2
-          - printed=sample_surface_area
+          - inferred=true
+          - 'area = π (d/2)^2 from stated graphite-crucible inner diameter 15 mm (section 3-2). Same crucible class used for
+            the a_Na2O runs (4-1: apparatus identical except Fe-Csat omitted).'
+          - extract_value=0.0001767 m2
+          - extract_field=sample_surface_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:

@@ -43,7 +43,84 @@ experiments:
   method:
     tag: unknown
     reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.3333118159137648686875407161'
+          - - SiO2
+            - '0.6666881840862351313124592841'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 276
+        table: '2'
+        note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in
+          this extract. Loaded mass is not stated.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '43.94'
+            locator:
+              published_page: 276
+              table: '2'
+              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
+                in this extract. Loaded mass is not stated.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 276
+              table: '2'
+              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
+                in this extract. Loaded mass is not stated.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '56.06'
+            locator:
+              published_page: 276
+              table: '2'
+              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
+                in this extract. Loaded mass is not stated.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 276
+              table: '2'
+              note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used
+                in this extract. Loaded mass is not stated.
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '43.94'
+          SiO2: '56.06'
+      locator:
+        published_page: 276
+        table: '2'
+        note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in
+          this extract. Loaded mass is not stated.
+    form:
+      state:
+        tag: value
+        value: crystalline K2Si2O5
+      locator:
+        published_page: 271
+        section: 3. Procedure
   conditions:
     temperature_K:
       state:

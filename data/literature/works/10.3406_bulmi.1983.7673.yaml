@@ -125,10 +125,13 @@ experiments:
           paragraph: experimental
           note: 0.3 mm diameter effusion holes drilled in the centres
         inference:
-          relation: identity:m2
+          relation: extract_inference
           inputs:
-          - as_published=7.068583e-08 m2
-          - printed=orifice_area
+          - inferred=true
+          - area = π (d/2)^2 from stated effusion orifice diameter 0.3 mm
+          - extract_value=7.068583e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
           parameters:
           - - original
             - state:
@@ -162,6 +165,42 @@ experiments:
                 paragraph: experimental
                 note: 0.3 mm diameter effusion holes drilled in the centres
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '-30'
+        locator:
+          published_page: 113
+          figure: '1'
+          paragraph: experimental
+          note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=-30 eV
+          - printed=ionization_voltage_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '-30'
+              locator:
+                published_page: 113
+                figure: '1'
+                paragraph: experimental
+                note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
+          output_unit: '1'
+    temperature_measurement:
+      thermocouples:
+        state:
+          tag: value
+          value: four Pt 30% Rh / Pt 6% Rh
+        locator:
+          published_page: 113
+          figure: '1'
+          paragraph: experimental
+          note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
 - experiment_id: 10.3406/bulmi.1983.7673::2
   kind: literature
   method:

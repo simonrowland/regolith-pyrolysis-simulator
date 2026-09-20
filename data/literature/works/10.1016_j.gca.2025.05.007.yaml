@@ -57,12 +57,17 @@ experiments:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
       inference:
-        relation: atm_to_Pa
+        relation: extract_inference
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
+        - inferred=true
+        - Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air. Table 1 Ex 7 prints log10 fO2=-0.68,
+          the air value (fO2 approx 0.21) at 1 atm total. The 1.0 atm scalar is inferred from that printed air token, not
+          a table-cell 1.0.
+        - extract_value=1.0 atm
+        - extract_field=chamber_pressure
+        - unit_conversion=atm_to_Pa
         parameters:
         - - original
           - state:
@@ -460,12 +465,17 @@ experiments:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
       inference:
-        relation: atm_to_Pa
+        relation: extract_inference
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
+        - inferred=true
+        - Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air. Table 1 Ex 7 prints log10 fO2=-0.68,
+          the air value (fO2 approx 0.21) at 1 atm total. The 1.0 atm scalar is inferred from that printed air token, not
+          a table-cell 1.0.
+        - extract_value=1.0 atm
+        - extract_field=chamber_pressure
+        - unit_conversion=atm_to_Pa
         parameters:
         - - original
           - state:
@@ -522,12 +532,17 @@ experiments:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
       inference:
-        relation: atm_to_Pa
+        relation: extract_inference
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
+        - inferred=true
+        - Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air. Table 1 Ex 7 prints log10 fO2=-0.68,
+          the air value (fO2 approx 0.21) at 1 atm total. The 1.0 atm scalar is inferred from that printed air token, not
+          a table-cell 1.0.
+        - extract_value=1.0 atm
+        - extract_field=chamber_pressure
+        - unit_conversion=atm_to_Pa
         parameters:
         - - original
           - state:
@@ -677,12 +692,17 @@ experiments:
         table: '1'
         note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
       inference:
-        relation: atm_to_Pa
+        relation: extract_inference
         inputs:
         - P_Pa = P_atm × 101325
         - original_unit=atm
-        - as_published=1.0 atm
-        - printed=chamber_pressure
+        - inferred=true
+        - Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air. Table 1 Ex 7 prints log10 fO2=-0.68,
+          the air value (fO2 approx 0.21) at 1 atm total. The 1.0 atm scalar is inferred from that printed air token, not
+          a table-cell 1.0.
+        - extract_value=1.0 atm
+        - extract_field=chamber_pressure
+        - unit_conversion=atm_to_Pa
         parameters:
         - - original
           - state:

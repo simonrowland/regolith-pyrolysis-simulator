@@ -119,6 +119,65 @@ experiments:
                 figure: '1'
                 note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '30'
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          figure: '1'
+          section: '2'
+          note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+            and English captions only.
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=30.0 eV
+          - printed=ionizing_electron_energy_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                published_page: 418
+                pdf_page_index: 2
+                figure: '1'
+                section: '2'
+                note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+                  and English captions only.
+          output_unit: '1'
+      total_emission_current_uA:
+        state:
+          tag: value
+          value: '200'
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          figure: '1'
+          section: '2'
+          note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+            and English captions only.
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=200.0 uA
+          - printed=total_emission_current_uA
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '200'
+              locator:
+                published_page: 418
+                pdf_page_index: 2
+                figure: '1'
+                section: '2'
+                note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals
+                  and English captions only.
+          output_unit: '1'
 - experiment_id: 10.2355/tetsutohagane1955.63.3_417::10
   kind: literature
   method:
@@ -562,3 +621,29 @@ experiments:
                 figure: '1'
                 note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '30'
+        locator:
+          published_page: 418
+          pdf_page_index: 2
+          section: '2.5'
+          note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=30.0 eV
+          - printed=ionizing_voltage_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                published_page: 418
+                pdf_page_index: 2
+                section: '2.5'
+                note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+          output_unit: '1'

@@ -1,0 +1,206 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2016.08.034
+  citation: 'Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin, A. V. & Wadhwa, M.
+    (2017), Thermal and chemical evolution in the early Solar System as recorded by FUN CAIs: Part II - Laboratory evaporation
+    of potential CMS-1 precursor material, Geochim. Cosmochim. Acta 201:49-64, DOI 10.1016/j.gca.2016.08.034'
+  source_ids:
+  - mendybaev-2017-fun-cai-lab-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:mendybaev-2017-fun-cai-lab-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2016.08.034
+experiments:
+- experiment_id: 10.1016/j.gca.2016.08.034::1
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.05976372234900118543359010501'
+          - - CaO
+            - '0.07119321826435993042515170709'
+          - - MgO
+            - '0.4939703307923544594320550803'
+          - - SiO2
+            - '0.3750727285942844247092031078'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '11.6'
+          CaO: '7.6'
+          MgO: '37.9'
+          SiO2: '42.9'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2016.08.034
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    note: Table 1 on manuscript PDF page 39; Table 2 on the same page. Run duration is time at 1900 C.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 2.5 mm diameter iridium wire loop
+      locator:
+        pdf_page_index: 9
+        paragraph: 25–40 mg of the mixture loaded onto 2.5 mm diameter iridium wire loops
+        section: '3.1'
+- experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2016.08.034
+  locator:
+    pdf_page_index: 13
+    paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
+    section: '4.1'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 2.5 mm diameter iridium wire loop
+      locator:
+        pdf_page_index: 9
+        paragraph: 2.5 mm diameter iridium wire loops
+        section: '3.1'

@@ -226,6 +226,24 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    gauge:
+      pressure_gauge:
+        state:
+          tag: value
+          value: MKS 901P piezo-transducer / micro-Pirani (no ion gauge, to avoid gas consumption)
+        locator:
+          pdf_page_index: 7
+          section: 2.1-2.2 vacuum MS and chemical analysis
+          note: Icarus journal pre-proof; no printed pagination.
+    pumping:
+      pump:
+        state:
+          tag: value
+          value: HiCube 80 Eco turbo pump station
+        locator:
+          pdf_page_index: 7
+          section: 2.1-2.2 vacuum MS and chemical analysis
+          note: Icarus journal pre-proof; no printed pagination.
   work_id: 10.1016/j.icarus.2023.115577
   locator:
     pdf_page_index: 6

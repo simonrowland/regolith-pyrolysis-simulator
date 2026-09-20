@@ -232,6 +232,31 @@ experiments:
     page: 43
     figure: '6'
     note: AM HTML caption only; no numeric table
+  apparatus:
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '16.5'
+        locator:
+          page: 43
+          figure: '6'
+          note: AM HTML caption only; no numeric table
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=16.5 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '16.5'
+              locator:
+                page: 43
+                figure: '6'
+                note: AM HTML caption only; no numeric table
+          output_unit: '1'
 - experiment_id: 10.1016/j.icarus.2017.02.006::7
   kind: literature
   method:

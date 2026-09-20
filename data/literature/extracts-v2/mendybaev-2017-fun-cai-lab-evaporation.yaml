@@ -1,0 +1,2701 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml
+observations:
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_al_non_loss
+  experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_non_loss_bound'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: Because aluminum is very refractory and does not evaporate during the experiments, the values of ƒ24Mg were
+      calculated as (MgO/Al2O3)residue/(MgO/Al2O3)zero-time run
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 13
+    paragraph: Because aluminum is very refractory and does not evaporate during the experiments
+    section: '4.1'
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_ca_non_loss
+  experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'qualitative_non_loss_bound'
+    species:
+      formula: Ca
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments, the plot of weight
+      percents of SiO2 versus MgO can be used to fully characterize the evaporation trajectory.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 13
+    paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
+    section: '4.1'
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:0
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.047'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-5
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000285'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0285 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0285'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '34.09'
+          Al2O3: '13.93'
+          SiO2: '42.93'
+          CaO: '9.05'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.4551489189825102823909682284'
+          - - Al2O3
+            - '0.0735183287893979544307696039'
+          - - SiO2
+            - '0.3844890215238969701546067974'
+          - - CaO
+            - '0.08684373070419479302365537038'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.09'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '13.93'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.93'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.05'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '4.7'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-5
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-5
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:1
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.166'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-10
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000025'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.025 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.025'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '33.53'
+          Al2O3: '15.2'
+          SiO2: '40.74'
+          CaO: '10.48'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.4506762936522052894946619447'
+          - - Al2O3
+            - '0.08075933681734383589196117917'
+          - - SiO2
+            - '0.367323510462810249471371201'
+          - - CaO
+            - '0.1012408590676406251420056752'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '33.53'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.2'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.74'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.48'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '16.6'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-10
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-10
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:2
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.286'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-1
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000334'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0334 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0334'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '32.12'
+          Al2O3: '18.16'
+          SiO2: '37.16'
+          CaO: '12.52'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.4386535118439120208628341768'
+          - - Al2O3
+            - '0.09803472018904329013850083837'
+          - - SiO2
+            - '0.3404225497675637732383634807'
+          - - CaO
+            - '0.1228892181994809157603015037'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '32.12'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '18.16'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.16'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.52'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '28.6'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-1
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-1
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:3
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.397'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-9
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000276'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0276 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0276'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '29.92'
+          Al2O3: '19.78'
+          SiO2: '35.54'
+          CaO: '14.77'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.4144338086482827174987102992'
+          - - Al2O3
+            - '0.1083023475556564777013601086'
+          - - SiO2
+            - '0.3302231776526229521317132441'
+          - - CaO
+            - '0.1470406661434378526682163479'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '29.92'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '19.78'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.54'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '14.77'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '39.7'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-9
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-9
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:4
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.463'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-3
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000294'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0294 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0294'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '27.36'
+          Al2O3: '21.69'
+          SiO2: '34.24'
+          CaO: '16.72'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.3857902908346978021680946422'
+          - - Al2O3
+            - '0.120896227157428700483273069'
+          - - SiO2
+            - '0.3238661043943359139522430329'
+          - - CaO
+            - '0.1694473776135375833963892563'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '27.36'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.69'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '34.24'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.72'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '46.3'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-3
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-3
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:5
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.547'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-7
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000342'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0342 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0342'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '23.87'
+          Al2O3: '25.3'
+          SiO2: '31.63'
+          CaO: '19.22'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.3464321767417024701571304587'
+          - - Al2O3
+            - '0.1451457487883170077617003547'
+          - - SiO2
+            - '0.3079367603328908068588116193'
+          - - CaO
+            - '0.2004853141370897152223575676'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.87'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '25.3'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '31.63'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '19.22'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '54.7'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-7
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-7
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:6
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.617'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-8
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000361'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0361 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0361'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '19.08'
+          Al2O3: '31.35'
+          SiO2: '28.21'
+          CaO: '21.37'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.2901680537611859135148160633'
+          - - Al2O3
+            - '0.188463289419087385581860495'
+          - - SiO2
+            - '0.2877867889551263252628721621'
+          - - CaO
+            - '0.2335818678646003756404512798'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '19.08'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '31.35'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '28.21'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '21.37'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '61.7'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-8
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-8
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:7
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.639'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-4
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000034'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.034 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.034'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '16.51'
+          Al2O3: '32.15'
+          SiO2: '27.32'
+          CaO: '24.03'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.254720951396881535868736198'
+          - - Al2O3
+            - '0.196072446389911754091666336'
+          - - SiO2
+            - '0.2827449330160203830688916014'
+          - - CaO
+            - '0.2664616691971863269707058647'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '16.51'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '32.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '27.32'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '24.03'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '63.9'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-4
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-4
+    output_unit: dimensionless
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::point:8
+  experiment_id: 10.1016/j.gca.2016.08.034::1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: unknown
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.693'
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Measured chemical bulk composition and magnesium, silicon and oxygen isotopic compositions of starting
+      materials and FUNC evaporation residues.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-6
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000039'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.039 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.039'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '10.95'
+          Al2O3: '40.16'
+          SiO2: '22.16'
+          CaO: '26.75'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.1797560405608946490430682268'
+          - - Al2O3
+            - '0.2606039978215055791137082447'
+          - - SiO2
+            - '0.2440257584105475435393598542'
+          - - CaO
+            - '0.3156142032070522283038636746'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.95'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '40.16'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.16'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '26.75'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        output_unit: mole_fraction
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - unknown:mendybaev-2017-fun-cai-lab-evaporation
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '69.3'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-6
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          pdf_page_index: 39
+          table: '1'
+          paragraph: FUNC-6
+    output_unit: dimensionless

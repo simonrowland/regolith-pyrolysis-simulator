@@ -42,7 +42,180 @@ experiments:
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        figure: '1'
+        section: EXPERIMENTS
+        line_range: 33-90
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        figure: '1'
+        section: EXPERIMENTS
+        line_range: 33-90
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -51,14 +224,15 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.01333223684210526315789473684'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.0001 Torr; vacuum level
+          in the chamber was about 10^-4 Torr during the experiments
       locator:
         published_page: 118
         pdf_page_index: 8
         paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
       inference:
-        relation: Torr_to_Pa
+        relation: extract_limit
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
@@ -102,16 +276,209 @@ experiments:
         tag: value
         value: high-purity graphite crucible (atomic-pile grade block)
       locator:
+        published_page: 113
         figure: '1'
-        paragraph: Graphite crucible; high purity graphite block
-        line_range: 70-74
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::10
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        figure: '10'
+        paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+        note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '10'
+              paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+              note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        figure: '10'
+        paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+        note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -120,11 +487,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -140,6 +533,24 @@ experiments:
     figure: '10'
     paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
     note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::2
   kind: literature
   method:
@@ -182,6 +593,146 @@ experiments:
               table: '2'
               note: Heating conditions and run notations
         output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 114
+        pdf_page_index: 4
+        table: '2'
+        note: Heating conditions and run notations
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 114
+        pdf_page_index: 4
+        table: '2'
+        note: Heating conditions and run notations
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -190,11 +741,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -209,12 +786,203 @@ experiments:
     pdf_page_index: 4
     table: '2'
     note: Heating conditions and run notations
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::3
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 116
+        pdf_page_index: 6
+        table: '3'
+        note: Summary of experimental results; residue bulk composition vs VF, T, t
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 116
+              pdf_page_index: 6
+              table: '3'
+              note: Summary of experimental results; residue bulk composition vs VF, T, t
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 116
+        pdf_page_index: 6
+        table: '3'
+        note: Summary of experimental results; residue bulk composition vs VF, T, t
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -223,14 +991,15 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.01333223684210526315789473684'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.0001 Torr; vacuum level
+          in the chamber was about 10^-4 Torr during the experiments
       locator:
         published_page: 118
         pdf_page_index: 8
         paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
       inference:
-        relation: Torr_to_Pa
+        relation: extract_limit
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
@@ -278,12 +1047,193 @@ experiments:
         pdf_page_index: 3
         figure: '1'
         paragraph: crucible made of a high purity graphite block commonly used in atomic piles
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::4
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        table: '4'
+        note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              table: '4'
+              note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        table: '4'
+        note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -292,11 +1242,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -311,12 +1287,203 @@ experiments:
     pdf_page_index: 8
     table: '4'
     note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::5
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 122
+        pdf_page_index: 12
+        table: '5'
+        note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 122
+              pdf_page_index: 12
+              table: '5'
+              note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 122
+        pdf_page_index: 12
+        table: '5'
+        note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -325,11 +1492,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -344,12 +1537,203 @@ experiments:
     pdf_page_index: 12
     table: '5'
     note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::6
   kind: literature
   method:
     tag: unknown
     reason: regime 'thermodynamic_tabulation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 124
+        pdf_page_index: 14
+        table: '6'
+        note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 124
+              pdf_page_index: 14
+              table: '6'
+              note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 124
+        pdf_page_index: 14
+        table: '6'
+        note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -358,11 +1742,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -377,12 +1787,215 @@ experiments:
     pdf_page_index: 14
     table: '6'
     note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::9
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        figure: '9'
+        paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+        note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 123
+              pdf_page_index: 13
+              figure: '9'
+              paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+              note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 123
+        pdf_page_index: 13
+        figure: '9'
+        paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+        note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -391,11 +2004,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -411,12 +2050,179 @@ experiments:
     figure: '9'
     paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
     note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        paragraph: molten spherule free evaporation graphite crucible
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              paragraph: molten spherule free evaporation graphite crucible
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        paragraph: molten spherule free evaporation graphite crucible
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -425,24 +2231,38 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value: '0.0013'
+        tag: unknown
+        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.0001 Torr; Hashimoto
+          printed during-run nominal. Fedkin's 1.3e-8 bar is the before-throw reading (about 10^{-5} Torr), not the run pressure;
+          it is not stored here.
       locator:
-        paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
       inference:
-        relation: identity:Pa
+        relation: extract_limit
         inputs:
-        - as_published=0.0013 Pa
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
         - printed=chamber_pressure
         parameters:
         - - original
           - state:
               tag: value
-              value: '0.0013'
+              value: '0.0001'
             locator:
-              paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
-              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
         output_unit: Pa
     sweep_gas:
       state:
@@ -464,12 +2284,205 @@ experiments:
       locator:
         paragraph: graphite crucible
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   kind: literature
   method:
     tag: value
     value: langmuir_free_evaporation
-  sample: {}
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 128
+        pdf_page_index: 18
+        equation: '14'
+        note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in
+          eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 128
+              pdf_page_index: 18
+              equation: '14'
+              note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed
+                in eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.16'
+          CaO: '2.53'
+          FeO: '35.04'
+          MgO: '23.84'
+          SiO2: '35.43'
+      locator:
+        published_page: 128
+        pdf_page_index: 18
+        equation: '14'
+        note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in
+          eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
   conditions:
     temperature_K:
       state:
@@ -478,11 +2491,37 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -498,3 +2537,21 @@ experiments:
     equation: '14'
     note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in eqn
       (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device

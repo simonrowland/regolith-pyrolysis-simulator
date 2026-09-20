@@ -13155,6 +13155,65 @@ observations:
     - pdf:kems-137-bischof-2023
     parameters: []
     output_unit: dimensionless
+- observation_id: kems-137-bischof-2023::bischof_2023_kems_geometry_and_calibration
+  experiment_id: 10.1016/j.gca.2023.08.027::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'kems_method_geometry_reference'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1400.0, 1742.0]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5001446588270395579114693973'
+        - - Al2O3
+          - '0.09016222059047146822155136996'
+        - - MgO
+          - '0.159959352914716545092785499'
+        - - CaO
+          - '0.2497337676677724287741937335'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: orifice diameter 0.4 mm printed, area not computed; KC chamber pressure is the nominal ~10^-6 mbar; Table 2 masses
+        are per-run (not one charge)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 6
+    table: '2'
+    section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+    note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
+  read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
   experiment_id: 10.1016/j.gca.2023.08.027::9
   identity:

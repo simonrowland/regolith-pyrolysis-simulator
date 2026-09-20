@@ -1,0 +1,1054 @@
+schema_version: literature_extract.v1
+source_id: sublimation-kinetics-2023-minerals
+source:
+  citation: >-
+    Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. &
+    Pownceby, M. I. (2023), "Metal and Oxide Sublimation from Lunar Regolith: A
+    Kinetics Study", Minerals 13, 79, DOI 10.3390/min13010079
+  doi: 10.3390/min13010079
+  url: https://doi.org/10.3390/min13010079
+  year: 2023
+  related_sources:
+  - source_id: kems-022-demaria-1971
+    relation: cited_kems_verification_not_this_work
+    note: Shaw compare FactSage p_sat to De Maria et al. 1971 KEMS on Apollo 12022 (their ref. [15]).
+      Those KEMS points are not re-tabulated here; they already live in kems-022-demaria-1971. Figures
+      3–4 that overlay De Maria traces are figure-only.
+extraction:
+  method: Born-digital Minerals 13:79 PDF from regolith-corpus raw/sublimation-kinetics-2023-minerals/sublimation-kinetics-2023-minerals.pdf
+    (12 pages, clean text layer). Transcribed with pdftotext -layout plus 150 dpi pdftoppm of pages 5–8
+    to certify Table 2 cells and to confirm Figures 1 and 3–5 have no printed data labels. Table 1 and
+    Table 2 cells are from the text layer. Printed BET numbers are from abstract/§3.1/§5 prose, not from
+    digitising Figure 1. Figure 1 has additional unlabelled sinter-temperature points that were not digitised.
+    Table 2 p_sat and HKL flux, and the 1200 °C g/h/g headline rates, are FactSage/HKL model output, stored
+    as model_derived, not as measurements. LMS-1 oxide composition is not printed in this source.
+  date: '2026-09-19'
+  worker: extract-sublimation-kinetics-2023
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: LMS-1
+  observable: rate_series
+  observation_id: shaw_2023_lms1_bet_printed_ssa_vs_T
+  field: unsintered_bet_m2_g
+  value: 3.29
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: abstract
+    note: 'The surface area of the samples was measured to vary from 3.29 m2/g in the unsintered sample'
+- species: LMS-1
+  observable: rate_series
+  observation_id: shaw_2023_lms1_bet_printed_ssa_vs_T
+  field: bet_800C_m2_g
+  value: 1.04
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: 3.1
+    figure: '1'
+    note: 'A surface area reduction from 1.04 m2/g at 800 C to 0.09 m2/g at 1150 C'
+- species: LMS-1
+  observable: rate_series
+  observation_id: shaw_2023_lms1_bet_printed_ssa_vs_T
+  field: bet_1150C_m2_g
+  value: 0.09
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: 3.1
+    figure: '1'
+    note: 0.09 m2/g at 1150 C as printed in §3.1
+- species: '12022'
+  observable: rate_series
+  observation_id: shaw_2023_table1_apollo_12022_composition_snyder
+  field: composition_wt_pct
+  value:
+    SiO2: 43.22
+    FeO: 21.45
+    MgO: 10.44
+    Al2O3: 9.04
+    CaO: 9.56
+    TiO2: 5.16
+    Cr2O3: 0.33
+    MnO: 0.25
+    Na2O: 0.47
+    K2O: 0.07
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    note: "Table 1 Apollo #12022 composition from Snyder et al.; SiO2 43.22 wt%"
+- species: Fe
+  observable: psat_series
+  observation_id: shaw_2023_table2_fe_psat_factsage_feo
+  field: p_atm_1200C
+  value: 9.4e-08
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+    note: Table 2 Fe pFe,sat at 1200 C = 9.4e-8 atm (FactSage, not measured)
+- species: Fe
+  observable: rate_series
+  observation_id: shaw_2023_table2_fe_hkl_flux
+  field: evaporation_rate_1200C
+  value: 4.6e-06
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+    note: Table 2 Fe Evap. Flux at 1200 C = 4.6e-6 mol/s/m2 (HKL, not measured)
+- species: Na
+  observable: rate_series
+  observation_id: shaw_2023_na_max_sublimation_rate_1200C
+  field: evaporation_rate
+  value: 1.38
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    section: '5'
+    note: predicted maximum rate of sublimation for Na at 1200 C was 1.38 g/h/g of regolith
+- species: Fe
+  observable: alpha
+  observation_id: shaw_2023_hkl_ae_unity_assumption
+  field: alpha
+  value: 1.0
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    section: 2.3.2
+    note: ae assumed unity; model assumption, not a measured evaporation coefficient
+species:
+  LMS-1:
+    observations:
+    - observation_id: shaw_2023_lms1_sintering_apparatus
+      type: rate_series
+      class_tag: measured
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        section: 2.1
+        paragraph: Lunar Simulant Sintering
+      quote: For the sintering test work, 2.6 g samples of LMS-1 lunar regolith simulant were placed
+        in a steel die assembly with a 13 mm diameter. The die was compressed using a manual hydraulic
+        press for 5 min at 80 kN of pressure. Three pellets were prepared for each test. Samples were
+        placed into an alumina (99.8%) boat on a layer of nickel foil separating the samples from the
+        boat.
+      T_range_K:
+      - 298.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: pressed_simulant_pellet
+        metastable: false
+        basis: explicit_author
+        note: LMS-1 compressed in a 13 mm steel die; height/thickness not printed. Partial melting of
+          the simulant was observed at 1200 C (see shaw_2023_lms1_fig2_micrographs_and_partial_melt).
+      standard_state: vacuum-sintered compressed LMS-1 pellets; BET later, not an evaporation-rate measurement
+      regime: vacuum_sintering
+      units: as printed (g, mm, kN, min, h, atm, C)
+      uncertainty:
+        note: no uncertainty printed on pellet mass, die diameter, compaction force, or hold time
+      values:
+        quantity: sintering_apparatus_and_pellet_geometry
+        method_class: measured
+        evidence_class: authors_own_experiment
+        sample_mass_g: 2.6
+        feedstock_as_printed: LMS-1 lunar regolith simulant (Exolith Lab)
+        lms1_composition_wt_pct:
+          status: absent
+          reason: not_printed_in_this_source
+          cited: Isachenkov et al. 2022 Icarus 376:114873 (their ref. [10]) for simulant specifications;
+            only the BET sample density 3.03 g/cm3 is printed from those specs
+        die_diameter_mm: 13.0
+        compaction_force_kN: 80.0
+        compaction_time_min: 5.0
+        n_pellets_per_test: 3
+        geometric_pellet_face_area:
+          status: absent
+          reason: die inner diameter 13 mm is printed; pellet height and geometric evaporating area are
+            not; geometric face area is not inferred from the die
+        furnace: Carbolite GERO HTRH 100-600/18
+        heating_elements: six MoSi2 heating elements in a vertical hanging position
+        programmer: model E3508P10
+        pump: Edwards E2M1.5 Rotary Vane Vacuum Pump
+        pressure_gauge: mechanical pressure gauge
+        chamber_pressure_as_printed: below 10^{-3} atm (required for the system to be considered sufficiently
+          sealed)
+        chamber_pressure_bound_kind: less_than
+        chamber_pressure_bound_atm: 0.001
+        chamber_pressure_conclusions_as_printed: ~10^{-3} atm
+        heating_duration_h: 6.0
+        hold_time_h: 2.0
+        cool_as_printed: allowed to cool naturally
+        T_is: not_printed_whether_sample_or_furnace; no thermocouple type or calibration is printed
+        T_range_K_conversion: sintering window discussed as 800-1200 C; unsintered BET plotted at 25 C;
+          T_K = t_C + 273.15 so 25 C -> 298.15 K and 1200 C -> 1473.15 K
+        facility: Robert Simpson High Temperature Processing facility, Advanced Technologies Centre, Swinburne
+          University of Technology
+      equipment:
+        cell_material:
+          value: alumina (99.8%) boat; nickel foil separator; steel die (13 mm)
+          locator:
+            published_page: 2
+            pdf_page_index: 2
+            section: 2.1
+            paragraph: Samples were placed into an alumina (99.8%) boat on a layer of nickel foil
+        chamber_pressure:
+          value:
+            as_printed: below 10^{-3} atm
+            semantics: upper_bound_not_point
+            bound_kind: less_than
+            bound_atm: 0.001
+            conclusions_as_printed: ~10^{-3} atm
+          locator:
+            published_page: 2
+            pdf_page_index: 2
+            section: 2.1
+            paragraph: A constant pressure of below 10^{-3} atm was required for the system to be considered
+              sufficiently sealed
+        sample_surface_area:
+          value:
+            basis: BET_N2_specific_surface_area
+            units: m2/g
+            geometric_area: refused_not_printed
+            note: Evaporation area used later is BET specific surface area versus sinter temperature, not
+              a geometric pellet face. A single area is not stored here; see shaw_2023_lms1_bet_printed_ssa_vs_T.
+          locator:
+            published_page: 3
+            pdf_page_index: 3
+            section: 2.2
+            paragraph: Brunauer-Emmett-Teller (BET) analysis
+    - observation_id: shaw_2023_lms1_bet_printed_ssa_vs_T
+      type: rate_series
+      class_tag: measured
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        section: 3.1
+        figure: '1'
+        note: Printed BET numbers from prose (abstract, §3.1, §5). Figure 1 is the plot of the same campaign;
+          additional unlabelled points on that plot were not digitised.
+      quote: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples.
+        Minimal further surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
+      T_range_K:
+      - 298.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: pressed_simulant_pellet
+        metastable: false
+        basis: explicit_author
+        note: BET on fractured sintered LMS-1 pellets plus loose fragments; 2 h isothermal snapshot, not
+          a time series
+      standard_state: N2 BET specific surface area (m2/g) at ~77 K, P/P0 0.05-0.35
+      regime: vacuum_sintering
+      units: m2/g as printed; T in C as printed
+      uncertainty:
+        plot_error_range_pct: 5.0
+        quote: For the reporting of surface areas in the current work, an error range of 5% was added to
+          plots; this error range comes from the survey published by Hackley and Stefaniak [14] where a
+          5% error range was observed between multiple laboratories. This error is predominantly attributed
+          to the accuracy of the sample mass measurements.
+        locator:
+          published_page: 3
+          pdf_page_index: 3
+          section: 2.2
+      values:
+        quantity: bet_specific_surface_area_vs_sinter_temperature
+        method_class: measured
+        evidence_class: authors_own_experiment
+        area_basis: BET_N2
+        area_basis_note: specific surface area m2/g, not geometric pellet face; ASTM C1274-12 R2>=0.9999,
+          no samples rejected
+        unsintered_bet_m2_g: 3.29
+        bet_800C_m2_g: 1.04
+        bet_1150C_m2_g: 0.09
+        further_reduction_1150_to_1200C_m2_g:
+          semantics: bound_not_point
+          as_printed: <0.002 m2/g
+          bound_kind: less_than
+          bound: 0.002
+          note: this is a bound on the CHANGE between 1150 and 1200 C, not a 1200 C area and not collapsed
+            to 0.09
+        bet_1200C_m2_g:
+          status: absent
+          reason: 1200 C area is not printed as a point; only the <0.002 m2/g further-reduction bound is
+            printed
+        instrument: Micromeritics TriStar II PLUS
+        prep: Micromeritics Smart VacPrep; dried at 300 C for 12 h under rotary-pump vacuum
+        adsorbate: nitrogen
+        analysis_T_as_printed: ~77 K
+        p_over_p0_full_sweep: 0 to 1
+        n_points_full_sweep: 160
+        bet_p_over_p0_range: 0.05 to 0.35
+        sample_density_g_cm3_used_in_bet: 3.03
+        sample_density_source: LMS-1 simulant specifications (Isachenkov et al. 2022, their ref. [10]);
+          quoted, not measured in this work
+        snapshot_hold_h: 2.0
+        temporal_note: calculations are a snapshot at the 2-h mark of sintering under consistent temperature;
+          authors state a time-resolved area is not reported
+        T_range_K_conversion: unsintered shown at 25 C -> 298.15 K; 800 C -> 1073.15 K; 1150 C -> 1423.15
+          K; 1200 C -> 1473.15 K via T_K = t_C + 273.15
+        series:
+        - T_C: 25.0
+          T_K: 298.15
+          condition: unsintered_feed
+          bet_surface_area_m2_g: 3.29
+          locator:
+            published_page: 1
+            pdf_page_index: 1
+            paragraph: abstract
+          quote: 3.29 m2/g in the unsintered sample
+        - T_C: 800.0
+          T_K: 1073.15
+          condition: sintered_2_h
+          bet_surface_area_m2_g: 1.04
+          locator:
+            published_page: 5
+            pdf_page_index: 5
+            section: 3.1
+          quote: 1.04 m2/g at 800 C
+        - T_C: 1150.0
+          T_K: 1423.15
+          condition: sintered_2_h
+          bet_surface_area_m2_g: 0.09
+          locator:
+            published_page: 5
+            pdf_page_index: 5
+            section: 3.1
+          quote: 0.09 m2/g at 1150 C
+      equipment:
+        sample_surface_area:
+          value:
+            basis: BET_N2
+            units: m2/g
+            printed_points_m2_g:
+              unsintered_25C: 3.29
+              sintered_800C: 1.04
+              sintered_1150C: 0.09
+            geometric_area: refused_not_printed
+            note: Do not collapse this series to a single average area. Flux in Table 2 is per m2 (HKL);
+              g/h/g rates multiply that flux by this BET m2/g at the sinter temperature.
+          locator:
+            published_page: 5
+            pdf_page_index: 5
+            section: 3.1
+            figure: '1'
+        chamber_pressure:
+          value:
+            as_printed: below 10^{-3} atm
+            semantics: upper_bound_not_point
+            bound_kind: less_than
+            bound_atm: 0.001
+          locator:
+            published_page: 2
+            pdf_page_index: 2
+            section: 2.1
+        cell_material:
+          value: 1/2 in. glass BET sample tube; sintered LMS-1 fractured into quarters plus loose fragments
+          locator:
+            published_page: 3
+            pdf_page_index: 3
+            section: 2.2
+    - observation_id: shaw_2023_lms1_fig1_ssa_curve_figure_only
+      type: rate_series
+      class_tag: measured
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        figure: '1'
+      quote: Figure 1. Calculated surface area changes due to sintering of LMS-1 simulant.
+      T_range_K:
+      - 298.15
+      - 1473.15
+      phase: condensed_solid
+      regime: vacuum_sintering
+      units: figure axis BET surface area (m2/g) vs Temperature (C)
+      values:
+        quantity: bet_ssa_vs_T_figure
+        method_class: figure_only
+        admission_status: figure_only
+        evidence_class: figure_not_digitised
+        printed_axis: BET surface area (m2/g) vs Temperature (C), 0-4.00 vs 0-1300 C
+        printed_in_prose_not_from_this_figure:
+        - unsintered_25C_3.29_m2_g
+        - 800C_1.04_m2_g
+        - 1150C_0.09_m2_g
+        - 1150_to_1200C_further_reduction_lt_0.002_m2_g
+        unlabelled_points_note: Figure 1 shows additional sinter-temperature points (including down to
+          400 C as stated in §3.1) with 5% error bars. Those points have no printed numeric labels and
+          were not digitised.
+        error_bars: 5% (Hackley and Stefaniak interlaboratory survey; added to plots)
+    - observation_id: shaw_2023_lms1_fig2_micrographs_and_partial_melt
+      type: transition_point
+      class_tag: measured
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        figure: '2'
+        section: 3.1
+      quote: the sample morphology is noticeably different. The 1200 °C sample shows more spherical-shaped
+        pores. ... this indicates the presence of liquid phases in the samples at 1200 °C.
+      T_range_K:
+      - 1373.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: pressed_simulant_pellet
+        metastable: false
+        basis: explicit_author
+        note: 1200 C morphology indicates liquid phases; this is not a measured liquidus temperature
+      standard_state: qualitative optical micrographs of sintered pellet cross-sections
+      regime: vacuum_sintering
+      units: C as printed
+      values:
+        quantity: partial_melting_observed
+        method_class: measured
+        T_C: 1200.0
+        T_K: 1473.15
+        T_conversion: 1200 C + 273.15 = 1473.15 K
+        property_kind: partial_melting_observed_in_micrograph
+        semantics: qualitative_observation_not_a_liquidus_point
+        figure_2_panels:
+          a: unsintered feed material
+          b: sintered 2 h at 1100 C
+          c: sintered 2 h at 1150 C
+          d: sintered 2 h at 1200 C
+        scale_bar_as_printed: 600 um (panel d)
+        note: Partial melting of the regolith simulant material was also stated at 1200 C in the introduction
+          (p. 2). Not a calibrated melting-point measurement.
+    - observation_id: shaw_2023_lms1_quoted_spec_density
+      type: rate_series
+      class_tag: quoted
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+        section: 2.2
+      quote: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications
+        [10].
+      phase: condensed_solid
+      standard_state: density adopted from LMS-1 specifications, not measured here
+      regime: quoted_literature
+      units: g/cm3 as printed
+      values:
+        quantity: density
+        method_class: quoted_from_other_workers
+        density_g_cm3: 3.03
+        cited: Isachenkov et al. 2022 Icarus 376:114873 (their ref. [10])
+  '12022':
+    observations:
+    - observation_id: shaw_2023_table1_apollo_12022_composition_snyder
+      type: rate_series
+      class_tag: quoted
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+      quote: >-
+        Table 1. Apollo #12022 composition used in the calculation of saturated
+        vapor pressures, data from Snyder et. al. [23]. Values adjusted to 100%
+        omitting trace elements.
+      phase: condensed_solid
+      condensed_form:
+        state: lunar_basalt_12022
+        metastable: false
+        basis: explicit_author
+        note: Composition is Snyder et al. 1997 as reprinted by Shaw; used as the FactSage full-silicate
+          feed for Figure 3, which the authors then discarded as inaccurate.
+      standard_state: major-oxide wt% adjusted to 100% omitting trace elements, as printed
+      regime: quoted_literature
+      units: wt% as printed
+      values:
+        quantity: printed_major_oxide_composition
+        method_class: quoted_from_other_workers
+        composition_wt_pct:
+          SiO2: 43.22
+          FeO: 21.45
+          MgO: 10.44
+          Al2O3: 9.04
+          CaO: 9.56
+          TiO2: 5.16
+          Cr2O3: 0.33
+          MnO: 0.25
+          Na2O: 0.47
+          K2O: 0.07
+        composition_basis: Apollo_12022_as_reprinted
+        composition_source: Snyder et al. 1997 GCA 61:2731-2747 (their ref. [23]); not an LMS-1 analysis
+        adjusted_to_100_pct_omitting_trace_elements: true
+        printed_column_order: SiO2, FeO, MgO, Al2O3, CaO, TiO2, Cr2O3, MnO, Na2O, K2O
+        used_for: FactSage 8.2 full-silicate p_sat in Figure 3; authors judged that prediction inaccurate
+          and did not use it for Table 2
+        lms1_composition:
+          status: absent
+          reason: LMS-1 oxide composition is not printed in this paper
+    - observation_id: shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        figure: '3'
+      quote: >-
+        Figure 3. Comparison between measured saturated vapor pressure of species
+        Fe, Na, and K from De Maria et al. [15] shown in blue, and the prediction
+        by FactSage 8.2 software shown in orange, given the Apollo sample #12022
+        feed shown in Table 1.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: FactSage 8.2 full-silicate p_sat vs cited De Maria KEMS; neither curve digitised
+      regime: engine_evaluation
+      units: atm vs C as plotted
+      values:
+        quantity: p_sat
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: figure_not_digitised
+        factsage_version: '8.2'
+        factsage_databases:
+        - FactPS
+        - FToxid
+        - FSstel
+        factsage_method: fixed-volume; 100 g solid feed; 1 liter volume
+        composition_wt_pct:
+          SiO2: 43.22
+          FeO: 21.45
+          MgO: 10.44
+          Al2O3: 9.04
+          CaO: 9.56
+          TiO2: 5.16
+          Cr2O3: 0.33
+          MnO: 0.25
+          Na2O: 0.47
+          K2O: 0.07
+        authors_verdict: full-silicate FactSage underestimates measured p_sat (Fe, Na ~1 order of magnitude;
+          K >2.5 orders at lower T); discarded for kinetics modelling
+        demaria_overlay: cited KEMS from De Maria et al. 1971 on 12022; not re-tabulated (see kems-022-demaria-1971)
+        T_axis_as_printed: figure axis; not digitised. Modelling window in the text is 800-1200 C.
+    - observation_id: shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        figure: '4'
+      quote: The oxide systems determined to provide the most accurate prediction were FeO for Fe, Al2O3-CaO-Na2O
+        for Na, and Al2O3-K2O for K.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: FactSage proxy-system p_sat vs cited De Maria KEMS; not digitised
+      regime: engine_evaluation
+      units: atm vs C as plotted
+      values:
+        quantity: p_sat
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: figure_not_digitised
+        proxy_systems_as_printed:
+          Fe: FeO (pure oxide)
+          Na: Al2O3-CaO-Na2O
+          K: Al2O3-K2O
+        proxy_system_mole_fractions:
+          status: absent
+          reason: binary/ternary compositions used in FactSage are not printed
+        legend_as_printed: Blue = DeMaria KEMS data; Green = Pure Oxide (FactSage); Yellow = Closest Oxide
+          System (FactSage)
+    - observation_id: shaw_2023_fig5_predicted_sublimation_rate_figure_only
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 8
+        pdf_page_index: 8
+        figure: '5'
+      quote: Figure 5. Predicted sublimation rate of elements Fe, Na, and K from lunar regolith, evaporation
+        rate calculated using the HKL equation, surface area calculated from the sintering of LMS-1 simulant.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: model combination of Table 2 HKL flux and Figure 1 BET area; not digitised
+      regime: langmuir_free_evaporation
+      units: g/h/g and g/h/m2 vs C; surface area m2/g on the right axis
+      values:
+        quantity: evaporation_rate
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: figure_not_digitised
+        traces_as_printed:
+          blue: Evaporation Rate (g/h/g)
+          grey: Evaporation Flux (g/h/m2)
+          orange: Surface Area (m2/g)
+        construction: Table 2 HKL flux (after 3600 x Mi conversion to g/h/m2) multiplied by Figure 1 BET
+          m2/g
+        printed_1200C_rates_are_in_prose_not_this_figure: true
+  Fe:
+    observations:
+    - observation_id: shaw_2023_table2_fe_psat_factsage_feo
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      quote: >-
+        Table 2. Predicted vapor pressures (FactSage), and calculated evaporation
+        flux (HKL equation) of the elements Fe, Na, and K from an Apollo sample
+        #12022 feedstock.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: FeO
+        metastable: false
+        basis: explicit_author
+        note: Authors state Fe p_sat was predicted from a pure FeO system, not from the Table 1 full silicate
+      standard_state: FactSage 8.2 pFe,sat over FeO; model, not KEMS
+      regime: engine_evaluation
+      units: atm as printed
+      values:
+        quantity: p_sat
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Fe(g)
+        factsage_version: '8.2'
+        factsage_databases:
+        - FactPS
+        - FToxid
+        - FSstel
+        proxy_system_as_printed: FeO
+        caption_feedstock_as_printed: "Apollo sample #12022 feedstock"
+        method_note: >-
+          caption names #12022; section 2.3.1/3.2 state the Fe column is the FeO proxy because the
+          full-silicate FactSage run (Figure 3) was discarded
+        p_atm_1200C: 9.4e-08
+        T_range_K_conversion: 800 C -> 1073.15 K; 1200 C -> 1473.15 K via T_K = t_C + 273.15
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          p_atm: 5.6e-13
+        - T_C: 900.0
+          T_K: 1173.15
+          p_atm: 2.5e-11
+        - T_C: 1000.0
+          T_K: 1273.15
+          p_atm: 6.0e-10
+        - T_C: 1050.0
+          T_K: 1323.15
+          p_atm: 2.5e-09
+        - T_C: 1100.0
+          T_K: 1373.15
+          p_atm: 9.1e-09
+        - T_C: 1150.0
+          T_K: 1423.15
+          p_atm: 3.0e-08
+        - T_C: 1200.0
+          T_K: 1473.15
+          p_atm: 9.4e-08
+      equipment:
+        sample_surface_area:
+          value:
+            basis: not_applicable_to_psat
+            note: Table 2 p_sat is intensive. HKL flux in the neighbouring columns is per m2; BET area
+              is applied only when converting to g/h/g.
+          locator:
+            published_page: 7
+            pdf_page_index: 7
+            table: '2'
+    - observation_id: shaw_2023_table2_fe_hkl_flux
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      quote: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation
+        given the predicted saturated pressures for each species.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL Langmuir flux from FactSage pFe,sat; ae=1; per m2
+      regime: langmuir_free_evaporation
+      units: mol/s/m2 as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Fe(g)
+        alpha_e_assumed: 1.0
+        condensation_term: removed (Langmuir evaporation; ac*pi neglected)
+        area_basis: per_m2
+        geometric_area: refused_not_printed
+        bet_area: applied_only_in_g_h_g_rates_not_in_this_column
+        hkl_as_printed: dni/dt = -A (ae p_i,sat - ac p_i) / sqrt(2 pi R Mi T)
+        flux_to_g_h_m2_conversion_as_printed: multiply by 3600 x Mi
+        evaporation_rate_1200C: 4.6e-06
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          evaporation_rate: 3.2e-11
+        - T_C: 900.0
+          T_K: 1173.15
+          evaporation_rate: 1.4e-09
+        - T_C: 1000.0
+          T_K: 1273.15
+          evaporation_rate: 3.1e-08
+        - T_C: 1050.0
+          T_K: 1323.15
+          evaporation_rate: 1.3e-07
+        - T_C: 1100.0
+          T_K: 1373.15
+          evaporation_rate: 4.6e-07
+        - T_C: 1150.0
+          T_K: 1423.15
+          evaporation_rate: 1.5e-06
+        - T_C: 1200.0
+          T_K: 1473.15
+          evaporation_rate: 4.6e-06
+      equipment:
+        sample_surface_area:
+          value:
+            basis: HKL_per_m2
+            geometric_area: refused_not_printed
+            note: This flux column is already divided by area. The area later used for g/h/g is the BET
+              m2/g series, not a geometric pellet face.
+          locator:
+            published_page: 4
+            pdf_page_index: 4
+            section: 2.3.2
+            paragraph: For the purposes of the current work, the area (A) will be included later.
+    - observation_id: shaw_2023_fe_max_sublimation_rate_1200C
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: '5'
+        paragraph: conclusions
+      quote: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08,
+        1.38, and 1.02 g/h/g of regolith, respectively.
+      T_range_K:
+      - 1473.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL flux (Table 2) times BET m2/g (Figure 1) at 1200 C; model
+      regime: langmuir_free_evaporation
+      units: g/h/g of regolith as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Fe(g)
+        T_C: 1200.0
+        T_K: 1473.15
+        evaporation_rate: 0.08
+        area_basis: BET_N2_specific_surface_area_from_sintered_LMS-1
+        area_at_1200C_m2_g: not_printed_as_a_point
+        area_note: 1150 C BET is 0.09 m2/g; 1150-1200 C further reduction is <0.002 m2/g. The 1200 C area
+          used in this product is not printed separately and is not inferred here.
+        construction: Table 2 Fe flux x BET area from Figure 1; authors report no local maximum below
+          the melting point
+    - observation_id: shaw_2023_hkl_ae_unity_assumption
+      type: alpha
+      class_tag: model
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        section: 2.3.2
+      quote: In the calculations presented here the value of the evaporation coefficient (ae) was assumed
+        to be unity. ... the assumption that ae = 1 in the current work is reasonable. This does however
+        result in the calculated evaporation rates presented here equating to a ‘best case scenario’.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL ae assumed unity for Fe, Na, and K
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: model_derived_assumption
+        admission_status: model_output_not_measurement
+        alpha: 1.0
+        applied_to:
+        - Fe
+        - Na
+        - K
+        note: not a measured alpha; no literature ae for similar systems was found by the authors
+  Na:
+    observations:
+    - observation_id: shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      quote: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O
+        system, and K from an Al2O3-K2O system.
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: Al2O3-CaO-Na2O
+        metastable: false
+        basis: explicit_author
+        note: closest FactSage ternary; mole fractions of that ternary are not printed. Authors state no
+          system accurately predicted the De Maria Na data.
+      standard_state: FactSage 8.2 pNa,sat over Al2O3-CaO-Na2O; model, not KEMS
+      regime: engine_evaluation
+      units: atm as printed
+      values:
+        quantity: p_sat
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Na(g)
+        proxy_system_as_printed: Al2O3-CaO-Na2O
+        proxy_system_mole_fractions:
+          status: absent
+          reason: not printed
+        p_atm_1200C: 2.4e-06
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          p_atm: 3.8e-11
+        - T_C: 900.0
+          T_K: 1173.15
+          p_atm: 9.6e-10
+        - T_C: 1000.0
+          T_K: 1273.15
+          p_atm: 1.9e-08
+        - T_C: 1050.0
+          T_K: 1323.15
+          p_atm: 7.3e-08
+        - T_C: 1100.0
+          T_K: 1373.15
+          p_atm: 2.6e-07
+        - T_C: 1150.0
+          T_K: 1423.15
+          p_atm: 8.1e-07
+        - T_C: 1200.0
+          T_K: 1473.15
+          p_atm: 2.4e-06
+    - observation_id: shaw_2023_table2_na_hkl_flux
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL Langmuir flux from FactSage pNa,sat; ae=1; per m2
+      regime: langmuir_free_evaporation
+      units: mol/s/m2 as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Na(g)
+        alpha_e_assumed: 1.0
+        area_basis: per_m2
+        geometric_area: refused_not_printed
+        evaporation_rate_1200C: 1.8e-04
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          evaporation_rate: 3.4e-09
+        - T_C: 900.0
+          T_K: 1173.15
+          evaporation_rate: 8.2e-08
+        - T_C: 1000.0
+          T_K: 1273.15
+          evaporation_rate: 1.6e-06
+        - T_C: 1050.0
+          T_K: 1323.15
+          evaporation_rate: 5.9e-06
+        - T_C: 1100.0
+          T_K: 1373.15
+          evaporation_rate: 2.0e-05
+        - T_C: 1150.0
+          T_K: 1423.15
+          evaporation_rate: 6.3e-05
+        - T_C: 1200.0
+          T_K: 1473.15
+          evaporation_rate: 1.8e-04
+      equipment:
+        sample_surface_area:
+          value:
+            basis: HKL_per_m2
+            geometric_area: refused_not_printed
+          locator:
+            published_page: 7
+            pdf_page_index: 7
+            table: '2'
+    - observation_id: shaw_2023_na_max_sublimation_rate_1200C
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: '5'
+      quote: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08,
+        1.38, and 1.02 g/h/g of regolith, respectively.
+      T_range_K:
+      - 1473.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL flux times BET m2/g at 1200 C; model
+      regime: langmuir_free_evaporation
+      units: g/h/g of regolith as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: Na(g)
+        T_C: 1200.0
+        T_K: 1473.15
+        evaporation_rate: 1.38
+        area_basis: BET_N2_specific_surface_area_from_sintered_LMS-1
+        area_at_1200C_m2_g: not_printed_as_a_point
+  K:
+    observations:
+    - observation_id: shaw_2023_table2_k_psat_factsage_al2o3_k2o
+      type: psat_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      quote: K from an Al2O3-K2O system
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      condensed_form:
+        state: Al2O3-K2O
+        metastable: false
+        basis: explicit_author
+        note: closest FactSage binary; mole fractions are not printed. Authors state no system accurately
+          predicted the De Maria K data.
+      standard_state: FactSage 8.2 pK,sat over Al2O3-K2O; model, not KEMS
+      regime: engine_evaluation
+      units: atm as printed
+      values:
+        quantity: p_sat
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: K(g)
+        proxy_system_as_printed: Al2O3-K2O
+        proxy_system_mole_fractions:
+          status: absent
+          reason: not printed
+        p_atm_1200C: 1.4e-06
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          p_atm: 3.1e-11
+        - T_C: 900.0
+          T_K: 1173.15
+          p_atm: 9.1e-10
+        - T_C: 1000.0
+          T_K: 1273.15
+          p_atm: 1.5e-08
+        - T_C: 1050.0
+          T_K: 1323.15
+          p_atm: 5.4e-08
+        - T_C: 1100.0
+          T_K: 1373.15
+          p_atm: 1.7e-07
+        - T_C: 1150.0
+          T_K: 1423.15
+          p_atm: 5.0e-07
+        - T_C: 1200.0
+          T_K: 1473.15
+          p_atm: 1.4e-06
+    - observation_id: shaw_2023_table2_k_hkl_flux
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+      T_range_K:
+      - 1073.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL Langmuir flux from FactSage pK,sat; ae=1; per m2
+      regime: langmuir_free_evaporation
+      units: mol/s/m2 as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: K(g)
+        alpha_e_assumed: 1.0
+        area_basis: per_m2
+        geometric_area: refused_not_printed
+        evaporation_rate_1200C: 8.0e-05
+        series:
+        - T_C: 800.0
+          T_K: 1073.15
+          evaporation_rate: 2.1e-09
+        - T_C: 900.0
+          T_K: 1173.15
+          evaporation_rate: 6.0e-08
+        - T_C: 1000.0
+          T_K: 1273.15
+          evaporation_rate: 9.7e-07
+        - T_C: 1050.0
+          T_K: 1323.15
+          evaporation_rate: 3.3e-06
+        - T_C: 1100.0
+          T_K: 1373.15
+          evaporation_rate: 1.0e-05
+        - T_C: 1150.0
+          T_K: 1423.15
+          evaporation_rate: 3.0e-05
+        - T_C: 1200.0
+          T_K: 1473.15
+          evaporation_rate: 8.0e-05
+      equipment:
+        sample_surface_area:
+          value:
+            basis: HKL_per_m2
+            geometric_area: refused_not_printed
+          locator:
+            published_page: 7
+            pdf_page_index: 7
+            table: '2'
+    - observation_id: shaw_2023_k_max_sublimation_rate_1200C
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: '5'
+      quote: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08,
+        1.38, and 1.02 g/h/g of regolith, respectively.
+      T_range_K:
+      - 1473.15
+      - 1473.15
+      phase: condensed_solid
+      standard_state: HKL flux times BET m2/g at 1200 C; model
+      regime: langmuir_free_evaporation
+      units: g/h/g of regolith as printed
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: K(g)
+        T_C: 1200.0
+        T_K: 1473.15
+        evaporation_rate: 1.02
+        area_basis: BET_N2_specific_surface_area_from_sintered_LMS-1
+        area_at_1200C_m2_g: not_printed_as_a_point

@@ -1,0 +1,5603 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sublimation-kinetics-2023-minerals.yaml
+observations:
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fe_max_sublimation_rate_1200C
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.08'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08, 1.38, and 1.02
+      g/h/g of regolith, respectively.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    paragraph: conclusions
+    section: '5'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        paragraph: conclusions
+        section: '5'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
+  experiment_id: 10.3390/min13010079::3
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: '12022'
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1073.15, 1473.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, admission_status, semantics,
+      factsage_version, factsage_databases, factsage_method, composition_wt_pct, authors_verdict, demaria_overlay, T_axis_as_printed'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Figure 3. Comparison between measured saturated vapor pressure of species Fe, Na, and K from De Maria et
+      al. [15] shown in blue, and the prediction by FactSage 8.2 software shown in orange, given the Apollo sample #12022
+      feed shown in Table 1.'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    figure: '3'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
+  experiment_id: 10.3390/min13010079::4
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: '12022'
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1073.15, 1473.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, admission_status, semantics,
+      proxy_systems_as_printed, proxy_system_mole_fractions, legend_as_printed'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: The oxide systems determined to provide the most accurate prediction were FeO for Fe, Al2O3-CaO-Na2O for
+      Na, and Al2O3-K2O for K.
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    figure: '4'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_fig5_predicted_sublimation_rate_figure_only
+  experiment_id: 10.3390/min13010079::5
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: '12022'
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1073.15, 1473.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_rate field selected; source fields: quantity, method_class, admission_status,
+      semantics, traces_as_printed, construction, printed_1200C_rates_are_in_prose_not_this_figure'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Figure 5. Predicted sublimation rate of elements Fe, Na, and K from lunar regolith, evaporation rate calculated
+      using the HKL equation, surface area calculated from the sintering of LMS-1 simulant.
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 8
+    pdf_page_index: 8
+    figure: '5'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_hkl_ae_unity_assumption
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1073.15, 1473.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '1'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_assumption
+    attribution: In the calculations presented here the value of the evaporation coefficient (ae) was assumed to be unity.
+      ... the assumption that ae = 1 in the current work is reasonable. This does however result in the calculated evaporation
+      rates presented here equating to a ‘best case scenario’.
+    model: model_derived_assumption
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    section: 2.3.2
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_k_max_sublimation_rate_1200C
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '1.02'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08, 1.38, and 1.02
+      g/h/g of regolith, respectively.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    section: '5'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: '5'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:0
+  experiment_id: 10.3390/min13010079::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bet_specific_surface_area_vs_sinter_temperature'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      plot_error_range_pct: '5'
+      quote: For the reporting of surface areas in the current work, an error range of 5% was added to plots; this error range
+        comes from the survey published by Hackley and Stefaniak [14] where a 5% error range was observed between multiple
+        laboratories. This error is predominantly attributed to the accuracy of the sample mass measurements.
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+        section: '2.2'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples. Minimal further
+      surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: abstract
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        paragraph: abstract
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:1
+  experiment_id: 10.3390/min13010079::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bet_specific_surface_area_vs_sinter_temperature'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1073.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      plot_error_range_pct: '5'
+      quote: For the reporting of surface areas in the current work, an error range of 5% was added to plots; this error range
+        comes from the survey published by Hackley and Stefaniak [14] where a 5% error range was observed between multiple
+        laboratories. This error is predominantly attributed to the accuracy of the sample mass measurements.
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+        section: '2.2'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples. Minimal further
+      surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: '3.1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        section: '3.1'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_bet_printed_ssa_vs_T::point:2
+  experiment_id: 10.3390/min13010079::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bet_specific_surface_area_vs_sinter_temperature'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      plot_error_range_pct: '5'
+      quote: For the reporting of surface areas in the current work, an error range of 5% was added to plots; this error range
+        comes from the survey published by Hackley and Stefaniak [14] where a 5% error range was observed between multiple
+        laboratories. This error is predominantly attributed to the accuracy of the sample mass measurements.
+      locator:
+        published_page: 3
+        pdf_page_index: 3
+        section: '2.2'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: A surface area reduction from 1.04 m2/g at 800 °C to 0.09 m2/g at 1150 °C was seen in samples. Minimal further
+      surface area reduction was seen between 1150 and 1200 °C (<0.002 m2/g).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: '3.1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        section: '3.1'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig1_ssa_curve_figure_only
+  experiment_id: 10.3390/min13010079::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bet_ssa_vs_T_figure'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 1473.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bet_ssa_vs_T_figure'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Figure 1. Calculated surface area changes due to sintering of LMS-1 simulant.
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    figure: '1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_fig2_micrographs_and_partial_melt
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_melting_observed'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_melting_observed'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: the sample morphology is noticeably different. The 1200 °C sample shows more spherical-shaped pores. ...
+      this indicates the presence of liquid phases in the samples at 1200 °C.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    figure: '2'
+    section: '3.1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        figure: '2'
+        section: '3.1'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: value
+      value: density
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile density does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile density does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile density does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile density does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile density does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile density does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile density does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile density does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile density does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile density does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile density does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile density does not use wall
+  value:
+    kind: point
+    point: '3.03'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_from_other_workers
+    attribution: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications [10].
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 3
+    pdf_page_index: 3
+    section: '2.2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_lms1_sintering_apparatus
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sintering_apparatus_and_pellet_geometry'
+    species:
+      formula: LMS-1
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 1473.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_apparatus_and_pellet_geometry'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed on pellet mass, die diameter, compaction force, or hold time
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: For the sintering test work, 2.6 g samples of LMS-1 lunar regolith simulant were placed in a steel die assembly
+      with a 13 mm diameter. The die was compressed using a manual hydraulic press for 5 min at 80 kN of pressure. Three pellets
+      were prepared for each test. Samples were placed into an alumina (99.8%) boat on a layer of nickel foil separating the
+      samples from the boat.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    paragraph: Lunar Simulant Sintering
+    section: '2.1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_na_max_sublimation_rate_1200C
+  experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '1.38'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The predicted maximum rate of sublimation for the species Fe, Na, and K at 1200 °C was 0.08, 1.38, and 1.02
+      g/h/g of regolith, respectively.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    section: '5'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: '5'
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table1_apollo_12022_composition_snyder
+  experiment_id: 10.3390/min13010079::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'printed_major_oxide_composition'
+    species:
+      formula: '12022'
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4454917556583907461809776937'
+        - - FeO
+          - '0.1849027244706631278343171463'
+        - - MgO
+          - '0.16042013096379654385872894'
+        - - Al2O3
+          - '0.05490915921806480449788752472'
+        - - CaO
+          - '0.1055795091443572984791498064'
+        - - TiO2
+          - '0.04001287189512889262963651761'
+        - - Cr2O3
+          - '0.001344645271037509295110597272'
+        - - MnO
+          - '0.002182596425334022351282892584'
+        - - Na2O
+          - '0.0046963779953533810250393144'
+        - - K2O
+          - '0.0004602289578736738478695676035'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_major_oxide_composition'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_from_other_workers
+    attribution: 'Table 1. Apollo #12022 composition used in the calculation of saturated vapor pressures, data from Snyder
+      et. al. [23]. Values adjusted to 100% omitting trace elements.'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000000032'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000000014'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000031'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00000013'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00000046'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000015'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_hkl_flux::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000046'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 2 also shows the calculated evaporation flux in mol/s/m2 determined using the HKL equation given the
+      predicted saturated pressures for each species.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.000000056742'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000000056'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.000002533125'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000025'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.000060795'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000006'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.0002533125'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000025'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.0009220575'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000091'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.00303975'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000003'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_fe_psat_factsage_feo::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.00952455'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 2. Predicted vapor pressures (FactSage), and calculated evaporation flux (HKL equation) of the elements
+      Fe, Na, and K from an Apollo sample #12022 feedstock.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000094'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000000021'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00000006'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00000097'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000033'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00001'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00003'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_hkl_flux::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00008'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.000003141075'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000031'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.00009220575'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000091'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.001519875'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000015'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.00547155'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000054'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.01722525'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000017'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.0506625'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000005'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_k_psat_factsage_al2o3_k2o::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.141855'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: K from an Al2O3-K2O system
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000014'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000000034'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000000082'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000016'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.0000059'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00002'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.000063'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_hkl_flux::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: point
+    point: '0.00018'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters: []
+    output_unit: mol/s/m2 as printed
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:0
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.00000385035'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000038'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:1
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.000097272'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000096'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:2
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.001925175'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000019'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:3
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.007396725'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000073'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:4
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.0263445'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000026'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:5
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.08207325'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000081'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
+- observation_id: sublimation-kinetics-2023-minerals::shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o::point:6
+  experiment_id: 10.3390/min13010079::2
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.24318'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: the saturated vapor pressure for Fe was predicted from an FeO system, Na from an Al2O3-CaO-Na2O system, and
+      K from an Al2O3-K2O system.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: sublimation-kinetics-2023-minerals
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    table: '2'
+  read_from: unknown:sublimation-kinetics-2023-minerals
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        table: '2'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:sublimation-kinetics-2023-minerals
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000024'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 7
+          pdf_page_index: 7
+          table: '2'
+    output_unit: Pa
