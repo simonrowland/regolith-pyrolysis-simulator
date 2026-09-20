@@ -176,3 +176,129 @@ entries:
   - printed: sample_oxide_composition_wt_pct
     field: sample.printed_composition
     unit: wt_pct
+  # vessel / cell material → apparatus.cell_material_and_liner (Located[str])
+  - printed: cell_material
+    field: apparatus.cell_material_and_liner
+    unit: null
+  - printed: cell_material_as_printed
+    field: apparatus.cell_material_and_liner
+    unit: null
+  - printed: cell_material_as_published
+    field: apparatus.cell_material_and_liner
+    unit: null
+  - printed: crucible_material
+    field: apparatus.cell_material_and_liner
+    unit: null
+  - printed: crucible_or_cell_material
+    field: apparatus.cell_material_and_liner
+    unit: null
+  - printed: kems_cell_material
+    field: apparatus.cell_material_and_liner
+    unit: null
+  # sample container → sample.container (Located[str])
+  - printed: sample_container
+    field: sample.container
+    unit: null
+  - printed: tga_crucible
+    field: sample.container
+    unit: null
+  - printed: dta_crucible
+    field: sample.container
+    unit: null
+  # vacuum pump settings → pressure_environment.pumping (Mapping)
+  - printed: pump
+    field: pressure_environment.pumping.pump
+    unit: null
+  - printed: pumping
+    field: pressure_environment.pumping.pumping
+    unit: null
+  - printed: backing_pump
+    field: pressure_environment.pumping.backing_pump
+    unit: null
+  - printed: high_vacuum_pump
+    field: pressure_environment.pumping.high_vacuum_pump
+    unit: null
+  - printed: q_pump_l_s_assumed_as_printed
+    field: pressure_environment.pumping.pumping_speed_m3_s
+    unit: L/s
+  - printed: q_pump_source
+    field: pressure_environment.pumping.q_pump_source
+    unit: null
+  # ionization settings → apparatus.ionization (Mapping)
+  - printed: electron_energy_eV
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: electron_ionization_energy_eV
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionizing_electron_energy_eV
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionizing_electron_energy_V
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionizing_energy_eV
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionizing_voltage_V
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: chosen_ionizing_voltage_V
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionization_voltage_V
+    field: apparatus.ionization.electron_energy_eV
+    unit: eV
+  - printed: ionizing_energy
+    field: apparatus.ionization.ionizing_energy
+    unit: null
+  - printed: ionization
+    field: apparatus.ionization.ionization
+    unit: null
+  - printed: emission_current_mA
+    field: apparatus.ionization.emission_current_mA
+    unit: mA
+  - printed: ionizing_current_mA
+    field: apparatus.ionization.ionizing_current_mA
+    unit: mA
+  - printed: total_emission_current_uA
+    field: apparatus.ionization.total_emission_current_uA
+    unit: uA
+  # calibration / standards → apparatus.calibration (Mapping)
+  - printed: calibration
+    field: apparatus.calibration.calibration
+    unit: null
+  - printed: pressure_calibration_factor
+    field: apparatus.calibration.pressure_calibration_factor
+    unit: "1"
+  # thermocouple / pyrometer → apparatus.temperature_measurement (Mapping[str, Located[str]])
+  - printed: thermocouple
+    field: apparatus.temperature_measurement.thermocouple
+    unit: null
+  - printed: thermocouples
+    field: apparatus.temperature_measurement.thermocouples
+    unit: null
+  - printed: thermocouple_note
+    field: apparatus.temperature_measurement.thermocouple_note
+    unit: null
+  - printed: Tb_thermocouple_location
+    field: apparatus.temperature_measurement.Tb_thermocouple_location
+    unit: null
+  - printed: pyrometer
+    field: apparatus.temperature_measurement.pyrometer
+    unit: null
+  - printed: temperature_calibration
+    field: apparatus.temperature_measurement.temperature_calibration
+    unit: null
+  # gauge → pressure_environment.gauge
+  - printed: pressure_gauge
+    field: pressure_environment.gauge.pressure_gauge
+    unit: null
+  # cell-internal pressure prose
+  - printed: residual_pressure_Pa_as_printed
+    field: pressure_environment.cell_internal_pressure_note
+    unit: null
+  # wall geometry
+  - printed: cell_wall_thickness_cm
+    field: apparatus.wall.cell_wall_thickness_m
+    unit: cm

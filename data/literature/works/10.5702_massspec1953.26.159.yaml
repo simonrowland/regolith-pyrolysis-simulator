@@ -112,6 +112,33 @@ experiments:
     pdf_page_index: 4
     figure: '3'
     note: Partial pressures (atm) vs 1/T in the W-Al2O3 system
+  apparatus:
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '30'
+        locator:
+          published_page: 162
+          pdf_page_index: 4
+          figure: '3'
+          note: also Fig. 4; O is a major vapor in W- and Mo-Al2O3
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=30.0 eV
+          - printed=ionizing_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                published_page: 162
+                pdf_page_index: 4
+                figure: '3'
+                note: also Fig. 4; O is a major vapor in W- and Mo-Al2O3
+          output_unit: '1'
 - experiment_id: 10.5702/massspec1953.26.159::4
   kind: literature
   method:
@@ -288,3 +315,31 @@ experiments:
         pdf_page_index: 2
         paragraph: inner effusion cell fabricated from various refractory metals and outer cell supporter machined from tungsten
           block
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '30'
+        locator:
+          published_page: 160
+          pdf_page_index: 2
+          section: 2. Experimental
+          note: apparatus and calibration from §2 (p. 160–161); T_range_K from Table 1 printed T cells 2248 (last data row)
+            and 2433 (third data row) on published p. 167. 1850 K is not printed.
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=30.0 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                published_page: 160
+                pdf_page_index: 2
+                section: 2. Experimental
+                note: apparatus and calibration from §2 (p. 160–161); T_range_K from Table 1 printed T cells 2248 (last data
+                  row) and 2433 (third data row) on published p. 167. 1850 K is not printed.
+          output_unit: '1'

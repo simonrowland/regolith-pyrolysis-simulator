@@ -365,3 +365,29 @@ experiments:
         pdf_page_index: 2
         section: III.1
         note: thoria cells made in our laboratory
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '19'
+        locator:
+          published_page: 383
+          pdf_page_index: 2
+          section: III
+          note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=19.0 eV
+          - printed=ionizing_electron_energy_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '19'
+              locator:
+                published_page: 383
+                pdf_page_index: 2
+                section: III
+                note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable exit slit
+          output_unit: '1'

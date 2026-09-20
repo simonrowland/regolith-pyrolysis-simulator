@@ -98,8 +98,26 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    pumping:
+      pumping:
+        state:
+          tag: value
+          value: not_printed_whether_static_or_pumped
+        locator:
+          pdf_page_index: 5
+          section: Integrated Mass Spectroscopy
+          note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
   work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
   locator:
     pdf_page_index: 4
     section: Integrated Mass Spectroscopy
     note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'

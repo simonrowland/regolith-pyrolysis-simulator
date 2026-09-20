@@ -86,6 +86,27 @@ experiments:
         figure: '1'
         section: '3.1'
         note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+    temperature_measurement:
+      thermocouple:
+        state:
+          tag: value
+          value: two pairs Pt-30%Rh / Pt-6%Rh on the susceptor top and bottom
+        locator:
+          published_page: 3051
+          pdf_page_index: 2
+          figure: '1'
+          section: '3.1'
+          note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+      thermocouple_note:
+        state:
+          tag: value
+          value: Pt-Rh tips evaporate in vacuum near 1600 C within hours; tip recut each run
+        locator:
+          published_page: 3051
+          pdf_page_index: 2
+          figure: '1'
+          section: '3.1'
+          note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
 - experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
   kind: literature
   method:

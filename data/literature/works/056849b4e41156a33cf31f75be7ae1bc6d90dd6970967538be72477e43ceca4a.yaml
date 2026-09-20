@@ -281,3 +281,53 @@ experiments:
         published_page: 290
         pdf_page_index: 2
         paragraph: crucibles of various materials
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '45'
+        locator:
+          published_page: 289
+          pdf_page_index: 1
+          section: PROCEDURE AND EXPERIMENTAL RESULTS
+          note: Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration and Mann/Colin cross sections p.293–294.
+            SCHEMA has no metadata type.
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=45.0 eV
+          - printed=ionizing_electron_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '45'
+              locator:
+                published_page: 289
+                pdf_page_index: 1
+                section: PROCEDURE AND EXPERIMENTAL RESULTS
+                note: Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration and Mann/Colin cross sections p.293–294.
+                  SCHEMA has no metadata type.
+          output_unit: '1'
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: complete evaporation of a known quantity of silver before each experiment
+        locator:
+          published_page: 289
+          pdf_page_index: 1
+          section: PROCEDURE AND EXPERIMENTAL RESULTS
+          note: Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration and Mann/Colin cross sections p.293–294.
+            SCHEMA has no metadata type.
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: Leeds and Northrup optical pyrometer focused at the effusion hole
+        locator:
+          published_page: 289
+          pdf_page_index: 1
+          section: PROCEDURE AND EXPERIMENTAL RESULTS
+          note: Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration and Mann/Colin cross sections p.293–294.
+            SCHEMA has no metadata type.

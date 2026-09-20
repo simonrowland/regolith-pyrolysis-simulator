@@ -220,6 +220,37 @@ experiments:
     table: II
     note: row=This Study
     source_path: tables/kems-031-halwax-2024/t2.csv
+  apparatus:
+    calibration:
+      pressure_calibration_factor:
+        state:
+          tag: value
+          value: '0.0000000076414'
+        locator:
+          page: 826
+          published_page: 826
+          pdf_page_index: 6
+          table: II
+          note: row=This Study
+          source_path: tables/kems-031-halwax-2024/t2.csv
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=7.6414e-09 1
+          - printed=pressure_calibration_factor
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000076414'
+              locator:
+                page: 826
+                published_page: 826
+                pdf_page_index: 6
+                table: II
+                note: row=This Study
+                source_path: tables/kems-031-halwax-2024/t2.csv
+          output_unit: '1'
 - experiment_id: 10.1007/s11663-024-02995-6::III
   kind: literature
   method:
@@ -254,6 +285,35 @@ experiments:
     pdf_page_index: 6
     table: III
     source_path: tables/kems-031-halwax-2024/t3.csv
+  apparatus:
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '70'
+        locator:
+          page: 826
+          published_page: 826
+          pdf_page_index: 6
+          table: III
+          source_path: tables/kems-031-halwax-2024/t3.csv
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=70 eV
+          - printed=electron_ionization_energy_eV
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '70'
+              locator:
+                page: 826
+                published_page: 826
+                pdf_page_index: 6
+                table: III
+                source_path: tables/kems-031-halwax-2024/t3.csv
+          output_unit: '1'
 - experiment_id: 10.1007/s11663-024-02995-6::IV
   kind: literature
   method:

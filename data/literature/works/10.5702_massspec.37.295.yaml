@@ -123,6 +123,45 @@ experiments:
                 section: 2.1 Apparatus
                 note: Combined ion source and Knudsen cell furnace; English experimental section
           output_unit: m
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '37'
+        locator:
+          published_page: 297
+          pdf_page_index: 3
+          figure: '1'
+          section: 2.1 Apparatus
+          note: Combined ion source and Knudsen cell furnace; English experimental section
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=37.0 eV
+          - printed=ionizing_voltage_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '37'
+              locator:
+                published_page: 297
+                pdf_page_index: 3
+                figure: '1'
+                section: 2.1 Apparatus
+                note: Combined ion source and Knudsen cell furnace; English experimental section
+          output_unit: '1'
+    temperature_measurement:
+      Tb_thermocouple_location:
+        state:
+          tag: value
+          value: outside bottom of the crucible
+        locator:
+          published_page: 297
+          pdf_page_index: 3
+          figure: '1'
+          section: 2.1 Apparatus
+          note: Combined ion source and Knudsen cell furnace; English experimental section
 - experiment_id: 10.5702/massspec.37.295::2
   kind: literature
   method:
@@ -156,6 +195,33 @@ experiments:
     pdf_page_index: 3
     figure: '2'
     note: Ionization efficiency curve of Ag and Mn. I_Ag and I_Mn in arbitrary unit
+  apparatus:
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: '37'
+        locator:
+          published_page: 297
+          pdf_page_index: 3
+          figure: '2'
+          note: Ionization efficiency curve of Ag and Mn. I_Ag and I_Mn in arbitrary unit
+        inference:
+          relation: identity:1
+          inputs:
+          - as_published=37.0 eV
+          - printed=chosen_ionizing_voltage_V
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '37'
+              locator:
+                published_page: 297
+                pdf_page_index: 3
+                figure: '2'
+                note: Ionization efficiency curve of Ag and Mn. I_Ag and I_Mn in arbitrary unit
+          output_unit: '1'
 - experiment_id: 10.5702/massspec.37.295::3
   kind: literature
   method:

@@ -227,6 +227,43 @@ experiments:
                 line_range: '163'
                 source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
           output_unit: m
+    wall:
+      cell_wall_thickness_m:
+        state:
+          tag: value
+          value: '0.00025'
+        locator:
+          figure: '2'
+          paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+          line_range: 145-163
+          source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+        inference:
+          relation: cm_to_m
+          inputs:
+          - L_m = L_cm / 100
+          - original_unit=cm
+          - as_published=0.025 cm
+          - printed=cell_wall_thickness_cm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.025'
+              locator:
+                figure: '2'
+                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+                line_range: 145-163
+                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                figure: '2'
+                paragraph: Knudsen cell Pt construction; effusion orifice 0.5 cm; Clausing in mass-loss eqn
+                line_range: 145-163
+                source_path: docs-private/research/ocr-artifacts/kems-027-plante-hastie-1983/spool/out/kems-027-plante-hastie-1983/vlm/kems-027-plante-hastie-1983.md
+          output_unit: m
 - experiment_id: 10.6028/nbs.ir.83-2731::20
   kind: literature
   method:
