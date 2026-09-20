@@ -1,0 +1,418 @@
+schema_version: literature_extract.v1
+source_id: burcat-third-millennium
+source:
+  citation: Burcat, A. & Ruscic, B. (2005), "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with Updates from Active Thermochemical Tables", ANL-05/20, TAE 960.
+  url: https://burcat.technion.ac.il/
+  year: 2005
+  version: Third Millennium database, printed edition revised April 2017
+extraction:
+  method: pdftotext -layout followed by manual transcription of printed Tables 1-3; the PDF is an introductory/database-methods report, not a primary apparatus report
+  date: '2026-09-19'
+  worker: w2-burcat-third-millennium
+  provenance_path: corpus/raw/burcat-third-millennium/Introduction_2005.pdf
+review_status: draft
+fidelity_samples:
+- species: O
+  observable: gibbs_table
+  observation_id: burcat_2005_table1_O_gas
+  field: delta_fH298_kJ_per_mol
+  value: 249.229
+  locator:
+    page: 13
+    table: '1'
+    note: Table 1 O(g) row, value and uncertainty printed as 249.229 +/- 0.002 kJ/mol
+- species: CH4
+  observable: gibbs_table
+  observation_id: burcat_2005_table2_CH4
+  field: bomb_calorimeter_delta_fH298_kJ_per_mol
+  value: -74.85
+  locator:
+    page: 14
+    table: '2'
+    note: Table 2 CH4 bomb-calorimeter column
+- species: OH
+  observable: gibbs_table
+  observation_id: burcat_2005_table3_OH_radical
+  field: delta_fH298_kJ_per_mol
+  value: 37.34
+  locator:
+    page: 15
+    table: '3'
+    note: Table 3 OH(g) row
+species:
+  C:
+    observations:
+    - observation_id: burcat_2005_table1_C_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values:
+        quantity: delta_fH298
+        method_class: compilation_assessed
+        generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048
+        species_as_printed: C(g)
+        delta_fH298_kJ_per_mol: 717.065
+        uncertainty_kJ_per_mol: 0.146
+  H:
+    observations:
+    - observation_id: burcat_2005_table1_H_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: H(g), delta_fH298_kJ_per_mol: 217.997, uncertainty_kJ_per_mol: 0.0001}
+  O:
+    observations:
+    - observation_id: burcat_2005_table1_O_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: O(g), delta_fH298_kJ_per_mol: 249.229, uncertainty_kJ_per_mol: 0.002}
+  N:
+    observations:
+    - observation_id: burcat_2005_table1_N_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: N(g), delta_fH298_kJ_per_mol: 472.459, uncertainty_kJ_per_mol: 0.044}
+  S:
+    observations:
+    - observation_id: burcat_2005_table1_S_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: NASA database, species_as_printed: S(g), delta_fH298_kJ_per_mol: 277.17, uncertainty_kJ_per_mol: 0.25}
+  Cl:
+    observations:
+    - observation_id: burcat_2005_table1_Cl_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: Cl(g), delta_fH298_kJ_per_mol: 121.302, uncertainty_kJ_per_mol: 0.001}
+  NO:
+    observations:
+    - observation_id: burcat_2005_table1_NO_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: NO(g), delta_fH298_kJ_per_mol: 91.097, uncertainty_kJ_per_mol: 0.084}
+  CO:
+    observations:
+    - observation_id: burcat_2005_table1_CO_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: CO(g), delta_fH298_kJ_per_mol: -110.538, uncertainty_kJ_per_mol: 0.026}
+  H2O:
+    observations:
+    - observation_id: burcat_2005_table1_H2O_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: H2O(g), delta_fH298_kJ_per_mol: -241.815, uncertainty_kJ_per_mol: 0.031}
+  CO2:
+    observations:
+    - observation_id: burcat_2005_table1_CO2_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: CO2(g), delta_fH298_kJ_per_mol: -393.472, uncertainty_kJ_per_mol: 0.014}
+  SO2:
+    observations:
+    - observation_id: burcat_2005_table1_SO2_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: NASA database, species_as_printed: SO2(g), delta_fH298_kJ_per_mol: -296.84, uncertainty_kJ_per_mol: 0.21}
+  NO2:
+    observations:
+    - observation_id: burcat_2005_table1_NO2_gas
+      type: gibbs_table
+      locator: {page: 13, table: '1'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Active Thermochemical Tables v1.25 using C(A)TN v1.048, species_as_printed: NO2(g), delta_fH298_kJ_per_mol: 34.025, uncertainty_kJ_per_mol: 0.085}
+  CH4:
+    observations:
+    - observation_id: burcat_2005_table2_CH4
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: CH4, bomb_calorimeter_delta_fH298_kJ_per_mol: -74.85, bomb_calorimeter_uncertainty_kJ_per_mol: 0.29, flame_calorimeter_delta_fH298_kJ_per_mol: -74.48, flame_calorimeter_uncertainty_kJ_per_mol: 0.42, semantics: competing_compiled_methods_do_not_average}
+  C2H6:
+    observations:
+    - observation_id: burcat_2005_table2_C2H6
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: C2H6, bomb_calorimeter_delta_fH298_kJ_per_mol: -84.68, bomb_calorimeter_uncertainty_kJ_per_mol: 0.50, flame_calorimeter_delta_fH298_kJ_per_mol: -83.85, flame_calorimeter_uncertainty_kJ_per_mol: 0.29, semantics: competing_compiled_methods_do_not_average}
+  C3H8:
+    observations:
+    - observation_id: burcat_2005_table2_C3H8
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: C3H8, bomb_calorimeter_delta_fH298_kJ_per_mol: -103.89, bomb_calorimeter_uncertainty_kJ_per_mol: 0.59, flame_calorimeter_delta_fH298_kJ_per_mol: -104.68, flame_calorimeter_uncertainty_kJ_per_mol: 0.50, semantics: competing_compiled_methods_do_not_average}
+  n-C4H10:
+    observations:
+    - observation_id: burcat_2005_table2_nC4H10
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: n-C4H10, bomb_calorimeter_delta_fH298_kJ_per_mol: -127.03, bomb_calorimeter_uncertainty_kJ_per_mol: 0.67, flame_calorimeter_delta_fH298_kJ_per_mol: -125.65, flame_calorimeter_uncertainty_kJ_per_mol: 0.67, semantics: competing_compiled_methods_do_not_average}
+  i-C4H10:
+    observations:
+    - observation_id: burcat_2005_table2_iC4H10
+      type: gibbs_table
+      locator: {page: 14, table: '2'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: Cohen and Benson (1992), species_as_printed: i-C4H10, bomb_calorimeter_delta_fH298_kJ_per_mol: -135.60, bomb_calorimeter_uncertainty_kJ_per_mol: 0.54, flame_calorimeter_delta_fH298_kJ_per_mol: -134.18, flame_calorimeter_uncertainty_kJ_per_mol: 0.63, semantics: competing_compiled_methods_do_not_average}
+  OH:
+    observations:
+    - observation_id: burcat_2005_table3_OH_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: OH(g), delta_fH298_kJ_per_mol: 37.34, uncertainty_kJ_per_mol: 0.04}
+  CH:
+    observations:
+    - observation_id: burcat_2005_table3_CH_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CH(g), delta_fH298_kJ_per_mol: 596.30, uncertainty_kJ_per_mol: 0.25}
+  CN:
+    observations:
+    - observation_id: burcat_2005_table3_CN_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CN(g), delta_fH298_kJ_per_mol: 438.81, uncertainty_kJ_per_mol: 0.52}
+  NH:
+    observations:
+    - observation_id: burcat_2005_table3_NH_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: NH(g), delta_fH298_kJ_per_mol: 358.76, uncertainty_kJ_per_mol: 0.37}
+  SH:
+    observations:
+    - observation_id: burcat_2005_table3_SH_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: SH(g), delta_fH298_kJ_per_mol: 141.87, uncertainty_kJ_per_mol: 0.52}
+  HO2:
+    observations:
+    - observation_id: burcat_2005_table3_HO2_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: HO2(g), delta_fH298_kJ_per_mol: 12.296, uncertainty_kJ_per_mol: 0.25}
+  CH3:
+    observations:
+    - observation_id: burcat_2005_table3_CH3_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CH3(g), delta_fH298_kJ_per_mol: 146.582, uncertainty_kJ_per_mol: 0.1}
+  CH2OH:
+    observations:
+    - observation_id: burcat_2005_table3_CH2OH_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CH2OH(g), delta_fH298_kJ_per_mol: -17.18, uncertainty_kJ_per_mol: 0.37}
+  CH3O:
+    observations:
+    - observation_id: burcat_2005_table3_CH3O_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CH3O(g), delta_fH298_kJ_per_mol: 20.257, uncertainty_kJ_per_mol: 0.42}
+  CHO:
+    observations:
+    - observation_id: burcat_2005_table3_CHO_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CHO(g), delta_fH298_kJ_per_mol: 42.296, uncertainty_kJ_per_mol: 0.3}
+  CH2:
+    observations:
+    - observation_id: burcat_2005_table3_CH2_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: CH2(g), delta_fH298_kJ_per_mol: 391.465, uncertainty_kJ_per_mol: 0.27}
+  C2O:
+    observations:
+    - observation_id: burcat_2005_table3_C2O_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C2O(g), delta_fH298_kJ_per_mol: 291.04, uncertainty_kJ_per_mol: 63}
+  C2H:
+    observations:
+    - observation_id: burcat_2005_table3_C2H_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C2H(g), delta_fH298_kJ_per_mol: 568.06, uncertainty_kJ_per_mol: 0.31}
+  C2H3:
+    observations:
+    - observation_id: burcat_2005_table3_C2H3_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C2H3(g), delta_fH298_kJ_per_mol: 296.61, uncertainty_kJ_per_mol: 0.92}
+  C2H5:
+    observations:
+    - observation_id: burcat_2005_table3_C2H5_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C2H5(g), delta_fH298_kJ_per_mol: 118.66, uncertainty_kJ_per_mol: 2}
+  C3H3:
+    observations:
+    - observation_id: burcat_2005_table3_C3H3_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C3H3(g), delta_fH298_kJ_per_mol: 339, uncertainty_kJ_per_mol: 4}
+  C3H5:
+    observations:
+    - observation_id: burcat_2005_table3_C3H5_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C3H5(g), delta_fH298_kJ_per_mol: 171, uncertainty_kJ_per_mol: 3}
+  n-C3H7:
+    observations:
+    - observation_id: burcat_2005_table3_nC3H7_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: n-C3H7(g), delta_fH298_kJ_per_mol: 101.32, uncertainty_kJ_per_mol: 1}
+  i-C3H7:
+    observations:
+    - observation_id: burcat_2005_table3_iC3H7_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: i-C3H7(g), delta_fH298_kJ_per_mol: 90.19, uncertainty_kJ_per_mol: 2}
+  C6H5:
+    observations:
+    - observation_id: burcat_2005_table3_C6H5_radical
+      type: gibbs_table
+      locator: {page: 15, table: '3'}
+      phase: gas
+      standard_state: standard enthalpy of formation at 298.15 K
+      regime: compiled_thermochemistry
+      units: kJ/mol
+      values: {quantity: delta_fH298, method_class: compilation_assessed, generator: IUPAC Task Force for Thermochemistry of Radicals (2005), species_as_printed: C6H5(g), delta_fH298_kJ_per_mol: 339.7, uncertainty_kJ_per_mol: 2.5}
