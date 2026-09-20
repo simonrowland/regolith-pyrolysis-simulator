@@ -1173,15 +1173,19 @@ def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
 
 
 def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
-    if not isinstance(payload, Mapping):
+    if payload is None:
         return None
+    if not isinstance(payload, Mapping):
+        raise TypeError("thermal schedule must be a mapping")
     method = payload.get("method")
     duration = payload.get("total_duration_s")
     cooling = payload.get("cooling_or_quench")
     ramps = []
     for raw in payload.get("ramps") or ():
-        if not isinstance(raw, Mapping) or raw.get("rate_K_s") is None:
-            continue
+        if not isinstance(raw, Mapping):
+            raise TypeError("thermal schedule ramp must be a mapping")
+        if raw.get("rate_K_s") is None:
+            raise ValueError("thermal schedule ramp requires rate_K_s")
         ramps.append(
             ThermalRamp(
                 rate_K_s=_located_from_plain(
@@ -1201,8 +1205,10 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
         )
     setpoints = []
     for raw in payload.get("setpoints_and_holds") or ():
-        if not isinstance(raw, Mapping) or raw.get("temperature_K") is None:
-            continue
+        if not isinstance(raw, Mapping):
+            raise TypeError("thermal schedule setpoint must be a mapping")
+        if raw.get("temperature_K") is None:
+            raise ValueError("thermal schedule setpoint requires temperature_K")
         setpoints.append(
             ThermalSetpoint(
                 temperature_K=_located_from_plain(
@@ -1217,18 +1223,25 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
         )
     points = None
     if payload.get("points") is not None:
-        points = tuple(
-            ThermalPoint(
-                time_s=_located_from_plain(raw["time_s"], _value_or_point_from_plain),
-                temperature_K=_located_from_plain(
-                    raw["temperature_K"], _value_or_point_from_plain
-                ),
+        parsed_points = []
+        for raw in payload["points"]:
+            if not isinstance(raw, Mapping):
+                raise TypeError("thermal schedule point must be a mapping")
+            if raw.get("time_s") is None or raw.get("temperature_K") is None:
+                raise ValueError(
+                    "thermal schedule point requires time_s and temperature_K"
+                )
+            parsed_points.append(
+                ThermalPoint(
+                    time_s=_located_from_plain(
+                        raw["time_s"], _value_or_point_from_plain
+                    ),
+                    temperature_K=_located_from_plain(
+                        raw["temperature_K"], _value_or_point_from_plain
+                    ),
+                )
             )
-            for raw in payload["points"]
-            if isinstance(raw, Mapping)
-            and raw.get("time_s") is not None
-            and raw.get("temperature_K") is not None
-        )
+        points = tuple(parsed_points)
     return ThermalSchedule(
         method=None if method is None else _located_from_plain(method, str),
         ramps=tuple(ramps) or None,

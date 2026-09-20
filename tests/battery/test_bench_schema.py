@@ -17,7 +17,10 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
-from simulator.battery.migrate import _geometry_from_plain
+from simulator.battery.migrate import (
+    _geometry_from_plain,
+    _thermal_schedule_from_plain,
+)
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -35,6 +38,8 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.validity import underdetermined_apparatus
+from simulator.battery.validate import ValidationReport, validate_corpus
+from tests.battery import factories
 from tests.battery.factories import kems_experiment
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -115,6 +120,34 @@ def _leaf_paths(record_type: type, prefix: str) -> set[str]:
     return paths
 
 
+def _pressure_validation_report(
+    pressure: Decimal | Value, identity_pressure: Decimal
+) -> ValidationReport:
+    experiment = factories.tabulation_experiment()
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=factories.located(pressure),
+        ),
+    )
+    observation = factories.observation(
+        "pressure-reconciliation",
+        experiment.experiment_id,
+        factories.activity_identity(total_P=identity_pressure),
+        Decimal("0"),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "total_pressure_Pa"
+        },
+    )
+    return validate_corpus([factories.work()], [experiment], [observation])
+
+
 def test_every_bench_field_has_a_vocabulary_row() -> None:
     targets = {str(row["field"]) for row in _vocabulary()}
     required = _leaf_paths(Bench, "bench")
@@ -122,12 +155,21 @@ def test_every_bench_field_has_a_vocabulary_row() -> None:
     required.update(
         {
             "experiment.bench_id",
-            "experiment.sample.composition_class",
-            "experiment.sample.characterization",
-            "experiment.sample.surface_area_m2",
-            "experiment.sample.pretreatment",
             "experiment.fO2_control.oxygen_partial_pressure_Pa",
         }
+    )
+    missing_sample_fields = {
+        item.name
+        for item in fields(Sample)
+        if not {
+            f"sample.{item.name}",
+            f"experiment.sample.{item.name}",
+        }
+        & targets
+    }
+    assert not missing_sample_fields, (
+        "sample fields without vocabulary rows: "
+        f"{sorted(missing_sample_fields)}"
     )
     assert required <= targets, f"bench fields without vocabulary rows: {sorted(required - targets)}"
 
@@ -156,10 +198,162 @@ def test_bench_identity_requires_citation_text() -> None:
         "cited_by_author",
     }
     with pytest.raises(ValueError, match="cited_as"):
+        BenchIdentity(BenchIdentityBasis.CITED_BY_AUTHOR)
+    with pytest.raises(ValueError, match="cited_as"):
         BenchIdentity(
             BenchIdentityBasis.CITED_BY_AUTHOR,
             BenchReference(None, "", (), Locator(page=1)),
         )
+    with pytest.raises(ValueError, match="BenchReference"):
+        BenchIdentity(
+            BenchIdentityBasis.CITED_BY_AUTHOR,
+            object(),  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="locator"):
+        BenchReference(None, "Smith (1990)", (), None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="BenchIdentity"):
+        Bench(
+            id="w::bench::one",
+            work_id="w",
+            identity=None,  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize("reason", (None, 0, False, "", "   "))
+def test_state_absence_requires_a_real_string_reason(reason: object) -> None:
+    with pytest.raises(ValueError, match="reason"):
+        State.unknown(reason)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="reason"):
+        State.not_applicable(reason)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    (
+        (
+            {
+                "ramps": [
+                    {
+                        "start_temperature_K": {
+                            "state": {"tag": "value", "value": "300"}
+                        }
+                    }
+                ]
+            },
+            "ramp requires rate_K_s",
+        ),
+        (
+            {
+                "setpoints_and_holds": [
+                    {
+                        "hold_duration_s": {
+                            "state": {"tag": "value", "value": "600"}
+                        }
+                    }
+                ]
+            },
+            "setpoint requires temperature_K",
+        ),
+        (
+            {
+                "points": [
+                    {"time_s": {"state": {"tag": "value", "value": "10"}}}
+                ]
+            },
+            "point requires time_s and temperature_K",
+        ),
+    ),
+)
+def test_incomplete_thermal_entries_are_rejected(
+    payload: dict[str, object], message: str
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        _thermal_schedule_from_plain(payload)
+
+
+@pytest.mark.parametrize("payload", ([], "schedule", 1))
+def test_nonmapping_thermal_schedule_is_rejected(payload: object) -> None:
+    with pytest.raises(TypeError, match="thermal schedule must be a mapping"):
+        _thermal_schedule_from_plain(payload)
+
+
+def test_point_pressure_reconciles_with_decimal_identity() -> None:
+    report = _pressure_validation_report(
+        Decimal("0.001"),
+        Decimal("0.001"),
+    )
+    assert report.ok, report.hard_issues
+
+
+@pytest.mark.parametrize(
+    "pressure",
+    (
+        Value(
+            ValueKind.BOUND,
+            bound_operator="<",
+            bound_value=Decimal("0.002"),
+        ),
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.0005"),
+            interval_high=Decimal("0.002"),
+        ),
+    ),
+)
+def test_nonpoint_pressure_is_not_collapsed_for_identity_reconciliation(
+    pressure: Value,
+) -> None:
+    report = _pressure_validation_report(
+        pressure,
+        Decimal("0.001"),
+    )
+    assert report.ok, report.hard_issues
+
+
+@pytest.mark.parametrize(
+    "pressure",
+    (
+        Value(
+            ValueKind.BOUND,
+            bound_operator="<",
+            bound_value=Decimal("0.002"),
+        ),
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.0005"),
+            interval_high=Decimal("0.002"),
+        ),
+    ),
+)
+def test_nonpoint_pressure_rejects_identity_outside_evidence(
+    pressure: Value,
+) -> None:
+    report = _pressure_validation_report(
+        pressure,
+        Decimal("0.003"),
+    )
+    assert any(
+        issue.path.endswith("identity.total_pressure_Pa")
+        and issue.detail
+        == "identity disagrees with Experiment conditions / point_conditions"
+        for issue in report.hard_issues
+    )
+
+
+def test_pressure_identity_reconciliation_rejects_unknown_bound_operator() -> None:
+    report = _pressure_validation_report(
+        Value(
+            ValueKind.BOUND,
+            bound_operator="about",
+            bound_value=Decimal("0.002"),
+        ),
+        Decimal("0.001"),
+    )
+    assert any(
+        issue.path.endswith("identity.total_pressure_Pa")
+        and issue.detail == "unsupported pressure bound operator 'about'"
+        for issue in report.hard_issues
+    )
 
 
 def test_bench_absence_reason_is_closed() -> None:

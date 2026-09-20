@@ -47,6 +47,15 @@ entries:
   - printed: tga_sample_mass_mg
     field: sample.mass_kg
     unit: mg
+  - printed: initial_composition
+    field: sample.initial_composition
+    unit: null
+  - printed: form
+    field: sample.form
+    unit: null
+  - printed: sample_form
+    field: sample.form
+    unit: null
   # exposed area → apparatus.geometry.exposed_area_m2
   - printed: sample_surface_area
     field: apparatus.geometry.exposed_area_m2

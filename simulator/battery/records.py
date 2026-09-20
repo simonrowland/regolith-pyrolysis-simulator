@@ -121,15 +121,15 @@ class State(Generic[T]):
     reason: str | None = None
 
     def __post_init__(self) -> None:
-        if self.reason is not None:
-            object.__setattr__(self, "reason", str(self.reason))
+        if self.reason is not None and not isinstance(self.reason, str):
+            raise ValueError(f"State.{self.tag} reason must be a string")
         if self.tag is StateTag.VALUE:
             if self.value is None:
                 raise ValueError("State.value requires a value")
         else:
             if self.value is not None:
                 raise ValueError(f"State.{self.tag} cannot carry a value")
-            if not self.reason:
+            if not self.reason or not self.reason.strip():
                 raise ValueError(f"State.{self.tag} requires a reason")
 
     @classmethod
@@ -138,11 +138,11 @@ class State(Generic[T]):
 
     @classmethod
     def unknown(cls, reason: str) -> "State[T]":
-        return cls(StateTag.UNKNOWN, reason=str(reason))
+        return cls(StateTag.UNKNOWN, reason=reason)
 
     @classmethod
     def not_applicable(cls, reason: str) -> "State[T]":
-        return cls(StateTag.NOT_APPLICABLE, reason=str(reason))
+        return cls(StateTag.NOT_APPLICABLE, reason=reason)
 
     @property
     def is_value(self) -> bool:
@@ -730,6 +730,8 @@ class BenchReference:
     def __post_init__(self) -> None:
         if not self.cited_as.strip():
             raise ValueError("BenchReference.cited_as is required")
+        if not isinstance(self.locator, Locator):
+            raise ValueError("BenchReference.locator is required")
 
 
 @dataclass(frozen=True)
@@ -741,7 +743,13 @@ class BenchIdentity:
         basis = BenchIdentityBasis(self.basis)
         object.__setattr__(self, "basis", basis)
         if basis is BenchIdentityBasis.CITED_BY_AUTHOR:
-            if self.ref is None or not self.ref.cited_as.strip():
+            if self.ref is None:
+                raise ValueError("cited_by_author BenchIdentity requires ref.cited_as")
+            if not isinstance(self.ref, BenchReference):
+                raise ValueError(
+                    "cited_by_author BenchIdentity requires a BenchReference"
+                )
+            if not self.ref.cited_as.strip():
                 raise ValueError("cited_by_author BenchIdentity requires ref.cited_as")
         elif self.ref is not None:
             raise ValueError("described_in_this_work BenchIdentity cannot carry ref")
@@ -782,6 +790,8 @@ class Bench:
     def __post_init__(self) -> None:
         if not self.id or not self.work_id:
             raise ValueError("Bench requires id and work_id")
+        if not isinstance(self.identity, BenchIdentity):
+            raise ValueError("Bench requires a BenchIdentity")
         object.__setattr__(
             self, "pumping_speed_m3_s", _located_value(self.pumping_speed_m3_s)
         )

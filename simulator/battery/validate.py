@@ -75,6 +75,7 @@ from simulator.battery.records import (
     Residual,
     Species,
     State,
+    Value,
     Work,
     as_decimal,
     phase_token,
@@ -150,6 +151,10 @@ def _check_located(
 def _located_decimal_value(located: Located[Any] | None) -> Any:
     if located is None or not located.state.is_value or located.state.value is None:
         return None
+    if isinstance(located.state.value, Value):
+        if located.state.value.kind is ValueKind.POINT:
+            return located.state.value.point
+        return located.state.value
     try:
         return as_decimal(located.state.value)
     except TypeError:
@@ -173,7 +178,36 @@ def _reconcile_identity_axis(
         ident_value = as_decimal(identity_state.value)
     except TypeError:
         ident_value = identity_state.value
-    if ident_value != source_value:
+    matches = ident_value == source_value
+    if isinstance(source_value, Value):
+        if source_value.kind is ValueKind.BOUND:
+            if source_value.bound_operator == "<":
+                matches = ident_value < source_value.bound_value
+            elif source_value.bound_operator in {"<=", "≤"}:
+                matches = ident_value <= source_value.bound_value
+            elif source_value.bound_operator == ">":
+                matches = ident_value > source_value.bound_value
+            elif source_value.bound_operator in {">=", "≥"}:
+                matches = ident_value >= source_value.bound_value
+            else:
+                issues.append(
+                    _issue(
+                        path,
+                        RefusalReason.INVALID_IDENTITY,
+                        f"unsupported pressure bound operator "
+                        f"{source_value.bound_operator!r}",
+                    )
+                )
+                return
+        elif source_value.kind is ValueKind.INTERVAL:
+            matches = (
+                source_value.interval_low
+                <= ident_value
+                <= source_value.interval_high
+            )
+        else:
+            return
+    if not matches:
         issues.append(
             _issue(
                 path,
