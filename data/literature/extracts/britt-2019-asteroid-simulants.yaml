@@ -1,0 +1,310 @@
+schema_version: literature_extract.v1
+source_id: britt-2019-asteroid-simulants
+source:
+  citation: Britt, D. T., Cannon, K. M., Donaldson Hanna, K., Hogancamp, J., Poch, O., Beck, P., Martin, D., Escrig, J., Bonal, L. & Metzger, P. T. (2019), "Simulated asteroid materials based on carbonaceous chondrite mineralogies", Meteoritics & Planetary Science 54, 2067-2082.
+  doi: 10.1111/maps.13345
+  year: 2019
+extraction:
+  method: pdftotext -layout transcription of the clean text-layer corpus PDF; PDF pages 5, 7, 9 and 11-12 read for recipes, characterization, XRF composition and TG/EGA measurements. Figure 6 curves were not digitized.
+  date: '2026-09-19'
+  worker: extract-britt-2019-asteroid-simulants
+  provenance_path: raw/britt-2019-asteroid-simulants/britt-2019-asteroid-simulants.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: CI_Asteroid_Simulant
+  observable: gibbs_table
+  observation_id: britt_2019_ci_table3_xrf_major_oxide_composition
+  field: composition_wt_pct_SiO2
+  value: 25.0
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: XRF table, CI Simulant column, SiO2 row; values are wt% as printed.
+- species: CM_Asteroid_Simulant
+  observable: gibbs_table
+  observation_id: britt_2019_cm_table3_xrf_major_oxide_composition
+  field: composition_wt_pct_SiO2
+  value: 32.5
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: XRF table, CM Simulant column, SiO2 row; values are wt% as printed.
+- species: CR_Asteroid_Simulant
+  observable: gibbs_table
+  observation_id: britt_2019_cr_table3_xrf_major_oxide_composition
+  field: composition_wt_pct_SiO2
+  value: 19.3
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: XRF table, CR Simulant column, SiO2 row; values are wt% as printed.
+- species: CI_Asteroid_Simulant
+  observable: rate_series
+  observation_id: britt_2019_ci_tg_integrated_mass_loss
+  field: total_integrated_mass_loss_wt_pct
+  value: 14.3
+  locator:
+    pdf_page_index: 11
+    section: Thermogravimetry and Evolved Gas Analysis
+    figure: '6a'
+    note: Body text prints total integrated mass loss CI = 14.3 wt%; not read from curve.
+- species: CM_Asteroid_Simulant
+  observable: rate_series
+  observation_id: britt_2019_cm_tg_integrated_mass_loss
+  field: total_integrated_mass_loss_wt_pct
+  value: 11.2
+  locator:
+    pdf_page_index: 11
+    section: Thermogravimetry and Evolved Gas Analysis
+    figure: '6a'
+    note: Body text prints total integrated mass loss CM = 11.2 wt%; not read from curve.
+- species: CR_Asteroid_Simulant
+  observable: rate_series
+  observation_id: britt_2019_cr_tg_integrated_mass_loss
+  field: total_integrated_mass_loss_wt_pct
+  value: 3.2
+  locator:
+    pdf_page_index: 11
+    section: Thermogravimetry and Evolved Gas Analysis
+    figure: '6a'
+    note: Body text prints total integrated mass loss CR = 3.2 wt%; not read from curve.
+species:
+  asteroid_simulants:
+    observations:
+    - observation_id: britt_2019_table2_prototype_recipes
+      type: gibbs_table
+      locator:
+        pdf_page_index: 5
+        table: '2'
+        note: Initial prototype mineral recipes and suggested future updates; all values wt% as printed.
+      phase: CI_CM_CR_asteroid_simulant_prototypes
+      standard_state: prototype recipe mass fraction as printed
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: prototype_mineral_recipe
+        method_class: measured_direct
+        evidence_class: authors_own_recipe
+        recipes:
+          CI_prototype:
+            Mg-serpentine: 48.0
+            Epsomite: 6.0
+            Magnetite: 13.5
+            Palygorskite: 5.0
+            Olivine: 7.0
+            Pyrite: 6.5
+            Vermiculite: 9.0
+            Coal: 5.0
+          CM_prototype:
+            Mg-serpentine: 72.5
+            Magnetite: 10.4
+            Olivine: 7.8
+            Pyrite: 2.6
+            Coal: 3.6
+            Pyroxene: 2.1
+            Siderite: 1.0
+          CR_prototype:
+            Mg-serpentine: 9.2
+            Magnetite: 14.3
+            Olivine: 33.7
+            Pyrite: 4.1
+            Coal: 2.0
+            Pyroxene: 31.6
+            Iron metal: 4.6
+            Nickel metal: 0.5
+        note: The table also prints future-update recipes; they are retained only as quoted recipe data, not treated as measurements of the prototype samples.
+    - observation_id: britt_2019_tga_ega_thermal_program
+      type: rate_series
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        figure: '6'
+        note: TG/EGA method paragraph; Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer.
+      T_range_K:
+      - 273.15
+      - 1273.15
+      phase: CI_CM_CR_asteroid_simulant_prototypes
+      standard_state: TG/EGA run conditions as printed
+      regime: tga_ega_flowing_helium
+      units: °C, °C min^-1, sccm, mbar and m/z as printed
+      values:
+        quantity: tga_ega_experimental_conditions
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        instrument: Labsys EVO differential scanning calorimeter/thermal gravimeter with ThermoStar quadrupole mass spectrometer
+        atmosphere_as_printed: helium
+        pressure_mbar_as_printed: 30
+        ramp_C_per_min_as_printed: 35
+        T_start_C_as_printed: ambient
+        T_end_C_as_printed: 1000
+        flow_rate_sccm_as_printed: 10
+        monitored_species:
+        - gas_species: H2O
+          mz_as_printed: 18
+        - gas_species: C3H3
+          mz_as_printed: 39
+        - gas_species: CO2
+          mz_as_printed: 44
+        - gas_species: SO2
+          mz_as_printed: 64
+        sample_mass: not_printed
+        crucible_or_container: not_printed
+        temperature_measurement_and_calibration: not_printed
+        vacuum_or_pumping: not_applicable; 30-mbar He atmosphere was used
+        run_duration: not_printed
+      uncertainty:
+        note: No numerical uncertainty is printed for the TG/EGA conditions or total integrated mass losses.
+    - observation_id: britt_2019_tga_ega_release_patterns
+      type: rate_series
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        figure: '6b-d'
+        note: Text description of the measured EGA traces; curves were not digitized.
+      phase: CI_CM_CR_asteroid_simulant_prototypes
+      standard_state: qualitative temperature-dependent EGA release pattern as printed
+      regime: tga_ega_flowing_helium
+      units: temperature intervals in °C and mass-spectrometer channels m/z as printed
+      values:
+        quantity: evolved_gas_release_pattern
+        method_class: measured_qualitative_from_text_and_figure
+        evidence_class: authors_own_measurement
+        figure_only_data_status: curves not digitized; no point values inferred
+        H2O:
+          mz_as_printed: 18
+          release_pattern_as_printed: distinct releases at both low and high temperatures
+        C3H3:
+          mz_as_printed: 39
+          release_temperature_as_printed: around 530 °C in all simulants
+        CO2:
+          mz_as_printed: 44
+          release_temperature_as_printed: multiple overlapping releases between 500 and 850 °C; rise toward 1000 °C; minor release around 400 °C in CR simulant
+        SO2:
+          mz_as_printed: 64
+          release_temperature_as_printed: minor releases from 450 to 900 °C; more complex pattern in CI simulant
+      uncertainty:
+        note: No numerical uncertainty is printed; temperature descriptions are retained as ranges or approximate wording.
+  CI_Asteroid_Simulant:
+    observations:
+    - observation_id: britt_2019_ci_table3_xrf_major_oxide_composition
+      type: gibbs_table
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+      phase: CI_asteroid_simulant_prototype_crushed_powder
+      standard_state: oxide bulk composition by XRF, wt% as printed
+      regime: xrf_oxide_mode
+      units: wt% as printed
+      values:
+        quantity: major_oxide_bulk_composition
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        composition_wt_pct:
+          SiO2: 25.0
+          TiO2: 0.5
+          Al2O3: 3.1
+          FeOT: 25.8
+          MnO: 0.3
+          MgO: 30.2
+          CaO: 3.0
+          Na2O: 6.4
+          K2O: 0.4
+          P2O5: 0.4
+          Cr2O3: 0.2
+          SO3: 4.9
+          Total: 100.0
+        composition_wt_pct_SiO2: 25.0
+        instrument: PANalytical Epsilon XRF spectrometer at UCF, oxides mode
+        sample_form: crushed powder
+        trace_elements_and_isotopes: not_measured
+        iron_speciation: not_measured; future Mössbauer spectroscopy stated
+      uncertainty:
+        note: No numerical uncertainty is printed in Table 3.
+    - observation_id: britt_2019_ci_tg_integrated_mass_loss
+      type: rate_series
+      locator:
+        pdf_page_index: 11
+        section: Thermogravimetry and Evolved Gas Analysis
+        figure: '6a'
+        note: Body text prints CI total integrated mass loss from 0 to 1000 °C.
+      T_range_K:
+      - 273.15
+      - 1273.15
+      phase: CI_asteroid_simulant_prototype
+      standard_state: integrated TG mass loss from ambient to 1000 °C as printed
+      regime: tga_ega_flowing_helium
+      units: wt% and °C as printed
+      values:
+        quantity: total_integrated_mass_loss
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        total_integrated_mass_loss_wt_pct: 14.3
+        temperature_interval_C_as_printed: ambient to 1000
+        qualitative_release: modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C
+      uncertainty:
+        note: none printed
+  CM_Asteroid_Simulant:
+    observations:
+    - observation_id: britt_2019_cm_table3_xrf_major_oxide_composition
+      type: gibbs_table
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+      phase: CM_asteroid_simulant_prototype_crushed_powder
+      standard_state: oxide bulk composition by XRF, wt% as printed
+      regime: xrf_oxide_mode
+      units: wt% as printed
+      values:
+        quantity: major_oxide_bulk_composition
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        composition_wt_pct: {SiO2: 32.5, TiO2: 0.3, Al2O3: 3.1, FeOT: 20.2, MnO: 0.2, MgO: 32.1, CaO: 3.1, Na2O: 6.2, K2O: 0.2, P2O5: 0.4, Cr2O3: 0.2, SO3: 1.5, Total: 100.0}
+        composition_wt_pct_SiO2: 32.5
+        instrument: PANalytical Epsilon XRF spectrometer at UCF, oxides mode
+        sample_form: crushed powder
+        trace_elements_and_isotopes: not_measured
+        iron_speciation: not_measured; future Mössbauer spectroscopy stated
+      uncertainty: {note: No numerical uncertainty is printed in Table 3.}
+    - observation_id: britt_2019_cm_tg_integrated_mass_loss
+      type: rate_series
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CM total integrated mass loss from 0 to 1000 °C.}
+      T_range_K: [273.15, 1273.15]
+      phase: CM_asteroid_simulant_prototype
+      standard_state: integrated TG mass loss from ambient to 1000 °C as printed
+      regime: tga_ega_flowing_helium
+      units: wt% and °C as printed
+      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 11.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C}
+      uncertainty: {note: none printed}
+  CR_Asteroid_Simulant:
+    observations:
+    - observation_id: britt_2019_cr_table3_xrf_major_oxide_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 9, table: '3', note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.}
+      phase: CR_asteroid_simulant_prototype_crushed_powder
+      standard_state: oxide bulk composition by XRF, wt% as printed
+      regime: xrf_oxide_mode
+      units: wt% as printed
+      values:
+        quantity: major_oxide_bulk_composition
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        composition_wt_pct: {SiO2: 19.3, TiO2: 0.4, Al2O3: 1.2, FeOT: 42.9, MnO: 0.3, MgO: 30.1, CaO: 0.8, Na2O: 3.3, K2O: 0.1, P2O5: 0.4, Cr2O3: 0.1, SO3: 0.9, Total: 100.0}
+        composition_wt_pct_SiO2: 19.3
+        instrument: PANalytical Epsilon XRF spectrometer at UCF, oxides mode
+        sample_form: crushed powder
+        trace_elements_and_isotopes: not_measured
+        iron_speciation: not_measured; future Mössbauer spectroscopy stated
+      uncertainty: {note: No numerical uncertainty is printed in Table 3.}
+    - observation_id: britt_2019_cr_tg_integrated_mass_loss
+      type: rate_series
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CR total integrated mass loss from 0 to 1000 °C.}
+      T_range_K: [273.15, 1273.15]
+      phase: CR_asteroid_simulant_prototype
+      standard_state: integrated TG mass loss from ambient to 1000 °C as printed
+      regime: tga_ega_flowing_helium
+      units: wt% and °C as printed
+      values: {quantity: total_integrated_mass_loss, method_class: measured_direct, evidence_class: authors_own_measurement, total_integrated_mass_loss_wt_pct: 3.2, temperature_interval_C_as_printed: ambient to 1000, qualitative_release: modest loss ambient to approximately 600 °C, followed by more rapid loss 600-1000 °C}
+      uncertainty: {note: none printed}
