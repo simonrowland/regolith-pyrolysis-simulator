@@ -1,0 +1,407 @@
+schema_version: literature_extract.v1
+source_id: usgs-lunar-sourcebook-tab8-1
+source:
+  citation: 'Lunar Sourcebook, Chapter 8, Table A8.1, "Statistical data for concentrations of major elements" (TAB8_1R.DOC; USGS Lunar Consortium copy)'
+  year: 1991
+  url: https://lunar-consortium.astrogeology.usgs.gov/data/chem_min/tab8_1.pdf
+extraction:
+  method: 'pdftotext -layout transcription of the three-page Table A8.1 PDF; values retained in printed wt% and statistic columns; blank cells remain absent'
+  date: '2026-09-19'
+  worker: w3-usgs-lunar-sourcebook-tab8-1
+  provenance_path: docs-private/research/2026-09-19-usgs-tab8-1/
+review_status: draft
+fidelity_samples:
+- path: species.lunar_sample_major_oxides.observations[usgs_tab8_1_apollo11_mbas].values.SiO2.average
+  value: 40.46
+  locator: {page: 1, table: A8.1, row_group: 'Apollo 11 MBAS', column: SiO2, statistic: Average}
+coverage:
+  evidence_class: compilation_assessed
+  table: A8.1
+  sample_groups: 23
+  oxide_columns: [SiO2, TiO2, Al2O3, FeO, MgO, CaO, Na2O]
+  statistics: [N, average, standard_deviation, minimum, maximum]
+  printed_units: weight percent
+  source_scope: 'Compiled major-element analyses of lunar materials; underlying references are listed after the table and are not reclassified as direct measurements here.'
+  absent_from_source:
+  - apparatus
+  - sample_mass
+  - sample_form
+  - container_or_crucible
+  - cell_or_orifice_geometry
+  - exposed_area
+  - vacuum_level
+  - pumping
+  - gas_identity_or_pressure
+  - temperature_measurement_or_calibration
+  - fO2_control
+  - run_duration
+  - measurement_uncertainties_beyond_printed_standard_deviations
+species:
+  lunar_sample_major_oxides:
+    observations:
+    - observation_id: usgs_tab8_1_apollo11_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Apollo 11 MBAS', note: 'Each value is under its printed oxide column and statistic row header.'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 11 MBAS
+        SiO2: {N: 11, average: 40.46, standard_deviation: 1.37, minimum: 38.59, maximum: 42.89}
+        TiO2: {N: 11, average: 10.41, standard_deviation: 1.02, minimum: 8.47, maximum: 11.87}
+        Al2O3: {N: 11, average: 10.08, standard_deviation: 0.84, minimum: 7.91, maximum: 10.87}
+        FeO: {N: 11, average: 19.22, standard_deviation: 1.28, minimum: 16.51, maximum: 21.71}
+        MgO: {N: 11, average: 7.01, standard_deviation: 0.87, minimum: 5.91, maximum: 8.52}
+        CaO: {N: 11, average: 11.54, standard_deviation: 0.82, minimum: 10.30, maximum: 12.65}
+        Na2O: {N: 11, average: 0.38, standard_deviation: 0.04, minimum: 0.34, maximum: 0.44}
+    - observation_id: usgs_tab8_1_apollo12_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Apollo 12 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 12 MBAS
+        SiO2: {N: 20, average: 44.88, standard_deviation: 1.76, minimum: 41.56, maximum: 47.27}
+        TiO2: {N: 20, average: 3.62, standard_deviation: 0.87, minimum: 2.59, maximum: 5.20}
+        Al2O3: {N: 20, average: 8.93, standard_deviation: 1.78, minimum: 5.30, maximum: 12.63}
+        FeO: {N: 20, average: 20.48, standard_deviation: 1.38, minimum: 16.78, maximum: 22.64}
+        MgO: {N: 20, average: 10.64, standard_deviation: 3.99, minimum: 5.75, maximum: 19.97}
+        CaO: {N: 20, average: 9.81, standard_deviation: 1.66, minimum: 6.31, maximum: 12.25}
+        Na2O: {N: 20, average: 0.25, standard_deviation: 0.05, minimum: 0.16, maximum: 0.33}
+    - observation_id: usgs_tab8_1_apollo15_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Apollo 15 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 15 MBAS
+        SiO2: {N: 9, average: 46.68, standard_deviation: 1.53, minimum: 45.02, maximum: 48.10}
+        TiO2: {N: 14, average: 1.97, standard_deviation: 0.39, minimum: 1.28, maximum: 2.51}
+        Al2O3: {N: 14, average: 10.21, standard_deviation: 1.64, minimum: 8.77, maximum: 13.70}
+        FeO: {N: 14, average: 19.87, standard_deviation: 2.05, minimum: 15.30, maximum: 22.52}
+        MgO: {N: 15, average: 8.76, standard_deviation: 1.17, minimum: 6.45, maximum: 10.60}
+        CaO: {N: 14, average: 10.63, standard_deviation: 0.49, minimum: 9.89, maximum: 11.50}
+        Na2O: {N: 15, average: 0.30, standard_deviation: 0.06, minimum: 0.21, maximum: 0.39}
+    - observation_id: usgs_tab8_1_apollo17_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Apollo 17 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 17 MBAS
+        SiO2: {N: 19, average: 39.03, standard_deviation: 1.03, minimum: 37.93, maximum: 41.92}
+        TiO2: {N: 26, average: 11.94, standard_deviation: 1.11, minimum: 8.30, maximum: 13.08}
+        Al2O3: {N: 25, average: 9.00, standard_deviation: 0.78, minimum: 8.38, maximum: 12.10}
+        FeO: {N: 25, average: 18.82, standard_deviation: 0.73, minimum: 16.60, maximum: 19.90}
+        MgO: {N: 25, average: 8.54, standard_deviation: 1.13, minimum: 6.15, maximum: 10.36}
+        CaO: {N: 26, average: 10.82, standard_deviation: 0.59, minimum: 9.79, maximum: 12.15}
+        Na2O: {N: 26, average: 0.39, standard_deviation: 0.03, minimum: 0.35, maximum: 0.48}
+    - observation_id: usgs_tab8_1_luna16_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Luna 16 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 16 MBAS
+        SiO2: {N: 3, average: 44.0, standard_deviation: 1.4, minimum: 42.8, maximum: 45.5}
+        TiO2: {N: 6, average: 4.77, standard_deviation: 0.49, minimum: 4.0, maximum: 5.3}
+        Al2O3: {N: 6, average: 13.83, standard_deviation: 0.81, minimum: 13.3, maximum: 15.4}
+        FeO: {N: 9, average: 18.7, standard_deviation: 0.7, minimum: 17.8, maximum: 19.9}
+        MgO: {N: 6, average: 6.40, standard_deviation: 0.51, minimum: 5.95, maximum: 7.05}
+        CaO: {N: 9, average: 11.82, standard_deviation: 0.81, minimum: 10.4, maximum: 13.0}
+        Na2O: {N: 9, average: 0.53, standard_deviation: 0.13, minimum: 0.28, maximum: 0.70}
+    - observation_id: usgs_tab8_1_luna24_mbas
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: 'Luna 24 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 24 MBAS
+        SiO2: {N: 2, average: 46.00, minimum: 45.20, maximum: 46.80}
+        TiO2: {N: 6, average: 1.02, standard_deviation: 0.19, minimum: 0.75, maximum: 1.30}
+        Al2O3: {N: 6, average: 12.20, standard_deviation: 1.30, minimum: 10.10, maximum: 13.80}
+        FeO: {N: 7, average: 21.58, standard_deviation: 0.87, minimum: 20.46, maximum: 22.40}
+        MgO: {N: 6, average: 7.40, standard_deviation: 1.60, minimum: 6.00, maximum: 10.50}
+        CaO: {N: 6, average: 12.20, standard_deviation: 0.90, minimum: 10.80, maximum: 13.50}
+        Na2O: {N: 7, average: 0.23, standard_deviation: 0.06, minimum: 0.10, maximum: 0.29}
+    - observation_id: usgs_tab8_1_anorthosite
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: Anorthosite}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Anorthosite
+        SiO2: {N: 3, average: 45.57, standard_deviation: 0.66, minimum: 45, maximum: 46}
+        TiO2: {N: 7, average: 0.08, standard_deviation: 0.07, minimum: 0.01, maximum: 0.23}
+        Al2O3: {N: 12, average: 33.4, standard_deviation: 1.6, minimum: 31, maximum: 36}
+        FeO: {N: 21, average: 1.00, standard_deviation: 1.1, minimum: 0.16, maximum: 4.0}
+        MgO: {N: 13, average: 1.21, standard_deviation: 1.20, minimum: 0.05, maximum: 3.7}
+        CaO: {N: 21, average: 19.1, standard_deviation: 1.1, minimum: 16.9, maximum: 21}
+        Na2O: {N: 21, average: 0.40, standard_deviation: 0.06, minimum: 0.26, maximum: 0.54}
+    - observation_id: usgs_tab8_1_norite
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: Norite}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Norite
+        SiO2: {N: 11, average: 50.6, standard_deviation: 1.6, minimum: 47.7, maximum: 52}
+        TiO2: {N: 17, average: 0.30, standard_deviation: 0.02, minimum: 0.27, maximum: 0.33}
+        Al2O3: {N: 23, average: 17.0, standard_deviation: 3.1, minimum: 15, maximum: 23}
+        FeO: {N: 23, average: 8.2, standard_deviation: 2.5, minimum: 3.9, maximum: 10.7}
+        MgO: {N: 23, average: 12.5, standard_deviation: 2.1, minimum: 10.2, maximum: 15.9}
+        CaO: {N: 24, average: 9.9, standard_deviation: 1.5, minimum: 8.8, maximum: 12.8}
+        Na2O: {N: 24, average: 0.38, standard_deviation: 0.05, minimum: 0.32, maximum: 0.44}
+    - observation_id: usgs_tab8_1_troctolite
+      type: rate_series
+      locator: {page: 1, table: A8.1, row_group: Troctolite}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Troctolite
+        SiO2: {N: 2, average: 43.5, minimum: 42.9, maximum: 44.1}
+        TiO2: {N: 8, average: 0.18, standard_deviation: 0.22, minimum: 0.04, maximum: 0.69}
+        Al2O3: {N: 11, average: 24.0, standard_deviation: 4.3, minimum: 15.02, maximum: 28.7}
+        FeO: {N: 12, average: 4.1, standard_deviation: 1.7, minimum: 2.26, maximum: 8.55}
+        MgO: {N: 11, average: 15.1, standard_deviation: 6.4, minimum: 8.3, maximum: 30.5}
+        CaO: {N: 12, average: 13.4, standard_deviation: 2.0, minimum: 9.2, maximum: 16}
+        Na2O: {N: 12, average: 0.37, standard_deviation: 0.09, minimum: 0.20, maximum: 0.47}
+    - observation_id: usgs_tab8_1_apollo11_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Apollo 11 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 11 S&RB
+        SiO2: {N: 8, average: 41.99, standard_deviation: 0.31, minimum: 41.50, maximum: 42.43}
+        TiO2: {N: 13, average: 7.94, standard_deviation: 0.62, minimum: 7.17, maximum: 9.17}
+        Al2O3: {N: 13, average: 12.58, standard_deviation: 0.80, minimum: 11.47, maximum: 13.77}
+        FeO: {N: 13, average: 16.40, standard_deviation: 0.79, minimum: 15.41, maximum: 17.74}
+        MgO: {N: 13, average: 7.93, standard_deviation: 0.17, minimum: 7.67, maximum: 8.33}
+        CaO: {N: 13, average: 11.74, standard_deviation: 0.25, minimum: 11.34, maximum: 12.12}
+        Na2O: {N: 13, average: 0.47, standard_deviation: 0.03, minimum: 0.40, maximum: 0.53}
+    - observation_id: usgs_tab8_1_apollo12_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Apollo 12 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 12 S&RB
+        SiO2: {N: 3, average: 46.21, standard_deviation: 0.12, minimum: 46.07, maximum: 46.29}
+        TiO2: {N: 3, average: 2.61, standard_deviation: 0.10, minimum: 2.50, maximum: 2.67}
+        Al2O3: {N: 3, average: 12.13, standard_deviation: 0.86, minimum: 11.14, maximum: 12.69}
+        FeO: {N: 3, average: 17.19, standard_deviation: 1.07, minimum: 16.33, maximum: 18.39}
+        MgO: {N: 3, average: 10.42, standard_deviation: 1.07, minimum: 9.73, maximum: 11.65}
+        CaO: {N: 3, average: 9.85, standard_deviation: 1.14, minimum: 8.54, maximum: 10.64}
+        Na2O: {N: 3, average: 0.41, standard_deviation: 0.03, minimum: 0.37, maximum: 0.43}
+    - observation_id: usgs_tab8_1_apollo15_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Apollo 15 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 15 S&RB
+        SiO2: {N: 12, average: 47.19, standard_deviation: 0.74, minimum: 46.50, maximum: 48.43}
+        TiO2: {N: 14, average: 1.46, standard_deviation: 0.34, minimum: 1.00, maximum: 2.17}
+        Al2O3: {N: 14, average: 14.32, standard_deviation: 2.62, minimum: 9.86, maximum: 17.91}
+        FeO: {N: 14, average: 14.98, standard_deviation: 3.30, minimum: 11.55, maximum: 20.70}
+        MgO: {N: 14, average: 10.95, standard_deviation: 0.53, minimum: 9.80, maximum: 11.67}
+        CaO: {N: 14, average: 10.47, standard_deviation: 0.96, minimum: 8.96, maximum: 11.76}
+        Na2O: {N: 14, average: 0.40, standard_deviation: 0.07, minimum: 0.30, maximum: 0.50}
+    - observation_id: usgs_tab8_1_apollo16_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Apollo 16 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 16 S&RB
+        SiO2: {N: 8, average: 44.89, standard_deviation: 0.51, minimum: 44.10, maximum: 48.80}
+        TiO2: {N: 18, average: 0.53, standard_deviation: 0.14, minimum: 0.26, maximum: 0.78}
+        Al2O3: {N: 19, average: 27.23, standard_deviation: 1.84, minimum: 23.04, maximum: 30.22}
+        FeO: {N: 19, average: 4.98, standard_deviation: 1.08, minimum: 2.91, maximum: 7.73}
+        MgO: {N: 19, average: 6.00, standard_deviation: 1.76, minimum: 3.97, maximum: 10.32}
+        CaO: {N: 19, average: 14.56, standard_deviation: 3.64, minimum: 4.54, maximum: 17.00}
+        Na2O: {N: 19, average: 0.47, standard_deviation: 0.08, minimum: 0.30, maximum: 0.72}
+    - observation_id: usgs_tab8_1_apollo17_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Apollo 17 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 17 S&RB
+        SiO2: {N: 15, average: 44.47, standard_deviation: 1.41, minimum: 41.57, maximum: 46.07}
+        TiO2: {N: 16, average: 2.84, standard_deviation: 2.01, minimum: 1.22, maximum: 7.35}
+        Al2O3: {N: 16, average: 18.93, standard_deviation: 2.89, minimum: 12.43, maximum: 21.38}
+        FeO: {N: 16, average: 10.29, standard_deviation: 2.67, minimum: 7.95, maximum: 15.94}
+        MgO: {N: 16, average: 9.95, standard_deviation: 0.30, minimum: 9.32, maximum: 10.55}
+        CaO: {N: 16, average: 12.29, standard_deviation: 0.61, minimum: 11.06, maximum: 13.16}
+        Na2O: {N: 16, average: 0.43, standard_deviation: 0.03, minimum: 0.37, maximum: 0.48}
+    - observation_id: usgs_tab8_1_luna16_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Luna 16 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 16 S&RB
+        SiO2: {N: 3, average: 44.37, standard_deviation: 2.93, minimum: 41.70, maximum: 47.50}
+        TiO2: {N: 3, average: 3.30, standard_deviation: 0.10, minimum: 3.20, maximum: 3.39}
+        Al2O3: {N: 3, average: 15.68, standard_deviation: 0.34, minimum: 15.33, maximum: 16.00}
+        FeO: {N: 3, average: 16.75, standard_deviation: 0.09, minimum: 16.64, maximum: 16.80}
+        MgO: {N: 1, average: 8.78}
+        CaO: {N: 3, average: 11.50, standard_deviation: 0.86, minimum: 11.00, maximum: 12.49}
+        Na2O: {N: 3, average: 0.35, standard_deviation: 0.02, minimum: 0.34, maximum: 0.37}
+    - observation_id: usgs_tab8_1_luna20_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Luna 20 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 20 S&RB
+        SiO2: {N: 3, average: 45.2, standard_deviation: 0.72, minimum: 44.4, maximum: 45.8}
+        TiO2: {N: 5, average: 0.50, standard_deviation: 0.06, minimum: 0.43, maximum: 0.56}
+        Al2O3: {N: 5, average: 22.75, standard_deviation: 0.69, minimum: 21.6, maximum: 23.44}
+        FeO: {N: 5, average: 7.46, standard_deviation: 0.47, minimum: 7.02, maximum: 8.1}
+        MgO: {N: 4, average: 9.69, standard_deviation: 0.35, minimum: 9.19, maximum: 10}
+        CaO: {N: 5, average: 14.70, standard_deviation: 0.93, minimum: 13.38, maximum: 15.8}
+        Na2O: {N: 5, average: 0.39, standard_deviation: 0.11, minimum: 0.29, maximum: 0.55}
+    - observation_id: usgs_tab8_1_luna24_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'Luna 24 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 24 S&RB
+        SiO2: {N: 1, average: 45.40}
+        TiO2: {N: 5, average: 1.04, standard_deviation: 0.15, minimum: 0.80, maximum: 1.20}
+        Al2O3: {N: 6, average: 11.95, standard_deviation: 0.43, minimum: 11.10, maximum: 12.30}
+        FeO: {N: 6, average: 19.55, standard_deviation: 0.62, minimum: 18.70, maximum: 20.50}
+        MgO: {N: 6, average: 9.87, standard_deviation: 0.43, minimum: 9.00, maximum: 10.20}
+        CaO: {N: 6, average: 11.07, standard_deviation: 0.25, minimum: 10.80, maximum: 11.40}
+        Na2O: {N: 6, average: 0.28, standard_deviation: 0.01, minimum: 0.27, maximum: 0.30}
+    - observation_id: usgs_tab8_1_amet_srb
+      type: rate_series
+      locator: {page: 2, table: A8.1, row_group: 'AMET S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: AMET S&RB
+        SiO2: {N: 1, average: 46.50}
+        TiO2: {N: 7, average: 0.28, standard_deviation: 0.05, minimum: 0.23, maximum: 0.37}
+        Al2O3: {N: 7, average: 25.69, standard_deviation: 0.68, minimum: 25.10, maximum: 26.60}
+        FeO: {N: 8, average: 5.72, standard_deviation: 0.38, minimum: 5.40, maximum: 6.50}
+        MgO: {N: 6, average: 7.67, standard_deviation: 0.98, minimum: 6.00, maximum: 8.80}
+        CaO: {N: 8, average: 15.13, standard_deviation: 0.38, minimum: 14.80, maximum: 16.00}
+        Na2O: {N: 8, average: 0.32, standard_deviation: 0.01, minimum: 0.30, maximum: 0.33}
+    - observation_id: usgs_tab8_1_apollo14_bx
+      type: rate_series
+      locator: {page: 3, table: A8.1, row_group: 'Apollo 14 BX'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 14 BX
+        SiO2: {N: 1, average: 48.09}
+        TiO2: {N: 10, average: 1.51, standard_deviation: 0.23, minimum: 1.03, maximum: 1.80}
+        Al2O3: {N: 15, average: 16.72, standard_deviation: 6.04, minimum: 10.50, maximum: 35.20}
+        FeO: {N: 16, average: 9.53, standard_deviation: 2.69, minimum: 0.43, maximum: 11.50}
+        MgO: {N: 10, average: 10.18, standard_deviation: 2.88, minimum: 2.08, maximum: 11.70}
+        CaO: {N: 15, average: 10.67, standard_deviation: 2.64, minimum: 9.00, maximum: 19.10}
+        Na2O: {N: 16, average: 0.73, standard_deviation: 0.13, minimum: 0.48, maximum: 0.98}
+    - observation_id: usgs_tab8_1_apollo15_bx
+      type: rate_series
+      locator: {page: 3, table: A8.1, row_group: 'Apollo 15 BX'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 15 BX
+        TiO2: {N: 8, average: 1.68, standard_deviation: 0.32, minimum: 1.16, maximum: 2.05}
+        Al2O3: {N: 8, average: 13.96, standard_deviation: 2.26, minimum: 9.90, maximum: 16.20}
+        FeO: {N: 8, average: 14.04, standard_deviation: 2.77, minimum: 11.10, maximum: 19.20}
+        MgO: {N: 8, average: 10.25, standard_deviation: 0.95, minimum: 9.20, maximum: 11.60}
+        CaO: {N: 8, average: 12.78, standard_deviation: 3.39, minimum: 10.30, maximum: 19.20}
+        Na2O: {N: 8, average: 0.46, standard_deviation: 0.11, minimum: 0.25, maximum: 0.60}
+    - observation_id: usgs_tab8_1_apollo16_bx
+      type: rate_series
+      locator: {page: 3, table: A8.1, row_group: 'Apollo 16 BX'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 16 BX
+        SiO2: {N: 13, average: 45.418, standard_deviation: 1.35, minimum: 43.60, maximum: 49.20}
+        TiO2: {N: 26, average: 0.64, standard_deviation: 0.45, minimum: 0.20, maximum: 2.15}
+        Al2O3: {N: 32, average: 25.11, standard_deviation: 5.01, minimum: 13.90, maximum: 33.80}
+        FeO: {N: 41, average: 5.08, standard_deviation: 2.84, minimum: 1.29, maximum: 13.35}
+        MgO: {N: 32, average: 7.24, standard_deviation: 3.24, minimum: 1.94, maximum: 13.00}
+        CaO: {N: 41, average: 15.14, standard_deviation: 2.72, minimum: 8.50, maximum: 18.90}
+        Na2O: {N: 41, average: 0.45, standard_deviation: 0.08, minimum: 0.31, maximum: 0.68}
+    - observation_id: usgs_tab8_1_apollo17_bx
+      type: rate_series
+      locator: {page: 3, table: A8.1, row_group: 'Apollo 17 BX'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Apollo 17 BX
+        SiO2: {N: 7, average: 45.21, standard_deviation: 2.14, minimum: 41.79, maximum: 46.80}
+        TiO2: {N: 10, average: 2.23, standard_deviation: 2.47, minimum: 0.65, maximum: 7.98}
+        Al2O3: {N: 10, average: 17.82, standard_deviation: 2.99, minimum: 12.26, maximum: 20.82}
+        FeO: {N: 10, average: 9.80, standard_deviation: 3.22, minimum: 7.30, maximum: 16.50}
+        MgO: {N: 10, average: 11.55, standard_deviation: 2.20, minimum: 8.80, maximum: 16.72}
+        CaO: {N: 10, average: 11.42, standard_deviation: 0.84, minimum: 9.72, maximum: 12.56}
+        Na2O: {N: 10, average: 0.53, standard_deviation: 0.10, minimum: 0.41, maximum: 0.69}
+    - observation_id: usgs_tab8_1_luna20_bx
+      type: rate_series
+      locator: {page: 3, table: A8.1, row_group: 'Luna 20 BX'}
+      phase: lunar_material_compilation
+      regime: compiled_lunar_chemical_analysis
+      units: wt_pct
+      values:
+        method_class: compilation_assessed
+        sample_group: Luna 20 BX
+        TiO2: {N: 19, average: 0.49, standard_deviation: 0.22, minimum: 0.20, maximum: 0.90}
+        Al2O3: {N: 19, average: 23.18, standard_deviation: 2.78, minimum: 19.50, maximum: 30.00}
+        FeO: {N: 27, average: 7.11, standard_deviation: 2.05, minimum: 3.80, maximum: 13.30}
+        MgO: {N: 19, average: 10.46, standard_deviation: 3.24, minimum: 3.10, maximum: 16.20}
+        CaO: {N: 23, average: 13.75, standard_deviation: 2.25, minimum: 6.70, maximum: 19.20}
+        Na2O: {N: 24, average: 0.42, standard_deviation: 0.20, minimum: 0.25, maximum: 1.32}
