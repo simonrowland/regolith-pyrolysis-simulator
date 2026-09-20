@@ -1,0 +1,329 @@
+schema_version: literature_extract.v1
+source_id: boulliung-2025-mercury-volatile-metals-magmatic
+source:
+  citation: 'Boulliung, J., Wood, B. J. & Mather, T. A. (2025), "Volatility of mercury and related volatile metals at magmatic temperatures", Chemical Geology, DOI 10.1016/j.chemgeo.2025.123018'
+  doi: 10.1016/j.chemgeo.2025.123018
+  year: 2025
+extraction:
+  method: layout-preserving pdftotext transcription of printed prose and rendered PDF verification; tables and supplementary values not present/readable in the supplied 37-page PDF were not reconstructed
+  date: '2026-09-20'
+  worker: i1-boulliung-2025-mercury-volatile-metals-magmatic
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+review_status: draft
+species:
+  Hg:
+    observations:
+    - observation_id: boulliung_2025_ssas_apparatus_and_run_conditions
+      type: laboratory_conditions
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Values are transcribed from the SSAS preparation and experiment paragraphs; no value is inferred from the drawing or from an unprovided supplement.
+      units: as printed
+      equipment:
+        sample_mass_g:
+          value: '~100'
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
+        sample_container:
+          value: alumina crucible
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
+        crucible_material: alumina
+        chamber_pressure:
+          value: '~2.7'
+          units: mbar
+          locator: {pdf_page_index: 9, section: '2.1 Experiments'}
+        cell_material: silica tube
+        chamber_length_cm:
+          value: '~9'
+          units: cm
+          locator: {pdf_page_index: 9, section: '2.1 Experiments'}
+        ampoule_volume_m3:
+          value: '4.4 x 10^-6'
+          locator: {pdf_page_index: 9, section: '2.1 Experiments'}
+        thermocouple:
+          value: thermocouple; temperature variation not exceeding +/- 5 C over ampoule length
+          locator: {pdf_page_index: 9, section: '2.1 Experiments'}
+        pumping:
+          value: vacuum line overnight; sealed while still evacuating
+          locator: {pdf_page_index: 9, section: '2.1 Experiments'}
+      values:
+        quantity: sealed_silica_ampoule_experiment_conditions
+        method_class: measured_direct
+        apparatus:
+          system: SSAS (Sealed Silica Ampoule System)
+          starting_material_form: powder
+          starting_material_mass_as_printed: ~100 mg
+          sample_container: alumina crucible
+          crucible_dimensions_as_printed: 5-mm outer diameter; 3-mm inner diameter; 10-mm long
+          ampoule: silica tube sealed at both ends
+          silica_tube_dimensions_as_printed: 10-mm outer diameter; 8-mm inner diameter
+          ampoule_length_as_printed: ~9 cm
+          ampoule_volume_as_printed: 4.4 x 10^-6 m3
+          evacuation_pressure_as_printed: ~2.7 mbar
+          pumping: connected to a vacuum line overnight; other extremity sealed while still evacuating
+          furnace: muffle furnace
+          temperature_C_as_printed: [1250, 1300, 1400]
+          duration_as_printed: 5 minutes to 24 hours
+          temperature_measurement: thermocouple
+          temperature_uniformity_as_printed: variations not exceeding +/- 5 C over the ampoule length
+          quench: silica ampoule quenched in air
+          atmosphere: sealed ampoule; no sweep gas during the run stated
+          fO2_control: about 1 log fO2 unit below FMQ, based on product Fe XANES
+        uncertainty:
+          temperature_uniformity_C: +/- 5
+    - observation_id: boulliung_2025_starting_material_hg_and_trace_doping
+      type: composition
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Values are printed in the starting-material preparation paragraph; the full Table 1 composition is referenced but not present as readable table text in the supplied PDF.
+      units: ppm as printed
+      values:
+        quantity: doped_starting_material_trace_composition
+        method_class: measured_direct
+        material: Icelandic basalt composition from Reykjanes Ridge
+        trace_elements_added_at_approximately_ppm:
+        - Ag
+        - As
+        - Cd
+        - Cl
+        - Co
+        - Cr
+        - Cs
+        - Cu
+        - F
+        - Ga
+        - Ge
+        - In
+        - Li
+        - Mo
+        - Ni
+        - Pb
+        - Rb
+        - Sb
+        - Sc
+        - Sn
+        - Sr
+        - V
+        - W
+        - Y
+        - Zn
+        - Zr
+        trace_element_doping_ppm_as_printed: ~500
+        mercury_species_added: HgO powder
+        mercury_initial_concentration_ppm: 93
+        mercury_initial_concentration_uncertainty_ppm: +/- 3
+        starting_material_homogeneity_measurements: 5 Hg measurements
+        fusion: covered alumina crucible at 1 atm and 1300 C for 5 minutes; two fused glasses combined after water drop-quench
+    - observation_id: boulliung_2025_hg_retention_1300c
+      type: concentration_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 13
+        figure: '2A'
+        section: 3.1 Element loss as a function of time
+        note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
+      units: ppm as printed
+      values:
+        quantity: mercury_concentration_in_quenched_melt_vs_time
+        method_class: measured_direct
+        temperature_C: 1300
+        initial_concentration_ppm: ~93
+        after_5_min_ppm: ~2.3
+        after_10_min_ppm: <0.1
+        after_6_to_24_h_ppm: ~0.09-0.13
+        analytical_method: Direct Mercury Analyzer
+    - observation_id: boulliung_2025_hg_equilibrium_partial_pressure
+      type: partial_pressure
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 13
+        section: 3.1 Element loss as a function of time; equation (1)
+        note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure measurement.
+      units: Pa as printed
+      values:
+        quantity: equilibrium_partial_pressure_of_Hg0
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        model_generator: ideal_gas_law_equation_1_author_calculation
+        derived_from: [boulliung_2025_hg_retention_1300c, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derivation:
+          relation: ideal_gas_law_equation_1
+          inputs: [boulliung_2025_hg_retention_1300c, boulliung_2025_ssas_apparatus_and_run_conditions]
+          output_unit: Pa
+        temperature_C: 1300
+        melt_hg_concentration_ppm: ~0.1
+        p_Hg_Pa: ~150
+        p_Hg_bar_as_printed: ~0.0015
+        gas_species_assumption: Hg0 monoatomic
+        equation_as_printed: p(Hg)=mRT/V
+        gas_constant_J_per_K_mol: 8.3145
+        ampoule_volume_m3: 4.4 x 10^-6
+    - observation_id: boulliung_2025_hg_equilibrium_partial_pressure_1400c
+      type: partial_pressure
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+        note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate calculation table.
+      units: Pa as printed
+      values:
+        quantity: equilibrium_partial_pressure_of_Hg0
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        model_generator: ideal_gas_law_equation_1_author_calculation
+        derived_from: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derivation:
+          relation: ideal_gas_law_equation_1
+          inputs: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+          output_unit: Pa
+        temperature_C: 1400
+        melt_hg_concentration_ppb: ~40
+        p_Hg_Pa: about 150
+    - observation_id: boulliung_2025_hg_oxidation_state_and_fugacity
+      type: redox_condition
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+        note: Fe oxidation state was measured by XANES in quenched products; the fO2 relation is the authors' interpretation.
+      units: dimensionless as printed
+      values:
+        quantity: ferric_fraction_and_oxygen_fugacity
+        method_class: measured_direct
+        fe3_fraction_as_printed: ~0.1
+        fe3_fraction_definition: Fe3+/(Fe3++Fe2+)
+        change_during_experiments: none detected
+        oxygen_fugacity_relative_to_FMQ: about -1 log unit
+        measurement: Fe K-edge XANES
+    - observation_id: boulliung_2025_volatile_metal_measured_retention
+      type: volatility_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+        note: These are the printed prose values; the complete Table 2 and Supplementary Table S4 series are not present as readable tables in the supplied PDF.
+      units: as printed
+      values:
+        quantity: volatile_metal_loss_examples
+        method_class: measured_direct
+        mercury:
+          fraction_degassed: '>99%'
+          melt_concentration_ppb: ~100
+        cadmium:
+          fraction_degassed: '78%'
+          melt_concentration_ppm: 71
+        thallium:
+          fraction_degassed: '80%'
+          melt_concentration_ppm: 12
+        relative_volatility_order_as_printed: Hg>>Tl>Cd>In>Zn*>Li>Cs>Cu*>As>Ag>Pb~Sn~Ga>Ge~Sb
+        asterisk_note: positions of Zn and Cu uncertain; maximum possible volatilities adopted
+    - observation_id: boulliung_2025_cd_tl_author_partial_pressures
+      type: partial_pressure_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+        note: Partial pressures are author-calculated from the closed-system inventory; the complete calculation table is not present as readable tabulated data in the supplied PDF.
+      units: Pa as printed
+      values:
+        quantity: volatile_metal_equilibrium_partial_pressures
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        model_generator: ideal_gas_law_equation_1_author_calculation
+        derived_from: [boulliung_2025_volatile_metal_measured_retention, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derivation:
+          relation: ideal_gas_law_equation_1
+          inputs: [boulliung_2025_volatile_metal_measured_retention, boulliung_2025_ssas_apparatus_and_run_conditions]
+          output_unit: Pa
+        cadmium:
+          melt_concentration_ppm: 71
+          equilibrium_partial_pressure_Pa: 714
+        thallium:
+          melt_concentration_ppm: 12
+          equilibrium_partial_pressure_Pa: 77
+    - observation_id: boulliung_2025_halogen_atmosphere_measurements
+      type: atmosphere_composition
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 16
+        section: 3.2 Fractional loss, speciation in the gas phase and comparisons with other measures of volatility
+        note: The paper reports virtually all F and Cl in the atmosphere; no point value is inferred.
+      units: ppm as printed
+      values:
+        quantity: halogen_partitioning_to_ampoule_atmosphere
+        method_class: measured_direct
+        fluorine_starting_material_ppm: 480
+        chlorine_starting_material_ppm: 590
+        atmosphere_partitioning: virtually all F and Cl
+        resulting_role: stable gaseous halides with several volatile metals, notably alkalis
+    - observation_id: boulliung_2025_hsc_gas_speciation
+      type: gas_speciation
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 16
+        section: 3.2 Fractional loss, speciation in the gas phase and comparisons with other measures of volatility; Table 3
+        note: Table 3 itself is not present as readable tabulated data in the supplied PDF; only the prose classification is recorded.
+      units: qualitative species assignments as printed
+      values:
+        quantity: dominant_gas_species_assignments
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        model_generator: HSC_Chemistry_GEM_free_energy_minimization
+        derived_from: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+        derivation:
+          relation: HSC_Chemistry_GEM_free_energy_minimization
+          inputs: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
+          output_unit: qualitative_species_assignments
+        calculation_basis: specified composition, temperature, pressure and oxygen fugacity
+        alkali_species: LiF0, CsCl0, CsF0, NaCl0, NaF0, RbF0
+        oxide_species: TlO, GeO, Ga2O, In2O, SnO, AsO
+        uncharged_species: Hg0, Cd0, Zn0, Cu0, Pb0, Ag0, Sb0, Rb0
+        source_database: HSC Chemistry software and databases
+  Ag:
+    observations:
+    - observation_id: boulliung_2025_ag_trace_doping_and_comparator
+      type: composition_and_volatility_comparator
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 8
+        section: 2.1 Experiments
+        note: Ag is one of the trace elements added at approximately 500 ppm; its full measured series is in referenced tables not present as readable tables in the supplied PDF.
+      units: ppm as printed
+      values:
+        quantity: trace_element_doping
+        method_class: measured_direct
+        starting_material_doping_ppm: ~500
+        full_result_series: not_present_in_supplied_pdf
+  Cd:
+    observations:
+    - observation_id: boulliung_2025_cd_equilibrium_comparator
+      type: partial_pressure
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+      units: as printed
+      values:
+        quantity: closed_system_cd_volatility
+        method_class: measured_direct
+        melt_concentration_ppm: 71
+        fraction_degassed: 78%
+        equilibrium_partial_pressure_Pa: 714
+  Tl:
+    observations:
+    - observation_id: boulliung_2025_tl_equilibrium_comparator
+      type: partial_pressure
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        pdf_page_index: 20
+        section: 4. Conclusions
+      units: as printed
+      values:
+        quantity: closed_system_tl_volatility
+        method_class: measured_direct
+        melt_concentration_ppm: 12
+        fraction_degassed: 80%
+        equilibrium_partial_pressure_Pa: 77
