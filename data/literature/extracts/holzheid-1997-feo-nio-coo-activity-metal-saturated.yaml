@@ -1,0 +1,287 @@
+schema_version: literature_extract.v1
+source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
+source:
+  citation: >-
+    Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO,
+    CoO and FeO in silicate melts", Chemical Geology 139, 21-38.
+  doi: 10.1016/S0009-2541(97)00030-2
+  year: 1997
+extraction:
+  method: layout-preserving pdftotext manual transcription; source tables and prose reviewed
+  date: '2026-09-20'
+  worker: i1-holzheid-1997-feo-nio-coo-activity-metal-saturated
+review_status: draft
+scope_assessment:
+  document_type: primary experimental silicate-melt solubility and activity-coefficient study
+  measured_direct_observations: 6
+  model_derived_observations: 4
+  compilation_assessed_observations: 1
+  apparatus_detail_status: >-
+    This paper states that the experiments follow Holzheid et al. (1994) and
+    Holzheid and Palme (1996a), but does not print the furnace, container,
+    sample-mass, temperature-calibration, pumping, or run-geometry details.
+    Those fields are absent here, not inferred.
+  absent_from_source:
+  - sample mass and physical sample form
+  - crucible or container material
+  - cell and orifice geometry
+  - exposed area
+  - vacuum level, pumping hardware, gas identity, and pressure for the experiments
+  - temperature sensor and calibration
+  - individual uncertainty for most Table 2 points
+  note: >-
+    Table 3 prints analytical standard deviations for oxide and metal
+    concentrations. Alloy-to-pure-metal recalculation adds uncertainty from
+    alloy activity coefficients; this is retained as a source qualification.
+fidelity_samples:
+- species: CoO
+  observation_id: holzheid_1997_table3a_ad_co_variable_mgo
+  field: fidelity_pin_CoO_wt_pct
+  value: 2.03
+  locator: {page: 25, table: '3a', row: 'V 69'}
+- species: NiO
+  observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
+  field: fidelity_pin_NiO_wt_pct
+  value: 0.17
+  locator: {page: 25, table: '3a', row: 'V 69'}
+- species: FeO
+  observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
+  field: fidelity_pin_FeO_wt_pct
+  value: 26.0
+  locator: {page: 25, table: '3b', row: 'V 69'}
+species:
+  SiO2:
+    observations:
+    - observation_id: holzheid_1997_table1_starting_compositions
+      type: activity_coefficient
+      locator: {page: 22, table: '1', section: 'Silicate starting compositions (electron microprobe analysis)'}
+      phase: silicate_melt_starting_composition
+      regime: experimental_melt_equilibration
+      units: wt.% as printed
+      values:
+        method_class: measured_direct
+        quantity: starting_silicate_composition
+        compositions:
+        - name: AD
+          system: anorthite-diopside
+          SiO2_wt_pct: 50.9
+          CaO_wt_pct: 24.9
+          MgO_wt_pct: 10.4
+          Al2O3_wt_pct: 13.8
+          FeO_wt_pct: 0.0
+        - name: BK
+          system: komatiitic basalt
+          SiO2_wt_pct: 49.1
+          CaO_wt_pct: 19.2
+          MgO_wt_pct: 10.6
+          Al2O3_wt_pct: 14.1
+          FeO_wt_pct: 7.0
+        analysis_method: electron microprobe analysis
+        note: Additional MgO was added to or removed from AD and BK compositions; exact modified bulk compositions are in Table 3 rows.
+        system_class: silicate_melt
+      uncertainty: {reported_status: not_reported for Table 1 starting compositions}
+      equipment: {}
+  CoO:
+    observations:
+    - observation_id: holzheid_1997_table3a_ad_co_variable_mgo
+      type: activity_coefficient
+      locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1670.0, 1677.0]
+      phase: anorthite-diopside_silicate_melt
+      standard_state: liquid CoO; pure-metal equilibrium as described in section 3
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: measured_direct
+        quantity: CoO_solubility_and_MgO_dependence
+        fidelity_pin_CoO_wt_pct: 2.03
+        rows:
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 2.03, CoO_sd_pct: 5, MgO_wt_pct: 6.97, MgO_sd_pct: 5, gamma_CoO: 1.72}
+        - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, CoO_wt_pct: 2.80, CoO_sd_pct: 5, MgO_wt_pct: 10.1, MgO_sd_pct: 5, gamma_CoO: 1.31}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, CoO_wt_pct: 1.85, CoO_sd_pct: 5, MgO_wt_pct: 10.8, MgO_sd_pct: 5, gamma_CoO: 1.46}
+        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 2.13, CoO_sd_pct: 5, MgO_wt_pct: 17.4, MgO_sd_pct: 5, gamma_CoO: 1.49}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 1.06, CoO_sd_pct: 5, MgO_wt_pct: 18.2, MgO_sd_pct: 5, gamma_CoO: 3.66}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, CoO_wt_pct: 1.63, CoO_sd_pct: 5, MgO_wt_pct: 19.3, MgO_sd_pct: 5, gamma_CoO: 1.77}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.76, CoO_sd_pct: 5, MgO_wt_pct: 22.0, MgO_sd_pct: 5, gamma_CoO: 4.93}
+        - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, CoO_wt_pct: 0.62, CoO_sd_pct: 5, MgO_wt_pct: 27.3, MgO_sd_pct: 5, gamma_CoO: 6.22}
+        analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
+        derived_fields:
+          gamma_CoO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+        system_class: silicate_melt
+      uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, analytical_errors_Ni_and_Co_below_10_pct: true}
+      equipment: {}
+    - observation_id: holzheid_1997_table3c_bk_co_variable_mgo
+      type: activity_coefficient
+      locator: {page: 26, table: '3c', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1667.0, 1675.0]
+      phase: komatiitic_basalt_silicate_melt
+      standard_state: liquid CoO; pure-metal equilibrium as described in section 3
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: measured_direct
+        quantity: CoO_solubility_and_MgO_dependence
+        rows:
+        - {run: BK57, T_K: 1673, duration_h: 66, log_fO2: -9.58, CoO_wt_pct: 2.40, CoO_sd_pct: 5, FeO_wt_pct: 4.48, FeO_sd_pct: 5, MgO_wt_pct: 10.6, MgO_sd_pct: 1, Co_wt_pct: 91.3, Co_sd_pct: 1, Fe_wt_pct: 6.38, Fe_sd_pct: 1, gamma_CoO: 1.21, gamma_FeO: 2.33}
+        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, CoO_wt_pct: 1.78, CoO_sd_pct: 5, FeO_wt_pct: 2.65, FeO_sd_pct: 6, MgO_wt_pct: 17.7, MgO_sd_pct: 6, Co_wt_pct: 91.4, Co_sd_pct: 2, Fe_wt_pct: 8.06, Fe_sd_pct: 5, gamma_CoO: 2.08, gamma_FeO: 3.44}
+        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 2.13, CoO_sd_pct: 5, FeO_wt_pct: 2.20, FeO_sd_pct: 10, MgO_wt_pct: 17.9, MgO_sd_pct: 1, Co_wt_pct: 90.8, Co_sd_pct: 1, Fe_wt_pct: 7.12, Fe_sd_pct: 1, gamma_CoO: 1.48, gamma_FeO: 3.24}
+        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 1.86, CoO_sd_pct: 5, FeO_wt_pct: 1.94, FeO_sd_pct: 10, MgO_wt_pct: 30.5, MgO_sd_pct: 1, Co_wt_pct: 92.8, Co_sd_pct: 1, Fe_wt_pct: 7.28, Fe_sd_pct: 1, gamma_CoO: 1.89, gamma_FeO: 4.01}
+        analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
+        derived_fields:
+          gamma_CoO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+        system_class: silicate_melt
+      uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, alloy_recalculation_uncertainty: true}
+      equipment: {}
+  NiO:
+    observations:
+    - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
+      type: activity_coefficient
+      locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1667.0, 1673.0]
+      phase: anorthite-diopside_silicate_melt
+      standard_state: liquid NiO; pure-metal equilibrium as described in section 3
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: measured_direct
+        quantity: NiO_solubility_and_MgO_dependence
+        fidelity_pin_NiO_wt_pct: 0.17
+        rows:
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 7.22, MgO_sd_pct: 5, gamma_NiO: 3.06}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.21, NiO_sd_pct: 5, MgO_wt_pct: 8.94, MgO_sd_pct: 5, gamma_NiO: 2.60}
+        - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, NiO_wt_pct: 0.26, NiO_sd_pct: 5, MgO_wt_pct: 10.4, MgO_sd_pct: 5, gamma_NiO: 2.61}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 5, MgO_wt_pct: 11.1, MgO_sd_pct: 5, gamma_NiO: 3.07}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.16, NiO_sd_pct: 6, MgO_wt_pct: 13.8, MgO_sd_pct: 5, gamma_NiO: 2.59}
+        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, NiO_wt_pct: 0.15, NiO_sd_pct: 5, MgO_wt_pct: 17.6, MgO_sd_pct: 5, gamma_NiO: 3.21}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.20, NiO_sd_pct: 5, MgO_wt_pct: 18.2, MgO_sd_pct: 5, gamma_NiO: 2.84}
+        - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, NiO_wt_pct: 0.13, NiO_sd_pct: 5, MgO_wt_pct: 18.2, MgO_sd_pct: 5, gamma_NiO: 3.30}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, NiO_wt_pct: 0.18, NiO_sd_pct: 5, MgO_wt_pct: 22.2, MgO_sd_pct: 5, gamma_NiO: 3.20}
+        - {run: V 65, T_K: 1671, duration_h: 48.5, log_fO2: -9.66, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 27.5, MgO_sd_pct: 5, gamma_NiO: 3.39}
+        analysis_method: instrumental neutron activation analysis for Ni; analytical standard deviations printed in Table 3
+        derived_fields:
+          gamma_NiO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+        system_class: silicate_melt
+      uncertainty: {analytical_errors_Ni_below_10_pct: true, concentration_uncertainty: Table 3 s.d. columns retained per row}
+      equipment: {}
+    - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo
+      type: activity_coefficient
+      locator: {page: 26, table: '3d', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1667.0, 1675.0]
+      phase: komatiitic_basalt_silicate_melt
+      standard_state: liquid NiO; pure-metal equilibrium as described in section 3
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: measured_direct
+        quantity: NiO_solubility_and_MgO_dependence
+        rows:
+        - {run: BK57, T_K: 1673, duration_h: 66, log_fO2: -9.58, NiO_wt_pct: 0.219, NiO_sd_pct: 5, FeO_wt_pct: 2.01, FeO_sd_pct: 12, MgO_wt_pct: 11.1, MgO_sd_pct: 1, Ni_wt_pct: 91.1, Ni_sd_pct: 1, Fe_wt_pct: 5.65, Fe_sd_pct: 6, gamma_NiO: 2.33, gamma_FeO: 1.65}
+        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, NiO_wt_pct: 0.167, NiO_sd_pct: 5, FeO_wt_pct: 2.19, FeO_sd_pct: 5, MgO_wt_pct: 17.4, MgO_sd_pct: 6, Ni_wt_pct: 89.5, Ni_sd_pct: 1, Fe_wt_pct: 9.50, Fe_sd_pct: 6, gamma_NiO: 2.84, gamma_FeO: 2.79}
+        - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, NiO_wt_pct: 0.130, NiO_sd_pct: 10, FeO_wt_pct: 1.72, FeO_sd_pct: 5, MgO_wt_pct: 17.5, MgO_sd_pct: 1, Ni_wt_pct: 90.5, Ni_sd_pct: 1, Fe_wt_pct: 8.52, Fe_sd_pct: 3, gamma_NiO: 3.15, gamma_FeO: 2.59}
+        - {run: V 67, T_K: 1667, duration_h: 75.3, log_fO2: -9.79, NiO_wt_pct: 0.171, NiO_sd_pct: 5, FeO_wt_pct: 0.975, FeO_sd_pct: 5, MgO_wt_pct: 30.0, MgO_sd_pct: 1, Ni_wt_pct: 92.5, Ni_sd_pct: 1, Fe_wt_pct: 6.84, Fe_sd_pct: 3, gamma_NiO: 2.74, gamma_FeO: 3.99}
+        analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
+        derived_fields:
+          gamma_NiO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+        system_class: silicate_melt
+      uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, alloy_recalculation_uncertainty: true}
+      equipment: {}
+  FeO:
+    observations:
+    - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
+      type: activity_coefficient
+      locator: {page: 25, table: '3b', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
+      T_range_K: [1667.0, 1677.0]
+      phase: anorthite-diopside_silicate_melt
+      standard_state: wustite(liquid) standard state for FeO activity coefficient
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: measured_direct
+        quantity: FeO_solubility_and_MgO_dependence
+        fidelity_pin_FeO_wt_pct: 26.0
+        rows:
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.465, CoO_sd_pct: 5, NiO_wt_pct: 0.0518, NiO_sd_pct: 18, FeO_wt_pct: 26.0, FeO_sd_pct: 5, MgO_wt_pct: 4.87, MgO_sd_pct: 5, gamma_CoO: 1.65, gamma_NiO: 3.68, gamma_FeO: 1.72}
+        - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.531, CoO_sd_pct: 5, NiO_wt_pct: 0.0502, NiO_sd_pct: 15, FeO_wt_pct: 20.8, FeO_sd_pct: 5, MgO_wt_pct: 6.83, MgO_sd_pct: 5, gamma_CoO: 1.75, gamma_NiO: 4.35, gamma_FeO: 1.83}
+        - {run: AD 10, T_K: 1677, duration_h: 50, log_fO2: -10.31, CoO_wt_pct: 0.334, CoO_sd_pct: 5, NiO_wt_pct: 0.0360, NiO_sd_pct: 7, FeO_wt_pct: 7.15, FeO_sd_pct: 5, MgO_wt_pct: 9.73, MgO_sd_pct: 5, gamma_CoO: 1.51, gamma_NiO: 3.82, gamma_FeO: 1.62}
+        - {run: V 64, T_K: 1677, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 0.280, CoO_sd_pct: 5, NiO_wt_pct: 0.0385, NiO_sd_pct: 19, FeO_wt_pct: 15.5, FeO_sd_pct: 5, MgO_wt_pct: 15.3, MgO_sd_pct: 5, gamma_CoO: 2.68, gamma_NiO: 4.87, gamma_FeO: 2.47}
+        - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, CoO_wt_pct: 0.286, CoO_sd_pct: 5, NiO_wt_pct: 0.0457, NiO_sd_pct: 15, FeO_wt_pct: 15.8, FeO_sd_pct: 5, MgO_wt_pct: 15.8, MgO_sd_pct: 5, gamma_CoO: 2.89, gamma_NiO: 4.34, gamma_FeO: 3.44}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.259, CoO_sd_pct: 5, NiO_wt_pct: 0.0367, NiO_sd_pct: 15, FeO_wt_pct: 10.6, FeO_sd_pct: 5, MgO_wt_pct: 20.0, MgO_sd_pct: 5, gamma_CoO: 3.53, gamma_NiO: 5.99, gamma_FeO: 4.41}
+        - {run: V 66, T_K: 1671, duration_h: 74.3, log_fO2: -9.64, CoO_wt_pct: 0.313, CoO_sd_pct: 5, NiO_wt_pct: 0.0689, NiO_sd_pct: 6, FeO_wt_pct: 9.56, FeO_sd_pct: 5, MgO_wt_pct: 25.0, MgO_sd_pct: 7, gamma_CoO: 3.06, gamma_NiO: 3.33, gamma_FeO: 5.22}
+        analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and Co
+        derived_fields:
+          gamma_FeO: {method_class: model_derived, generator: authors' equilibrium calculation from measured composition, fO2, and literature thermodynamic data}
+        alloy_note: FeNiCo-alloy runs were recalculated to pure-metal equilibria using literature alloy activity coefficients
+        system_class: silicate_melt
+      uncertainty: {alloy_recalculation_uncertainty: source states alloy activity coefficients and post-run alloy compositions add uncertainty, concentration_uncertainty: Table 3 s.d. columns retained per row}
+      equipment: {}
+  NiO_activity_model:
+    observations:
+    - observation_id: holzheid_1997_equilibrium_free_energy_fits
+      type: activity_coefficient
+      locator: {page: 29, equations: '7-9', section: '3. Calculation of activity coefficients'}
+      phase: liquid_oxide_standard_state
+      regime: thermodynamic_equilibrium_calculation
+      units: J/mol, T in K, as printed
+      values:
+        method_class: model_derived
+        generator: equilibrium-constant calculation using O'Neill and Pownceby (1993) and Barin (1989) thermodynamic data
+        equations:
+          NiO_liquid_deltaG_J_per_mol: '-185092 + 99.844*T - 4.898*T*ln(T)'
+          CoO_liquid_deltaG_J_per_mol: '-187746 + 91.371*T - 5.672*T*ln(T)'
+          FeO_wustite_liquid_deltaG_J_per_mol: '-244118 + 115.559*T - 8.474*T*ln(T)'
+        reaction_form: metal(s) + 1/2 O2(g) = oxide(liquid)
+        standard_state: pure liquid oxide at 1 atm; FeO uses wustite(liquid) notation
+      uncertainty: {reported_status: source discusses uncertainties in thermodynamic data but gives no uncertainty for these fitted expressions}
+      equipment: {}
+  FeO_compilation:
+    observations:
+    - observation_id: holzheid_1997_table4_activity_coefficient_summary
+      type: activity_coefficient
+      locator: {page: 29, table: '4', section: 'Summary of activity coefficients gamma of metal oxides'}
+      phase: silicate_melt
+      regime: summary_of_experimental_activity_coefficients
+      units: dimensionless activity coefficient and standard deviation as printed
+      values:
+        method_class: model_derived
+        generator: authors' activity-coefficient calculation and summary averaging from Tables 2-3
+        summary:
+          constant_T_variable_fO2:
+            system_A: {gamma_CoO: 1.59, CoO_sd: 0.17, gamma_NiO: 2.91, NiO_sd: 0.56}
+            system_B: {gamma_CoO: 1.54, CoO_sd: 0.08, gamma_NiO: 2.76, NiO_sd: 0.61, gamma_FeO: 1.59, FeO_sd: 0.10}
+            system_C: {gamma_CoO: 1.18, CoO_sd: 0.12, gamma_NiO: 2.54, NiO_sd: 0.45, gamma_FeO: 1.68, FeO_sd: 0.22}
+            system_D: {gamma_CoO: 1.39, CoO_sd: 0.18, gamma_NiO: 2.81, NiO_sd: 0.23, gamma_FeO: 1.77, FeO_sd: 0.28}
+            all_data: {gamma_CoO: 1.46, CoO_sd: 0.22, gamma_NiO: 2.79, NiO_sd: 0.53, gamma_FeO: 1.71, FeO_sd: 0.25}
+          variable_T_variable_fO2:
+            system_A: {gamma_CoO: 1.64, CoO_sd: 0.24, gamma_NiO: 2.70, NiO_sd: 0.45}
+            system_B: {gamma_CoO: 1.63, CoO_sd: 0.25, gamma_NiO: 2.57, NiO_sd: 0.30, gamma_FeO: 1.78, FeO_sd: 0.17}
+            system_C: {gamma_CoO: 0.77, CoO_sd: 0.27, gamma_NiO: 1.64, NiO_sd: 0.39, gamma_FeO: 1.78, FeO_sd: 0.48}
+            all_data: {gamma_CoO: 1.55, CoO_sd: 0.35, gamma_NiO: 2.61, NiO_sd: 0.46, gamma_FeO: 1.68, FeO_sd: 0.19}
+          average_all_data: {gamma_CoO: 1.51, CoO_sd: 0.28, gamma_NiO: 2.70, NiO_sd: 0.52, gamma_FeO: 1.70, FeO_sd: 0.22}
+          standard_error_of_mean: {CoO: 0.03, NiO: 0.06, FeO: 0.03}
+      uncertainty: {note: Table 4 prints standard deviations and standard errors of the mean; all are retained separately.}
+      equipment: {}
+  NiO_compilation:
+    observations:
+    - observation_id: holzheid_1997_abstract_experimental_ranges
+      type: activity_coefficient
+      locator: {page: 21, section: abstract}
+      phase: silicate_melt
+      regime: experimental_activity_coefficient_summary
+      units: dimensionless, wt.%, degrees C, and fO2 relative to IW as printed
+      values:
+        method_class: compilation_assessed
+        generator: authors' compilation and averaging of this study's experiments
+        gamma_NiO: 2.70
+        gamma_NiO_uncertainty: 0.52
+        gamma_CoO: 1.51
+        gamma_CoO_uncertainty: 0.28
+        gamma_FeO_wustite: 1.70
+        gamma_FeO_wustite_uncertainty: 0.22
+        number_of_experiments: {NiO: 77, CoO: 76, FeO: 57}
+        temperature_range_C: [1300, 1600]
+        oxygen_fugacity_range_relative_to_IW: 'IW + 1.5 to IW - 3'
+        FeO_range_wt_pct: [0, 12]
+        MgO_range_wt_pct: [4, 30]
+        note: Authors report no temperature or fO2 dependence within the stated range; CoO and FeO gamma increase slightly above 20 wt.% MgO.
+      uncertainty: {reported_status: uncertainty printed as plus-minus values in abstract}
+      equipment: {}
