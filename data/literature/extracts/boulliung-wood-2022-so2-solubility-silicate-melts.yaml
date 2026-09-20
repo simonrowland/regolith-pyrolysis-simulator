@@ -1,0 +1,442 @@
+schema_version: literature_extract.v1
+source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+source:
+  citation: 'Boulliung, J. & Wood, B. J. (2022), "SO2 solubility and degassing behavior in silicate melts", Geochimica et Cosmochimica Acta 336:150-164, DOI 10.1016/j.gca.2022.08.032'
+  doi: 10.1016/j.gca.2022.08.032
+  year: 2022
+extraction:
+  method: layout-preserving pdftotext transcription of printed Tables 1-4 and experimental methods
+  date: '2026-09-19'
+  worker: w1-boulliung-wood-2022-so2-solubility-silicate-melts
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+review_status: draft
+species:
+  S:
+    observations:
+    - observation_id: boulliung_wood_2022_starting_material_compositions
+      type: composition_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+        page: 151
+        table: '1'
+        note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are 1-sigma uncertainty on the last digit, b.d.l. means below detection limit.
+      units: wt.% for oxide columns; dimensionless n and total
+      values:
+        quantity: fused_starting_material_major_oxide_composition
+        method_class: measured_direct
+        material_form: fused_starting_material
+        table_transcription: |
+          Table 1
+          Electron microprobe analyses (in wt.%) of the fused starting materials. Numbers in parentheses represents 1r uncertainties on the last digit. b.d.l.: below detection limit. Note
+          fusion was in air and hence Fe2O3/FeO probably high.
+
+               Composition       SiO2         Al2O3        MgO           CaO           FeO             TiO2       K2O           Na2O          MnO           P2O5         Total       n
+               T-Basalt          47.0(1)      16.4(1)      4.3(1)        9.4(1)        10.3(2)         3.33(4)    1.87(3)       4.68(4)       0.21(2)       (1.24)a       98.7       10
+               Lunar Basalt      42.3(2)      11.9(1)      7.5(1)        9.6(1)        16.9(1)         8.34(6)    0.20(3)       0.88(2)       0.58(2)       –             98.2       10
+               NIB               49.6(1)      14.6(1)      8.7(1)        12.4(1)       9.0(1)          0.92(2)    0.21(6)       2.25(6)       0.17(5)       (0.30)        98.2       10
+               Nephelinite       41.7(1)      14.2(1)      8.0(1)        13.9(1)       9.9(1)          2.68(1)    3.21(3)       3.95(4)       2.45(2)       –             99.9       8
+               Andac             61.6(9)      19.0(9)      2.0(2)        4.1(3)        4.9(3)          1.04(4)    4.60(9)       0.87(3)       b.d.l.        –             98.1       8
+               B-A               53.9(5)      14.6(2)      9.4(2)        9.9(2)        6.4(1)          0.61(1)    1.34(5)       2.79(6)       b.d.l.        –             99.0       8
+               Andesite          61.1(6)      18.0(2)      3.5(1)        6.9(2)        3.9(1)          0.61(1)    1.19(4)       4.07(6)       b.d.l.                      99.2       10
+               Basanite          43.8(1)      10.9(1)      13.1(1)       9.4(1)        11.5(1)         2.28(3)    1.89(2)       3.94(4)       0.18(5)       (1.45)b       98.4       10
+               T-Phonolite       53.3(9)      22.9(9)      1.9(1)        4.8(3)        4.4(1)          1.50(6)    3.64(9)       7.77(9)       b.d.l.        –            100.4       8
+               Rhyolite          73.2(9)      14.8(9)      0.3(1)        1.0(1)        1.1(4)          0.31(5)    6.08(9)       2.61(7)       b.d.l.        –             99.4       8
+               SLC               39.9(1)      10.9(1)      15.4(1)       17.3(1)       14.4(1)         b.d.l.     b.d.l.        0.13(3)       b.d.l.        –             98.0       8
+               CMAS1             48.4(1)      16.8(2)      12.4(1)       22.3(1)       b.d.l.          b.d.l.     b.d.l.        b.d.l.        b.d.l.        –            100.1       10
+               CMAS2             45.5(1)      18.7(1)      17.4(1)       18.4(1)       b.d.l.          b.d.l.     b.d.l.        b.d.l.        b.d.l.        –            100.1       10
+               CMAS3             50.4(1)      15.6(1)      14.5(1)       19.6(1)       b.d.l.          b.d.l.     b.d.l.        b.d.l.        b.d.l.        –            100.2       10
+           a
+                Data fromTaracsák et al. (2021).
+           b
+                Data fromAdam (1990).
+
+
+    - observation_id: boulliung_wood_2022_run_conditions
+      type: laboratory_conditions
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+        page: 152
+        table: '2'
+        section: 2.2 Experimental conditions
+        note: Every value below is transcribed from the printed Table 2 cell under its column header.
+      units: K, cm3 min^-1, cm s^-1, atm, h, dimensionless ratios and log10 fugacity relative to the stated standard
+      values:
+        quantity: atmosphere_controlled_sulfate_equilibration_runs
+        method_class: measured_condition_or_author_calculated_condition
+        apparatus:
+          furnace: Gero vertical furnace HTRV 70-250/18
+          support: platinum wire loop, 0.25 mm diameter
+          charges: up to 7 experimental charges hung on a Pt chandelier suspended from a silica rod
+          sample_mass_range_mg: 5-10
+          gas_flow_cm3_min: 200
+          gas_linear_velocity_cm_s: 0.2
+          gas_pretreatment_min: 10
+          equilibration_time_range_h: 6-10
+          pressure: 1 atm
+          atmosphere: Air-SO2
+          fO2_control: FMQ-buffered/oxidizing; tabulated log(fO2) values are calculated from NIST/JANAF thermochemical tables
+          temperature_measurement: not stated
+          temperature_calibration: not stated
+          exposed_area: not stated
+          crucible: not used; sample suspended on Pt loop
+          vacuum_level: not applicable
+          pumping: not stated
+        table_transcription: |
+          Table 2
+          Run conditions and gas mixtures for the different S equilibration experiments of this study at P = 1 atm. The conditions to study the temperature effect on sulfur solubility were
+          with a Air/SO2 ratio of 0.60. The fO2 and fS2 parameters were determined using NIST and JANAF thermochemical tables.
+
+            Temperature (K)                   Air                 SO2                   Air/SO2               log(fO2)                     DFMQ                log(fS2)               t (h)
+            1473                              37.5                62.5                  0.6                    1.10                        7.2                  16.22                 10
+            1523                              37.5                62.5                  0.6                    1.10                        6.6                  15.38                 10
+            1573                              37.5                62.5                  0.6                    1.10                        6.1                  14.6                  10
+            1573                              10                  90                    0.11                   1.68                        5.5                  13.13                 10
+            1573                              80                  20                    4                      0.77                        6.5                  15.87                 10
+            1623                              37.5                62.5                  0.6                    1.10                        5.6                  13.86                 10
+            1673                              37.5                62.5                  0.6                    1.10                        5.2                  13.16                 10
+            1723                              37.5                62.5                  0.6                    1.10                        4.7                  12.51                 8
+            1773                              37.5                62.5                  0.6                    1.10                        4.3                  11.89                 6
+
+
+                                                                                                        3. Results
+
+                                                                                                        3.1. Compositions of products
+
+    - observation_id: boulliung_wood_2022_equilibrated_glass_measurements
+      type: sulfur_solubility_and_sulfate_capacity_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+        page: 153
+        table: '3'
+        note: Table continues on printed pages 154-155. Every value below remains in the printed column order; values in parentheses are 1-sigma uncertainty on the last digit(s), b.d.l. is not zero, and EPMA/SIMS is the stated analytical method.
+      units: wt.% for oxide/SO4/Total columns; ppm S; log10 C_S6+; n
+      values:
+        quantity: final_equilibrated_glass_major_oxides_sulfur_and_sulfate_capacity
+        method_class: measured_direct_with_author_calculated_capacity
+        table_transcription: |
+          Table 3
+          Major oxide compositions (in wt. %), average sulfur contents (in ppm) and sulfate capacity of the glasses after equilibration experiments. Major oxide compositions and S
+          contents greater than 60 ppm were determined by EPMA and S contents  60 ppm were determined by SIMS. The sulfate capacity was calculated according to the Eq. (3). Numbers
+          in parentheses represent 1r uncertainties on the last(s) digit(s). b.d.l.: below detection limit. Note high fO2 values and hence ferric/ferrous.
+
+            Sample         Temparature      SiO2     Al2O3    MgO        CaO    FeO        TiO2     K2O      Na2O        MnO      P2O5       SO4       Total   S (ppm)    Log     n
+                           (K)                                                                                                                                            Cs
+            T-Basalt       1473             49.1     16.6     4.3        9.8    7.63(9)    2.97     1.30     4.28        0.23     (1.24)a    0.465      97.9   1550       9.0     20
+                                            (2)      (1)      (1)        (1)               (6)      (6)      (9)         (5)                 (12)              (40)       (2)     (EPMA)
+            NIB                             49.1     14.4     8.5        12.4   8.88(9)    0.93     0.41     2.41        0.19     (0.30)     0.543      98.1   1810       9.0     20
+                                            (3)      (1)      (1)        (1)               (4)      (6)      (5)         (5)                 (12)              (40)       (2)     (EPMA)
+            Nephelinite                     43.2     14.3     7.9        14.4   8.73(4)    2.93     0.49     2.58        2.51                1.227      98.3   4090       9.4     20
+                                            (1)      (1)      (1)        (1)               (7)      (9)      (6)         (6)                 (42)              (140)      (2)     (EPMA)
+            Basanite                        47.2     12.1     10.4       10.7   9.30(9)    2.55     0.58     2.92        0.19     (1.45)b    0.771      98.1   2570       9.2     20
+                                            (1)      (1)      (5)        (2)               (7)      (6)      (6)         (5)                 (36)              (120)      (2)     (EPMA)
+            T-Phonolite                     57.7     20.7     2.0        4.6    4.88(7)    1.64     2.62     6.03        0.14                0.219     100.1   730(50)    8.6     30
+                                            (2)      (2)      (1)        (1)               (5)      (5)      (9)         (6)                 (15)                         (2)     (EPMA)
+            Lunar          1523             47.0     13.0     8.0        11.0   11.07      5.35     0.24     1.68        0.49                0.150      98.0   500(10)    8.0     20
+               Basalt                       (5)      (1)      (1)        (1)    (36)       (40)     (7)      (6)         (6)                 (3)                          (2)     (EPMA)
+            NIB                             50.1     14.8     8.7        12.3   9.10(6)    0.92     0.24     2.09        0.18     (0.30)     0.246      99.0   820(20)    8.3     30
+                                            (1)      (1)      (1)        (1)               (6)      (7)      (7)         (5)                 (6)                          (2)     (EPMA)
+            Nephelinite                     43.3     14.6     8.1        13.8   9.81(9)    2.75     0.47     2.51        2.42                0.570      98.4   1900       8.6     20
+                                            (9)      (1)      (2)        (9)               (9)      (9)      (9)         (9)                 (78)              (260)      (2)     (EPMA)
+            B-A                             55.3     14.4     8.9        9.5    5.94(7)    0.62     1.47     3.01        b.d.l.              0.162      99.3   540        8.1     20
+                                            (2)      (1)      (1)        (1)               (6)      (7)      (6)                             (48)              (160)      (2)     (EPMA)
+            Andesite                        62.2     18.0     3.3        6.6    3.53(6)    0.61     1.25     4.83        b.d.l.              0.029     100.3   95(40)     7.3     20
+                                            (3)      (2)      (1)        (1)               (7)      (7)      (6)                             (12)                         (2)     (EPMA)
+            Basanite                        46.1     11.7     12.2       10.1   10.88      2.41     0.49     2.95        0.19     (1.45)b    0.393      99.0   1310       8.5     20
+                                            (9)      (1)      (1)        (2)    (92)       (5)      (6)      (6)         (7)                 (12)              (40)       (2)     (EPMA)
+
+                                                                                                                                                                      (continued on next page)
+
+
+                                                                                                  153
+           J. Boulliung and B.J. Wood                                                                                       Geochimica et Cosmochimica Acta 336 (2022) 150–164
+
+
+          Table 3 (continued)
+
+            Sample         Temparature   SiO2   Al2O3   MgO    CaO    FeO       TiO2       K2O      Na2O   MnO      P2O5       SO4       Total   S (ppm)   Log    n
+                           (K)                                                                                                                             Cs
+            T-Phonolite                  57.5   21.5    2.0    4.6    4.9(7)    1.66       2.42     5.34   0.14                0.147     100.2   490(30)   8.0    40
+                                         (2)    (3)     (1)    (1)              (8)        (6)      (9)    (7)                 (9)                         (2)    (EPMA)
+            SLC                          43.4   11.6    12.1   19.9   10.67     b.d.l.     b.d.l.   0.56   b.d.l.              0.951      99.2   3170      8.8    20
+                                         (2)    (1)     (3)    (1)    (55)                          (7)                        (21)              (70)      (2)    (EPMA)
+            T-Basalt       1573          48.5   16.9    4.5    9.6    10.77     3.60       0.29     3.39   0.23     (1.24)a    0.069      99.0   230(20)   7.3    20
+                                         (1)    (1)     (1)    (1)    (5)       (5)        (3)      (4)    (3)                 (6)                         (1)    (EPMA)
+            Lunar                        42.9   12.0    7.7    10.0   15.14     7.44       b.d.l.   2.00   0.57                0.066      97.8   220(20)   7.3    15
+               Basalt                    (1)    (1)     (1)    (2)    (19)      (5)                 (9)    (3)                 (6)                         (1)    (EPMA)
+            NIB                          49.5   14.7    8.8    12.2   9.1(1)    0.93       0.14     2.49   0.17     (0.30)     0.135      98.5   450(20)   7.6    20
+                                         (1)    (1)     (1)    (1)              (2)        (1)      (5)    (2)                 (6)                         (1)    (EPMA)
+            Nephelinite                  41.5   14.4    8.3    14.3   10.68     2.93       0.22     2.33   2.72                0.246      97.6   820(30)   7.9    20
+                                         (1)    (1)     (1)    (1)    (8)       (5)        (7)      (7)    (7)                 (9)                         (1)    (EPMA)
+            Andac                        66.1   15.5    1.8    3.2    4.10(9)   0.93       4.85     1.87   b.d.l.              0.011      98.4   35(10)    6.5    5 (SIMS)
+                                         (9)    (6)     (2)    (2)              (7)        (9)      (4)                        (3)                         (1)
+            B-A                          54.3   14.1    9.2    9.6    6.22(5)   0.60       1.13     3.07   b.d.l.              0.111      98.4   370(20)   7.5    20
+                                         (1)    (1)     (1)    (1)              (6)        (5)      (6)                        (6)                         (1)    (EPMA)
+            Andesite                     62.2   17.0    3.3    6.5    3.53(7)   0.63       1.38     4.73   b.d.l.              0.018      99.3   59(10)    6.7    5 (SIMS)
+                                         (1)    (1)     (1)    (1)              (7)        (6)      (7)                        (3)                         (1)
+            Basanite                     45.7   11.5    13.5   9.7    11.7(1)   2.45       b.d.l.   2.09   0.20     (1.45)b    0.135      98.5   450(20)   7.6    20
+                                         (1)    (1)     (1)    (1)              (2)                 (4)    (4)                 (6)                         (1)    (EPMA)
+            T-Phonolite                  57.7   20.6    2.1    4.8    4.92(8)   1.66       2.44     6.28   0.15                0.066     100.6   220(10)   7.3    20
+                                         (2)    (1)     (1)    (1)              (7)        (5)      (8)    (5)                 (3)                         (1)    (EPMA)
+            SLC                          42.0   10.8    14.1   18.2   11.86     b.d.l.     b.d.l.   0.58   b.d.l.              0.474      98.0   1579      8.2    15
+                                         (1)    (1)     (1)    (1)    (6)                           (5)                        (6)               (20)      (2)    (EPMA)
+            Rhyolite                     70.2   16.4    0.3    1.1    1.09(7)   0.32       6.93     2.47   b.d.l.              0.004      98.9   14(9)     6.1    5 (SIMS)
+                                         (9)    (9)     (1)    (2)              (5)        (9)      (19)                       (3)                         (3)
+            CMAS1                        47.6   16.9    11.9   21.9   b.d.l.    b.d.l.     b.d.l.   0.90   b.d.l.              0.582      99.8   1940      8.2    20
+                                         (1)    (1)     (1)    (1)                                  (1)                        (7)               (25)      (2)    (EPMA)
+            CMAS2                        45.0   20.1    14.1   19.2   b.d.l.    b.d.l.     b.d.l.   0.79   b.d.l.              0.456      99.6   1520      8.1    20
+                                         (1)    (1)     (1)    (1)                                  (3)                        (9)               (30)      (2)    (EPMA)
+            CMAS3                        49.1   15.3    14.4   19.1   b.d.l.    b.d.l.     b.d.l.   0.78   b.d.l.              0.435      99.5   1450      8.1    20
+                                         (1)    (1)     (1)    (1)                                  (4)                        (9)               (30)      (1)    (EPMA)
+            T-Basalt       1623          48.3   16.4    4.3    9.5    10.63     3.46       0.93     4.03   0.24     (1.24)a    0.045      99.0   150(10)   6.8    20
+                                         (1)    (1)     (1)    (1)    (5)       (6)        (4)      (6)    (4)                 (3)                         (2)    (EPMA)
+            Lunar                        42.7   11.1    7.0    9.3    16.89     8.39       0.11     1.68   0.51                0.019      97.7   64(22)    6.4    5 (SIMS)
+               Basalt                    (1)    (1)     (1)    (1)    (8)       (5)        (5)      (5)    (4)                 (7)                         (2)
+            NIB                          49.6   14.7    8.6    12.4   9.21(5)   0.94       0.20     2.26   0.19     (0.30)     0.063      98.4   210(10)   6.9    20
+                                         (1)    (1)     (1)    (1)              (7)        (5)      (6)    (5)                 (3)                         (2)    (EPMA)
+            Nephelinite                  42.1   14.6    8.2    14.3   10.67     2.90       0.14     2.17   2.75                0.123      98.0   410(20)   7.2    20
+                                         (1)    (1)     (1)    (1)    (6)       (6)        (4)      (5)    (6)                 (6)                         (2)    (EPMA)
+            Andac                        65.6   15.9    1.4    3.4    4.03(6)   0.92       5.06     1.99   b.d.l.              0.008      98.3   25(9)     6.0    5 (SIMS)
+                                         (5)    (2)     (1)    (1)              (4)        (5)      (9)                        (3)                         (2)
+            B-A                          54.3   14.4    9.0    9.6    6.43(4)   0.58       1.10     2.88   b.d.l.              0.051      98.3   170(20)   6.8    20
+                                         (2)    (1)     (1)    (1)              (6)        (4)      (5)                        (6)                         (2)    (EPMA)
+            Andesite                     62.4   17.0    3.2    6.5    3.49(4)   0.61       1.55     5.19   b.d.l.              0.020      99.9   65(12)    6.4    5 (SIMS)
+                                         (1)    (1)     (1)    (1)              (6)        (5)      (5)                        (4)                         (2)
+            Basanite                     45.6   11.4    13.5   9.7    11.76     2.44       0.13     2.49   0.20     (1.45)b    0.084      98.9   280(10)   7.0    20
+                                         (1)    (1)     (1)    (1)    (6)       (7)        (6)      (6)    (5)                 (3)                         (2)    (EPMA)
+            T-Phonolite                  58.1   20.6    2.1    4.8    5.01(4)   1.65       2.08     6.23   0.15                0.039     100.7   130(10)   6.7    25
+                                         (2)    (1)     (1)    (1)              (5)        (5)      (9)    (4)                 (3)                         (2)    (EPMA)
+            SLC                          40.5   10.6    15.0   17.4   13.39     b.d.l.     b.d.l.   0.64   b.d.l.              0.264      97.8   880(20)   7.5    20
+                                         (1)    (1)     (1)    (1)    (8)                           (7)                        (6)                         (2)    (EPMA)
+            Rhyolite                     72.8   14.4    0.3    1.0    1.15(9)   0.31       7.48     1.51   b.d.l.              0.003      98.9   10(9)     5.6    5 (SIMS)
+                                         (9)    (8)     (1)    (2)              (4)        (9)      (9)                        (3)                         (2)
+            CMAS1                        48.0   16.5    11.9   21.7   b.d.l.    b.d.l.     b.d.l.   0.74   b.d.l.              0.267      99.1   890(20)   7.5    20
+                                         (1)    (1)     (1)    (1)                                  (6)                        (6)                         (2)    (EPMA)
+            CMAS2                        44.9   19.0    16.0   18.5   b.d.l.    b.d.l.     b.d.l.   0.71   b.d.l.              0.216      99.3   720(20)   7.4    20
+                                         (1)    (1)     (1)    (1)                                  (6)                        (6)                         (2)    (EPMA)
+            CMAS3                        49.4   15.3    14.3   19.2   b.d.l.    b.d.l.     b.d.l.   0.95   b.d.l.              0.213      99.5   710(20)   7.4    20
+                                         (1)    (1)     (1)    (1)                                  (5)                        (6)                         (2)    (EPMA)
+            T-Basalt       1673          49.0   17.0    4.5    9.6    10.65     3.58       0.24     3.79   0.23     (1.24)a    0.018      99.8   59(16)    6.0    20
+                                         (2)    (1)     (1)    (1)    (7)       (5)        (5)      (4)    (4)                 (5)                         (2)    (EPMA)
+            Lunar                        41.2   11.5    7.3    9.1    17.03     8.66       b.d.l.   2.04   0.68                0.026      97.5   87(48)    6.2    20
+               Basalt                    (4)    (1)     (2)    (5)    (75)      (9)                 (9)    (5)                 (14)                        (2)    (EPMA)
+            NIB                          49.7   14.8    8.8    12.2   9.04(6)   0.93       0.15     2.42   0.18     (0.30)     0.036      98.5   120(20)   6.3    20
+                                         (1)    (1)     (1)    (1)              (4)        (2)      (7)    (3)                 (6)                         (2)    (EPMA)
+            Nephelinite                  42.8   14.8    8.3    13.6   10.47     2.97       0.11     2.17   2.65                0.06       97.9   200(30)   6.5    20
+                                         (1)    (1)     (1)    (1)    (9)       (6)        (4)      (5)    (6)                                             (2)    (EPMA)
+            Andac                        65.6   16.5    1.6    3.7    4.21(9)   0.98       4.41     2.25   b.d.l.              0.005      99.3   15(9)     5.4    5 (SIMS)
+                                         (4)    (1)     (1)    (2)              (4)        (9)      (5)                        (3)                         (3)
+            B-A                          54.8   14.7    9.1    9.7    5.99(7)   0.60       0.85     3.16   b.d.l.              0.030      98.9   100(20)   6.2    20
+
+
+
+
+                                                                                         154
+           J. Boulliung and B.J. Wood                                                                                           Geochimica et Cosmochimica Acta 336 (2022) 150–164
+
+
+          Table 3 (continued)
+
+               Sample        Temparature     SiO2   Al2O3   MgO    CaO    FeO       TiO2       K2O      Na2O   MnO      P2O5         SO4     Total   S (ppm)   Log    n
+                             (K)                                                                                                                               Cs
+                                             (1)    (1)     (1)    (1)              (9)        (6)      (9)                          (6)                       (2)    (EPMA)
+               Andesite                      62.6   18.0    3.3    6.7    3.55(6)   0.63       1.23     4.20   b.d.l.                0.011   100.2   37(10)    5.8    5 (SIMS)
+                                             (3)    (1)     (1)    (1)              (4)        (5)      (9)                          (3)                       (2)
+               Basanite                      45.9   11.5    13.6   9.7    11.66     2.47       b.d.l.   2.23   0.20     (1.45)b      0.042    98.8   140(20)   6.4    20
+                                             (1)    (1)     (1)    (1)    (8)       (4)                 (9)    (5)                   (6)                       (2)    (EPMA)
+               SLC                           39.4   10.7    15.5   16.7   14.7(1)   b.d.l.     b.d.l.   0.63   b.d.l.                0.117    97.8   390(20)   6.8    20
+                                             (1)    (1)     (1)    (1)                                  (5)                          (6)                       (2)    (EPMA)
+               Rhyolite                      73.2   14.8    0.31   1.0    1.15(9)   0.32       6.05     2.58   b.d.l.                0.003    99.4   8(9)      5.1    5 (SIMS)
+                                             (9)    (9)     (4)    (2)              (3)        (9)      (9)                          (3)                       (2)
+               CMAS1                         48.1   16.5    12.3   21.7   b.d.l.    b.d.l.     b.d.l.   0.90   b.d.l.                0.132    99.7   440(10)   6.9    20
+                                             (1)    (1)     (1)    (1)                                  (4)                          (3)                       (2)    (EPMA)
+               CMAS2                         45.1   18.6    17.5   17.5   b.d.l.    b.d.l.     b.d.l.   1.06   b.d.l.                0.120    99.9   400(20)   6.8    20
+                                             (1)    (1)     (1)    (1)                                  (5)                          (6)                       (2)    (EPMA)
+               CMAS3                         49.6   15.4    14.3   19.2   b.d.l.    b.d.l.     b.d.l.   1.29   b.d.l.                0.108    99.9   360(30)   6.8    20
+                                             (1)    (1)     (1)    (1)                                  (5)                          (9)                       (2)    (EPMA)
+               T-Basalt      1723            49.0   16.8    4.4    9.7    10.02     3.4(6)     0.59     4.04   0.21     (1.24)a      0.014    99.4   46(10)    5.6    5 (SIMS)
+                                             (2)    (1)     (1)    (9)    (9)                  (7)      (9)    (6)                   (3)                       (2)
+               Lunar                         41.9   11.7    7.3    9.4    15.95     8.56       0.17     3.09   0.55                  0.016    98.6   52(10)    5.6    5 (SIMS)
+                  Basalt                     (1)    (1)     (1)    (1)    (9)       (6)        (7)      (9)    (7)                   (3)                       (2)
+               NIB                           50.0   14.8    8.8    12.3   8.85(7)   0.90       0.24     3.01   0.18     (0.30)       0.030    99.4   100(20)   5.9    20
+                                             (1)    (1)     (1)    (1)              (6)        (6)      (8)    (6)                   (6)                       (2)    (EPMA)
+               Nephelinite                   42.5   14.8    8.4    14.6   10.20     2.8(6)     b.d.l.   2.70   2.49                  0.042    98.5   140(20)   6.0    20
+                                             (1)    (1)     (1)    (1)    (7)                           (7)    (7)                   (6)                       (2)    (EPMA)
+               Andac                         66.0   16.5    1.7    3.4    3.82(7)   0.94       4.33     2.76   b.d.l.                0.004    99.4   13(9)     5.0    5 (SIMS)
+                                             (3)    (1)     (1)    (1)              (6)        (6)      (6)                          (3)                       (3)
+               B-A                           55.4   14.6    9.2    9.6    5.50(6)   0.59       0.75     4.01   b.d.l.                0.019    99.7   62(16)    5.7    5 (SIMS)
+                                             (1)    (1)     (1)    (1)              (5)        (7)      (7)                          (5)                       (2)
+               Andesite                      62.3   17.9    3.3    6.6    3.28(7)   0.59       0.97     5.74   b.d.l.                0.007   100.7   24(9)     5.3    5 (SIMS)
+                                             (1)    (1)     (1)    (1)              (6)        (7)      (5)                          (3)                       (2)
+                                                                                                                                 b
+               Basanite                      46.1   11.5    13.8   9.9    11.37     2.39       0.16     2.72   0.19     (1.45)       0.036    99.6   120(10)   6.0    20
+                                             (2)    (1)     (1)    (1)    (9)       (6)        (6)      (9)    (6)                   (3)                       (2)    (EPMA)
+               T-Phonolite                   57.7   22.2    2.1    4.8    4.81(7)   1.64       1.60     5.83   0.14                  0.023   100.8   75(21)    5.8    5 (SIMS)
+                                             (2)    (1)     (1)    (1)              (6)        (7)      (8)    (9)                   (6)                       (2)
+               SLC                           39.7   10.9    15.6   17.1   14.22     b.d.l.     b.d.l.   1.15   b.d.l.                0.075    98.8   250(30)   6.3    25
+                                             (1)    (1)     (1)    (1)    (8)                           (6)                          (9)                       (2)    (EPMA)
+               Rhyolite                      75.0   13.3    0.3    0.9    0.93(7)   0.29       5.81     2.97   b.d.l.                0.002    99.5   8(9)      4.8    5 (SIMS)
+                                             (9)    (6)     (1)    (2)              (6)        (9)      (9)                          (3)                       (7)
+               CMAS1                         48.1   16.7    12.1   22.2   b.d.l.    b.d.l.     b.d.l.   1.38   b.d.l.                0.093   100.6   310(20)   6.4    20
+                                             (1)    (1)     (1)    (1)                                  (6)                          (6)                       (2)    (EPMA)
+               CMAS2                         45.4   18.8    17.8   17.5   b.d.l.    b.d.l.     b.d.l.   1.44   b.d.l.                0.078   101.0   260(20)   6.3    20
+                                             (2)    (2)     (3)    (5)                                  (6)                          (6)                       (2)    (EPMA)
+               CMAS3                         50.0   15.5    14.5   19.2   b.d.l.    b.d.l.     b.d.l.   1.43   b.d.l.                0.066   100.6   220(20)   6.2    20
+                                             (1)    (1)     (1)    (1)                                  (6)                          (6)                       (2)    (EPMA)
+               T-Basalt      1773            49.2   16.8    4.4    9.6    9.87(8)   3.46       0.42     4.65   0.22     (1.24)a      0.008    99.8   27(9)     5.0    5 (SIMS)
+                                             (1)    (1)     (1)    (1)              (6)        (7)      (8)    (7)                   (3)                       (2)
+               Lunar                         42.3   11.5    7.2    9.4    16.62     8.62       b.d.l.   2.30   0.62                  0.008    98.5   25(9)     5.0    5 (SIMS)
+                  Basalt                     (1)    (1)     (1)    (1)    (9)       (8)                 (6)    (7)                   (3)                       (2)
+               NIB                           50.5   14.9    8.6    12.4   8.47(6)   0.92       b.d.l.   3.23   0.17     (0.30)       0.012    99.5   39(10)    5.2    5 (SIMS)
+                                             (1)    (1)     (1)    (1)              (7)                 (6)    (6)                   (3)                       (2)
+               Nephelinite                   41.8   14.6    8.4    14.3   10.27     2.90       b.d.l.   3.45   2.62                  0.054    98.3   180       5.9    30
+                                             (2)    (1)     (1)    (3)    (9)       (6)                 (9)    (6)                   (3)             (100)     (2)    (EPMA)
+               Andac                         66.1   16.2    1.5    3.3    4.06(5)   0.97       4.34     3.06   b.d.l.                0.004    99.6   14(9)     4.7    5 (SIMS)
+                                             (3)    (1)     (1)    (1)              (6)        (6)      (9)                          (3)                       (2)
+               B-A                           53.8   14.6    9.1    9.8    6.00(7)   0.60       0.59     5.33   b.d.l.                0.013    99.8   44(10)    5.2    5 (SIMS)
+                                             (3)    (1)     (1)    (1)              (6)        (5)      (9)                          (3)                       (2)
+               Andesite                      62.3   17.9    3.4    6.6    3.37(5)   0.63       1.12     5.33   b.d.l.                0.006   100.6   20(9)     4.9    5 (SIMS)
+                                             (1)    (1)     (1)    (1)              (5)        (5)      (9)                          (3)                       (2)
+                                                                                                                                 b
+               Basanite                      46.6   11.7    13.6   9.9    11.04     2.41       b.d.l.   2.96   0.20     (1.45)       0.015    99.9   49(10)    5.3    5 (SIMS)
+                                             (1)    (1)     (1)    (1)    (8)       (7)                 (7)    (7)                   (3)                       (2)
+               T-Phonolite                   58.4   22.0    2.1    4.8    4.69(9)   1.72       1.21     4.39   0.15                  0.010    99.5   32(10)    5.1    5 (SIMS)
+                                             (2)    (1)     (1)    (1)              (6)        (5)      (7)    (5)                   (3)                       (2)
+               SLC                           40.3   11.0    15.3   17.2   13.83     b.d.l.     b.d.l.   0.96   b.d.l.                0.045    98.6   150(20)   5.8    20
+                                             (1)    (1)     (1)    (1)    (7)                           (7)                          (6)                       (2)    (EPMA)
+               Rhyolite                      74.8   15.1    0.3    0.9    1.14(9)   0.32       4.10     3.52   b.d.l.                0.002   100.2   8(9)      4.5    5 (SIMS)
+                                             (8)    (7)     (1)    (1)              (6)        (1)      (9)                          (3)                       (7)
+               CMAS1                         48.4   16.9    12.0   22.2   b.d.l.    b.d.l.     b.d.l.   1.23   b.d.l.                0.048   100.7   160(20)   5.8    30
+                                             (1)    (1)     (1)    (1)                                  (7)                          (6)                       (2)    (EPMA)
+               CMAS2                         45.6   19.0    17.3   17.7   b.d.l.    b.d.l.     b.d.l.   1.12   b.d.l.                0.036   100.7   120(20)   5.7    30
+                                             (1)    (1)     (1)    (1)                                  (7)                          (6)                       (2)    (EPMA)
+               CMAS3                         48.9   15.2    14.2   18.9   b.d.l.    b.d.l.     b.d.l.   2.98   b.d.l.                0.036   100.2   120(9)    5.7    30
+                                             (1)    (1)     (1)    (1)                                  (6)                          (3)                       (2)    (EPMA)
+           a
+                Data from Taracsák et al. (2021).
+           b
+                Data from Adam (1990).
+
+
+
+                                                                                             155
+           J. Boulliung and B.J. Wood                                                                                                  Geochimica et Cosmochimica Acta 336 (2022) 150–164
+
+
+
+
+    - observation_id: boulliung_wood_2022_air_so2_ratio_measurements
+      type: sulfur_solubility_and_sulfate_capacity_ratio_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+        page: 158
+        table: '4'
+        note: Every value below is transcribed from the printed Table 4 cell under its column header; the table reports final glass products at 1573 K for Air/SO2 4.00 and 0.11.
+      units: dimensionless Air/SO2; wt.% oxide/SO4/Total; ppm S; log10 C_S6+; n
+      values:
+        quantity: final_glass_composition_sulfur_and_sulfate_capacity_vs_air_so2
+        method_class: measured_direct_with_author_calculated_capacity
+        table_transcription: |
+          Table 4
+          Major oxides compositions (in wt.%), sulfur contents (in ppm) and sulfate capacity of final glass products obtained at 1573 K and for two different Air/SO2 ratios (i.e., 4.00 and
+          0.11). Numbers in parentheses represent 1r uncertainties on the last(s) digit(s). b.d.l.: below detection limit.
+
+               Composition    Air/           SiO2       Al2O3   MgO      CaO      FeO       TiO2           K2O         Na2O        MnO      P2O5          SO4        Total   S (ppm)   Log     n
+                              SO2                                                                                                                                                      Cs
+               T-Basalt       4              47.6       16.4    4.3(1)   9.4(1)   10.43     3.39           1.41        4.27        0.22     (1.24)a       0.054(6)    98.6   180(20)   7.5     30
+                                             (1)        (1)                       (9)       (8)            (7)         (7)         (6)                                                 (2)     (EPMA)
+               Lunar Basalt                  44.7       11.9    7.6(1)   10.0     14.57     6.84           b.d.l.      1.40        0.66                   0.027(3)    97.7   90(10)    7.2     25
+                                             (1)        (1)              (1)      (8)       (9)                        (6)         (7)                                                 (2)     (EPMA)
+               NIB                           50.1       14.8    8.7(1)   12.4     9.09(7)   0.92           b.d.l.      2.09        b.d.l.   (0.30)        0.069(6)    98.5   230(20)   7.6     30
+                                             (1)        (1)              (1)                (8)                        (7)                                                             (2)     (EPMA)
+               Nephelinite                   41.9       14.5    8.(1)2   14.2     10.54     2.88           0.45        2.69        2.58                   0.156(6)    98.1   520(20)   8.0     30
+                                             (1)        (1)              (1)      (7)       (7)            (7)         (7)         (6)                                                 (2)     (EPMA)
+               B-A                           54.4       14.4    9.1(1)   9.6(1)   6.36(8)   0.62           1.44        3.06        b.d.l.                 0.051(6)    99.0   170(20)   7.5     30
+                                             (1)        (1)                                 (6)            (8)         (6)                                                             (2)     (EPMA)
+               Andesite                      61.8       17.7    3.2(1)   6.5(1)   3.52(8)   0.61           2.01        4.76        b.d.l.                 0.021(6)   100.1   70(20)    7.1     25
+                                             (1)        (1)                                 (7)            (7)         (7)                                                             (2)     (EPMA)
+               Basanite                      45.6       11.3    13.4     9.7(1)   11.66     2.39           0.28        2.56        b.d.l.   (1.45)b       0.102(6)    98.5   340(20)   7.8     30
+                                             (1)        (1)     (1)               (7)       (7)            (6)         (7)                                                             (2)     (EPMA)
+               T-Phonolite                   55.8       22.1    2.1(1)   5.0(1)   5.15(7)   1.69           2.60        5.80        b.d.l.                 0.051(6)   100.2   170(20)   7.5     30
+                                             (3)        (1)                                 (7)            (7)         (9)                                                             (2)     (EPMA)
+               SLC                           42.5       11.0    14.0     18.7     11.81     b.d.l.         b.d.l.      b.d.l.      b.d.l.                 0.243(6)    98.3   810(20)   8.2     20
+                                             (1)        (1)     (1)      (1)      (9)                                                                                                  (2)     (EPMA)
+               CMAS1                         48.1       17.0    12.0     22.4     b.d.l.    b.d.l.         b.d.l.      b.d.l.      b.d.l.                 0.297(6)    99.8   990(20)   8.3     30
+                                             (1)        (1)     (1)      (1)                                                                                                           (2)     (EPMA)
+               CMAS2                         46.2       20.0    13.8     19.6     b.d.l.    b.d.l.         b.d.l.      b.d.l.      b.d.l.                 0.180(9)    99.9   600(30)   8.1     30
+                                             (1)        (1)     (2)      (1)                                                                                                           (2)     (EPMA)
+               CMAS3                         50.3       15.4    14.5     19.2     b.d.l.    b.d.l.         b.d.l.      b.d.l.      b.d.l.                 0.207(6)    99.6   690(20)   8.1     30
+                                             (1)        (1)     (1)      (1)                                                                                                           (2)     (EPMA)
+               T-Basalt       0.11           47.7       16.3    4.3(1)   9.4(1)   10.29     3.39           1.19        4.0(7)      0.21     (1.24)a       0.075(6)    98.3   250(20)   7.5     40
+                                             (1)        (1)                       (7)       (6)            (7)                     (6)                                                 (2)     (EPMA)
+               Lunar Basalt                  43.5       11.7    7.6(1)   9.9(1)   15.59     7.66           b.d.l       0.91        0.58                   0.030(5)    97.5   100(15)   7.1     20
+                                             (1)        (1)                       (7)       (8)                        (7)         (5)                                                 (2)     (EPMA)
+               NIB                           49.9       14.8    8.7(1)   12.3     9.06(9)   0.92           b.d.l.      2.19        b.d.l.   (0.30)        0.090(6)    98.3   300(20)   7.5     40
+                                             (2)        (1)              (1)                (7)                        (6)                                                             (2)     (EPMA)
+               Nephelinite                   42.1       14.6    8.2(1)   14.3     10.42     2.85           0.31        2.46        2.59                   0.201(6)    97.9   670(20)   7.9     40
+                                             (1)        (1)              (1)      (9)       (7)            (6)         (8)         (7)                                                 (2)     (EPMA)
+               Andac                         67.2       15.8    1.4(1)   3.2(2)   3.94(7)   0.94           4.97        0.96        b.d.l                  0.0141      98.4   47(23)    6.7     5 (SIMS)
+                                             (9)        (6)                                 (8)            (9)         (9)                                (7)                          (3)
+               B-A                           54.9       14.5    9.2(1)   9.6(1)   6.40(6)   0.61           1.21        2.77        b.d.l.                 0.072(6)    99.3   240(20)   7.5     45
+                                             (1)        (1)                                 (6)            (6)         (7)                                                             (2)     (EPMA)
+               Andesite                      62.1       17.7    3.3(1)   6.7(1)   3.58(6)   0.62           1.61        4.24        b.d.l.                 0.018(6)    99.9   60(20)    6.9     5 (SIMS)
+                                             (2)        (1)                                 (5)            (6)         (6)                                                             (2)
+                                                                                                                                                     b
+               Basanite                      45.8       11.4    13.51)   9.8(1)   11.43     2.41           0.28        2.46        b.d.l.   (1.45)        0.117(6)    98.7   390(20)   7.7     50
+                                             (1)        (1)                       (6)       (6)            (6)         (7)                                                             (2)     (EPMA)
+               T-Phonolite                   57.1       21.8    2.0(1)   4.6(1)   4.77(9)   1.64           2.55        5.58        b.d.l.                 0.057(6)   100.1   190(20)   7.3     40
+                                             (4)        (2)                                 (7)            (6)         (7)                                                             (2)     (EPMA)
+               SLC                           41.7       11.0    13.9     18.8     12.32     b.d.l          b.d.l       b.d.l       b.d.l                  0.300(5)    98.0   1000      8.1     20
+                                             (1)        (1)     (2)      (1)      (6)                                                                                        (15)      (2)     (EPMA)
+               CMAS1                         48.1       16.8    11.8     22.4     b.d.l     b.d.l          b.d.l.      b.d.l       b.d.l                  0.354(6)    99.4   1180      8.2     40
+                                             (1)        (1)     (1)      (1)                                                                                                 (20)      (2)     (EPMA)
+               CMAS2                         45.7       19.7    14.3     19.6     b.d.l     b.d.l          b.d.l       b.d.l       b.d.l                  0.276       99.6   920(40)   8.0     20
+                                             (1)        (4)     (7)      (6)                                                                              (12)                         (2)     (EPMA)
+               CMAS3                         50.2       15.7    14.4     19.4     b.d.l.    b.d.l.         b.d.l.      b.d.l.      b.d.l.                 0.249(6)    99.9   830(20)   8.0     20
+                                             (1)        (1)     (1)      (1)                                                                                                           (2)     (EPMA)
+           a
+                Data from Taracsák et al. (2021).
+           b
+                Data from Adam (1990).
+
+        analytical_notes:
+          EPMA_threshold_ppm: 60
+          EPMA_counting_time_peak_s: 30
+          EPMA_counting_time_background_s: 15
+          EPMA_Na_K_peak_s: 20
+          EPMA_Na_K_background_s: 10
+          SIMS_primary_beam_voltage_kV: 10
+          SIMS_primary_beam_current_nA_about: 10
+          SIMS_nominal_mass_resolution: 4000
+          SIMS_uncertainty_10_to_100_ppm: '<=30%'
+          SIMS_uncertainty_below_10_ppm: '50-100%'
+          sulfur_detection_limit_ppm_about: 60
+          analysis_points_per_sample: 15-40
+          quench: same atmosphere, cold area at top of vertical furnace
+          sample_mount: epoxy
+          EPMA_coating: carbon
+          SIMS_coating: gold
+deepening:
+  classification: original measured atmosphere-controlled silicate-melt experiments; Table 3/4 sulfate capacity is calculated from measured sulfur and fugacity inputs, not a direct instrument output
+  measured_scope: sulfur concentration, sulfate capacity inputs/outputs, major oxide compositions, gas/temperature/time conditions
+  not_found: vapor pressure, evaporation flux, sublimation rate, mass-loss series, elemental/isotopic evaporation fractionation, condensation temperature, Knudsen/effusion-cell geometry, vacuum experiment
+  model_only_not_admitted: pressure-dependent SO2 degassing paths and fitted/model comparisons in Sections 4.2-4.3 and Figures 8-12
+  vocabulary_names_not_in_lab_parameter_vocabulary:
+  - sample_mass_range_mg
+  - gas_flow_cm3_min
+  - gas_linear_velocity_cm_s
+  - gas_pretreatment_min
+  - equilibration_time_range_h
+  - fO2_control
+  - temperature_measurement
+  - temperature_calibration
+  - crucible
+  - gas_composition_air_so2_ratio
+  - analytical_method
+  - sulfur_detection_limit_ppm_about
+  - SIMS_primary_beam_voltage_kV
+  - SIMS_primary_beam_current_nA_about
+  - SIMS_nominal_mass_resolution
+  - analysis_points_per_sample
+  - quench
+  - sample_mount
+  - coating
