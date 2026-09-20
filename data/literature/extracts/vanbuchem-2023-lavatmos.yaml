@@ -1,0 +1,123 @@
+schema_version: literature_extract.v1
+source_id: vanbuchem-2023-lavatmos
+source:
+  citation: "van Buchem, C. P. A., Miguel, Y., Zilinskas, M. & van Westenen, W. (2023), \"LavAtmos: An open-source chemical equilibrium vaporization code for lava worlds\", Meteoritics & Planetary Science 58:1149-1161."
+  doi: 10.1111/maps.13994
+  url: https://doi.org/10.1111/maps.13994
+  year: 2023
+extraction:
+  method: manual transcription from pdftotext -layout; printed tables retained; figure curves not digitized
+  date: '2026-09-20'
+  worker: w3-vanbuchem-2023-lavatmos
+review_status: draft
+species: {}
+evidence_policy:
+  classification: model
+  measurement_claim: No new instrument measurements are reported. Laboratory points discussed in the validation section are attributed to Hastie et al. (1982) and Hastie & Bonnell (1985); no uncertainties are supplied for those points.
+  model_generator: LavAtmos using MELTS oxide activities, JANAF thermochemical data, mass-action reactions, and internally solved oxygen partial pressure; comparison models are named per table or note.
+  missing_values: Printed em dashes in Table 2 remain strings and are not converted to zero.
+  figure_policy: Figures 1-6 are qualitative or plotted output; no numeric curve values were read off or invented.
+  scope_note: This is a chemical-equilibrium modelling/code paper. It contains no sample mass, crucible, cell/orifice geometry, vacuum apparatus, pumping, gas-flow, temperature calibration, fO2-control apparatus, or run-duration measurements.
+model_tables:
+- table: '1'
+  locator: {page: 1151, table: '1'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: LavAtmos reaction inventory; JANAF equilibrium constants combined with MELTS activities
+    quantity: vaporization_reaction_inventory
+    rows_as_printed:
+    - {end_member: '-', number: 1, reactants: '1/2O2(g)', vapor: 'O(g)'}
+    - {end_member: SiO2, number: 2, reactants: 'SiO2(l) + O2(g)', vapor: 'Si(g)'}
+    - {end_member: SiO2, number: 3, reactants: '2SiO2(l) + 2O2(g)', vapor: 'Si2(g)'}
+    - {end_member: SiO2, number: 4, reactants: '3SiO2(l) + 3O2(g)', vapor: 'Si3(g)'}
+    - {end_member: SiO2, number: 5, reactants: 'SiO2(l) + 1/2O2(g)', vapor: 'SiO(g)'}
+    - {end_member: SiO2, number: 6, reactants: 'SiO2(l)', vapor: 'SiO2(g)'}
+    - {end_member: Al2O3, number: 7, reactants: '1/2Al2O3(l) + 3/4O2(g)', vapor: 'Al(g)'}
+    - {end_member: Al2O3, number: 8, reactants: 'Al2O3(l) + 3/2O2(g)', vapor: 'Al2(g)'}
+    - {end_member: Al2O3, number: 9, reactants: '1/2Al2O3(l) + 1/4O2(g)', vapor: 'AlO(g)'}
+    - {end_member: Al2O3, number: 10, reactants: 'Al2O3(l) + O2(g)', vapor: 'Al2O(g)'}
+    - {end_member: Al2O3, number: 11, reactants: '1/2Al2O3(l) + 1/2O2(g)', vapor: 'AlO2(g)'}
+    - {end_member: Al2O3, number: 12, reactants: 'Al2O3(l) + 1/2O2(g)', vapor: 'Al2O2(g)'}
+    - {end_member: TiO2, number: 13, reactants: 'TiO2(l) + O2(g)', vapor: 'Ti(g)'}
+    - {end_member: TiO2, number: 14, reactants: 'TiO2(l) + 1/2O2(g)', vapor: 'TiO(g)'}
+    - {end_member: TiO2, number: 15, reactants: 'TiO2(l)', vapor: 'TiO2(g)'}
+    - {end_member: Fe2O3, number: 16, reactants: '1/2Fe2O3(l) + 3/4O2(g)', vapor: 'Fe(g)'}
+    - {end_member: Fe2O3, number: 17, reactants: '1/2Fe2O3(l) + 1/4O2(g)', vapor: 'FeO(g)'}
+    - {end_member: Fe2SiO4, number: 18, reactants: '1/2Fe2SiO4(l) + 1/2O2(g) + 1/2SiO2(l)', vapor: 'Fe(g)'}
+    - {end_member: Fe2SiO4, number: 19, reactants: '1/2Fe2SiO4(l) + 1/2SiO2(l)', vapor: 'FeO(g)'}
+    - {end_member: Mg2SiO4, number: 20, reactants: '1/2Mg2SiO4(l) + 1/2O2(g) + 1/2SiO2(l)', vapor: 'Mg(g)'}
+    - {end_member: Mg2SiO4, number: 21, reactants: 'Mg2SiO4(l) + O2(g) + SiO2(l)', vapor: 'Mg2(g)'}
+    - {end_member: Mg2SiO4, number: 22, reactants: 'Mg2SiO4(l) + 1/2SiO2(l)', vapor: 'MgO(g)'}
+    - {end_member: CaSiO3, number: 23, reactants: 'CaSiO3(l) + 1/2O2(g) + SiO2(l)', vapor: 'Ca(g)'}
+    - {end_member: CaSiO3, number: 24, reactants: '2CaSiO3(l) + O2(g) + 2SiO2(l)', vapor: 'Ca2(g)'}
+    - {end_member: CaSiO3, number: 25, reactants: 'CaSiO3(l) + SiO2(l)', vapor: 'CaO(g)'}
+    - {end_member: Na2SiO3, number: 26, reactants: '1/2Na2SiO3(l) + 1/4O2(g) + 1/2SiO2(l)', vapor: 'Na(g)'}
+    - {end_member: Na2SiO3, number: 27, reactants: 'Na2SiO3(l) + 1/2O2(g) + SiO2(l)', vapor: 'Na2(g)'}
+    - {end_member: Na2SiO3, number: 28, reactants: '1/2Na2SiO3(l) + 1/4O2(g) + 1/2SiO2(l)', vapor: 'NaO(g)'}
+    - {end_member: KAlSiO4, number: 29, reactants: 'KAlSiO4(l) + 1/4O2(g) + 1/2Al2O3(l) + SiO2(l)', vapor: 'K(g)'}
+    - {end_member: KAlSiO4, number: 30, reactants: '2KAlSiO4(l) + 1/2O2(g) + Al2O3(l) + 2SiO2(l)', vapor: 'K2(g)'}
+    - {end_member: KAlSiO4, number: 31, reactants: 'KAlSiO4(l) + 1/4O2(g) + 1/2Al2O3(l) + SiO2(l)', vapor: 'KO(g)'}
+- table: '2'
+  locator: {page: 1154, table: '2'}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: LavAtmos input compositions; SRM glass and illite are attributed to Hastie sources, other compositions to the cited literature in the table note
+    quantity: melt_compositions_used_for_figures_2_to_6
+    units: wt_percent
+    rows_as_printed:
+    - {oxide: SiO2, SRM_glass: '71.390', Illite: '60.200', BSE: '45.400', CB: '50.700', EH4: '62.730', NSP_source: '53.670', NSP_lava: '58.700'}
+    - {oxide: MgO, SRM_glass: '0.270', Illite: '2.100', BSE: '36.760', CB: '36.900', EH4: '30.240', NSP_source: '36.890', NSP_lava: '13.900'}
+    - {oxide: Al2O3, SRM_glass: '2.780', Illite: '26.000', BSE: '4.480', CB: '4.600', EH4: '2.580', NSP_source: '4.750', NSP_lava: '13.800'}
+    - {oxide: TiO2, SRM_glass: '–', Illite: '–', BSE: '0.210', CB: '–', EH4: '–', NSP_source: '–', NSP_lava: '–'}
+    - {oxide: Fe2O3, SRM_glass: '0.040', Illite: '4.400', BSE: '–', CB: '–', EH4: '–', NSP_source: '–', NSP_lava: '–'}
+    - {oxide: FeO, SRM_glass: '–', Illite: '–', BSE: '8.100', CB: '3.500', EH4: '–', NSP_source: '0.020', NSP_lava: '0.040'}
+    - {oxide: CaO, SRM_glass: '10.750', Illite: '–', BSE: '3.650', CB: '3.300', EH4: '1.990', NSP_source: '2.260', NSP_lava: '5.810'}
+    - {oxide: Na2O, SRM_glass: '12.750', Illite: '0.200', BSE: '0.349', CB: '0.190', EH4: '1.710', NSP_source: '1.970', NSP_lava: '7.000'}
+    - {oxide: K2O, SRM_glass: '2.020', Illite: '7.400', BSE: '0.031', CB: '0.050', EH4: '0.200', NSP_source: '0.050', NSP_lava: '0.200'}
+    - {oxide: Total, SRM_glass: '100.00', Illite: '100.300', BSE: '98.980', CB: '99.240', EH4: '99.450', NSP_source: '99.610', NSP_lava: '99.450'}
+- table: validation_and_limitations
+  locator: {page: 1153, section: Validation}
+  classification: quoted_attributed
+  values:
+    method_class: attributed_laboratory_comparison
+    generator: Hastie et al. (1982) and Hastie & Bonnell (1985) laboratory data, as reported and compared by van Buchem et al.; no uncertainties printed
+    quantity: validation_scope_and_reported_comparison
+    claims_as_printed:
+    - "LavAtmos and MAGMA align well with the O2 laboratory data for SRM glass."
+    - "For SRM glass, LavAtmos and VapoRock K partial pressures differ by about a factor 2; VapoRock is closer to the experimental data; MAGMA is about one order of magnitude below VapoRock."
+    - "For illite, LavAtmos O2 agrees with the data at 1750 K and above; MAGMA underestimates K by about a factor 2 near 1550 K and about an order of magnitude above 2000 K."
+    - "For illite, LavAtmos and VapoRock SiO predictions are similar and both underestimate the experimental data by about a factor 2."
+    - "No experimental uncertainties were provided by the cited laboratory authors."
+    - "The authors state that suitable experimental data were not available for the remaining species beyond the cited O2, K, Na, and SiO comparisons."
+- table: model_scope_and_conditions
+  locator: {page: 1150, section: Methodology}
+  classification: model_derived
+  values:
+    method_class: model_derived
+    generator: LavAtmos
+    quantity: stated_model_domain
+    values_as_printed:
+      oxide_species_count: 9
+      vapor_species_count: 31
+      temperature_range_K: '1500–4000'
+      default_surface_pressure_bar: '0.1'
+      pressure_independence_below_bar: 'about 100'
+      oxygen_fugacity: internally determined from mass action and mass balance
+      excluded_volatiles: 'H2O, CO2, N2 and other volatiles'
+      equilibrium_assumption: chemical equilibrium and congruent vaporization
+- table: figure_only_trends
+  locator: {page: 1153, section: Validation}
+  classification: figure_only
+  values:
+    method_class: figure_only
+    generator: LavAtmos and named comparison codes; plotted trends are not digitized
+    quantity: printed_figure_trends
+    rows_as_printed:
+    - {figure: 1, page: 1153, trend: 'Mass-law function behavior as a function of PO2 at different temperatures; inset shows the 1500 K scale.'}
+    - {figure: 2, page: 1154, trend: 'Partial-pressure curves compare Hastie laboratory points with LavAtmos, MAGMA, and VapoRock for SRM glass and illite.'}
+    - {figure: 3, page: 1155, trend: 'BSE output from 1500 to 4000 K; Na vapor dominates to about 2700 K, then SiO dominates; O2 and O are also prominent.'}
+    - {figure: 4, page: 1156, trend: 'Selected BSE vapor mole fractions compared across LavAtmos, Ito et al., and MAGMA.'}
+    - {figure: 5, page: 1155, trend: 'BSE total vapor pressures compared across LavAtmos, Ito et al., and MAGMA.'}
+    - {figure: 6, page: 1156, trend: 'LavAtmos and VapoRock partial-pressure outputs compared for CB, EH4, NSP source, and NSP lava compositions.'}
