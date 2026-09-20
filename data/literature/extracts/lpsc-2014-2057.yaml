@@ -1,0 +1,263 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2014-2057
+source:
+  citation: 'Bruck, A. M., Sutter, B., Ming, D. W. & Mahaffy, P. (2014), "Thermal decomposition of calcium perchlorate/iron-mineral mixtures: implications of the evolved oxygen from the Rocknest eolian deposit in Gale Crater, Mars", 45th Lunar and Planetary Science Conference, abstract 2057.'
+  year: 2014
+extraction:
+  method: manual transcription from the clean two-page PDF text layer using pdftotext -layout, with figures classified as figure-only where values were not printed.
+  date: '2026-09-20'
+  worker: i2-lpsc-2014-2057
+review_status: draft
+fidelity_samples:
+- path: species.Ca(ClO4)2.observations[lpsc_2014_2057_thermal_program].values.sample_mass_mmol
+  value: 3.2
+  locator:
+    page: 1
+    section: Materials and Methods
+    note: printed as 3.2 mmol Ca-perchlorate mixed outside the glovebox
+- path: species.Ca(ClO4)2.observations[lpsc_2014_2057_thermal_program].values.heating_rate_C_per_min
+  value: 35
+  locator:
+    page: 1
+    section: Materials and Methods
+    note: printed heating rate 35°C/min
+- path: species.O2.observations[lpsc_2014_2057_dsc_peak_shifts].values.magnetite_shift_C
+  value: -35
+  locator:
+    page: 1
+    section: Results and Discussion
+    note: printed DSC relative order and shift for magnetite
+- path: species.O2.observations[lpsc_2014_2057_qms_peak_shifts].values.magnetite_shift_C
+  value: -25
+  locator:
+    page: 2
+    section: Results and Discussion
+    note: printed QMS/O2 relative order and shift for magnetite
+species:
+  Ca(ClO4)2:
+    observations:
+    - observation_id: lpsc_2014_2057_thermal_program
+      type: rate_series
+      locator:
+        page: 1
+        section: Materials and Methods
+      phase: dehydrated_calcium_perchlorate_mixed_with_iron_phase
+      regime: dsc_qms_heated_carrier_gas
+      units: as printed (mmol, mg, micrometres, °C, °C/min, mL/min, mbar)
+      values:
+        quantity: experimental_materials_and_thermal_program
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        material: dehydrated Ca(ClO4)2 prepared from Ca(ClO4)2·4H2O
+        reagent_source: ACROS ORGANICS
+        dehydration: dissolved in deionized water, flash frozen with N2(l), freeze dried in a Labconco Freezone 4.5 Plus evaporator
+        grinding_and_sieving: ground with an agate mortar/pestle and sieved to <=125 µm in a N2(g)-purged glove box
+        sample_mass_mmol: 3.2
+        iron_phase_molar_equivalents: [1, 5]
+        iron_phase_mass_mmol: [3.2, 16]
+        HWMK919_sample_mass_mg: [0.5, 2.5]
+        HWMK919_particle_size_um: '<=5'
+        other_sample_particle_size_um: '<=125'
+        instrument_dsc: Setaram Sensys-Evo differential scanning calorimeter
+        instrument_ms: Stanford Research Systems Universal Gas Analyzer
+        temperature_start_C: 25
+        temperature_end_C: 715
+        heating_rate_C_per_min: 35
+        carrier_gas: He
+        carrier_gas_flow_mL_per_min: 3
+        carrier_gas_pressure_mbar: [30, 75]
+        sample_container: not_printed
+        temperature_measurement_and_calibration: not_printed
+        vacuum_level: not_printed
+        pumping: not_printed
+        fO2_control: not_printed
+        run_duration: not_printed
+      equipment:
+        chamber_pressure:
+          value: 30-75 mbar He carrier gas
+          locator:
+            page: 1
+            section: Materials and Methods
+        cell_material:
+          value: not_printed
+          locator:
+            page: 1
+            section: Materials and Methods
+        sample_surface_area:
+          value: not_printed
+          locator:
+            page: 1
+            section: Materials and Methods
+  O2:
+    observations:
+    - observation_id: lpsc_2014_2057_dsc_peak_shifts
+      type: transition_point
+      locator:
+        page: 1
+        section: Results and Discussion
+      phase: calcium_perchlorate_iron_mineral_mixture
+      regime: differential_scanning_calorimetry
+      units: °C relative to Ca-perchlorate-only sample, as printed
+      values:
+        quantity: Ca_perchlorate_decomposition_peak_temperature_shift
+        method_class: measured_reduced
+        evidence_class: authors_own_measurement_reduced
+        reference: Ca-perchlorate-only sample
+        relative_order: magnetite (-35°C) > hematite (-30°C) > pyrite (-10°C) > HWMK919 (-0°C) > fayalite (+10°C)
+        magnetite_shift_C: -35
+        hematite_shift_C: -30
+        pyrite_shift_C: -10
+        HWMK919_shift_C: '-0'
+        fayalite_shift_C: 10
+        peak_assignment: first endotherm reaction (a) <=150°C; second endotherm reaction (b) <=400°C; large exotherm reaction (c) >=400°C
+        figure_status: Figure 1 curves are not digitised; the listed shifts are printed in the text
+    - observation_id: lpsc_2014_2057_qms_peak_shifts
+      type: transition_point
+      locator:
+        page: 2
+        section: Results and Discussion
+      phase: calcium_perchlorate_iron_mineral_mixture
+      regime: evolved_oxygen_qms
+      units: °C relative to Ca-perchlorate-only sample, as printed
+      values:
+        quantity: O2_release_peak_temperature_shift
+        method_class: measured_reduced
+        evidence_class: authors_own_measurement_reduced
+        reference: Ca-perchlorate-only sample
+        relative_order: magnetite (-25°C) > hematite (-20°C) > pyrite (-10°C) > HWMK919 (-0°C) > fayalite (+10°C)
+        magnetite_shift_C: -25
+        hematite_shift_C: -20
+        pyrite_shift_C: -10
+        HWMK919_shift_C: '-0'
+        fayalite_shift_C: 10
+        figure_status: Figure 2 curves are not digitised; the listed shifts are printed in the text
+    - observation_id: lpsc_2014_2057_dsc_qms_method_difference
+      type: transition_point
+      locator:
+        page: 2
+        section: Results and Discussion
+      phase: calcium_perchlorate_iron_mineral_mixture
+      regime: dsc_vs_qms_comparison
+      units: °C, as printed
+      values:
+        quantity: decomposition_temperature_method_difference
+        method_class: measured_reduced
+        evidence_class: authors_own_measurement_reduced
+        small_difference_C: '~10'
+        largest_differentials_C: '~20-25'
+        note: Between DSC and QMS there is a small difference in the two Fe oxide sample mixtures; the largest differentials are caused by magnetite and hematite.
+    - observation_id: lpsc_2014_2057_chlorine_release_windows
+      type: rate_series
+      locator:
+        page: 2
+        section: Results and Discussion
+      phase: calcium_perchlorate_iron_mineral_mixture
+      regime: evolved_gas_qms
+      units: °C, as printed
+      values:
+        quantity: evolved_chlorine_species_temperature_windows
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        fayalite_HCl_mz36_release_temperature_C: '>580'
+        fayalite_Cl_mz35_release_temperature_C: '>580'
+        pyrite_and_HWMK919_evolved_chlorine_temperature_C: '>450'
+        data_status: data not shown in the abstract; temperatures are printed qualitative windows, not digitised curves
+    - observation_id: lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
+      type: rate_series
+      locator:
+        page: 2
+        figure: '1 and 2'
+      phase: calcium_perchlorate_iron_mineral_mixture
+      regime: dsc_qms_plotted_curve
+      units: as plotted
+      values:
+        quantity: thermal_and_evolved_oxygen_curves
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only_not_digitised
+        figure_1: Differential scanning calorimetry results for Ca(ClO4)2·nH2O with 1 molar equivalent of the corresponding Fe-bearing analog versus temperature.
+        figure_2: Evolved oxygen release from Rocknest, and MS results for Ca(ClO4)2 and Ca(ClO4)2+Fe analog materials versus temperature.
+  HCl:
+    observations:
+    - observation_id: lpsc_2014_2057_hcl_qualitative_release
+      type: rate_series
+      locator:
+        page: 2
+        section: Results and Discussion
+      phase: fayalite_calcium_perchlorate_mixture
+      regime: evolved_gas_qms
+      units: °C, as printed
+      values:
+        quantity: HCl_release_temperature
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        m_z: 36
+        release_temperature_C: '>580'
+        data_status: data not shown in the abstract
+  Cl:
+    observations:
+    - observation_id: lpsc_2014_2057_cl_qualitative_release
+      type: rate_series
+      locator:
+        page: 2
+        section: Results and Discussion
+      phase: pyrite_and_HWMK919_calcium_perchlorate_mixtures
+      regime: evolved_gas_qms
+      units: °C, as printed
+      values:
+        quantity: chlorine_release_temperature
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        m_z: 35
+        release_temperature_C: '>450'
+        data_status: data not shown in the abstract
+  HWMK919:
+    observations:
+    - observation_id: lpsc_2014_2057_hwmk919_material_characterisation
+      type: rate_series
+      locator:
+        page: 1
+        section: Materials and Methods
+      phase: amorphous_martian_soil_analog
+      regime: sample_characterisation
+      units: as printed (µm, mg)
+      values:
+        quantity: sample_provenance_and_characterisation
+        method_class: measured_direct
+        evidence_class: named_sample_characterisation
+        material: Mauna Kea Volcano dust sample HWMK919 used as a Martian soil analog
+        particle_size_um: '<=5'
+        sample_mass_mg: [0.5, 2.5]
+        molecular_weight: difficult to determine because HWMK919 has complex mineralogy
+  magnetite:
+    observations:
+    - observation_id: lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
+      type: rate_series
+      locator:
+        page: 2
+        section: Conclusions
+      phase: Rocknest_eolian_deposit
+      regime: quoted_attributed
+      units: wt. %, as printed
+      values:
+        quantity: reported_Rocknest_iron_oxide_abundance
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        abundance_wt_pct: about 2
+        attribution: Bish et al. (2013), reference [9]
+  hematite:
+    observations:
+    - observation_id: lpsc_2014_2057_rocknest_reported_hematite_abundance
+      type: rate_series
+      locator:
+        page: 2
+        section: Conclusions
+      phase: Rocknest_eolian_deposit
+      regime: quoted_attributed
+      units: wt. %, as printed
+      values:
+        quantity: reported_Rocknest_iron_oxide_abundance
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        abundance_wt_pct: 1
+        attribution: Bish et al. (2013), reference [9]

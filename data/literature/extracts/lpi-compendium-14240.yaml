@@ -1,0 +1,266 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-14240
+source:
+  citation: "Meyer, C. (2007), Lunar Sample Compendium: 14240, Lunar and Planetary Institute, 5 pp."
+  year: 2007
+  url: https://www.lpi.usra.edu/lunar/samples/atlas/compendium/14240.pdf
+extraction:
+  method: "manual transcription from pdftotext -layout with page-3 table-cell visual verification"
+  date: '2026-09-20'
+  worker: i2-lpi-compendium-14240
+  source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-14240/lpi-compendium-14240.pdf
+  source_pdf_pages: 5
+  scope: "secondary compilation of Apollo 14 lunar-soil provenance and composition; no primary vaporization experiment"
+  apparatus_status: "no vaporization apparatus, run conditions, pressure, temperature, pumping, crucible, or calibration record stated"
+review_status: draft
+species:
+  lunar_sample_14240:
+    observations:
+    - observation_id: lpi_14240_sample_mass_conflicting_reports
+      type: sample_characterization
+      locator:
+        published_page: 2
+        section: Processing
+      units: g
+      values:
+        quantity: named_sample_mass
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        official_LRL_weight_g: 168
+        actual_weight_when_opened_g: 184
+        attribution:
+          official_LRL_weight: "difference between hardware and returned sample"
+          actual_weight_when_opened: "sample opened at UCB Space Science Laboratory; Burlingame 1971"
+        disagreement: "The compendium reports both 168 g official LRL weight and 184 g actual opened-sample weight; neither is reconciled."
+    - observation_id: lpi_14240_trench_provenance
+      type: sample_characterization
+      locator:
+        published_page: 1
+        section: Introduction
+      units: as_published
+      values:
+        quantity: named_sample_provenance
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        collection_site: Soil Mechanics Trench, station G, rim of approximately 6 m crater
+        collection_depth_cm: "25-36"
+        planned_trench_depth_cm: "60"
+        actual_trench_depth_cm: "~30"
+        collection_position: bottom of trench
+        contamination_note: "may contain material slumped from trench walls"
+        maturity_Is_FeO: 46
+        comparison_sample: Apollo_14_14149
+        comparison_maturity_Is_FeO: 53
+        material_description: "immature lunar soil; subsurface sample"
+        locators:
+          collection_depth: "page 2, Petrography"
+          maturity: "page 2, Petrography"
+          collection_site: "page 1, Introduction; page 2, Petrography"
+    - observation_id: lpi_14240_sesc_aliquot_and_sieve_masses
+      type: sample_characterization
+      locator:
+        published_page: 4
+        figure: 'sample subdivision schematic'
+      units: g
+      values:
+        quantity: printed_sample_subdivision_masses
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        opened_in: Berkeley
+        aliquots_g:
+          - label: 1
+            mass_g: 7
+          - label: 3
+            mass_g: 4.3
+          - label: 28
+            mass_g: 13.3
+          - label: 29
+            mass_g: 16.5
+          - label: 31
+            mass_g: 11.1
+          - label: 53
+            mass_g: 14
+          - label: 60
+            mass_g: 7.2
+          - label: 59
+            mass_g: 7.3
+          - label: 22
+            mass_g: 2.5
+          - label: 23
+            mass_g: 5
+          - label: 24
+            mass_g: 2.1
+          - label: 26
+            mass_g: 4.5
+          - label: 30
+            mass_g: 41.4
+        sieve_fraction:
+          size_range_micrometre: 250-500
+          mass_g: 41.4
+        note: "The schematic prints these aliquot masses; it does not state a complete mass-balance treatment or identify every reserve mass."
+    - observation_id: lpi_14240_chemical_composition_table1
+      type: composition_table
+      locator:
+        published_page: 3
+        table: '1'
+        section: Chemistry
+      units: as_published
+      values:
+        quantity: chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        table_reference_columns: [Laul72, Rose72, Laul82_14149_for_comparison]
+        technique_markers:
+          a: INAA
+          b: microchemical
+        note: "Blank cells are absent in the source. Laul72 prints two values where present; Rose72 prints one value with adjacent technique markers where shown."
+        composition:
+          wt_percent:
+            SiO2:
+              Rose72: 47.77
+              Rose72_technique: b
+            TiO2:
+              Laul72: [1.8, 2]
+              Rose72: 1.67
+              Rose72_technique: b
+              Laul82_14149: 1.6
+            Al2O3:
+              Laul72: [19.4, 18.5]
+              Rose72: 17.99
+              Rose72_technique: b
+              Laul82_14149: 17.9
+            FeO:
+              Laul72: 10.9
+              Rose72: 10.02
+              Rose72_technique: b
+              Laul82_14149: 10
+            MnO:
+              Laul72: [0.125, 0.13]
+              Rose72: 0.14
+              Rose72_technique: b
+              Laul82_14149: 0.13
+            MgO:
+              Rose72: 9.47
+              Rose72_technique: b
+              Laul82_14149: 9.9
+            CaO:
+              Laul72: [12, 12]
+              Rose72: 11.25
+              Rose72_technique: b
+              Laul82_14149: 11
+            Na2O:
+              Laul72: [0.717, 0.745]
+              Rose72: 0.7
+              Rose72_technique: b
+              Laul82_14149: 0.78
+            K2O:
+              Laul72: [0.57, 0.6]
+              Rose72: 0.54
+              Rose72_technique: b
+              Laul82_14149: 0.58
+            P2O5:
+              Rose72: 0.55
+              Rose72_technique: b
+          ppm:
+            Sc:
+              Laul72: 22
+              Rose72: 28
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 21
+            V:
+              Laul72: [55, 40]
+              Rose72: 52
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 40
+            Cr:
+              Laul72: 1430
+              Rose72: 1574
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 1232
+            Co:
+              Laul72: 36
+              Rose72: 33
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 27.5
+            Ni:
+              Rose72: 320
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 320
+            Cu:
+              Rose72: 16
+              Rose72_technique: b
+            Zn:
+              Rose72: 23
+              Rose72_technique: b
+            Ga:
+              Rose72: 7.5
+              Rose72_technique: b
+            Rb:
+              Rose72: 13
+              Rose72_technique: b
+            Sr:
+              Rose72: 390
+              Rose72_technique: b
+              Laul82_14149: 170
+            Y:
+              Rose72: 250
+              Rose72_technique: b
+            Zr:
+              Laul72: 790
+              Rose72: 930
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 680
+            Nb:
+              Rose72: 42
+              Rose72_technique: b
+            Ba:
+              Laul72: 790
+              Laul82_14149: 870
+            La:
+              Laul72: 70
+              Rose72: 67
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 60.5
+            Ce:
+              Laul72: 214
+              Rose72_technique: a
+              Laul82_14149: 170
+            Nd:
+              Laul82_14149: 110
+            Sm:
+              Laul72: 31
+              Laul82_14149: 26.5
+            Eu:
+              Laul72: 2.65
+              Laul82_14149: 2.2
+            Tb:
+              Laul82_14149: 5.4
+            Dy:
+              Laul82_14149: 37
+            Ho:
+              Laul82_14149: 8.2
+            Tm:
+              Laul82_14149: 3.3
+            Yb:
+              Laul72: 24
+              Rose72: 23
+              Rose72_technique: both_a_and_b_marked
+              Laul82_14149: 20.2
+            Lu:
+              Laul72: 3.2
+              Laul82_14149: 2.8
+            Hf:
+              Laul72: 20
+              Laul82_14149: 21.9
+            Ta:
+              Laul82_14149: 3
+            Th:
+              Laul72: 14
+              Laul82_14149: 13.3
+            U:
+              Laul82_14149: 3.6
+        absent_or_blank_rows: [S, sum, Ge, As, Se, Mo, Ru, Rh, Pd, Ag, Cd, In, Sn, Sb, Te, Cs, Pr, Gd, Er, W, Re, Os, Ir, Pt, Au]
+        source_references:
+          a: "INAA"
+          b: "microchemical"
+      note: "This is a secondary compilation of cited analyses by Laul et al. 1972, Rose et al. 1972, and Laul et al. 1982; it is not a new laboratory analysis in Meyer 2007."

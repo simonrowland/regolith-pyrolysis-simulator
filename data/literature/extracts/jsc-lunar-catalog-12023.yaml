@@ -1,0 +1,234 @@
+schema_version: literature_extract.v1
+source_id: jsc-lunar-catalog-12023
+source:
+  citation: 'Meyer, C. (2011), "12023 - 407.9 grams / 12024 - 56.5 grams: Trench Soils", Lunar Sample Compendium, Johnson Space Center.'
+  url: https://curator.jsc.nasa.gov/lunar/lsc/12023.pdf
+  year: 2011
+extraction:
+  method: Born-digital 8-page PDF; pdftotext -layout; printed prose, figure captions, and Table 1 transcribed; plotted curves not digitised.
+  date: '2026-09-20'
+  worker: extract-jsc-lunar-catalog-12023
+  provenance_path: corpus:jsc-lunar-catalog-12023/jsc-lunar-catalog-12023.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: 12023
+  observable: gibbs_table
+  observation_id: jsc_12023_table1_warren78_composition
+  field: method_class
+  value: compilation_assessed
+  locator: {pdf_page_index: 7, table: '1', row: FeO, column: Warren78}
+- species: 12023
+  observable: gibbs_table
+  observation_id: jsc_12023_provenance_and_characterisation
+  field: average_grain_size_um
+  value: 48
+  locator: {pdf_page_index: 3, figure: '7', caption: 'average grain size'}
+- species: 12023
+  observable: gibbs_table
+  observation_id: jsc_12023_sample_masses_and_collection
+  field: sample_12023_mass_g_precise
+  value: 407.9
+  locator: {pdf_page_index: 1, header: '12023 - 407.9 grams'}
+species:
+  '12023':
+    observations:
+    - observation_id: jsc_12023_sample_masses_and_collection
+      type: gibbs_table
+      locator: {pdf_page_index: 1, section: Introduction, header: '12023 - 407.9 grams / 12024 - 56.5 grams'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: as-reported sample provenance
+      regime: sample_characterisation
+      units: g, cm, and container names as printed
+      values:
+        quantity: sample_provenance
+        method_class: measured_direct
+        sample_12023_mass_g_precise: 407.9
+        sample_12023_mass_g_rounded: 408
+        sample_12024_mass_g: 56.5
+        trench_depth_cm_about: 20
+        collection_site: east rim of Sharp Crater, Apollo 12
+        sample_12023_collection_form: bottom of trench
+        sample_12023_container: Lunar Environment Sample Container (LESC)
+        sample_12024_collection_form: top of trench
+        sample_12024_container: Gas Analysis Sample Container (GASC)
+        drive_tube_12027_depth_cm: 20
+      uncertainty:
+        note: 12023 is printed as 407.9 g in the header and 408 g in Figure 11; trench depth is stated as about 20 cm.
+    - observation_id: jsc_12023_provenance_and_characterisation
+      type: gibbs_table
+      locator: {pdf_page_index: 2, section: Petrography, paragraph: 'maturity index and average grain size'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: as-reported petrographic characterisation
+      regime: sample_characterisation
+      units: microns and dimensionless index as printed
+      values:
+        quantity: sample_characterisation
+        method_class: quoted_attributed
+        quoted_from: Morris (1978) for maturity; Graf (1993), data by McKay et al., for grain-size distribution
+        maturity_index_Is_per_FeO: 60
+        maturity_class: mature
+        average_grain_size_um: 48
+        glass_particle_split_mass_g: 5
+        sample_mixup_note: Morris et al. (1977) mode for 12023 is incorrect; modes for 12023 and 12024 are unknown.
+      uncertainty:
+        note: No numerical uncertainty printed; the source explicitly identifies the mode as unknown after a sample mixup.
+    - observation_id: jsc_12023_table1_warren78_composition
+      type: gibbs_table
+      locator: {pdf_page_index: 7, table: '1', column: Warren78, technique: INAA}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: composition as printed by the compendium
+      regime: sample_characterisation
+      units: wt% for oxides, ppm for elements, as printed
+      values:
+        quantity: chemical_composition
+        method_class: compilation_assessed
+        quoted_from: Warren et al. (1978)
+        oxide_wt_pct:
+          TiO2: 2.45
+          Al2O3: 10.77
+          FeO: 15.3
+          MnO: 0.2
+          MgO: 11.94
+          CaO: 9.24
+          Na2O: 0.43
+          K2O: 0.26
+        elemental_ppm:
+          Sc: 35.7
+          Cr: 2580
+          Co: 42
+          Ni: 220
+          Zr: 460
+          Cs: 0.38
+          Ba: 423
+          La: 33
+          Ce: 88
+          Nd: 62
+          Sm: 15.5
+          Eu: 1.8
+          Tb: 3.4
+          Yb: 12.4
+          Lu: 1.74
+          Hf: 11.6
+          Ta: 1.5
+          Th: 6.3
+          U: 1.7
+        absent_table_entries:
+        - SiO2
+        - P2O5
+        - S
+        - V
+        - Nb
+        - Mo
+        - Rb
+        - Sr
+        - Y
+        - Dy
+        - Ho
+        - Er
+        - Tm
+      uncertainty:
+        note: No numerical uncertainties are printed; technique is identified as INAA. Blank table cells are retained as absent, not zero.
+    - observation_id: jsc_12023_carbon_nitrogen_compilation
+      type: rate_series
+      locator: {pdf_page_index: 3, section: Chemistry, paragraph: 'reported carbon and nitrogen abundances'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: attributed literature values as printed
+      regime: sample_characterisation
+      units: ppm as printed
+      values:
+        quantity: carbon_and_nitrogen_abundance
+        method_class: quoted_attributed
+        rows:
+        - {source: Moore et al. (1971), sample: 12023, C_ppm: 150, N_ppm: 120}
+        - {source: Moore et al. (1971), sample: 12024, C_ppm: 115}
+        - {source: Kaplan and Petrowski (1971), sample: 12023, C_ppm: 120, basis: average of 5 splits}
+        - {source: Kerridge et al. (1978), sample: 12023, C_ppm: 108, N_ppm: 72}
+        - {source: Norris et al. (1983), sample: 12023, C_ppm: 115, N_ppm: 70}
+      uncertainty:
+        note: No numerical uncertainties printed; differing attributed values are retained and not reconciled.
+    - observation_id: jsc_12023_glass_bead_ages
+      type: gibbs_table
+      locator: {pdf_page_index: 3, section: Radiogenic age dating}
+      phase: Apollo_12_glass_beads
+      standard_state: as-reported 40Ar/39Ar plateau ages
+      regime: radiogenic_age_characterisation
+      units: years as printed
+      values:
+        quantity: radiogenic_age
+        method_class: quoted_attributed
+        quoted_from: Levine et al. (2005, 2007) and Barra et al. (2006)
+        number_of_glass_beads: 'numerous (81?)'
+        majority_age_upper_bound_years: '<500 m.y.'
+        technique: 40Ar/39Ar plateau
+      uncertainty:
+        note: The source prints the bead count as “81?” and the age as a bound; neither is converted to a point estimate.
+    - observation_id: jsc_12023_figure_only_characterisation
+      type: rate_series
+      locator: {pdf_page_index: 2, figure: '4-5'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: plotted comparisons as printed
+      regime: sample_characterisation
+      units: as plotted
+      values:
+        quantity: figure_only_characterisation
+        method_class: figure_only
+        admission_status: typed_refusal
+        figures:
+        - {figure: '4', description: '12023 composition compared with other lunar soils; no curve values digitised'}
+        - {figure: '5', description: 'carbon content and maturity index comparison for 12023 and 12024; no curve values digitised'}
+        - {figure: '6', description: 'normalized rare-earth-element diagram for 12023; no plotted values digitised'}
+        - {figure: '7', description: 'grain-size distribution for 12023; only printed average grain size captured above'}
+        - {figure: '8', description: 'gas release pattern for 12023; no plotted values digitised'}
+      uncertainty:
+        note: Figure values were not read off axes.
+  '12024':
+    observations:
+    - observation_id: jsc_12024_sample_mass_and_characterisation
+      type: gibbs_table
+      locator: {pdf_page_index: 1, header: '12024 - 56.5 grams'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: as-reported sample provenance
+      regime: sample_characterisation
+      units: g and cm as printed
+      values:
+        quantity: sample_provenance
+        method_class: measured_direct
+        sample_mass_g: 56.5
+        collection_form: top of trench
+        container: Gas Analysis Sample Container (GASC)
+        trench_depth_cm_about: 20
+      uncertainty:
+        note: Trench depth is stated as about 20 cm; no numerical mass uncertainty is printed.
+    - observation_id: jsc_12024_coarse_particle_masses
+      type: gibbs_table
+      locator: {pdf_page_index: 6, figure: '13', caption: '12024,15 large dark rock'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: coarse-fines inventory as printed
+      regime: sample_characterisation
+      units: g, mm, and cm as printed
+      values:
+        quantity: particle_inventory
+        method_class: quoted_attributed
+        quoted_from: Marvin (1978)
+        particle_12024_15_mass_g: 14.1
+        particle_12024_15_description: large dark rock / olivine vitrophyre
+        figure_scale_cm: 1
+        coarse_fraction_mm: 2 to 4
+        fine_fraction_mm: '<1'
+      uncertainty:
+        note: No numerical uncertainties printed; range and bound are retained.
+    - observation_id: jsc_12024_figure_only_characterisation
+      type: rate_series
+      locator: {pdf_page_index: 6, figure: '13'}
+      phase: Apollo_12_lunar_trench_soil
+      standard_state: plotted sample subdivision as printed
+      regime: sample_characterisation
+      units: as printed
+      values:
+        quantity: figure_only_sample_subdivision
+        method_class: figure_only
+        admission_status: typed_refusal
+        description: 'Figure shows the 56.5 g 12024 allocation tree and labelled subsample masses; no additional rows transcribed beyond the explicitly printed 14.1 g particle above.'
+      uncertainty:
+        note: Figure allocation values not systematically transcribed.

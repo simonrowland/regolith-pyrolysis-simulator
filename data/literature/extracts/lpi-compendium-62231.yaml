@@ -1,0 +1,146 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-62231
+source:
+  citation: "Meyer, C. (2010), Lunar Sample Compendium: 62231 and 62241 Soils, Apollo 16 station 2."
+  year: 2010
+extraction:
+  method: Born-digital five-page PDF; pdftotext -layout; printed narrative, inventory diagram, tables, and figure captions transcribed; plotted figure values not digitised.
+  date: '2026-09-20'
+  worker: i2-lpi-compendium-62231
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-62231/lpi-compendium-62231.pdf
+  scope: secondary lunar sample compendium entry; sample provenance and characterisation retained, with compiled chemistry separated from attributed literature values
+  apparatus_status: no experimental apparatus, run conditions, or analytical calibration for the reproduced source data are stated in this entry
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: lunar_sample_62231
+  observable: sample_characterisation
+  observation_id: lpi_2010_62231_inventory_mass
+  field: sample_mass_g
+  value: 87
+  locator:
+    pdf_page_index: 4
+    figure: 'processing diagram'
+    section: Processing
+- species: lunar_sample_62231
+  observable: composition
+  observation_id: lpi_2010_62231_table1_chemistry
+  field: Al2O3_wt_pct
+  value: 26.5
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    row: '62231'
+    column: Al2O3
+species:
+  lunar_sample_62231:
+    observations:
+    - observation_id: lpi_2010_62231_inventory_mass
+      type: sample_characterization
+      locator:
+        pdf_page_index: 4
+        figure: 'processing diagram'
+        section: Processing
+        note: Printed inventory diagram for the 62230/62231 bag; 62231 is the named sample row.
+      phase: lunar_soil
+      regime: lunar_sample_inventory
+      units: g as printed
+      values:
+        quantity: sample_mass_and_sieving_inventory
+        method_class: measured_direct
+        sample: '62231'
+        sample_mass_g: 87
+        sample_mass_note: printed sample inventory mass; the original weighing procedure is not stated
+        sieved_fraction_less_than_1_mm_g: 27
+        sieved_fraction_4_to_10_mm_g: 50
+        reserve_fraction_g: 4.5
+        fraction_assignment_note: diagram labels the three 62231-associated fractions as <1 mm, 4-10 mm, and reserve; no further size distribution is reported
+      uncertainty:
+        note: no uncertainty printed
+      equipment:
+        note: no collection, weighing, sieve, or recovery apparatus details are stated
+    - observation_id: lpi_2010_62231_maturity_and_grain_size
+      type: sample_characterization
+      locator:
+        pdf_page_index: 2
+        section: Petrography
+      phase: lunar_soil
+      regime: lunar_soil_characterisation
+      units: as published
+      values:
+        quantity: maturity_and_grain_size_characterisation
+        method_class: quoted_attributed
+        maturity_index_Is_over_FeO: 91
+        maturity_index_source: Morris (1978)
+        grain_size_distribution: not reported
+        coarse_particle_catalogue: 4-10 mm particles cataloged by Marvin (1972)
+      uncertainty:
+        note: no uncertainty printed
+      equipment:
+        note: analytical apparatus for the cited maturity and particle catalogue is not stated in this entry
+    - observation_id: lpi_2010_62231_table1_chemistry
+      type: composition_summary
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        row: '62231'
+        note: Every numeric value below is in the printed 62231 row and under its named column; reference is Korotev82 and technique (a) is INAA.
+      phase: lunar_soil
+      regime: compiled_lunar_chemical_analysis
+      units: wt% for oxides; ppm except where the printed element header says ppb
+      values:
+        quantity: named_sample_chemical_composition
+        method_class: compilation_assessed
+        source_basis: Korotev (1982), reproduced in Table 1; technique (a) INAA
+        rows:
+        - sample: '62231'
+          Al2O3_wt_pct: 26.5
+          FeO_wt_pct: 5.6
+          MgO_wt_pct: 6.4
+          CaO_wt_pct: 14.5
+          Na2O_wt_pct: 0.444
+          Sc_ppm: 9.28
+          V_ppm: 22
+          Cr_ppm: 731
+          Co_ppm: 35.3
+          Ni_ppm: 485
+          Sr_ppm: 165
+          Cs_ppm: 0.14
+          Ba_ppm: 129
+          La_ppm: 11
+          Ce_ppm: 29.7
+          Sm_ppm: 5.29
+          Eu_ppm: 1.13
+          Tb_ppm: 1.13
+          Yb_ppm: 3.7
+          Lu_ppm: 0.52
+          Hf_ppm: 4.17
+          Ta_ppm: 0.53
+          Ir_ppb: 14.8
+          Th_ppm: 1.98
+          U_ppm: 0.48
+      uncertainty:
+        note: no uncertainty printed for the 62231 row
+      equipment:
+        analytical_method: INAA, as table technique note (a)
+        note: instrument, sample mass, preparation, calibration, irradiation, counting, and detection limits are not stated in this compendium entry
+    - observation_id: lpi_2010_62231_figure_only_context
+      type: composition_summary
+      locator:
+        pdf_page_index: 1
+        figure: '2'
+        section: Chemistry
+        note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none were digitised.
+      phase: lunar_soil
+      regime: figure_only_lunar_chemical_context
+      units: as plotted
+      values:
+        quantity: station_2_soil_composition_plot
+        method_class: figure_only
+        status: figure_only_not_digitised
+        plotted_sample: '62231'
+        plotted_comparand: '62241 and other Apollo soil samples'
+      uncertainty:
+        note: plotted uncertainty or error bars are not printed in extractable text
+      equipment:
+        note: no apparatus details stated for the plotted source data

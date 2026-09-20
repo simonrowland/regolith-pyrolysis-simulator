@@ -1,0 +1,252 @@
+schema_version: literature_extract.v1
+source_id: nagabayashi-hino-banya-1989-phosphorus
+source:
+  citation: >-
+    Nagabayashi, R., Hino, M. & Ban-ya, S. (1989), "Mathematical Expression of
+    Phosphorus Distribution in Steelmaking Process by Quadratic Formalism",
+    ISIJ International 29(2):140-147.
+  year: 1989
+extraction:
+  method: pdftotext -layout transcription of printed experimental methods, equations and Table 1; plotted data were not digitized
+  date: '2026-09-20'
+  worker: i3-nagabayashi-hino-banya-1989-phosphorus
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+review_status: draft
+corrections: []
+species:
+  P2O5:
+    observations:
+    - observation_id: nagabayashi_1989_experiment_1823K
+      type: transition_point
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 140
+        section: '2. Experimentals'
+        note: Abstract gives the full temperature range; the apparatus and run parameters are printed in section 2 on published page 140.
+      T_range_K: [1573.0, 1953.0]
+      phase: liquid
+      regime: equilibrium_slag_metal_experiment
+      units: as published
+      values:
+        quantity: transition_temperature
+        value_K: 1823.0
+        method_class: measured_direct
+        temperature_range_K_as_printed: [1573.0, 1953.0]
+        experimental_temperature_set_K: [1823.0, 1873.0, 1923.0]
+        apparatus:
+          reaction_chamber: alumina_tube
+          reaction_chamber_dimensions_m_as_printed: [0.42, 0.52, 1.0]
+          furnace: Keramax electric resistance furnace
+          furnace_power_kVA: 8.0
+          atmosphere: Ar
+          argon_flow_Nm3_per_s: 1.67e-6
+          iron_phosphorus_alloy_mass_kg: 1.5e-2
+          premelted_synthetic_slag_mass_kg_range: [6.0e-3, 8.0e-3]
+          crucible_materials:
+          - CaO
+          - SiO2
+          - MgO
+          equilibration_time_s:
+            CaO_crucible: 9.0e2
+            SiO2_crucible: 3.6e3
+            MgO_crucible: 1.44e4
+          quench: water bath, followed by He-atmosphere cooling
+        sample_processing: slag and metal separated by crushing after quench
+        analyses: ferrous iron, total iron and other oxides determined by chemical analysis
+        method_class_note: These are measured experimental conditions and sample-analysis procedures, not inferred values.
+      equipment:
+        sample:
+          mass_kg: 1.5e-2
+          form: Fe-P alloy plus premelted synthetic slag, melted under flowing Ar
+          container: crucible
+          locator:
+            source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+            page: 140
+            section: '2. Experimentals'
+        chamber_length_m: 1.0
+        reaction_chamber_dimensions_m_as_printed: [0.42, 0.52, 1.0]
+        slag_mass_kg_range_as_printed: [6.0e-3, 8.0e-3]
+        atmosphere: Ar
+        argon_flow_Nm3_per_s: 1.67e-6
+        cell_material:
+          value: crucible materials were CaO, SiO2 or MgO; CaO crucible was stabilized with about 10 mass% FeO
+          locator:
+            source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+            page: 141
+            section: '2. Experimentals'
+    - observation_id: nagabayashi_1989_experiment_1873K
+      type: transition_point
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 141
+        section: '4. Distribution Ratio of Phosphorus'
+        note: One of the three explicitly stated experimental temperatures.
+      T_range_K: [1573.0, 1953.0]
+      phase: liquid
+      regime: equilibrium_slag_metal_experiment
+      units: K as published
+      values:
+        quantity: transition_temperature
+        value_K: 1873.0
+        method_class: measured_direct
+    - observation_id: nagabayashi_1989_experiment_1923K
+      type: transition_point
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 141
+        section: '4. Distribution Ratio of Phosphorus'
+        note: One of the three explicitly stated experimental temperatures.
+      T_range_K: [1573.0, 1953.0]
+      phase: liquid
+      regime: equilibrium_slag_metal_experiment
+      units: K as published
+      values:
+        quantity: transition_temperature
+        value_K: 1923.0
+        method_class: measured_direct
+    - observation_id: nagabayashi_1989_phosphorus_distribution_text_results
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 142
+        section: '4. Distribution Ratio of Phosphorus'
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table and was not digitized.
+      T_range_K: [1823.0, 1923.0]
+      phase: liquid
+      regime: equilibrium_slag_metal_experiment
+      units: distribution ratio L_P as defined in Eq. (7), dimensionless
+      values:
+        quantity: phosphorus_distribution_ratio
+        method_class: measured_direct
+        definition: L_P = (mass% P in slag) / (mass% P in metal)
+        rows:
+        - slag_system: FetO-P2O5-CaO, saturated with solid CaO
+          temperature_K: 1873.0
+          stated_result: maximum L_P observed at 10-20 mass% FetO
+        - slag_system: FetO-P2O5-MgO, saturated with solid (Mg,Fe)O
+          temperature_K: 1873.0
+          stated_result: approximate maximum L_P about 10
+        - slag_system: FetO-P2O5-SiO2, saturated with solid SiO2
+          temperature_K: 1873.0
+          stated_result: approximate maximum L_P about 1
+        - slag_system: FetO-P2O5 binary
+          temperature_K: 1873.0
+          stated_result: approximate L_P about 1 by extrapolation of the three ternary systems
+        - slag_system: FetO-P2O5-CaO-MgO, saturated with (Mg,Fe)O
+          temperature_K: 1873.0
+          stated_result: L_P increased from about 10 to about 1000 with increasing CaO content
+        trend_with_temperature: phosphorus distribution ratio decreased with increasing temperature; numerical results omitted by the authors
+        order_of_phosphorus_distribution_ability: [SiO2, FeO, MgO, CaO]
+      uncertainty:
+        note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+    - observation_id: nagabayashi_1989_interaction_ca_p5
+      type: activity_coefficient
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 143
+        section: '4. Distribution Ratio of Phosphorus'
+        equation: '12'
+        table: '1'
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: J as printed
+      values:
+        quantity: interaction_parameter
+        method_class: model_derived
+        model: regular-solution model, quadratic formalism; values obtained from the slope of the fitted line in Fig. 5
+        generator: authors' quadratic formalism / regular-solution fit
+        epsilon: -251040.0
+        interaction: Ca2+_P5+
+    - observation_id: nagabayashi_1989_interaction_mg_p5
+      type: activity_coefficient
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 143
+        section: '4. Distribution Ratio of Phosphorus'
+        equation: '12'
+        table: '1'
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: J as printed
+      values:
+        quantity: interaction_parameter
+        method_class: model_derived
+        model: regular-solution model, quadratic formalism
+        generator: authors' quadratic formalism / regular-solution fit
+        epsilon: -37660.0
+        interaction: Mg2+_P5+
+    - observation_id: nagabayashi_1989_interaction_si_p5
+      type: activity_coefficient
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 143
+        section: '4. Distribution Ratio of Phosphorus'
+        equation: '12'
+        table: '1'
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: J as printed
+      values:
+        quantity: interaction_parameter
+        method_class: model_derived
+        model: regular-solution model, quadratic formalism
+        generator: authors' quadratic formalism / regular-solution fit
+        epsilon: 83680.0
+        interaction: Si4+_P5+
+    - observation_id: nagabayashi_1989_log_kp1_temperature_fit
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 145
+        section: '6. Equilibrium of Phosphorus Distribution'
+        equation: '19'
+      T_range_K: [1573.0, 1953.0]
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: dimensionless log10 Kp1; T in K
+      values:
+        quantity: log10_Kf
+        method_class: model_derived
+        model: regular-solution quadratic formalism evaluated against present and prior experimental data
+        generator: authors' regular-solution model
+        equilibrium: P + 2.5 O = (P O2.5) in slag
+        expression_as_printed: log Kp1 = 17060/T - 8.510 (alpha = 0.4)
+        intercept: -8.510
+        inverse_temperature_coefficient_K: 17060.0
+        standard_state: hypothetical pure liquid P O2.5 under regular-solution assumption; phosphorus is 1 mass% in iron
+    - observation_id: nagabayashi_1989_log_kp2_temperature_fit
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 145
+        section: '6. Equilibrium of Phosphorus Distribution'
+        equation: '21'
+      T_range_K: [1573.0, 1953.0]
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: dimensionless log10 Kp2; T in K
+      values:
+        quantity: log10_Kf
+        method_class: model_derived
+        model: regular-solution quadratic formalism evaluated against present and prior experimental data
+        generator: authors' regular-solution model
+        equilibrium: P + 2.5 FeO = (P O2.5) in slag + 2.5 Fe
+        expression_as_printed: log Kp2 = 328/T - 0.936 (alpha = 0.4)
+        intercept: -0.936
+        inverse_temperature_coefficient_K: 328.0
+        standard_state: hypothetical pure liquid P O2.5 under regular-solution assumption; phosphorus is 1 mass% in iron
+    - observation_id: nagabayashi_1989_model_accuracy_statement
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 146
+        section: '7. Conclusions'
+      phase: liquid
+      regime: regular_solution_quadratic_formalism
+      units: percent as printed
+      values:
+        quantity: model_accuracy_percent
+        method_class: model_derived
+        model: regular-solution quadratic formalism
+        stated_accuracy_percent: 10.0
+        claim: phosphorus and oxygen contents in equilibrium liquid iron can be evaluated within approximately plus or minus 10 percent

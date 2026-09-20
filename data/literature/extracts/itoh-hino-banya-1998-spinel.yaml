@@ -1,0 +1,313 @@
+schema_version: literature_extract.v1
+source_id: itoh-hino-banya-1998-spinel
+source:
+  citation: 'Itoh, H., Hino, M. and Ban-Ya, S. (1998), "Thermodynamics on the Formation of Spinel (MgO·Al2O3) Nonmetallic Inclusions in Liquid Steel", Tetsu-to-Hagané 84(2), 85–90.'
+  doi: 10.2355/tetsutohagane1955.84.2_85
+  url: https://www.jstage.jst.go.jp/article/tetsutohagane1955/84/2/84_2_85/_pdf
+  year: 1998
+extraction:
+  method: Manual transcription from the clean text-layer J-STAGE PDF with pdftotext -layout, checked against 180 dpi page renders. Equations and printed numeric labels were transcribed from the page images. Figures were not digitised; plotted points retain figure_only status.
+  date: '2026-09-20'
+  worker: w1-itoh-hino-banya-1998-spinel
+  provenance_path: data/literature/extracts/itoh-hino-banya-1998-spinel.yaml
+review_status: draft
+source_locators:
+  abstract: &abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    published_page: 85
+    section: Synopsis
+  methods: &methods
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    published_page: 86
+    section: 3. Experimental method
+  results: &results
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    published_page: 86
+    section: 4. Experimental results and discussion
+laboratory_parameters:
+  heated_equipment:
+    furnace:
+      value: high-frequency induction furnace
+      locator: *methods
+    sample_mass:
+      value: about 90
+      units: g
+      locator: *methods
+    crucible_materials:
+      value: MgO, Al2O3, MgO·Al2O3 spinel, and dolomite with MgO/CaO = 40/60 mass ratio
+      locator: *methods
+    crucible_dimensions:
+      value: 25 O.D. × 20 I.D. × 50 H
+      units: mm
+      locator: *methods
+    heating_atmosphere:
+      value: (1:1) Ar-H2 mixed gas
+      locator: *methods
+    gas_flow:
+      value: 200
+      units: ml/min
+      locator: *methods
+    deoxidation_atmosphere:
+      value: H2; deoxidation for more than 2 h after complete melting
+      locator: *methods
+    run_temperatures:
+      value: [1873, 1948, 2023]
+      units: K
+      locator: *methods
+    dominant_run_temperature:
+      value: 1873
+      units: K
+      locator: *methods
+    quench:
+      value: power switched off and sample rapidly quenched after holding at the prescribed temperature
+      locator: *methods
+    deoxidizer:
+      value: commercial Fe-48%Al alloy for MgO or spinel crucibles; commercial Mg wrapped in Fe foil for Al2O3 crucibles
+      locator: *methods
+    analysis:
+      value: ICP emission spectrometry for Al, Mg and Ca after acid dissolution and solvent extraction; inert-gas impulse-fusion infrared absorption for O; X-ray diffraction for interfacial equilibrium phases
+      locator: *methods
+  absent_parameters:
+    - numerical analytical uncertainty for Al, Mg, Ca or O concentrations
+    - furnace temperature measurement sensor, calibration and accuracy
+    - chamber pressure or vacuum level
+    - pumping system or pumping speed
+    - oxygen fugacity or partial pressure
+    - exposed melt area
+    - crucible mass and charge mass by run
+    - individual run durations except the stated deoxidation and equilibrium-time tests
+fidelity_samples:
+  - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_o_Mg_Al
+    value: -150
+    locator: {published_page: 88, equation: '19', figure: '4', note: 'Printed value γ_o^(Mg,Al) = −150 at 1873 K.'}
+  - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_Mg_O_Al
+    value: -230
+    locator: {published_page: 88, equation: '19', note: 'Printed value r_Mg^(O,Al) = −230 at 1873 K.'}
+  - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_Al_O_Mg
+    value: -260
+    locator: {published_page: 88, equation: '20', note: 'Printed value r_Al^(O,Mg) = −260 at 1873 K.'}
+  - path: species.Mg.observations[itoh_1998_spinel_equilibrium_constants].values.logK_spinel_1873K
+    value: -20.54
+    locator: {published_page: 88, equation: '18', note: 'Printed 1873 K result from the cited prior Mg, Ca and Al deoxidation data.'}
+  - path: species.Al.observations[itoh_1998_spinel_thresholds].values.spinel_threshold_Al2O3_mass_pct_MgO_CaO_40_60
+    value: 52
+    locator: {published_page: 87, section: 4.3, figure: '3', note: 'Printed threshold: at 1873 K, spinel appears at 52 mass% Al2O3 and above for MgO/CaO = 40/60.'}
+  - path: species.Al.observations[itoh_1998_spinel_thresholds].values.spinel_threshold_Al2O3_mass_pct_MgO_CaO_90_10
+    value: 15
+    locator: {published_page: 87, section: 4.3, figure: '3', note: 'Printed threshold: at 1873 K, spinel appears at 15 mass% Al2O3 and above for MgO/CaO = 90/10.'}
+species:
+  Mg:
+    observations:
+      - observation_id: itoh_1998_equilibrium_time
+        type: transition_point
+        locator:
+          <<: *results
+          figure: '2'
+          section: 4.1 Equilibrium attainment time
+        phase: liquid_iron_with_dolomite_crucible
+        regime: Al_deoxidation_at_1873K
+        T_range_K: [1873.0, 1873.0]
+        units: min
+        values:
+          quantity: equilibrium_hold_time_after_Al_addition
+          method_class: measured_direct
+          concentration_stability_after_min: 30
+          selected_equilibrium_time_min: 60
+          condition_as_printed: MgO/CaO = 40/60 mass ratio; 1873 K
+          generator_note: concentration-versus-time measurements in Fig. 2; values were not digitised
+        uncertainty:
+          note: No numerical uncertainty printed; 60 min is the authors' selected equilibrium time, not a measured uncertainty bound.
+      - observation_id: itoh_1998_dolomite_MgO_CaO_phase_observations
+        type: transition_point
+        locator:
+          <<: *results
+          section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
+          figure: '1'
+        phase: oxide_deoxidation_products_at_1873K
+        regime: Al_deoxidation_equilibrium
+        T_range_K: [1873.0, 1873.0]
+        units: mass ratio and mass%
+        values:
+          quantity: observed_deoxidation_product_phase_presence
+          method_class: measured_direct
+          spinel_present_when_MgO_CaO_mass_ratio: '>90/10'
+          spinel_absent_when_crucible_CaO_mass_pct: '>=10'
+          equilibrium_phases_when_CaO_mass_pct_at_least_10: [CaO, MgO]
+          warning: authors note possible crucible-fragment contamination in identified oxide phases
+        uncertainty:
+          note: No numerical uncertainty printed; phase identification by XRD.
+      - observation_id: itoh_1998_spinel_interaction_parameters
+        derived_from: itoh_1998_dolomite_MgO_CaO_phase_observations
+        derivation:
+          relation: regular-solution interaction-parameter slope/intercept expansion of Eq. 7
+          inputs: present 1873 K equilibrium observations plus prior Mg, Ca and Al deoxidation-equilibrium parameters
+        type: activity_coefficient
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 88
+          equations: '7-20'
+          figure: '4'
+          note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; symbols retain the paper's interaction-coefficient notation.
+        T_range_K: [1873.0, 1873.0]
+        phase: dilute_liquid_iron
+        standard_state: dissolved-element concentration in mass% with infinite-dilution activity coefficients
+        regime: regular_solution_interaction_parameter_expansion
+        units: dimensionless interaction coefficients
+        values:
+          quantity: cross_interaction_coefficients
+          method_class: model_derived
+          generator: authors_regular_solution_interaction_parameter_fit_from_present_equilibrium_data
+          r_o_Mg_Al: -150
+          r_o_Ca_Al: 0
+          r_o_Ca_Mg: 0
+          r_Mg_O_Al: -230
+          r_Al_O_Mg: -260
+          r_o_Ca_Al_note: 'The paper says γ_o^(Ca,Al) can be set to zero from the slope.'
+          r_o_Ca_Mg_note: 'The paper says γ_o^(Ca,Mg) can be set to zero from the slope.'
+        uncertainty:
+          note: No numerical uncertainty printed for the fitted interaction coefficients.
+      - observation_id: itoh_1998_spinel_equilibrium_constants
+        derived_from: itoh_1998_dolomite_MgO_CaO_phase_observations
+        derivation:
+          relation: substitution and combination of printed equilibrium relations (Eqs. 12-18 and 21-24)
+          inputs: Knacke et al. thermochemical data and prior Mg, Ca and Al deoxidation-equilibrium data cited by the authors
+        type: gibbs_table
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 88
+          equations: '12-18, 21-24'
+          note: Printed equations and evaluated 1873 K values; do not treat these author calculations as direct measurements.
+        T_range_K: [1873.0, 2023.0]
+        phase: MgO-Al2O3-spinel equilibria
+        standard_state: activities as printed; dissolved elements in mass% infinite-dilution convention
+        regime: thermochemical_equilibrium_calculation
+        units: log10 equilibrium constant; T in K
+        values:
+          quantity: printed_equilibrium_constants_and_relations
+          method_class: model_derived
+          generator: authors_combination_of_Knacke_thermochemical_data_and_prior_Mg_Ca_Al_deoxidation_equilibria
+          logK_spinel_1873K: -20.54
+          logK_MgO_to_spinel_expression: '-23.856 + 32280/T'
+          logK_spinel_to_Al2O3_expression: '-26.274 + 27950/T'
+          logK_MgO_expression: '-4.280 - 4700/T'
+          logK_Al2O3_expression: '11.620 - 45300/T'
+          logK_spinel_expression: '6.736 - 51080/T'
+          logK_spinel_formation_relation: 'log Ksp = -0.604 - 1080/T for MgO(s) + Al2O3(s) = MgO·Al2O3(s)'
+        uncertainty:
+          note: No numerical uncertainty printed for the equilibrium constants or fitted expressions.
+  Al:
+    observations:
+      - observation_id: itoh_1998_spinel_thresholds
+        type: transition_point
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 87
+          section: 4.3 Relationship between dolomite composition and deoxidation-product phases
+          figure: '3'
+          note: Thresholds are printed in text; phase diagrams were not digitised.
+        T_range_K: [1873.0, 1873.0]
+        phase: MgO-Al2O3-spinel_deoxidation_products
+        regime: Al_deoxidation_equilibrium
+        units: mass% Al2O3
+        values:
+          quantity: printed_spinel_phase_appearance_thresholds
+          method_class: measured_direct
+          spinel_threshold_Al2O3_mass_pct_MgO_CaO_40_60: 52
+          spinel_threshold_Al2O3_mass_pct_MgO_CaO_90_10: 15
+          MgO_crucible_condition: spinel appears when even a very small amount of Al2O3 is present
+        uncertainty:
+          note: No numerical uncertainty printed; phase regions were established by X-ray diffraction and the text's phase-presence summary.
+      - observation_id: itoh_1998_solid_solution_activity_assumptions
+        type: activity_coefficient
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 88
+          equations: '21-24'
+          figure: '5'
+        T_range_K: [1873.0, 2023.0]
+        phase: MgO-Al2O3-spinel_solid_solutions
+        regime: ideal_solid_solution_phase_boundary_calculation
+        units: dimensionless activity
+        values:
+          quantity: author_assumed_solid_solution_activities
+          method_class: author_estimate
+          generator: ideal_solid_solution_assumption_used_to_calculate_phase_boundaries
+          activity_MgO_at_1873_1948_2023K: [0.99, 0.99, 0.98]
+          activity_spinel_at_1873_1948_2023K: [0.96, 0.90, 0.82]
+          activity_spinel_in_Al2O3_rich_solution_at_1873_1948_2023K: [0.64, 0.56, 0.48]
+          activity_Al2O3: 1
+          temperatures_K: [1873, 1948, 2023]
+        uncertainty:
+          note: These are explicit assumptions for calculated phase boundaries, not measurements; no uncertainty printed.
+  Ca:
+    observations:
+      - observation_id: itoh_1998_quoted_prior_interaction_parameters
+        type: activity_coefficient
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 87
+          equation: '7'
+          note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
+        T_range_K: [1873.0, 1873.0]
+        phase: dilute_liquid_iron
+        regime: quoted_prior_interaction_parameter
+        units: dimensionless interaction coefficients
+        values:
+          quantity: quoted_prior_interaction_coefficients
+          method_class: quoted_attributed
+          generator: Mizin_et_al_1983_and_Sponseller_Flinn_1964_as_cited_by_authors
+          e_Mg_Al_1873K: -0.017
+          e_Ca_Al_1873K: -0.072
+        uncertainty:
+          note: No numerical uncertainty printed for the attributed values.
+      - observation_id: itoh_1998_assumed_Ca_Mg_interaction
+        type: activity_coefficient
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 87
+          equation: '7'
+          note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
+        T_range_K: [1873.0, 1873.0]
+        phase: dilute_liquid_iron
+        regime: author_assumed_interaction_parameter
+        units: dimensionless interaction coefficient
+        values:
+          quantity: assumed_Ca_Mg_interaction_coefficient
+          method_class: author_estimate
+          generator: authors_assumption_carried_from_prior_work
+          e_Ca_Mg_1873K: 0
+        uncertainty:
+          note: Explicit zero assumption; not a measured zero and no uncertainty printed.
+  O:
+    observations:
+      - observation_id: itoh_1998_fig1_fig2_measured_concentration_plots
+        type: transition_point
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+          published_page: 86
+          figures: '1-2'
+          note: Dissolved Mg/O versus dolomite MgO/CaO and concentration versus time are plotted; points were not digitised.
+        phase: liquid_iron
+        regime: Al_deoxidation_equilibrium
+        units: mass% as plotted
+        values:
+          quantity: dissolved_element_concentration_plots
+          method_class: figure_only
+          admission_status: figure_only
+          not_digitised: true
+        uncertainty:
+          note: Figure error bars or point uncertainties were not transcribed.
+deepening:
+  dispatch_id: i1-itoh-hino-banya-1998-spinel
+  date: '2026-09-20'
+  note: Primary equilibrium experiment. Measured phase-presence thresholds, equilibrium-time selection, and apparatus conditions were separated from fitted interaction coefficients, quoted prior coefficients, explicit author assumptions, and calculated equilibrium constants. Figures 1-2 and 3-8 were not digitised.
+  looked_for_but_not_found:
+    - printed numerical Al, Mg, Ca or O concentration table
+    - numerical analytical uncertainties
+    - vacuum pressure, pumping, oxygen fugacity, exposed area, or temperature calibration
+    - numerical values for plotted points in Figures 1-8
+    - lunar regolith, silicate-melt, vaporization, evaporation, or gas-phase measurements
+  vocabulary_gap:
+    - crucible_dimensions_mm_as_printed (no dedicated vocabulary entry; retained source-faithful in laboratory_parameters)
+    - gas_flow_ml_per_min (no dedicated vocabulary entry; retained source-faithful in laboratory_parameters)
+    - deoxidation_duration_h (no dedicated vocabulary entry; retained source-faithful in laboratory_parameters)

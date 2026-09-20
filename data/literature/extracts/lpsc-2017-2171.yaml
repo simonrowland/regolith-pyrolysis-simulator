@@ -1,0 +1,126 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2017-2171
+source:
+  citation: >-
+    Barber, S. J. et al. (2017), "ProSPA: the Science Laboratory for the
+    Processing and Analysis of Lunar Polar Volatiles within PROSPECT",
+    Lunar and Planetary Science XLVIII, abstract 2171.
+  year: 2017
+extraction:
+  method: Manual transcription from the clean text layer using pdftotext -layout; all numeric values are retained as printed and no Figure 2 curves were digitized.
+  date: '2026-09-20'
+  worker: i2-lpsc-2017-2171
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpsc-2017-2171/lpsc-2017-2171.pdf
+review_status: draft
+evidence_policy:
+  classification: instrument_design_and_method_metadata
+  measurement_claim: This is an instrument design/status abstract, not a report of a completed laboratory experiment or measured vaporization series. Printed operating parameters and predictions are retained as method metadata; no measured_direct rows are claimed.
+  figure_status: Figure 2 contains example heating profiles but no numeric table; curves were not read off the figure.
+  absent_fields: sample mass, sample composition, bulk density, container material, oven geometry, orifice geometry, exposed area, chamber pressure or vacuum, pumping, gas pressure, temperature sensor/calibration, fO2 control, run duration, and numerical uncertainties.
+species:
+  lunar_volatiles:
+    observations:
+    - observation_id: barber_2017_prospa_sample_preservation_and_oven
+      type: rate_series
+      locator:
+        page: 1
+        pdf_page_index: 1
+        section: Volatiles Preservation
+      phase: instrument_design
+      standard_state: ProSPA sample handling and sealed-oven design as printed
+      regime: lunar_volatiles_sample_processing
+      units: K, cubic mm, m, and qualitative text as printed
+      values:
+        quantity: method_capability_window
+        method_class: method_only
+        evidence_class: author_estimate
+        semantics: instrument_design_parameters_not_measured_species_observations
+        local_regolith_temperature_assumed_as_printed: "~120 to 150 K"
+        sample_depth_as_printed: "up to 1.2 m"
+        sample_volume_as_printed: "up to a few tens of cubic mm"
+        sample_transfer_temperature_as_printed: "120 K or colder"
+        oven: single-use sample ovens on a rotary carousel
+        sample_presence_check: imager confirms presence and enables volume estimation
+        sealing: actuator seals oven to a pipe leading to the chemical analysis laboratory
+        volatile_preservation_design_goal: minimize duration from sample extraction to sealing
+      uncertainty:
+        note: No numerical uncertainty is printed; the local regolith temperature is explicitly described as assumed and sample volume is an upper estimate.
+      equipment:
+        solids_inlet_system: series of single-use sample ovens on a rotary carousel with sample imager
+        thermal_isolation: SIS thermally isolated from the warm enclosure
+        locator_note: Oven and SIS geometry, sample mass/form, and container material are not stated.
+    - observation_id: barber_2017_prospa_extraction_programmes
+      type: rate_series
+      locator:
+        page: 2
+        pdf_page_index: 2
+        section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
+      phase: instrument_design
+      standard_state: ProSPA proposed extraction modes as printed
+      regime: thermal_extraction_and_reduction
+      units: degrees C per min, degrees C, and qualitative text as printed
+      values:
+        quantity: method_capability_window
+        method_class: method_only
+        evidence_class: author_estimate
+        evolved_gas_analysis_ramp_C_per_min: 6
+        evolved_gas_analysis: oven heated at ramp rate; released gases continuously analyzed by mass spectrometer
+        oxygen_reduction_target_temperature_C: 900
+        oxygen_reduction_feed_gas: hydrogen
+        stepped_pyrolysis: gases released at a series of fixed temperatures from samples in vacuum
+        combustion: gases released at a series of fixed temperatures from samples in oxygen
+        heating_profiles: example profiles are shown in Figure 2 and were not digitized
+      uncertainty:
+        note: No numerical uncertainty or run duration is printed.
+      equipment:
+        sample_oven: sealed sample oven for thermal extraction
+        gases: hydrogen feed gas for reduction; vacuum or oxygen for stepped pyrolysis or combustion
+        locator_note: Oven dimensions, pressure, flow rate, pumping, and temperature calibration are not stated.
+    - observation_id: barber_2017_prospa_analysis_capability_and_status
+      type: rate_series
+      locator:
+        page: 2
+        pdf_page_index: 2
+        section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
+      phase: instrument_design
+      standard_state: ProSPA analytical capability and project status as printed
+      regime: mass_spectrometric_lunar_volatiles_analysis
+      units: amu, per mil, kg, W, and qualitative text as printed
+      values:
+        quantity: method_capability_window
+        method_class: method_only
+        evidence_class: author_estimate
+        ion_trap_target_mz_range_amu: 2-200
+        magnetic_sector_isotope_precision: approximately per mil level
+        mass_requirement_kg: 10
+        peak_power_W: approximately 70
+        analysis_outputs:
+        - identity of volatiles
+        - quantity of volatiles
+        - isotopic composition of volatiles
+        isotope_targets:
+        - D/H
+        - delta13C
+        - delta15N
+        - delta18O
+        development_status: Phase B
+        preliminary_design_review: Q4 2017
+        experimental_and_modelling_status: theoretical and laboratory work underway
+        reference_materials: on-board reference materials used for contextual interpretation
+        instrument_heritage: Rosetta Philae and ExoMars rover systems, with Beagle 2 Gas Analysis Package heritage for the magnetic sector instrument
+      uncertainty:
+        note: No numerical uncertainty is printed; isotope precision, peak power, and mass are approximate or design-level statements where qualified in the source.
+      equipment:
+        mass_spectrometers: ion trap device and magnetic sector instrument
+        heritage_device_mass_as_printed: "<500 gram all-in device"
+        gas_handling: open/closed valves, metering valves, micro-reactors, pressure sensors, and reference materials
+        locator_note: Electron energy, detector calibration, chamber pressure, pumping, and gas-handling flow conditions are not stated.
+vocabulary_gaps:
+- ion_trap_target_mz_range_amu
+- magnetic_sector_isotope_precision
+- mass_requirement_kg
+- peak_power_W
+- sample_volume_as_printed
+- sample_depth_as_printed
+- local_regolith_temperature_assumed_as_printed
+- heritage_device_mass_as_printed

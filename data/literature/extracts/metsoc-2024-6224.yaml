@@ -1,0 +1,248 @@
+schema_version: literature_extract.v1
+source_id: metsoc-2024-6224
+source:
+  citation: >-
+    Prince, B. S., Zega, T. J., Connolly Jr., H. C. & Lauretta, D. S. (2024),
+    "Nanometer-sized Fluid Inclusions in OSIRIS-REx Samples of Bennu", 86th Annual Meeting of the
+    Meteoritical Society, LPI Contribution No. 3036, abstract 6224.
+  doi: null
+  url: https://www.hou.usra.edu/meetings/metsoc2024/pdf/6224.pdf
+  year: 2024
+  conference: 86th Annual Meeting of the Meteoritical Society
+extraction:
+  method: >-
+    Official one-page conference-abstract PDF from corpus raw/metsoc-2024-6224/metsoc-2024-6224.pdf.
+    Text transcribed with pdftotext -layout. The source has a clean text layer; no OCR or figure/table
+    transcription was needed. This abstract reports direct TEM/EDS/EELS characterization and sample
+    preparation measurements for returned Bennu material, but no vaporization, evaporation,
+    sublimation, thermal-decomposition, pressure, melt-thermodynamic, or mass-loss measurements.
+  date: '2026-09-20'
+  worker: i2-metsoc-2024-6224
+  provenance_path: data/literature/extracts/metsoc-2024-6224.yaml
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Bennu_sample
+  observable: sample_characterization
+  observation_id: metsoc_2024_6224_returned_sample_mass
+  field: returned_sample_mass_g
+  value: 121.6
+  locator:
+    pdf_page_index: 1
+    section: Introduction
+    note: OSIRIS-REx delivered 121.6 g of material from asteroid Bennu, as printed.
+- species: Bennu_sample
+  observable: sample_preparation
+  observation_id: metsoc_2024_6224_particle_preparation
+  field: particles_collected_approx
+  value: 100
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Approximately 100 particles were collected from the avionics deck of the sample canister, as printed.
+- species: Bennu_sample
+  observable: particle_size
+  observation_id: metsoc_2024_6224_particle_preparation
+  field: particle_size_range_um_as_printed
+  value: <1 to ~300
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Particle sizes are printed as <1 µm to ~300 µm; the bound and approximation are retained.
+- species: Bennu_sample
+  observable: targeted_grains
+  observation_id: metsoc_2024_6224_targeted_grains
+  field: pyrrhotite_grains_targeted
+  value: 2
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Sections targeting two pyrrhotite grains were prepared and analyzed, as printed.
+- species: Bennu_sample
+  observable: targeted_grains
+  observation_id: metsoc_2024_6224_targeted_grains
+  field: carbonate_grains_targeted
+  value: 2
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Sections targeting two carbonate grains were prepared and analyzed, as printed.
+- species: H2O_bearing_vesicle
+  observable: EELS_peak
+  observation_id: metsoc_2024_6224_h2o_bearing_vesicle
+  field: EELS_peak_eV
+  value: 8.6
+  locator:
+    pdf_page_index: 1
+    section: Results
+    note: An O-bearing vesicle showed an EELS peak at 8.6 eV, as printed.
+species:
+  Bennu_sample:
+    observations:
+    - observation_id: metsoc_2024_6224_sample_preparation_and_instrumentation
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Methods
+        note: >-
+          Sample OREX-501044-0 was prepared from approximately 100 avionics-deck particles on a
+          carbon sticker. Particle sizes are printed as <1 µm to ~300 µm. Potential inclusion-bearing
+          phases were screened by EDS in a FEI Helios 660 Nanolab G3 FIB-SEM at K-ALFAA; extracted
+          electron-transparent sections were analyzed in a Hitachi HF5000 S/TEM at K-ALFAA using
+          SAED, EDS, and EELS. The source names two pyrrhotite and two carbonate grains targeted to date.
+      phase: Bennu_returned_sample_particles
+      condensed_form:
+        state: particulate
+        metastable: false
+        basis: explicit_author
+        note: Particles collected from the OSIRIS-REx sample canister and mounted on a carbon sticker.
+      regime: FIB_SEM_STEM_SAED_EDS_EELS_characterization
+      units: as published
+      values:
+        quantity: sample_provenance_and_analytical_preparation
+        method_class: measured_direct
+        sample_id: OREX-501044-0
+        particles_collected_approx: 100
+        particle_size_range_as_printed: <1 µm to ~300 µm
+        particle_size_min_um: <1
+        particle_size_max_um: ~300
+        collection_location: avionics deck of the OSIRIS-REx sample canister
+        mounting: carbon sticker
+        screening_method: energy-dispersive x-ray spectroscopy (EDS)
+        screening_instrument: FEI Helios 660 Nanolab G3 focused-ion-beam scanning-electron microscope (FIB-SEM)
+        screening_facility: Kuiper-Arizona Laboratory for Astromaterials Analysis (K-ALFAA)
+        section_analysis_instrument: Hitachi HF5000 scanning TEM (S/TEM)
+        section_analysis_facility: K-ALFAA
+        section_methods:
+        - selected-area electron diffraction (SAED)
+        - energy-dispersive x-ray spectroscopy (EDS)
+        - electron energy-loss spectroscopy (EELS)
+        pyrrhotite_grains_targeted: 2
+        carbonate_grains_targeted: 2
+      uncertainty:
+        note: >-
+          The source prints approximate particle count, a lower size bound, and an approximate upper
+          size; these are retained without conversion to point values. No uncertainty is printed for
+          the sample count, particle sizes, or targeting counts.
+    - observation_id: metsoc_2024_6224_returned_sample_mass
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+        note: >-
+          The Introduction states that OSIRIS-REx delivered 121.6 g of material from asteroid (101955)
+          Bennu to Earth in September 2023.
+      phase: Bennu_returned_sample
+      condensed_form:
+        state: particulate_material
+        metastable: false
+        basis: explicit_author
+      regime: returned_sample_provenance
+      units: g
+      values:
+        quantity: returned_sample_mass
+        method_class: measured_direct
+        returned_sample_mass_g: 121.6
+        source_body: asteroid (101955) Bennu
+        delivery_time: September 2023
+      uncertainty:
+        note: none printed
+  Mg_silicate_inclusion:
+    observations:
+    - observation_id: metsoc_2024_6224_pyrrhotite_vesicle_characterization
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results
+        note: >-
+          TEM analyses of OREX-501044-100 found numerous vesicle-like features in pyrrhotite. EDS and
+          EELS suggested at least three types of filled vesicles; silicate-bearing vesicles appeared to
+          be amorphous Mg-silicate inclusions.
+      phase: pyrrhotite_hosted_vesicles
+      condensed_form:
+        state: inclusion
+        metastable: false
+        basis: explicit_author
+      regime: TEM_EDS_EELS_characterization
+      units: as published
+      values:
+        quantity: filled_vesicle_types_and_composition
+        method_class: measured_direct
+        host_grain: OREX-501044-100 pyrrhotite
+        filled_vesicle_types_at_least: 3
+        identified_filled_vesicle_types:
+        - silicate-bearing
+        - C-bearing
+        - H2O-bearing
+        silicate_bearing_vesicles: amorphous Mg-silicate inclusions
+        carbon_bearing_vesicles: present
+        water_bearing_vesicles: present
+        other_vesicle_compositions: likely many not yet identified
+      uncertainty:
+        note: >-
+          The source says "at least three" types and "likely many" other compositions; neither is
+          collapsed to an exact count.
+    - observation_id: metsoc_2024_6224_h2o_bearing_vesicle
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results
+        note: >-
+          EELS of another O-bearing vesicle showed a peak at 8.6 eV corresponding to the exciton energy
+          of H2O. The authors state that C and N were not detected in this fluid inclusion.
+      phase: H2O_bearing_vesicle
+      condensed_form:
+        state: fluid_or_gas_inclusion
+        metastable: false
+        basis: explicit_author
+      regime: EELS_characterization
+      units: eV
+      values:
+        quantity: EELS_exciton_peak
+        method_class: measured_direct
+        EELS_peak_eV: 8.6
+        peak_assignment: H2O exciton energy
+        carbon_detected: false
+        nitrogen_detected: false
+        inclusion_state_interpretation: fluid inclusion
+      uncertainty:
+        note: >-
+          The source describes the inclusion as H2O-bearing and interprets it as a nanometer-sized fluid
+          inclusion; it does not print a size or a compositional concentration.
+  C_Si_O_inclusion:
+    observations:
+    - observation_id: metsoc_2024_6224_csi_o_inclusion
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Results
+        note: >-
+          At least one vesicle contained heterogeneous amorphous C, Si, and O, suggesting a solid organic
+          inclusion.
+      phase: pyrrhotite_hosted_vesicle
+      condensed_form:
+        state: amorphous_solid
+        metastable: false
+        basis: explicit_author
+      regime: EDS_EELS_characterization
+      units: as published
+      values:
+        quantity: heterogeneous_inclusion_composition
+        method_class: measured_direct
+        vesicles_with_C_Si_O_at_least: 1
+        detected_elements:
+        - C
+        - Si
+        - O
+        phase_description: heterogeneous amorphous C-Si-O
+        author_interpretation: suggests a solid organic inclusion
+      uncertainty:
+        note: at least one is retained as a lower bound; no concentration or size is printed.
+corpus_notes:
+  absent_from_source:
+  - vaporization or evaporation measurements
+  - sublimation or thermal-decomposition measurements
+  - furnace, crucible, cell, or orifice geometry
+  - sample mass for the analyzed OREX-501044-0 particle subset
+  - vacuum level, pumping, gas identity, gas pressure, temperature, calibration, fO2 control, or run duration
+  - inclusion dimensions and quantitative elemental concentrations

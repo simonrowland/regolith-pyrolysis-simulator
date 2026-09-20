@@ -1,0 +1,207 @@
+schema_version: literature_extract.v1
+source_id: vanbuchem-2025-lavatmos2
+source:
+  citation: "van Buchem, C. P. A., Zilinskas, M., Miguel, Y. & van Westrenen, W. (2025), \"LavAtmos 2.0: Incorporating volatile species in vaporisation models\", Astronomy & Astrophysics."
+  doi: 10.1051/0004-6361/202450992
+  url: http://dx.doi.org/10.1051/0004-6361/202450992
+  year: 2025
+extraction:
+  method: manual transcription from pdftotext -layout; printed table values, equations, bounds, ranges, and figure-only findings retained without digitising curves
+  date: '2026-09-20'
+  worker: i3-vanbuchem-2025-lavatmos2
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/vanbuchem-2025-lavatmos2/vanbuchem-2025-lavatmos2.pdf
+review_status: draft
+evidence_policy:
+  classification: mixed_model_and_compilation
+  measurement_claim: No new instrument measurements, samples, or experimental runs are reported. The paper reports LavAtmos 2.0 calculations and compares them with earlier published calculations and attributed laboratory data.
+  model_generators:
+  - LavAtmos 2.0, using mass action, mass conservation, MELTS melt activities, and FastChem 3 gas equilibrium
+  - JANAF thermochemical tables for reaction equilibrium constants
+  - LavAtmos 1 / volatile-free vaporisation for the named comparator curves
+  - Charnoz et al. (2023), Hu et al. (2024), and other cited studies where explicitly identified as comparison or input sources
+  apparatus_status: No sample mass, sample form, container, crucible, cell/orifice geometry, exposed area, vacuum, pumping, gas-flow, temperature calibration, fO2-control apparatus, or run duration is reported for a new experiment in this source. Do not attach apparatus from cited papers.
+  numeric_encoding: Printed percentages, pressures, temperatures, approximate values, and figure-only claims remain as printed; no curve values were read off figures.
+  cited_measurements: Earlier laboratory comparisons are retained only as quoted_attributed context; their apparatus and measurements belong to the cited sources, not this extract.
+model_tables:
+- table: '1'
+  locator: {page: 4, table: '1'}
+  classification: model_derived
+  generator: LavAtmos 2.0 input cases constructed by the authors; BSE lava-ocean context is stated in the table title
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_input
+    quantity: volatile_components_in_complex_atmosphere_compositions
+    units: w% relative to total added volatiles
+    rows_as_printed:
+    - {atmosphere_type: C dominated, C_w_pct: '80.00', H_w_pct: '10.00', N_w_pct: '9', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+    - {atmosphere_type: H dominated, C_w_pct: '1.00', H_w_pct: '80.00', N_w_pct: '18.00', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+    - {atmosphere_type: N dominated, C_w_pct: '1.00', H_w_pct: '18.00', N_w_pct: '80.00', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+    - {atmosphere_type: S dominated, C_w_pct: '5.00', H_w_pct: '1.00', N_w_pct: '4.00', S_w_pct: '60.00', P_w_pct: '30.00', O_w_pct: '-'}
+    - {atmosphere_type: Carbon poor, source_group: 55-Cnc_e_best_fits_Hu_2024, C_w_pct: '9.09e-6', H_w_pct: '99.01', N_w_pct: '0.90', S_w_pct: '3.33e-6', P_w_pct: '6.67e-6', O_w_pct: '9.09e-7'}
+    - {atmosphere_type: Carbon rich, source_group: 55-Cnc_e_best_fits_Hu_2024, C_w_pct: '0.91', H_w_pct: '79.21', N_w_pct: '0.79', S_w_pct: '6.67', P_w_pct: '3.33', O_w_pct: '9.09'}
+    notes_as_printed: Percentages are relative to the total amount of volatiles C, H, N, S, and P added; the first four are first-order archetypal cases, and the final two are compositions consistent with Hu et al. (2024).
+- table: model_workflow_and_equations
+  locator: {page: 2, section: '2.1 Workflow'}
+  classification: model_derived
+  generator: LavAtmos 2.0 with MELTS and FastChem 3; JANAF thermochemical tables supply equilibrium constants
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_definition
+    quantity: stated_inputs_assumptions_and_mass_action_relations
+    inputs_as_printed: "melt composition; surface temperature T; total volatile pressure P; elemental fractions of C, H, N, S, and P"
+    pressure_definition: "total atmospheric pressure at the gas-melt interface is the sum of total volatile pressure and total vaporised pressure"
+    equations_as_printed:
+    - {number: 1, reaction: 'SiO2(l) ↔ SiO2(g)'}
+    - {number: 2, reaction: 'SiO2(l) − 1/2 O2(g) ↔ SiO(g)'}
+    - {number: 3, relation: 'P_SiO2(g) = K1(T) a_SiO2(l)'}
+    - {number: 4, relation: 'P_SiO(g) = K2(T) a_SiO2(l) P_O2^−1/2'}
+    - {number: 5, relation: '0 = P_O2 + 1/2 P_H2O − P_SiO2 − 1/2 P_SiO'}
+    assumptions_as_printed:
+    - all atmospheric oxygen comes from melt vaporisation reactions
+    - volatile solubility in the melt is not included
+    - condensation reactions are not considered
+    - gas phase contains species available to FastChem 3 and species from the melt or volatile composition
+- table: model_scope_and_conditions
+  locator: {page: 2, section: '2.1 Workflow'}
+  classification: model_derived
+  generator: LavAtmos 2.0
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_condition
+    quantity: explicitly_stated_model_conditions
+    conditions_as_printed:
+    - {surface_temperature_K: '2000', context: 'validation comparison with Charnoz et al. (2023), BSE melt'}
+    - {total_volatile_pressure: '220.64 bars steam', context: 'validation example for FastChem hydroxyl chemistry'}
+    - {pressure_limit_for_MELTS_effect_note: 'beyond 100 bar', context: 'increasing pressure starts to significantly affect endmember activities'}
+- table: figure_only_results
+  locator: {page: 5, figure: '3'}
+  classification: figure_only
+  generator: LavAtmos 2.0 calculations; curves not digitised
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    measurement_kind: model_output_plotted
+    quantity: plotted_partial_pressure_trends
+    rows_as_printed:
+    - {figure: '2', locator_page: 4, result: 'LavAtmos 2.0 mole fractions compared with Charnoz et al. (2023) at 2000 K for a BSE melt; SiO2 shows a significant difference between the approaches.'}
+    - {figure: '3', locator_page: 5, result: 'SiO2, SiO, and Si partial pressures above a BSE lava ocean; left column varies total volatile pressure at 3000 K and right column varies surface temperature at 1 bar total volatile pressure.'}
+    - {figure: '4', locator_page: 6, result: 'Major volatile species in pure C, H, N, S, and P atmospheres; curves are plotted against total volatile pressure and surface temperature.'}
+    - {figure: '5', locator_page: 7, result: 'In a pure C atmosphere, selected vaporised species include O2, SiO, TiO, Fe, Na, and K; at about 2000 K Fe may become the dominant vaporised species instead of Na.'}
+    - {figure: '6', locator_page: 9, result: 'Complex N-dominated atmosphere compared with pure N and no-volatile cases; partial pressures of Si and SiO increase at high volatile pressures and lower temperatures.'}
+    - {figure: '7', locator_page: 10, result: 'S-dominated chemistry forms SiS and TiS; C-dominated chemistry forms NaCN and KCN at high total volatile pressure.'}
+    - {figure: '8', locator_page: 11, result: 'LavAtmos 2.0 and volatile-free partial pressures for SiO, SiO2, Na, K, and O2 in carbon-poor and carbon-rich 55-Cnc e-like atmospheres.'}
+    - {figure: '9', locator_page: 12, result: 'Total O pressure for LavAtmos 2.0, volatile-free vaporisation, and no lava-ocean vaporisation.'}
+    - {figure: '10', locator_page: 14, result: 'CO, CO2, H2O, and SO2 partial pressures for carbon-poor and carbon-rich 55-Cnc e-like atmospheres.'}
+    - {figure: '11', locator_page: 15, result: 'C/O ratio as a function of total volatile pressure at 2500 K and temperature at 10 bar total volatile pressure.'}
+    - {figure: '12', locator_page: 16, result: 'MELTS-calculated melt endmember activities with dissolved water; solid lines are water-saturated and dashed lines are dry-melt activities.'}
+- table: printed_model_findings
+  locator: {page: 12, section: '4.1 Vaporised partial pressure comparison'}
+  classification: model_derived
+  generator: LavAtmos 2.0 and LavAtmos 1 volatile-free vaporisation comparator
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_output_summary
+    quantity: explicitly_printed_model_output_thresholds
+    values_as_printed:
+    - {value: 'about 0.2 bar', quantity: total_pressure_of_pure_melt_vapour, condition: '3000 K', locator_note: 'page 4, section 3.1'}
+    - {value: 'about 3500 K', quantity: temperature_where_vapour_species_overwhelm_fixed_volatile_pressure, condition: 'pure volatile atmosphere comparison', locator_note: 'page 7, section 3.1'}
+    - {value: 'around 1e-2 bar', quantity: method_divergence_onset, condition: '55-Cnc e-like comparison at 2500 K', locator_note: 'page 12, section 4.1'}
+    - {value: 'up to three orders of magnitude', quantity: LavAtmos_2_increase_in_total_O_pressure_relative_to_volatile_free_case, condition: 'total volatile pressure sweep', locator_note: 'page 13, section 4.1'}
+    - {value: 'up to six orders of magnitude', quantity: partial_pressure_difference_between_LavAtmos_2_and_volatile_free_method, condition: 'spectroscopically important CO2, CO, H2O, and SO2 species', locator_note: 'page 16, section 6'}
+species:
+  BSE:
+    observations:
+    - observation_id: vanbuchem_2025_table_1_volatile_atmosphere_inputs
+      type: model_input_table
+      locator: {page: 4, table: '1'}
+      phase: BSE_lava_ocean
+      regime: thermochemical_equilibrium_model
+      units: w%
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: LavAtmos 2.0 input cases constructed by the authors
+        quantity: volatile_components_in_complex_atmosphere_compositions
+        rows_as_printed:
+        - {atmosphere_type: C dominated, C_w_pct: '80.00', H_w_pct: '10.00', N_w_pct: '9', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+        - {atmosphere_type: H dominated, C_w_pct: '1.00', H_w_pct: '80.00', N_w_pct: '18.00', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+        - {atmosphere_type: N dominated, C_w_pct: '1.00', H_w_pct: '18.00', N_w_pct: '80.00', S_w_pct: '0.50', P_w_pct: '0.50', O_w_pct: '-'}
+        - {atmosphere_type: S dominated, C_w_pct: '5.00', H_w_pct: '1.00', N_w_pct: '4.00', S_w_pct: '60.00', P_w_pct: '30.00', O_w_pct: '-'}
+        - {atmosphere_type: Carbon poor, C_w_pct: '9.09e-6', H_w_pct: '99.01', N_w_pct: '0.90', S_w_pct: '3.33e-6', P_w_pct: '6.67e-6', O_w_pct: '9.09e-7'}
+        - {atmosphere_type: Carbon rich, C_w_pct: '0.91', H_w_pct: '79.21', N_w_pct: '0.79', S_w_pct: '6.67', P_w_pct: '3.33', O_w_pct: '9.09'}
+    - observation_id: vanbuchem_2025_model_workflow_equations
+      type: model_definition
+      locator: {page: 2, section: '2.1 Workflow'}
+      phase: BSE_lava_ocean
+      regime: thermochemical_equilibrium_model
+      units: as printed
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: LavAtmos 2.0 with MELTS and FastChem 3; JANAF thermochemical tables
+        quantity: stated_inputs_assumptions_and_mass_action_relations
+        equations_as_printed:
+        - {number: 1, reaction: 'SiO2(l) ↔ SiO2(g)'}
+        - {number: 2, reaction: 'SiO2(l) − 1/2 O2(g) ↔ SiO(g)'}
+        - {number: 3, relation: 'P_SiO2(g) = K1(T) a_SiO2(l)'}
+        - {number: 4, relation: 'P_SiO(g) = K2(T) a_SiO2(l) P_O2^−1/2'}
+        - {number: 5, relation: '0 = P_O2 + 1/2 P_H2O − P_SiO2 − 1/2 P_SiO'}
+    - observation_id: vanbuchem_2025_model_scope_conditions
+      type: model_conditions
+      locator: {page: 2, section: '2.1 Workflow'}
+      phase: BSE_lava_ocean
+      regime: thermochemical_equilibrium_model
+      units: as printed
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: LavAtmos 2.0
+        quantity: explicitly_stated_model_conditions
+        conditions_as_printed:
+        - {surface_temperature_K: '2000', context: 'validation comparison with Charnoz et al. (2023), BSE melt'}
+        - {total_volatile_pressure: '220.64 bars steam', context: 'validation example'}
+        - {pressure_limit_for_MELTS_effect_note: 'beyond 100 bar', context: 'activity-pressure note'}
+    - observation_id: vanbuchem_2025_figure_only_results
+      type: figure_only_model_output
+      locator: {page: 5, figure: '3'}
+      phase: BSE_lava_ocean
+      regime: thermochemical_equilibrium_model
+      units: plotted output; curves not digitised
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        generator: LavAtmos 2.0 calculations; LavAtmos 1 and cited models where named in captions
+        quantity: plotted_partial_pressure_trends
+        rows_as_printed:
+        - {figure: '2', page: 4, result: 'LavAtmos 2.0 compared with Charnoz et al. (2023) at 2000 K for BSE melt; SiO2 differs significantly.'}
+        - {figure: '3', page: 5, result: 'SiO2, SiO, and Si partial pressures above a BSE lava ocean.'}
+        - {figure: '4', page: 6, result: 'Major volatile species in pure C, H, N, S, and P atmospheres.'}
+        - {figure: '5', page: 7, result: 'Pure C atmosphere: O2, SiO, TiO, Fe, Na, and K; Fe may dominate over Na at about 2000 K.'}
+        - {figure: '6', page: 9, result: 'Complex N-dominated atmosphere increases Si and SiO at high volatile pressure and lower temperature.'}
+        - {figure: '7', page: 10, result: 'S chemistry forms SiS and TiS; C chemistry forms NaCN and KCN at high pressure.'}
+        - {figure: '8', page: 11, result: 'LavAtmos 2.0 versus volatile-free partial pressures for SiO, SiO2, Na, K, and O2.'}
+        - {figure: '9', page: 12, result: 'Total O pressure for LavAtmos 2.0, volatile-free, and no-lava-vaporisation cases.'}
+        - {figure: '10', page: 14, result: 'CO, CO2, H2O, and SO2 partial pressures.'}
+        - {figure: '11', page: 15, result: 'C/O ratio versus total volatile pressure and temperature.'}
+        - {figure: '12', page: 16, result: 'MELTS melt endmember activities with dissolved water.'}
+    - observation_id: vanbuchem_2025_printed_model_findings
+      type: model_output_summary
+      locator: {page: 12, section: '4.1 Vaporised partial pressure comparison'}
+      phase: BSE_lava_ocean
+      regime: thermochemical_equilibrium_model
+      units: as printed
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: LavAtmos 2.0 and LavAtmos 1 volatile-free vaporisation comparator
+        quantity: explicitly_printed_model_output_thresholds
+        values_as_printed:
+        - {value: 'about 0.2 bar', quantity: total_pressure_of_pure_melt_vapour, condition: '3000 K', locator_note: 'page 4, section 3.1'}
+        - {value: 'about 3500 K', quantity: temperature_where_vapour_species_overwhelm_fixed_volatile_pressure, condition: 'pure volatile atmosphere comparison', locator_note: 'page 7, section 3.1'}
+        - {value: 'around 1e-2 bar', quantity: method_divergence_onset, condition: '55-Cnc e-like comparison at 2500 K', locator_note: 'page 12, section 4.1'}
+        - {value: 'up to three orders of magnitude', quantity: LavAtmos_2_increase_in_total_O_pressure_relative_to_volatile_free_case, condition: 'total volatile pressure sweep', locator_note: 'page 13, section 4.1'}
+        - {value: 'up to six orders of magnitude', quantity: partial_pressure_difference_between_LavAtmos_2_and_volatile_free_method, condition: 'CO2, CO, H2O, and SO2', locator_note: 'page 16, section 6'}

@@ -1,0 +1,310 @@
+schema_version: literature_extract.v1
+source_id: nasa-tm-2024-simulant-guide
+source:
+  citation: Slabic, Ane (2024), Lunar Regolith Simulant User's Guide, Rev. A, NASA/TM-20240011783.
+  year: 2024
+  report_number: NASA/TM-20240011783
+extraction:
+  method: Born-digital 100-page PDF; pdftotext -layout; printed tables transcribed; figure curves not digitised.
+  date: '2026-09-20'
+  worker: i3-nasa-tm-2024-simulant-guide
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/nasa-tm-2024-simulant-guide/nasa-tm-2024-simulant-guide.pdf
+review_status: draft
+corrections: []
+classification:
+  primary: compilation_assessed
+  note: The guide aggregates published, NASA SDL, and APL characterization results; it is not a single apparatus study.
+  model_generators:
+  - NASA/JSC ARES Figures of Merit MATLAB implementation, for the FoM score tables.
+  - Petkov and Voecks (2023) mass-spectrometry study, for the cited evolved-gas figure.
+  apparatus_status: The guide reports selected downstream apparatus conditions, but does not provide a complete primary-run record for every compiled table.
+fidelity_samples:
+- species: lunar_regolith_simulants
+  observable: simulant_characterisation
+  observation_id: nasa_tm_2024_table7_bulk_chemistry
+  field: composition_wt_pct
+  value: 47.2
+  locator: {pdf_page_index: 44, published_page: 34, table: '7', row: BP-1, column: SiO2}
+species:
+  lunar_regolith_simulants:
+    observations:
+    - observation_id: nasa_tm_2024_table5_modal_mineralogy
+      type: gibbs_table
+      locator: {pdf_page_index: 42, published_page: 32, table: '5', section: 4.3 Mineralogy}
+      phase: lunar_regolith_simulant_mixtures
+      standard_state: modal mineralogy as printed, wt.%
+      regime: simulant_characterisation
+      units: wt.% as printed
+      values:
+        quantity: modal_mineralogy
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation from the cited source in each row; no single new mineralogy run.
+        rows:
+        - {simulant: BP-1, region: Low-Ti Mare, glass: 0, pyroxene: 23.7, plagioclase_feldspar: 60.7, reference: Stoeser et al. 2010}
+        - {simulant: CSM-LHT-1, region: Highlands, plagioclase_feldspar: 100, reference: APL SAR 2021}
+        - {simulant: CSM-LMT-1, region: High-Ti Mare, glass: 23, pyroxene: 77, reference: APL SAR 2021}
+        - {simulant: GreenSpar, region: Highlands, anorthosite: 90, reference: Hudson Resources}
+        - {simulant: JSC-1A, region: Low-Ti Mare, glass: 26.67, pyroxene: 19.43, plagioclase_feldspar: 37.83, olivine: 12.44, ilmenite: 0.11, reference: Schrader et al. 2008}
+        - {simulant: LHS-1, region: Highlands, glass: 24.7, olivine: 0.3, ilmenite: 0.4, anorthosite: 74.4, reference: Exolith Datasheet}
+        - {simulant: LMS-1, region: Low-Ti Mare, glass: 32, pyroxene: 32.8, olivine: 11.1, ilmenite: 4.3, basalt: 19.8, reference: Exolith Datasheet}
+        - {simulant: MLS-1, region: High-Ti Mare, glass: 14, pyroxene: 33, plagioclase_feldspar: 46, olivine: 7, reference: Weiblen and Gordon 1988}
+        - {simulant: NU-LHT-2M, region: Highlands, agglutinates: 29.02, glass: 7.17, pyroxene: 4.2, plagioclase_feldspar: 54.9, olivine: 9.5, ilmenite: 0.2, reference: Schrader et al. 2009}
+        - {simulant: NU-LHT-4M, region: Highlands, agglutinates: 27, glass: 4.53, olivine: 5.32, ilmenite: 0.6, norite: 19.86, anorthosite: 42.49, reference: Wilson USGS 2020}
+        - {simulant: OB-1A, region: Highlands, glass: 45.5, pyroxene: 2.6, plagioclase_feldspar: 46.2, olivine: 5.6, reference: Schrader et al. 2008; OB-1 values extrapolated to OB-1A}
+        - {simulant: OPRH3N, region: Highlands, glass: 15, pyroxene: 1, plagioclase_feldspar: 80, basalt: 3, reference: OPR Datasheet}
+        - {simulant: OPRH4W30, region: Highlands, glass: 30, anorthosite: 90, basalt: 10, reference: OPR Datasheet}
+        - {simulant: OPRL2N, region: High-Ti Mare, plagioclase_feldspar: 10, basalt: 90, reference: OPR Datasheet}
+      uncertainty: {note: No numerical uncertainties printed; n/a cells retained as absent.}
+
+    - observation_id: nasa_tm_2024_table6_apollo_bulk_chemistry
+      type: gibbs_table
+      locator: {pdf_page_index: 43, published_page: 33, table: '6', section: 4.4 Chemistry}
+      phase: apollo_lunar_regolith_regional_averages
+      standard_state: aggregated Apollo surface oxide chemistry as printed
+      regime: compilation_characterisation
+      units: wt.% as printed
+      values:
+        quantity: regional_bulk_oxide_composition
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Secondary aggregation from Taylor 1973; Wanke 1973; Rhodes 1974; Christian 1976; Warren et al. 1978; Korotev 1982; Papike and Simon 1982.
+        rows:
+        - {region: Highlands, SiO2: 45.62, TiO2: 0.84, Al2O3: 24.47, FeO: 6.6, MgO: 6.98, CaO: 14.65, Na2O: 0.48, K2O: 0.2}
+        - {region: High-Ti Mare, SiO2: 41.27, TiO2: 7.48, Al2O3: 12.5, FeO: 16.47, MgO: 9.75, CaO: 11.26, Na2O: 0.39, K2O: 0.11}
+        - {region: Low-Ti Mare, SiO2: 45.62, TiO2: 2.09, Al2O3: 13.2, FeO: 16.45, MgO: 10.19, CaO: 10.65, Na2O: 0.42, K2O: 0.19}
+      uncertainty: {note: No numerical uncertainties printed.}
+
+    - observation_id: nasa_tm_2024_table7_bulk_chemistry
+      type: gibbs_table
+      locator: {pdf_page_index: 44, published_page: 34, table: '7', section: 4.4 Chemistry}
+      phase: lunar_regolith_simulant_mixtures
+      standard_state: bulk oxide chemistry as printed
+      regime: compilation_characterisation
+      units: wt.% as printed
+      values:
+        quantity: bulk_oxide_composition
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation of XRF results, with ICP-OES verification by Wilson USGS 2020 where stated; rows retain cited references.
+        rows:
+        - {simulant: BP-1, region: Low-Ti Mare, SiO2: 47.2, TiO2: 2.3, Al2O3: 16.7, FeO: 6.2, MgO: 6.5, CaO: 9.2, Na2O: 3.5, K2O: 1.1, reference: Stoeser et al. 2010}
+        - {simulant: CSM-LHT-1, region: Highlands, SiO2: 48.0, TiO2: 2.9, Al2O3: 22.9, FeO: 5.7, MgO: 1.9, CaO: 15.9, Na2O: 2.6, K2O: 0.0, reference: APL SAR 2021}
+        - {simulant: CSM-LMT-1, region: High-Ti Mare, SiO2: 46.9, TiO2: 5.1, Al2O3: 15.1, FeO: 14.0, MgO: 4.1, CaO: 12.2, Na2O: 2.7, K2O: 0.0, reference: APL SAR 2021}
+        - {simulant: GreenSpar, region: Highlands, SiO2: 51.0, TiO2: 0.0, Al2O3: 30.6, FeO: 0.4, MgO: 0.2, CaO: 14.7, Na2O: 2.5, K2O: 0.2, reference: Wilson USGS 2020}
+        - {simulant: JSC-1A, region: Low-Ti Mare, SiO2: 46.8, TiO2: 1.8, Al2O3: 16.4, FeO: 11.4, MgO: 8.7, CaO: 10.0, Na2O: 3.2, K2O: 0.8, reference: Wilson USGS 2020}
+        - {simulant: LHS-1, region: Highlands, SiO2: 50.2, TiO2: 2.5, Al2O3: 23.9, FeO: 3.2, MgO: 1.9, CaO: 15.4, Na2O: 3.0, K2O: 0.0, reference: APL SAR 2021}
+        - {simulant: LMS-1, region: Low-Ti Mare, SiO2: 46.9, TiO2: 4.5, Al2O3: 24.2, FeO: 3.2, MgO: 2.4, CaO: 15.2, Na2O: 2.8, K2O: 0.0, reference: APL SAR 2021}
+        - {simulant: MLS-1, region: High-Ti Mare, SiO2: 42.8, TiO2: 6.8, Al2O3: 12.1, FeO: 16.3, MgO: 6.2, CaO: 11.1, Na2O: 2.2, K2O: 0.2, reference: Weiblen and Gordon 1988}
+        - {simulant: NU-LHT-2M, region: Highlands, SiO2: 47.0, TiO2: 0.4, Al2O3: 24.5, FeO: 3.7, MgO: 8.4, CaO: 13.6, Na2O: 1.5, K2O: 0.1, reference: Wilson USGS 2020}
+        - {simulant: NU-LHT-4M, region: Highlands, SiO2: 47.2, TiO2: 0.4, Al2O3: 23.5, FeO: 4.3, MgO: 8.7, CaO: 12.8, Na2O: 1.5, K2O: 0.2, reference: Wilson USGS 2020}
+        - {simulant: OB-1A, region: Highlands, SiO2: 49.7, TiO2: 1.5, Al2O3: 16.8, FeO: 11.8, MgO: 5.8, CaO: 9.7, Na2O: 2.5, K2O: 0.7, reference: Wilson USGS 2020, note: OB-1 chemistry extrapolated to OB-1A; no direct OB-1A chemistry measurement}
+        - {simulant: OPRH3N, region: Highlands, SiO2: 46.0, TiO2: 2.5, Al2O3: 25.4, FeO: 4.7, MgO: 2.2, CaO: 16.9, Na2O: 2.3, K2O: 0.0, reference: APL SAR 2021}
+        - {simulant: OPRH4W30, region: Highlands, SiO2: 48.1, TiO2: 0.2, Al2O3: 30.3, FeO: 1.7, MgO: 1.1, CaO: 15.2, Na2O: 2.3, K2O: 0.1, reference: OPR Datasheet}
+        - {simulant: OPRL2N, region: High-Ti Mare, SiO2: 46.2, TiO2: 5.5, Al2O3: 16.6, FeO: 12.9, MgO: 2.7, CaO: 12.9, Na2O: 3.2, K2O: 0.0, reference: APL SAR 2021}
+      uncertainty: {note: No numerical uncertainties printed; K2O 0.0 values are printed table values, not inferred absence.}
+
+    - observation_id: nasa_tm_2024_table10_particle_size_distribution
+      type: rate_series
+      locator: {pdf_page_index: 48, published_page: 38, table: '10', section: 4.5 Particle Size Distribution}
+      phase: lunar_regolith_simulant_particles
+      standard_state: percent-passing quartiles as printed
+      regime: particle_size_characterisation
+      units: micrometres as printed
+      values:
+        quantity: particle_size_distribution_quartiles
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation from Clark 2021, SDL 2022, and APL SAR 2021; instruments and subsample protocols are stated in the source text.
+        rows:
+        - {simulant: BP-1, region: Low-Ti Mare, Q25_um: 36.4, Q50_um: 88.4, Q75_um: 205.0, reference: Clark 2021}
+        - {simulant: CSM-LHT-1, region: Highlands, Q25_um: 34.5, Q50_um: 122.3, Q75_um: 331.3, reference: SDL 2022; APL SAR 2021}
+        - {simulant: CSM-LMT-1, region: High-Ti Mare, Q25_um: 40.6, Q50_um: 140.5, Q75_um: 360.8, reference: SDL 2022; APL SAR 2021}
+        - {simulant: GreenSpar (250um), region: Highlands, Q25_um: 37.5, Q50_um: 78.0, Q75_um: 141.2, reference: Clark 2021}
+        - {simulant: JSC-1A, region: Low-Ti Mare, Q25_um: 54.5, Q50_um: 129.1, Q75_um: 260.6, reference: Clark 2021}
+        - {simulant: LHS-1, region: Highlands, Q25_um: 38.6, Q50_um: 85.3, Q75_um: 165.2, reference: SDL 2022; APL SAR 2021}
+        - {simulant: LMS-1, region: Low-Ti Mare, Q25_um: 56.2, Q50_um: 113.3, Q75_um: 247.1, reference: SDL 2022; APL SAR 2021}
+        - {simulant: MLS-1, region: High-Ti Mare, Q25_um: 83.4, Q50_um: 197.6, Q75_um: 400.4, reference: Clark 2021}
+        - {simulant: OB-1A, region: Highlands, Q25_um: 68.1, Q50_um: 138.5, Q75_um: 417.8, reference: Clark 2021}
+        - {simulant: NU-LHT-2M, region: Highlands, Q25_um: 55.9, Q50_um: 125.7, Q75_um: 244.5, reference: Clark 2021}
+        - {simulant: NU-LHT-4M, region: Highlands, Q25_um: 48.1, Q50_um: 106.7, Q75_um: 195.9, reference: Clark 2021}
+        - {simulant: OPRH3N, region: Highlands, Q25_um: 15.3, Q50_um: 36.2, Q75_um: 84.7, reference: APL SAR 2021}
+        - {simulant: OPRH4W30, region: Highlands, Q25_um: 21.5, Q50_um: 46.9, Q75_um: 128.4, reference: Clark 2021}
+        - {simulant: OPRL2N, region: High-Ti Mare, Q25_um: 16.3, Q50_um: 36.5, Q75_um: 82.8, reference: APL SAR 2021}
+      uncertainty: {note: No numerical uncertainties printed; values are averaged quartiles.}
+
+    - observation_id: nasa_tm_2024_table13_particle_geometry
+      type: rate_series
+      locator: {pdf_page_index: 52, published_page: 42, table: '13', section: 4.6 Particle Geometry}
+      phase: lunar_regolith_simulant_particles
+      standard_state: bulk particle aspect ratio and root form factor as printed
+      regime: particle_geometry_characterisation
+      units: dimensionless as printed
+      values:
+        quantity: particle_geometry
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation from SDL 2022 and APL SAR 2021; SDL used MicroTrac SYNC LD/DIA and APL used Camsizer X2 DIA.
+        rows:
+        - {simulant: BP-1, region: Low-Ti Mare, aspect_ratio: 0.67, root_form_factor: 0.93, reference: SDL 2022}
+        - {simulant: CSM-LHT-1, region: Highlands, aspect_ratio: 0.66, root_form_factor: 0.92, reference: SDL 2022}
+        - {simulant: CSM-LMT-1, region: High-Ti Mare, aspect_ratio: 0.56, root_form_factor: 0.84, reference: APL SAR 2021}
+        - {simulant: GreenSpar, region: Highlands, aspect_ratio: 0.62, root_form_factor: 0.90, reference: SDL 2022}
+        - {simulant: JSC-1A, region: Low-Ti Mare, aspect_ratio: 0.66, root_form_factor: 0.93, reference: SDL 2022}
+        - {simulant: LHS-1, region: Highlands, aspect_ratio: 0.61, root_form_factor: 0.90, reference: SDL 2022}
+        - {simulant: LMS-1, region: Low-Ti Mare, aspect_ratio: 0.49, root_form_factor: 0.87, reference: APL SAR 2021}
+        - {simulant: MLS-1, region: High-Ti Mare, aspect_ratio: 0.64, root_form_factor: 0.91, reference: SDL 2022}
+        - {simulant: NU-LHT-2M, region: Highlands, aspect_ratio: 0.63, root_form_factor: 0.91, reference: SDL 2022}
+        - {simulant: NU-LHT-4M, region: Highlands, aspect_ratio: 0.62, root_form_factor: 0.91, reference: SDL 2022}
+        - {simulant: OB-1A, region: Highlands, aspect_ratio: 0.59, root_form_factor: 0.89, reference: APL SAR 2021}
+        - {simulant: OPRH3N, region: Highlands, aspect_ratio: 0.63, root_form_factor: 0.90, reference: SDL 2022}
+        - {simulant: OPRH4W30, region: Highlands, aspect_ratio: 0.61, root_form_factor: 0.90, reference: SDL 2022}
+        - {simulant: OPRL2N, region: High-Ti Mare, aspect_ratio: 0.63, root_form_factor: 0.91, reference: SDL 2022}
+      uncertainty: {note: No numerical uncertainties printed.}
+
+    - observation_id: nasa_tm_2024_table16_density
+      type: rate_series
+      locator: {pdf_page_index: 55, published_page: 45, table: '16', section: 4.7 Density}
+      phase: lunar_regolith_simulant_granular_material
+      standard_state: minimum and maximum bulk density as printed
+      regime: density_characterisation
+      units: g/cm3 as printed
+      values:
+        quantity: bulk_density_range
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation from SDL and APL SAR studies; APL used modified Proctor mold/aluminum cylinder at ambient pressure in air or nitrogen, SDL used a vibratory table with ASTM D4253/D4254.
+        rows:
+        - {simulant: BP-1, region: Low-Ti Mare, rho_min_g_cm3: 1.43, rho_max_g_cm3: 1.86, reference: Suescun-Flores et al. 2015}
+        - {simulant: CSM-LHT-1, region: Highlands, rho_min_g_cm3: 1.50, rho_max_g_cm3: 1.90, reference: SDL 2023}
+        - {simulant: CSM-LMT-1, region: High-Ti Mare, rho_min_g_cm3: 1.50, rho_max_g_cm3: 1.76, reference: APL SAR 2022}
+        - {simulant: JSC-1A, region: Low-Ti Mare, rho_min_g_cm3: 1.57, rho_max_g_cm3: 2.03, reference: Zeng et al. 2010}
+        - {simulant: LHS-1, region: Highlands, rho_min_g_cm3: 1.38, rho_max_g_cm3: 1.56, reference: APL SAR 2022}
+        - {simulant: LMS-1, region: Low-Ti Mare, rho_min_g_cm3: 1.58, rho_max_g_cm3: 1.73, reference: APL SAR 2023}
+        - {simulant: MLS-1, region: High-Ti Mare, rho_min_g_cm3: 1.59, rho_max_g_cm3: 2.09, reference: Perkins 1991; Perkins and Madson 1996; Batiste and Sture 2008}
+        - {simulant: NU-LHT-2M, region: Highlands, rho_min_g_cm3: 1.37, rho_max_g_cm3: 2.06, reference: Zeng et al. 2010}
+        - {simulant: NU-LHT-4M, region: Highlands, rho_min_g_cm3: 1.50, rho_max_g_cm3: 1.63, reference: APL SAR 2022}
+        - {simulant: OB-1A, region: Highlands, rho_min_g_cm3: 1.51, rho_max_g_cm3: 1.63, reference: APL SAR 2022}
+        - {simulant: OPRH3N, region: Highlands, rho_min_g_cm3: 1.32, rho_max_g_cm3: 1.50, reference: APL SAR 2022}
+        - {simulant: OPRL2N, region: High-Ti Mare, rho_min_g_cm3: 1.31, rho_max_g_cm3: 1.54, reference: APL SAR 2022}
+      uncertainty: {note: No numerical uncertainties printed; GreenSpar and OPRH4W30 are n/a, not zero.}
+
+    - observation_id: nasa_tm_2024_table19_shear_strength
+      type: rate_series
+      locator: {pdf_page_index: 59, published_page: 49, table: '19', section: 4.8 Shear Strength}
+      phase: lunar_regolith_simulant_granular_material
+      standard_state: cohesion and angle of internal friction as printed
+      regime: direct_shear_characterisation
+      units: kPa and degrees as printed
+      values:
+        quantity: shear_strength_parameters
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: Guide compilation; APL direct-shear measurements used GeoTac Digishear, ambient conditions, three confining stresses 500, 1500, and 3000 lb/ft2, lateral movement 0.1 in/min, maximum displacement 0.25 in.
+        rows:
+        - {simulant: BP-1, cohesion_avg_kPa: 1.0, cohesion_range_kPa: 0-2.0, angle_avg_deg: 45.0, angle_range_deg: 39.0-51.0, reference: Suescun-Flores et al. 2015}
+        - {simulant: CSM-LHT-1, cohesion_avg_kPa: 12.0, angle_avg_deg: 32.0, reference: APL SAR 2022}
+        - {simulant: CSM-LMT-1, cohesion_avg_kPa: 12.0, angle_avg_deg: 36.0, reference: APL SAR 2022}
+        - {simulant: JSC-1A, cohesion_avg_kPa: 1.7, cohesion_range_kPa: 1.4-2.4, angle_avg_deg: 44.9, angle_range_deg: 42.9-48.8, reference: McKay 1994; Arslan et al. 2010}
+        - {simulant: LHS-1, cohesion_avg_kPa: 11.0, angle_avg_deg: 35.0, reference: APL SAR 2022}
+        - {simulant: LMS-1, cohesion_avg_kPa: 10.0, angle_avg_deg: 37.0, reference: APL SAR 2022}
+        - {simulant: MLS-1, cohesion_avg_kPa: 0.8, cohesion_range_kPa: 0.1-1.5, angle_avg_deg: 51.7, angle_range_deg: 41.4-62.3, reference: Perkins 1991; Perkins and Madson 1996; Batiste and Sture 2008}
+        - {simulant: NU-LHT-4M, cohesion_avg_kPa: 8.0, angle_avg_deg: 38.0, reference: APL SAR 2022}
+        - {simulant: OB-1A, cohesion_avg_kPa: 15.0, angle_avg_deg: 35.0, reference: APL SAR 2022}
+        - {simulant: OPRH3N, cohesion_avg_kPa: 12.0, angle_avg_deg: 36.0, reference: APL SAR 2022}
+        - {simulant: OPRL2N, cohesion_avg_kPa: 7.0, angle_avg_deg: 40.0, reference: APL SAR 2022}
+      uncertainty: {note: Printed ranges retained; n/a rows omitted from numeric rows.}
+
+    - observation_id: nasa_tm_2024_table22_magnetic_susceptibility
+      type: rate_series
+      locator: {pdf_page_index: 61, published_page: 51, table: '22', section: 4.9 Magnetic Susceptibility}
+      phase: lunar_regolith_simulant_material
+      standard_state: logarithm of magnetic susceptibility as printed
+      regime: magnetic_susceptibility_characterisation
+      units: log(chi), chi in 10^-9 m3/kg as printed
+      values:
+        quantity: magnetic_susceptibility
+        method_class: secondary_compilation
+        evidence_class: compilation_assessed
+        generator: NASA SDL 2023 measurements compiled by the guide; Bartington MS2/MS3, three subsample runs, low 0.465 kHz ±1% and high 4.65 kHz ±1%, applied field 250 microT peak ±10%, calibration accuracy 1% using 10 mL sample.
+        rows:
+        - {simulant: BP-1, log_chi: 3.73}
+        - {simulant: CSM-LHT-1, log_chi: 2.98}
+        - {simulant: CSM-LMT-1, log_chi: 3.48}
+        - {simulant: GreenSpar, log_chi: 0.95}
+        - {simulant: JSC-1A, log_chi: 3.38}
+        - {simulant: LHS-1, log_chi: 3.08}
+        - {simulant: LMS-1, log_chi: 3.43}
+        - {simulant: MLS-1, log_chi: 4.01}
+        - {simulant: NU-LHT-2M, log_chi: 3.03}
+        - {simulant: NU-LHT-4M, log_chi: 2.86}
+        - {simulant: OB-1A, log_chi: 3.22}
+        - {simulant: OPRL2N, log_chi: 3.65}
+      uncertainty: {note: Instrument calibration and field/frequency tolerances are printed; row-specific uncertainty is not.}
+
+    - observation_id: nasa_tm_2024_table25_crystalline_silica
+      type: rate_series
+      locator: {pdf_page_index: 71, published_page: 61, table: '25', section: 5.4 Crystalline Silica Content in Simulants}
+      phase: planetary_simulant_and_feedstock_materials
+      standard_state: silica analysis values as printed
+      regime: silica_characterisation
+      units: wt.% and percent as printed
+      values:
+        quantity: crystalline_and_respirable_silica
+        method_class: quoted_literature
+        evidence_class: quoted_attributed
+        generator: DCM Science Laboratories 2022/2023, Herndon Solutions Group 2021, and Innovative Health Applications/RJ Lee Group 2010, as identified by table footnotes.
+        rows:
+        - {sample: CSM-LHT-1, total_crystalline_silica_wt_pct: 2.56, passing_lt_10um_pct: 13.0, total_respi_crystalline_silica_wt_pct: 0.33, analysis_year: 2023}
+        - {sample: CSM-LHT-1G, total_crystalline_silica_wt_pct: 3.21, passing_lt_10um_pct: 11.4, total_respi_crystalline_silica_wt_pct: 0.37, analysis_year: 2022}
+        - {sample: GreenSpar, total_crystalline_silica_wt_pct: 6.37, passing_lt_10um_pct: 3.33, total_respi_crystalline_silica_wt_pct: 0.16, analysis_year: 2022}
+        - {sample: LHS-1, total_crystalline_silica_wt_pct: 3.05, passing_lt_10um_pct: 7.0, total_respi_crystalline_silica_wt_pct: 0.21, analysis_year: 2023}
+        - {sample: LHS-2, total_crystalline_silica_wt_pct: 3.68, passing_lt_10um_pct: 5.1, total_respi_crystalline_silica_wt_pct: 0.19, analysis_year: 2023}
+        - {sample: NU-LHT-2M, total_crystalline_silica_wt_pct: 0.67, passing_lt_10um_pct: 10.1, total_respi_crystalline_silica_wt_pct: 0.07, analysis_year: 2023}
+        - {sample: NU-LHT-4M, total_crystalline_silica_wt_pct: 0.92, passing_lt_10um_pct: 8.1, total_respi_crystalline_silica_wt_pct: 0.07, analysis_year: 2023}
+        - {sample: NUW-LHT-5M, total_crystalline_silica_wt_pct: 0.84, passing_lt_10um_pct: 13.9, total_respi_crystalline_silica_wt_pct: 0.13, analysis_year: 2023}
+        - {sample: OB-1A, total_crystalline_silica_wt_pct: 0.84, passing_lt_10um_pct: 3.0, total_respi_crystalline_silica_wt_pct: 0.03, analysis_year: 2023}
+        - {sample: OPRH3N, total_crystalline_silica_wt_pct: 0.87, passing_lt_10um_pct: 11.5, total_respi_crystalline_silica_wt_pct: 0.10, analysis_year: 2023}
+        - {sample: OPRH4W30, total_crystalline_silica_wt_pct: 1.60, passing_lt_10um_pct: 16.3, total_respi_crystalline_silica_wt_pct: 0.26, analysis_year: 2023}
+        - {sample: BP-1, total_crystalline_silica_wt_pct: 0.52, passing_lt_10um_pct: 11.5, total_respi_crystalline_silica_wt_pct: 0.06, analysis_year: 2023}
+        - {sample: CSM-LMT-1, total_crystalline_silica_wt_pct: 0.29, passing_lt_10um_pct: 12.1, total_respi_crystalline_silica_wt_pct: 0.04, analysis_year: 2023}
+        - {sample: JSC-1A, total_crystalline_silica_wt_pct: 0.13, passing_lt_10um_pct: 3.4, total_respi_crystalline_silica_wt_pct: '<0.01', analysis_year: 2023}
+        - {sample: LMS-1, total_crystalline_silica_wt_pct: 0.18, passing_lt_10um_pct: 10.2, total_respi_crystalline_silica_wt_pct: 0.02, analysis_year: 2023}
+        - {sample: MLS-1, total_crystalline_silica_wt_pct: 0.14, passing_lt_10um_pct: 4.2, total_respi_crystalline_silica_wt_pct: 0.01, analysis_year: 2023}
+        - {sample: OPRL2N, total_crystalline_silica_wt_pct: 0.29, passing_lt_10um_pct: 16.8, total_respi_crystalline_silica_wt_pct: 0.05, analysis_year: 2023}
+      uncertainty: {note: "'<0.01' is retained as the printed detection-limit bound; No data cells omitted, not zero."}
+
+    - observation_id: nasa_tm_2024_high_temperature_vacuum_guidance
+      type: rate_series
+      locator: {pdf_page_index: 99, published_page: 83, section: 6.2.2.B.(ii) High Temperatures, figure: '24'}
+      phase: CSM-LHT-1G_simulant
+      standard_state: cited vacuum-sintering evolved-gas observations and guide summary
+      regime: high_temperature_vacuum_simulant_processing
+      units: torr, wt.%, degrees C, and m/z as printed
+      values:
+        quantity: evolved_gas_and_thermal_processing_context
+        method_class: quoted_literature
+        evidence_class: quoted_attributed
+        generator: Petkov and Voecks (2023) mass spectrometry; guide reports the cited result and does not provide the primary apparatus record.
+        gas_species_reported: [H2, H2O, CO2, SO2, SO3, HCl, HF]
+        mass_to_charge_labels: {H2: 2, H2O: 18, CO2: 44, SO2: [48, 64], SO3: 80, HF: 20, HCl: [36, 38]}
+        physi_adsorbed_water_evolves_below_pressure_torr: 20
+        thermal_processing_mass_loss_wt_pct: 0.5-1
+        figure_24: figure_only_temperature_traces_not_digitised
+      uncertainty: {note: Figure traces and source-specific uncertainties are not printed as numeric tables in this guide.}
+
+    - observation_id: nasa_tm_2024_figure24_evolved_species
+      type: rate_series
+      locator: {pdf_page_index: 99, published_page: 83, figure: '24', section: 6.2.2.B.(ii) High Temperatures}
+      phase: CSM-LHT-1G_simulant
+      standard_state: selected mass spectra traces as plotted
+      regime: vacuum_mass_spectrometry
+      units: m/z and temperature as plotted; curves not digitised
+      values:
+        quantity: evolved_species_traces
+        method_class: figure_only
+        evidence_class: figure_only
+        generator: Petkov and Voecks (2023), attributed by the guide.
+        status: figure_only_not_digitised
+        species: [H2, H2O, CO2, SO2, SO3, HCl, HF]
+      uncertainty: {note: No printed numeric trace values or uncertainty table.}

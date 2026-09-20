@@ -1,0 +1,182 @@
+schema_version: literature_extract.v1
+source_id: busemann-2024-noble-gases-ryugu-bennu
+source:
+  citation: 'Busemann, H., Krietsch, D., Maden, C., Barnes, J. J., Nguyen, A. N., Conolly, H. C. Jr., and Lauretta, D. S. (2024), "Noble gases in samples returned from asteroids Ryugu and Bennu", one-page conference abstract.'
+  year: 2024
+extraction:
+  method: Born-digital one-page conference abstract; transcribed from pdftotext -layout. Printed values and ranges retained; no figure values digitised and no apparatus values inferred.
+  date: '2026-09-20'
+  worker: i1-busemann-2024-noble-gases-ryugu-bennu
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/busemann-2024-noble-gases-ryugu-bennu/
+review_status: draft
+corrections: []
+absent_from_source:
+- oxide or elemental bulk composition
+- noble-gas concentrations or yields
+- sample density, grain size, recovery fraction, or exposed area
+- laser power, pulse profile, or sample temperature
+- chamber pressure, pumping, gas flow, or vacuum level
+- crucible dimensions/material and laser-cell geometry
+- heating-step durations
+- numerical uncertainties for the printed mass ranges, isotope ranges, and ages
+species:
+  Ryugu_sample:
+    observations:
+    - observation_id: busemann_2024_ryugu_particle_allocation_and_mass
+      type: characterization
+      locator:
+        page: 1
+        section: Samples & Analysis
+        note: nine Ryugu particles allocated by JAXA; four from chamber A first touchdown and five from chamber C artificial crater; mass range printed for the nine particles
+      phase: returned_asteroid_particle
+      regime: returned_sample_characterisation
+      units: mg, as printed
+      values:
+        quantity: sample_allocation_and_mass
+        method_class: measured_direct
+        particle_count: 9
+        chamber_A_particle_count: 4
+        chamber_C_particle_count: 5
+        particle_mass_range_mg: 0.5 to 1.7
+        allocation_source: JAXA
+    - observation_id: busemann_2024_ryugu_sample_handling_and_laser_extraction
+      type: method
+      locator:
+        page: 1
+        section: Samples & Analysis
+        note: handling, instrument, and individual-particle laser extraction conditions printed in the abstract
+      phase: returned_asteroid_particle
+      regime: UHV_laser_melting_noble_gas_mass_spectrometry
+      units: as printed
+      values:
+        quantity: sample_handling_and_extraction_method
+        method_class: method_only
+        transfer_atmosphere: pure N2
+        transfer_environment: UHV sample chamber
+        purpose_of_N2_handling: prevent contact with air
+        instrument: custom-built mass spectrometer Albatros
+        laser: 1064 micrometre Nd:YAG IR laser
+        extraction_mode: individual particle melting
+        heating_steps_per_particle: 2 to 4
+        sample_form_before_laser: particle
+        post_laser_residue_check: Ryugu residues exposed to air and additionally extracted in a crucible to verify complete gas extraction
+    - observation_id: busemann_2024_ryugu_laser_residue_and_noble_gas_detection
+      type: characterization
+      locator:
+        page: 1
+        section: Samples & Analysis
+        note: qualitative outcome of laser melting and residue extraction
+      phase: returned_asteroid_particle
+      regime: UHV_laser_melting_noble_gas_mass_spectrometry
+      units: qualitative, as printed
+      values:
+        quantity: laser_residue_structure_and_detectable_noble_gases
+        method_class: measured_direct
+        released_volatiles: large amounts of water and other reactive volatiles
+        crystalline_residue_status: only particle that retained a crystalline structure after lasering contained detectable Ryugu noble gases
+        glassy_residue_status: all other particles turned immediately into glassy spheres and lacked any gas
+  Bennu_sample:
+    observations:
+    - observation_id: busemann_2024_bennu_particle_mass_and_handling
+      type: characterization
+      locator:
+        page: 1
+        section: Samples & Analysis
+        note: three Bennu particle masses and handling history printed in the abstract
+      phase: returned_asteroid_particle
+      regime: returned_sample_characterisation
+      units: mg, as printed
+      values:
+        quantity: sample_mass_and_handling
+        method_class: measured_direct
+        particle_count: 3
+        particle_ids:
+        - OREX-800032-102
+        - OREX-800032-103
+        - OREX-800032-104
+        particle_masses_mg:
+          OREX-800032-102: 0.07
+          OREX-800032-103: 0.89
+          OREX-800032-104: 0.94
+        brief_air_contact: true
+        air_contact_context: capsule after atmospheric entry and before storage in pure N2 in a clean room
+        instrument: custom-built mass spectrometer Albatros
+        extraction_mode: individual particle melting with 1064 micrometre Nd:YAG IR laser in 2 to 4 heating steps
+  Ne:
+    observations:
+    - observation_id: busemann_2024_ryugu_bennu_neon_isotope_ranges
+      type: rate_series
+      locator:
+        page: 1
+        section: Results & Discussion
+        note: trapped 20Ne/22Ne ranges by Ryugu chamber and qualitative Bennu placement in the same isotope space
+      phase: returned_asteroid_particle
+      regime: noble_gas_mass_spectrometry
+      units: isotope ratio, as printed
+      values:
+        quantity: trapped_neon_isotope_ratio
+        method_class: measured_direct
+        ryugu_chamber_A_trapped_20Ne_22Ne: '~12 to 13'
+        ryugu_chamber_C_trapped_20Ne_22Ne: '~9.0 to 10.7'
+        bennu_20Ne_22Ne_comparison: same range as Ryugu particles
+        interpretation: chamber C values are consistent with non-solar trapped Ne components such as Q and HL
+        smallest_bennu_particle_interpretation: mixing of Ne from presolar diamonds and SiC or graphite
+        third_bennu_particle_interpretation: mixing of, for example, Q and HL
+  Xe:
+    observations:
+    - observation_id: busemann_2024_xenon_isotope_composition_and_contamination_check
+      type: characterization
+      locator:
+        page: 1
+        section: Results & Discussion
+        note: qualitative isotope-system findings for all particles and the Bennu handling-contamination assessment
+      phase: returned_asteroid_particle
+      regime: noble_gas_mass_spectrometry
+      units: qualitative, as printed
+      values:
+        quantity: xenon_components_and_terrestrial_contamination_assessment
+        method_class: measured_direct
+        xenon_isotopic_composition: all particles consistent with phase Q
+        additional_components: small additions of Xe-HL from presolar diamonds
+        excess_component: excess 129Xe* from short-lived 129I decay
+        129Xe_star_129XeQ_ratio: comparably high and similar in all samples
+        closure_interpretation: similar initial I concentrations and closure to Xe loss, or incorporation of a well-mixed Xe reservoir
+        contamination_assessment: most diagnostic Xe isotopes and Ar/Xe versus Kr/Xe systematics prove noble gases are not affected by terrestrial contamination
+  noble_gases:
+    observations:
+    - observation_id: busemann_2024_preliminary_ryugu_exposure_ages
+      type: rate_series
+      derived_from: cosmic-ray production rates given by reference [7]
+      derivation:
+        relation: preliminary exposure-age calculation using the cosmic-ray production rates cited by the authors
+        input_source: Okazaki et al. 2023, reference [7]
+        status: preliminary
+      locator:
+        page: 1
+        section: Results & Discussion
+        note: preliminary ages obtained using cosmic-ray production rates from reference [7]
+      phase: returned_asteroid_particle
+      regime: cosmic_ray_exposure_age_calculation
+      units: Ma, as printed
+      values:
+        quantity: preliminary_cosmic_ray_exposure_age
+        method_class: model_derived
+        generator: cosmic ray production rates from Okazaki et al. 2023, reference [7]
+        exposure_age_range_Ma: 5 to 8
+        scope: all particles examined here
+        status: preliminary
+    - observation_id: busemann_2024_noble_gas_abundance_and_component_comparison
+      type: characterization
+      locator:
+        page: 1
+        section: Results & Discussion
+        note: qualitative concentration and component comparisons printed in the abstract
+      phase: returned_asteroid_particle
+      regime: noble_gas_mass_spectrometry
+      units: qualitative, as printed
+      values:
+        quantity: noble_gas_component_comparison
+        method_class: measured_direct
+        He_Xe_concentrations: comparable to but at the upper end of ranges reported in references [5] to [7]
+        absent_components: Ar-rich and water-susceptible noble-gas components found in less aqueously altered CMs or CRs and all COs
+        geological_context: strong aqueous alteration on Ryugu and Bennu parent bodies

@@ -1,0 +1,98 @@
+schema_version: literature_extract.v1
+source_id: arxiv-1902-05005
+source:
+  citation: >-
+    Sossi, P. A. & Fegley, B. Jr. (2018), "Thermodynamics of Element Volatility and its
+    Application to Planetary Processes", Reviews in Mineralogy and Geochemistry 84(1):393-459.
+  doi: 10.2138/rmg.2018.84.11
+  year: 2018
+extraction:
+  method: pdftotext -layout transcription of printed Tables 1-2 and source-faithful review/model notes
+  date: '2026-09-20'
+  worker: i1-arxiv-1902-05005
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/arxiv-1902-05005/arxiv-1902-05005.pdf
+review_status: draft
+corrections: []
+species:
+  Al:
+    observations:
+    - observation_id: sossi_fegley_2018_table1_parent_oxide_vapour_species
+      type: vapour_species_temperature_ranges
+      locator: {pdf_page_index: 12, table: '1', note: 'Table 1, printed p. 13; values are compilation rows and superscript references.'}
+      phase: pure_oxide
+      regime: equilibrium_saturated_vapour_compilation
+      units: K and gas species as printed
+      values:
+        quantity: saturated_vapour_species
+        method_class: compilation_assessed
+        source_basis: cited experimental and thermochemical literature listed in Table 1
+        rows:
+        - {oxide: alpha-Al2O3(s,l), temperature_K: ['2309-2605', '1500-1800', '2188-2594', '1900-2600', '2300-2600', '2450', '2200-2318', '2105-2800', '3500-4700', '2300-2600'], gas_species: 'Al, AlO, Al2O, AlO2, Al2O2'}
+        - {oxide: CaO(s), temperature_K: ['2080-2206', '1500-1900', '1923-2227'], gas_species: 'Ca, CaO'}
+        - {oxide: Cr2O3(s), temperature_K: ['1839-2059', '1690-2020'], gas_species: 'Cr, CrO, CrO2, CrO3'}
+        - {oxide: Fe1-xO(s), temperature_K: ['1776 (l)', '1773-1867 (l)', '1600-1750 (s,l)', '1543-1573 (l)', '1930-1950 (l)'], gas_species: 'Fe > FeO'}
+        - {oxide: Fe3O4(s), temperature_K: ['1400-1600', '1373-1673'], gas_species: 'Fe'}
+        - {oxide: Fe2O3(s,l), temperature_K: ['1030-1200', '1639-1764'], gas_species: 'Fe, FeO, FeO2'}
+        - {oxide: K2O(s,l), temperature_K: ['1087-1186', '1037-1184', '580-825', '298-3000'], gas_species: 'K, K2O, KO, K2O2, K2, KO2'}
+        - {oxide: MgO(s), temperature_K: ['1950', '1720-1960', '2020-2160', '1573-1973', '1820-1983'], gas_species: 'Mg, MgO'}
+        - {oxide: MnO(s), temperature_K: ['1767', '1618-1815', '1858-1999', '1535-1782'], gas_species: 'Mn, MnO, MnO2'}
+        - {oxide: Na2O(s), temperature_K: ['987-1114', '1144-1304', '984-1056', '873-1003'], gas_species: 'Na, Na2O, NaO, NaO2'}
+        - {oxide: SiO2(cristobalite), temperature_K: ['1840-1951', '1200-1950', '1600-1754'], gas_species: 'SiO, SiO2 >> Si'}
+        - {oxide: SiO2(l), temperature_K: ['1823-1983', '1833-1877', '1887-1988', '1800-2200'], gas_species: 'SiO, SiO2 >> Si'}
+        - {oxide: TiO2(rutile,l), temperature_K: ['1881', '2193', '1850-2540'], gas_species: 'TiO2, TiO, Ti'}
+      uncertainty: {note: 'No numeric uncertainty is printed for these compilation ranges.'}
+  Fe:
+    observations:
+    - observation_id: sossi_fegley_2018_table2_activity_coefficients
+      type: activity_coefficient_table
+      locator: {pdf_page_index: 22, table: '2', note: 'Table 2, printed pp. 23-24; all 28 listed oxide species transcribed below.'}
+      phase: complex_silicate_melt
+      regime: compiled_activity_measurements
+      units: K, composition labels, and dimensionless gamma as printed
+      values:
+        quantity: activity_coefficient
+        method_class: compilation_assessed
+        source_basis: cited determinations; review warns values are guides and composition/fO2 dependent
+        rows:
+        - {oxide: AlO1.5, temperature_K: '1573-1773', composition: 'CMAS (An-Di)', gamma: '0.28-0.37', reference: 'Ghiorso and Sack 1995'}
+        - {oxide: AsO1.5, temperature_K: '1573', composition: FCS, gamma: '0.03-0.56', reference: 'Chen and Jahanshahi 2010'}
+        - {oxide: BiO1.5, temperature_K: '1573', composition: FCS, gamma: '0.3-0.5', reference: 'Paulina et al. 2013'}
+        - {oxide: CaO, temperature_K: '1873', composition: 'CMAS (0.55 < Basicity < 0.65)', gamma: 'approximately 0.001-0.15', reference: 'Beckett 2002'}
+        - {oxide: CoO, temperature_K: ['1573-1873', '1673'], composition: ['(F)CMAS', CMAS], gamma: ['0.5-2.2', '0.8-1.8'], reference: 'Holzheid et al. 1997; O’Neill and Eggins 2002; O’Neill and Berry 2006'}
+        - {oxide: CrO, temperature_K: '1773', composition: CAS, gamma: '1.9-7.2', reference: 'Pretorius and Muan 1992'}
+        - {oxide: CrO1.5, temperature_K: '1773', composition: CAS, gamma: '23-42', reference: 'Pretorius and Muan 1992'}
+        - {oxide: CuO0.5, temperature_K: ['1573', '1923'], composition: ['(F)CMAS', CMAS], gamma: ['9-11', '3.5'], reference: 'Holzheid and Lodders 2001; Wood and Wade 2013'}
+        - {oxide: FeO, temperature_K: ['1600', '1573-1873', '1673', '1923'], composition: ['SKAnFa', '(F)CMAS', CMAS, CMAS], gamma: ['0.6-2.3', '1.2-2.1', '0.9-1.8', 'approximately 0.5-2.5'], reference: 'Doyle 1988; Holzheid et al. 1997; O’Neill and Eggins 2002; Wood and Wade 2013'}
+        - {oxide: GeO, temperature_K: '1423-1523', composition: FCAS, gamma: '1.44-2.55', reference: 'Yan and Swinbourne 2013'}
+        - {oxide: GeO2, temperature_K: '1573', composition: FCMS, gamma: '0.24-1.50', reference: 'Shuva et al. 2016'}
+        - {oxide: InO1.5, temperature_K: '1923', composition: CMAS, gamma: '0.02', reference: 'Wood and Wade 2013'}
+        - {oxide: KO0.5, temperature_K: '1573', composition: 'KFCAS with KAlSiO4(s)', gamma: '6.3e-5-7.1e-4', reference: 'Hastie et al. 1981'}
+        - {oxide: MgO, temperature_K: '1873', composition: 'CMAS (0.55 < Basicity < 0.65)', gamma: 'approximately 0.25-4', reference: 'Beckett 2002'}
+        - {oxide: MnO, temperature_K: ['1823-1923', '1873'], composition: ['FCMS(P)', CAS], gamma: ['0.7-3.5', '0.5-7.2'], reference: 'Suito and Inoue 1984; Ohta and Suito 1995'}
+        - {oxide: MoO2, temperature_K: ['1673', '1923'], composition: CMAS, gamma: ['67-227', 'approximately 5-100'], reference: 'O’Neill and Eggins 2002; Wood and Wade 2013'}
+        - {oxide: MoO3, temperature_K: '1673', composition: CMAS, gamma: '0.1-0.8', relation: 'log gamma_MoO3 = 1.49(log gamma_MoO2)-3.59', reference: 'O’Neill and Eggins 2002'}
+        - {oxide: NaO0.5, temperature_K: ['1623', '1673'], composition: ['CMAS', CMS], gamma: ['1e-3', '8.4e-4-2.2e-3'], reference: 'Mathieu et al. 2008; Mathieu et al. 2011'}
+        - {oxide: NiO, temperature_K: ['1573-1873', '1673', '1923'], composition: ['(F)CMAS', 'CMAS', CMAS], gamma: ['1.3-3.5', '2.0-4.3', 'approximately 1.5-3.0'], reference: 'Holzheid et al. 1997; O’Neill and Eggins 2002; O’Neill and Berry 2006; Wood and Wade 2013'}
+        - {oxide: PO2.5, temperature_K: '1823-1923', composition: CMFS, gamma: '1e-6-1e-10', reference: 'Turkdogan 2000'}
+        - {oxide: PbO, temperature_K: '1923', composition: CMAS, gamma: '0.22', reference: 'Wood and Wade 2013'}
+        - {oxide: SiO2, temperature_K: '1573-1773', composition: 'CMAS (An-Di)', gamma: '0.9-1.1', reference: 'Ghiorso and Sack 1995'}
+        - {oxide: SnO, temperature_K: '1573', composition: FCS, gamma: '5-6.2', reference: 'Takeda and Yazawa 1989'}
+        - {oxide: TiO2, temperature_K: '1573-1773', composition: CMAS, gamma: '1.5-1.7', reference: 'Ghiorso and Sack 1995'}
+        - {oxide: V2O3, temperature_K: ['1900', '2000', '2100'], composition: CMAS, gamma: ['1.2-20.8', '0.3-5.2', '0.05-1.65'], reference: 'Wang et al. 2010'}
+        - {oxide: WO2, temperature_K: '1673', composition: CMAS, gamma: '7.4-45', relation: 'log gamma_WO2 = log gamma_MoO2 - 2.20', reference: 'O’Neill et al. 2008'}
+        - {oxide: WO3, temperature_K: ['1673', '1923'], composition: CMAS, gamma: '0.02-0.3 at 1673 K', relation: 'printed note: log gamma_WO3 = log gamma_MoO3 - 1.42 for the 1923 K row', reference: 'O’Neill et al. 2008; Wood and Wade 2013'}
+        - {oxide: ZnO, temperature_K: '1673-1823', composition: CAS, gamma: '0.25-0.58', reference: 'Reyes and Gaskell 1983'}
+      uncertainty: {note: 'No uncertainty intervals are printed; ranges and approximate markers are retained.'}
+figures_not_digitized:
+  locator: {pdf_page_index: 25, figure: '3', note: 'Calculated partial vapour pressures over lunar basalt 12022; plotted values not transcribed.'}
+  admission_status: figure_only
+  measurements_seen: 'Cited KEMS data from De Maria et al. (1971) and Gooding and Muenow (1976); no point read from the figure.'
+apparatus_not_stated:
+  - primary KEMS cell geometry, orifice, Clausing factor, sample mass, exposed area, pumping, and run durations
+  - primary transpiration and torsion-effusion apparatus details
+  - primary lunar-basalt sample preparation and calibration details
+refused:
+  - what: measured_direct assignment or a single apparatus for the review tables
+    why: this source is a review and compilation; its tables cite primary experiments but do not report an authors-own apparatus or run set
+  - what: digitization of plotted Figure 3 values
+    why: values are figure-only and the brief forbids treating read-off points as printed values

@@ -1,0 +1,191 @@
+schema_version: literature_extract.v1
+source_id: ta-yamanaka-1997-metsoc
+source:
+  citation: >-
+    Yamanaka, A. & Tsuchiyama, A. (1997), "Evaporation experiments of Na from a
+    Na2O-SiO2 melt by thermogravimetry: Measurement of evaporation coefficients",
+    60th Annual Meteoritical Society Meeting, abstract 5122.
+  year: 1997
+extraction:
+  method: >-
+    Manual transcription from the clean one-page PDF using pdftotext -layout,
+    checked against a rendered page image. Figure 1 retained as figure-only;
+    plotted points were not digitised. No numeric result table is present.
+  date: '2026-09-20'
+  worker: i3-ta-yamanaka-1997-metsoc
+  provenance_path: raw/ta-yamanaka-1997-metsoc/ta-yamanaka-1997-metsoc.pdf
+review_status: draft
+species:
+  Na:
+    observations:
+    - observation_id: yamanaka_1997_na_thermogravimetry_conditions
+      type: rate_series
+      locator:
+        page: 1
+        section: Experiments
+      phase: Na2O-SiO2_glass_melt
+      standard_state: Na(g) evaporation from Na2O-SiO2 melt
+      regime: thermogravimetry_low_pressure_gas_mixing
+      units: as published
+      uncertainty:
+        note: No numerical uncertainties are printed for the composition, mass, temperature, oxygen partial pressure, or vacuum.
+      values:
+        quantity: evaporation_experiment_conditions
+        method_class: measured_direct
+        instrument: SETARAM TG-92 high-temperature mass balance
+        instrument_identification_limit_mg: 1
+        instrument_temperature_upper_limit_C: 1750
+        sample_mass_mg: about 15
+        sample_form: Na2O-SiO2 glass melt held on a Pt wire loop
+        composition_wt_pct:
+          Na2O: 24.99
+          SiO2: 75.01
+        liquidus_temperature_C: 800
+        temperature_range_C:
+        - 1300
+        - 1500
+        oxygen_partial_pressure_range_atm:
+        - 1e-13
+        - 1e-8
+        gas_mixing: H2/CO2 mixing gases
+        total_pressure_atm: about 1e-3
+        pressure_regime: low vacuum conditions
+        heating: constant temperature
+        sodium_distribution_in_recovered_samples: homogeneous by EPMA
+        epma_instrument: JEOL-733
+        absent_from_source:
+        - run duration
+        - exposed melt area
+        - Pt-loop dimensions
+        - pumping system or pump speed
+        - temperature sensor and calibration
+        - numerical uncertainty for measured conditions
+      equipment:
+        cell_material:
+          value: Pt wire loop
+          locator: {page: 1, section: Experiments}
+        chamber_pressure:
+          value: about 1e-3
+          units: atm
+          semantics: nominal_as_printed
+          locator: {page: 1, section: Experiments}
+    - observation_id: yamanaka_1997_na_measured_evaporation_mass_fit
+      type: rate_series
+      locator:
+        page: 1
+        section: Results and discussion
+        equation: '4'
+      phase: Na2O-SiO2_glass_melt
+      standard_state: Na(g) evaporation mass and partial pressure as defined by the authors
+      regime: thermogravimetry_surface_controlled_evaporation
+      units: as published
+      uncertainty:
+        note: No numerical uncertainty is printed; fitted zeta and eta are stated to come from least squares.
+      values:
+        quantity: evaporation_mass_time_fit
+        method_class: measured_direct
+        gas_species: Na(g)
+        measured_quantity: g is the measured evaporation mass
+        mass_balance_statement: experimental data fitted well with Eq. (4)
+        fit_parameters: zeta and eta obtained by the least square method
+        blank_experiment_result: pNa,0 = 0
+        blank_experiment_status: explicitly confirmed by blank experiments
+        equations_as_printed:
+          equation_1: J = alpha*(peNa - pNa)/(2*pi*mNa*k*T)^0.5
+          equation_2: peNa = peNa,0 + f1*g
+          equation_3: pNa = pNa,0 + f2*g
+          equation_4: g = -zeta*[exp(-eta*t) - 1]; zeta = (peNa - pNa)/(f1 + f2); eta = A*alpha*mNaO0.5*(f1 + f2)/(2*pi*mNa*k*T)^0.5
+        source_not_printed:
+        - numerical evaporation-mass time series
+        - numerical zeta
+        - numerical eta
+        - numerical alpha
+    - observation_id: yamanaka_1997_na_hkl_and_least_squares_model
+      type: alpha
+      locator:
+        page: 1
+        section: Results and discussion
+        equation: '1'
+      phase: Na2O-SiO2_glass_melt
+      standard_state: equilibrium and partial Na pressures in the authors' evaporation model
+      regime: Hertz-Knudsen_surface_process
+      units: dimensionless alpha; equation quantities otherwise as published
+      uncertainty:
+        note: No numerical uncertainty is printed; alpha is assumed constant within the fit.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: model_derived
+        model_generator: authors' Hertz-Knudsen equation with Eq. (4) least-squares fit
+        alpha_assumption: alpha is assumed to be constant for the fit
+        surface_area_assumption: A, the melt surface area, is assumed to be constant
+        alpha_pe_obtained_by: multiplying fitted zeta by fitted eta
+        alpha_bound_as_printed: 0 < alpha <= 1
+        equilibrium_pressure_source: activity coefficients calculated from Rego et al. (1985) and equilibrium constant from Chase et al. (1985) JANAF Thermochemical Tables, 3rd ed., p. 1577
+        reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
+        numerical_alpha_values_printed: false
+        numerical_activity_coefficients_printed: false
+        numerical_equilibrium_pressures_printed: false
+    - observation_id: yamanaka_1997_na_alpha_figure_only
+      type: alpha
+      locator:
+        page: 1
+        figure: '1'
+        section: Results and discussion
+      T_range_K:
+      - 1573.15
+      - 1673.15
+      phase: Na2O-SiO2_glass_melt
+      standard_state: alpha plotted against p(O2)
+      regime: thermogravimetry_surface_controlled_evaporation
+      units: dimensionless alpha; p(O2) in bar as plotted
+      uncertainty:
+        note: Figure 1 has no printed uncertainty values; plotted coordinates were not digitised.
+      values:
+        quantity: evaporation_coefficient_alpha_vs_oxygen_pressure
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        status: not_digitised
+        caption_as_printed: Evaporation coefficient, alpha, plotted against p(O2)
+        plotted_temperature_series_C:
+        - 1300
+        - 1400
+        plotted_total_pressure_bar_as_printed: 2x10^-3
+        x_axis_as_printed: p(O2) / bar, 1e-13 to 1e-5 decade ticks
+        y_axis_as_printed: alpha, 0.01 to 1 decade ticks
+        note: Alpha is stated in prose to be less than unity and temperature- and p(O2)-dependent; no exact point values are printed.
+    - observation_id: yamanaka_1997_na_compiled_thermodynamic_inputs
+      type: activity_coefficient
+      locator:
+        page: 1
+        section: Results and discussion
+      phase: Na2O-SiO2_glass_melt
+      standard_state: activity coefficients and equilibrium constant used to obtain peNa
+      regime: thermodynamic_input_to_author_model
+      units: as published
+      uncertainty:
+        note: Numerical inputs are not printed in this abstract.
+      values:
+        quantity: thermodynamic_inputs_for_equilibrium_Na_pressure
+        method_class: compilation_assessed
+        compiled_sources:
+        - Rego et al. (1985), Metallurgical Transactions 16B:313-323, activity coefficients
+        - Chase et al. (1985), JANAF Thermochemical Tables, 3rd ed., p. 1577, equilibrium constant
+        numerical_values_printed: false
+        role: peNa obtained as a function of p(O2) from compiled activity coefficients and equilibrium constant
+fidelity_samples:
+- species: Na
+  observation_id: yamanaka_1997_na_thermogravimetry_conditions
+  field: sample_mass_mg
+  value: about 15
+  locator: {page: 1, section: Experiments}
+- species: Na
+  observation_id: yamanaka_1997_na_thermogravimetry_conditions
+  field: composition_wt_pct
+  value: {Na2O: 24.99, SiO2: 75.01}
+  locator: {page: 1, section: Experiments}
+- species: Na
+  observation_id: yamanaka_1997_na_alpha_figure_only
+  field: plotted_total_pressure_bar_as_printed
+  value: 2x10^-3
+  locator: {page: 1, figure: '1'}

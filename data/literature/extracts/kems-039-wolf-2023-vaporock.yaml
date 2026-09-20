@@ -1,0 +1,290 @@
+schema_version: literature_extract.v1
+source_id: kems-039-wolf-2023-vaporock
+source:
+  citation: >-
+    Wolf, A. S., Jäggi, N., Sossi, P. A. & Bower, D. J. (2023), "VapoRock:
+    Thermodynamics of vaporized silicate melts for modeling volcanic outgassing
+    and magma ocean atmospheres", The Astrophysical Journal, arXiv:2208.09582v2.
+  doi: null
+  url: https://arxiv.org/abs/2208.09582
+  year: 2023
+extraction:
+  method: >-
+    Born-digital 40-page PDF transcribed with pdftotext -layout. Numeric table
+    cells and printed prose retained; unlabelled figure traces were not digitised.
+  date: '2026-09-20'
+  worker: extract-kems-039-wolf-2023-vaporock
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-039-wolf-2023-vaporock/kems-039-wolf-2023-vaporock.pdf
+review_status: draft
+evidence_policy:
+  classification: mixed_compilation_and_model
+  measurement_claim: >-
+    This is a computational VapoRock paper, not a new laboratory experiment.
+    No measured_direct rows are created. External KEMS values are retained only
+    as quoted_attributed or figure_only evidence and keep their primary authors.
+  engine_constraint: >-
+    VapoRock is one of this project's engines. Every model_derived row names
+    VapoRock (or explicitly names MAGMA where the paper reports the comparator);
+    model output is engine reference, never validation evidence.
+  apparatus_status: >-
+    The paper summarizes KEMS work by Hastie et al. and De Maria et al. but does
+    not print their sample mass, cell/orifice geometry, pumping, calibration,
+    fO2-control apparatus, or run durations. No apparatus record is attached.
+  absent_not_zero:
+    - primary KEMS apparatus parameters
+    - raw numeric pressure points underlying Figures 1 and 2
+    - printed uncertainty for the cited silicate-melt KEMS points
+fidelity_samples:
+- species: SiO
+  observable: p_partial
+  observation_id: wolf_2023_abstract_factor3_model_accuracy
+  field: model_accuracy_factor
+  value: '~3'
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    section: abstract
+    note: Abstract reports VapoRock agreement with experiments within a factor of approximately 3.
+- species: lunar_basalt_12065
+  observable: printed_major_oxide_composition
+  observation_id: wolf_2023_table2_lunar_basalt_12065_composition
+  field: composition_wt_pct.SiO2
+  value: 46.87
+  locator:
+    published_page: 14
+    pdf_page_index: 14
+    table: '2'
+    note: Table 2 Lunar basalt column; composition is reproduced from cited sources, not measured here.
+species:
+  VapoRock:
+    observations:
+    - observation_id: wolf_2023_vaporock_system_and_species
+      type: p_partial
+      class_tag: model
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        table: '1'
+        section: 2.2
+      phase: gas
+      regime: engine_evaluation
+      units: as printed; species list has no scalar value
+      values:
+        quantity: model_system_and_vapor_species
+        method_class: model_derived
+        generator: VapoRock
+        evidence_class: model_derived
+        measurement_status: model_output_not_measurement
+        liquid_model: MELTS (Ghiorso & Sack 1995)
+        gas_databases:
+        - NIST-JANAF / Chase 1998
+        - Lamoreaux & Hildenbrand 1984
+        - Lamoreaux et al. 1987
+        system_components: [SiO2, MgO, FeO, Fe2O3, Al2O3, CaO, Na2O, K2O, TiO2, Cr2O3]
+        vapor_species_count: 34
+        vapor_species_by_element:
+          Si: [Si, Si2, Si3, SiO, SiO2]
+          Mg: [Mg, Mg2, MgO]
+          Fe: [Fe, FeO]
+          Al: [Al, Al2, Al2O, AlO, Al2O2, AlO2]
+          Ca: [Ca, Ca2, CaO]
+          Na: [Na, Na2, NaO]
+          K: [K, K2, KO]
+          Ti: [Ti, TiO, TiO2]
+          Cr: [Cr, CrO, CrO2, CrO3]
+          O: [O, O2]
+    - observation_id: wolf_2023_eq9_sio_sio2_fo2_proxy
+      type: p_partial
+      class_tag: model
+      locator:
+        published_page: 25
+        pdf_page_index: 25
+        section: 4.5
+        equation: '9'
+      phase: gas
+      regime: engine_evaluation
+      units: log10 equilibrium constant; T in K
+      values:
+        quantity: log10_Kf
+        method_class: model_derived
+        generator: VapoRock using JANAF
+        evidence_class: model_derived
+        gas_reaction: SiO(g) + 1/2 O2(g) = SiO2(g)
+        logK_expression: 10278/T - 4.0436
+        proxy_expression: fO2 = (pSiO2 / (pSiO * K(7)))^2
+    - observation_id: wolf_2023_lunar_vaporock_activity_fits
+      type: activity
+      class_tag: model
+      locator:
+        published_page: 12
+        pdf_page_index: 12
+        section: 3.3
+      phase: condensed_liquid
+      regime: engine_evaluation
+      units: T in K; activity coefficients dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        generator: VapoRock
+        evidence_class: model_derived
+        composition: Apollo lunar basalt 12065
+        ln_gamma_NaO05: -20264/T + 2.37
+        ln_gamma_KO05: -28743/T + 3.36
+        gamma_KO05_over_gamma_NaO05:
+          T_1400_K: 0.006
+          T_1500_K: 0.009
+        model_comparison: VapoRock pNa agrees within factor 2 at 1400 and 1500 K extremes; pK is about 3 times low, improving to factor 2 by 1500 K.
+    - observation_id: wolf_2023_illite_and_srm_activity_fits
+      type: activity
+      class_tag: model
+      locator:
+        published_page: 11
+        pdf_page_index: 11
+        section: 3.2
+      phase: condensed_liquid
+      regime: engine_evaluation
+      units: T in K; activity coefficients dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        generator: VapoRock
+        evidence_class: model_derived
+        illite:
+          ln_gamma_SiO2: approximately_constant_0.80_plus_or_minus_0.01
+          ln_gamma_KO05: -29380/T + 4.13
+        SRM_621:
+          ln_gamma_NaO05: -18520/T + 1.85
+          ln_gamma_KO05: -26690/T + 5.64
+        model_comparison: illite pK within 50 percent and pSiO within factor 2 at highest temperatures; SRM pNa 3-4 times low and pK 2-3 times high.
+  external_KEMS:
+    observations:
+    - observation_id: wolf_2023_hastie_kems_scope_and_uncertainty
+      type: p_partial
+      class_tag: quoted
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        figure: '1'
+        section: 3.2
+      phase: gas
+      regime: quoted_literature
+      units: bar and K as printed
+      quote: Hastie et al. 1981 and Hastie & Bonnell 1985, 1986 KEMS measurements summarized by Wolf et al.
+      values:
+        quantity: p_partial
+        method_class: quoted_measurement
+        evidence_class: quoted_attributed
+        attribution: Hastie et al. 1981; Hastie & Bonnell 1985, 1986
+        source_measurement: SiO(g), Na(g), O2(g), and K(g) partial pressures above SRM 621 and illite liquids
+        temperature_ranges_K:
+          SRM_621: [1340, 1710]
+          illite: [1550, 1960]
+        stated_uncertainty: within 50 percent in chemically inert systems; likely higher for silicate melts
+        raw_pressure_points: absent_from_this_paper
+    - observation_id: wolf_2023_demaria_lunar_kems_scope
+      type: p_partial
+      class_tag: quoted
+      locator:
+        published_page: 12
+        pdf_page_index: 12
+        figure: '2'
+        section: 3.3
+      phase: gas
+      regime: quoted_literature
+      units: bar and K as printed
+      quote: De Maria et al. 1971 KEMS measurements summarized by Wolf et al.
+      values:
+        quantity: p_partial
+        method_class: quoted_measurement
+        evidence_class: quoted_attributed
+        attribution: De Maria et al. 1971
+        source_measurement: Na(g), K(g), O2(g), Fe(g), SiO(g), Mg(g), Mn(g), Cr(g), Ca(g), Al(g), AlO(g), TiO(g), and TiO2(g) partial pressures
+        samples: [Apollo 12022, Apollo 12065]
+        heated_to_K: {12022: 2270, 12065: 2500}
+        pO2_determined_range_K: [1396, 1499]
+        comparison_range_used_by_VapoRock_K: [1400, 1500]
+        stated_uncertainty: approximately 50 percent relative for KEMS-derived partial pressures
+        raw_pressure_points: absent_from_this_paper
+    - observation_id: wolf_2023_lunar_basalt_12065_composition_compiled
+      type: rate_series
+      class_tag: quoted
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+        table: '2'
+      phase: condensed_solid
+      regime: compilation_assessed
+      units: wt% as printed
+      values:
+        quantity: printed_major_oxide_composition
+        method_class: compilation_derived
+        evidence_class: compilation_assessed
+        generator: Wolf et al. Table 2 compilation from Maxwell & Wiik 1971 and Meyer 2004, with De Maria et al. 1971 cited for the lunar basalt context
+        composition_wt_pct: {SiO2: 46.87, MgO: 7.82, Al2O3: 10.05, TiO2: 3.34, FeO: 19.76, CaO: 10.73, Na2O: 0.27, K2O: 0.073, MnO: 0.256}
+        trace_omissions: [H2O, P2O5, NiO, Cr2O3]
+    - observation_id: wolf_2023_table2_model_compositions
+      type: rate_series
+      class_tag: quoted
+      locator:
+        published_page: 14
+        pdf_page_index: 14
+        table: '2'
+      phase: condensed_liquid
+      regime: compilation_assessed
+      units: wt% as printed
+      values:
+        quantity: printed_major_oxide_composition
+        method_class: compilation_derived
+        evidence_class: compilation_assessed
+        generator: Wolf et al. Table 2 compilation; source references are in the printed table note
+        compositions:
+          Tholeiite: {SiO2: 50.71, MgO: 4.68, Al2O3: 14.48, TiO2: 1.70, Fe2O3: 4.89, FeO: 9.07, CaO: 8.83, Na2O: 3.16, K2O: 0.77, MnO: 0.22, H2O: 1.04, P2O5: 0.36, Total: 99.91}
+          Alkali_basalt: {SiO2: 44.80, MgO: 11.07, Al2O3: 13.86, TiO2: 1.96, Fe2O3: 2.91, FeO: 9.63, CaO: 10.16, Na2O: 3.19, K2O: 1.09, MnO: 0.17, H2O: 0.73, P2O5: 0.55, Total: 100.12}
+          Komatiite: {SiO2: 47.10, MgO: 29.60, Al2O3: 4.04, TiO2: 0.24, FeO: 11.5, CaO: 5.44, Na2O: 0.46, K2O: 0.09, MnO: 0.22, P2O5: 0.05, Total: 100.04}
+          Dunite: {SiO2: 40.20, MgO: 43.20, Al2O3: 0.80, TiO2: 0.20, Fe2O3: 1.90, FeO: 11.9, CaO: 0.80, Na2O: 0.30, K2O: 0.10, MnO: 0.20, H2O: 0.40, P2O5: 0.10, Total: 100.10}
+          Bishop_Tuff: {SiO2: 75.60, MgO: 0.25, Al2O3: 13.00, TiO2: 0.21, FeO: 1.10, CaO: 0.95, Na2O: 3.35, K2O: 5.55, Total: 100.01}
+          Type_B_CAI: {SiO2: 44.78, MgO: 17.05, Al2O3: 11.41, CaO: 26.76, Total: 100.00}
+          Lunar_basalt: {SiO2: 46.87, MgO: 7.82, Al2O3: 10.05, TiO2: 3.34, FeO: 19.76, CaO: 10.73, Na2O: 0.27, K2O: 0.073, MnO: 0.256, Total: 100.36}
+          BSE: {SiO2: 45.97, MgO: 36.66, Al2O3: 4.77, TiO2: 0.18, FeO: 8.24, CaO: 3.78, Na2O: 0.35, K2O: 0.04, MnO: 0.14, H2O: 0.11, P2O5: 0.02, NiO: 0.24, Total: 100.50}
+    - observation_id: wolf_2023_table3_vaporock_vs_magma22
+      type: p_partial
+      class_tag: model
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+        table: '3'
+        section: 3.4
+      phase: gas
+      regime: engine_evaluation
+      units: elemental abundances relative to Na; column scale factors as printed
+      values:
+        quantity: model_elemental_vapor_abundance
+        method_class: model_derived
+        generator: VapoRock, compared with MAGMA 04 and MAGMA 22
+        evidence_class: model_derived
+        temperature_K: 1900
+        oxygen_fugacity: composition-specific IW values printed in Table 3
+        column_scale_factors: {Na: 100, K: 1e-4, Al: 1e-9, Si: 1e-3, Ca: 1e-8, Ti: 1e-6, Fe: 1e-3, Mg: 1e-4}
+        rows_as_printed: Table 3 contains VapoRock, MAGMA 04, MAGMA 22, and [M/Na]/[M/Ca] ratios for Tholeiite, Alkali basalt, Komatiite, Dunite, and Bishop Tuff.
+        headline_comparison: VapoRock and MAGMA 22 generally agree within factor 5 for K and within factors 3-5 for Na after Ca normalization; MAGMA 04 K differs by roughly 2-3 orders of magnitude.
+    - observation_id: wolf_2023_bse_vapor_model_scope
+      type: p_partial
+      class_tag: model
+      locator:
+        published_page: 22
+        pdf_page_index: 22
+        section: 4.3
+        figure: '4'
+      phase: gas
+      regime: engine_evaluation
+      units: bar as plotted; T range in K
+      values:
+        quantity: p_partial
+        method_class: model_derived
+        generator: VapoRock
+        evidence_class: model_derived
+        composition: Bulk Silicate Earth
+        temperature_range_K: [1500, 3000]
+        oxygen_fugacity_source: Schaefer & Fegley 2009 and ONeill et al. 1998
+        dominant_species_by_element: {Na: Na, Si: SiO, Mg: Mg, Al: AlO, Ti: TiO2, Fe: Fe, Ca: Ca, K: K, Cr: CrO2}
+        printed_trend: Na dominates until approximately 2700 K, then SiO; SiO reaches 0.01 to 0.1 bar at the upper end.

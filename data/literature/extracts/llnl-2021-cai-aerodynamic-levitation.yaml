@@ -1,0 +1,175 @@
+schema_version: literature_extract.v1
+source_id: llnl-2021-cai-aerodynamic-levitation
+source:
+  citation: >-
+    Ryerson, F. J., Badro, J., Sossi, P. A., Deng, Z., Borensztajn, S. & Wehr, N.
+    (2022), "Experimental investigation of elemental and isotopic evaporation
+    processes by laser heating in an aerodynamic levitation furnace",
+    Comptes Rendus Geoscience.
+  year: 2022
+  related_sources:
+  - source_id: kems-010-richter-2007
+    relation: same_B_type_CAI_starting_composition_and_temperature_vacuum_comparison
+extraction:
+  method: >-
+    Born-digital LLNL-JRNL-832617 PDF from regolith-corpus raw source (16 pages,
+    clean text layer), transcribed with pdftotext -layout. Numeric values are
+    retained as printed; no figure values were digitised and no geometry was
+    computed from a diameter.
+  date: '2026-09-20'
+  worker: extract-llnl-2021-cai-aerodynamic-levitation
+review_status: draft
+corrections:
+- issue: experiment_duration_disagreement
+  note: Abstract states 60-600 s; §3 states 180-900 s. Both are retained and neither is reconciled.
+  locators:
+  - {pdf_page_index: 3, section: Abstract}
+  - {pdf_page_index: 6, section: 3. Experiments and analyses}
+fidelity_samples:
+- path: species.B_type_CAI.observations[ryerson_2022_CAI_starting_and_evaporated_composition_table1].values.samples[0].MgO_wt_pct
+  value: 11.61
+  locator: {pdf_page_index: 5, table: '1', row: VP1, column: MgO (wt%)}
+species:
+  B_type_CAI:
+    observations:
+    - observation_id: ryerson_2022_CAI_starting_and_evaporated_composition_table1
+      type: rate_series
+      class_tag: measured
+      locator:
+        pdf_page_index: 5
+        table: '1'
+        section: Elemental and isotopic composition of the evaporated samples
+      quote: Table 1 reports the elemental composition of the starting melt and six levitation-furnace residues.
+      phase: glass
+      regime: aerodynamic_levitation_evaporation
+      units: wt% for oxides; dimensionless ratios
+      values:
+        quantity: oxide_composition_and_elemental_loss_series
+        method_class: measured_direct
+        material: B-type calcium-aluminium-rich inclusion (CAI) melt
+        starting_composition_wt_pct: {MgO: 12.0, SiO2: 46.0, Al2O3: 19.0, CaO: 23.0}
+        samples:
+        - {sample: VP1, MgO_wt_pct: 11.61, SiO2_wt_pct: 37.62, Al2O3_wt_pct: 22.99, CaO_wt_pct: 27.78, MgO_Al2O3: 0.5050, SiO2_Al2O3: 1.6364, f_Mg: 0.800, f_Si: 0.676}
+        - {sample: VP2, MgO_wt_pct: 12.05, SiO2_wt_pct: 40.03, Al2O3_wt_pct: 21.74, CaO_wt_pct: 26.18, MgO_Al2O3: 0.5543, SiO2_Al2O3: 1.8413, f_Mg: 0.878, f_Si: 0.761}
+        - {sample: VP3, MgO_wt_pct: 11.90, SiO2_wt_pct: 41.45, Al2O3_wt_pct: 21.16, CaO_wt_pct: 25.49, MgO_Al2O3: 0.5624, SiO2_Al2O3: 1.9589, f_Mg: 0.890, f_Si: 0.809}
+        - {sample: VP4, MgO_wt_pct: 11.94, SiO2_wt_pct: 41.68, Al2O3_wt_pct: 21.08, CaO_wt_pct: 25.31, MgO_Al2O3: 0.5664, SiO2_Al2O3: 1.9772, f_Mg: 0.897, f_Si: 0.817}
+        - {sample: VP5, MgO_wt_pct: 11.90, SiO2_wt_pct: 39.08, Al2O3_wt_pct: 22.25, CaO_wt_pct: 26.77, MgO_Al2O3: 0.5348, SiO2_Al2O3: 1.7564, f_Mg: 0.847, f_Si: 0.725}
+        - {sample: VP6, MgO_wt_pct: 10.77, SiO2_wt_pct: 34.81, Al2O3_wt_pct: 24.51, CaO_wt_pct: 29.92, MgO_Al2O3: 0.4394, SiO2_Al2O3: 1.4202, f_Mg: 0.696, f_Si: 0.587}
+      apparatus_and_conditions:
+        sample_form: six spherical glass samples, approximately 2 mm diameter after quench
+        preparation: high-purity SiO2, MgO, Al2O3 and CaCO3 powders; fired at 900 C overnight; pressed to a pellet
+        initial_chunks: six 15 mg chunks
+        initial_fusion_temperature_C: 1600
+        initial_fusion_duration_s: 30
+        initial_levitating_gas: pure O2
+        quench_rate_C_per_s: 850
+        evaporation_temperature_K: 1873
+        evaporation_gas_molar_ratio: {Ar_pct: 92.0, CO2_pct: 1.6, H2_pct: 6.4}
+        oxygen_fugacity_log10_atm: -9.1
+        oxygen_fugacity_buffer_relation: 0.5 log unit below iron-wustite buffer, whose log fO2 is -8.6
+        experiment_duration_as_printed_in_abstract_s: [60, 600]
+        experiment_duration_as_printed_in_methods_s: [180, 900]
+        duration_disagreement: abstract_and_methods_differ; both ranges retained
+    - observation_id: ryerson_2022_isotope_ratios_table1
+      type: rate_series
+      class_tag: measured
+      locator:
+        pdf_page_index: 5
+        table: '1'
+        section: Elemental and isotopic composition of the evaporated samples
+      phase: glass
+      regime: aerodynamic_levitation_evaporation
+      units: per mil relative to BHVO-2G; 2se as printed
+      values:
+        quantity: evaporated_residue_isotope_compositions
+        method_class: measured_direct
+        standard: BHVO-2G
+        samples:
+        - {sample: VP1, d26Mg_permil: -3.78, d26Mg_2se_permil: 0.19, d25Mg_permil: -1.98, d25Mg_2se_permil: 0.12, d30Si_permil: -1.73, d30Si_2se_permil: 0.04, d29Si_permil: -0.78, d29Si_2se_permil: 0.02}
+        - {sample: VP2, d26Mg_permil: -4.39, d26Mg_2se_permil: 0.21, d25Mg_permil: -2.29, d25Mg_2se_permil: 0.12, d30Si_permil: -2.63, d30Si_2se_permil: 0.17, d29Si_permil: -1.27, d29Si_2se_permil: 0.08}
+        - {sample: VP3, d26Mg_permil: -4.80, d26Mg_2se_permil: 0.22, d25Mg_permil: -2.49, d25Mg_2se_permil: 0.14, d30Si_permil: -2.68, d30Si_2se_permil: 0.31, d29Si_permil: -1.17, d29Si_2se_permil: 0.30}
+        - {sample: VP4, d26Mg_permil: -4.62, d26Mg_2se_permil: 0.22, d25Mg_permil: -2.40, d25Mg_2se_permil: 0.13, d30Si_permil: -2.79, d30Si_2se_permil: 0.07, d29Si_permil: -1.33, d29Si_2se_permil: 0.05}
+        - {sample: VP5, d26Mg_permil: -4.22, d26Mg_2se_permil: 0.28, d25Mg_permil: -2.19, d25Mg_2se_permil: 0.15, d30Si_permil: -2.26, d30Si_2se_permil: 0.28, d29Si_permil: -0.97, d29Si_2se_permil: 0.26}
+        - {sample: VP6, d26Mg_permil: -2.27, d26Mg_2se_permil: 0.14, d25Mg_permil: -1.15, d25Mg_2se_permil: 0.10, d30Si_permil: -1.04, d30Si_2se_permil: 0.11, d29Si_permil: -0.40, d29Si_2se_permil: 0.06}
+      apparatus_and_conditions:
+        elemental_analysis: Zeiss Auriga 40 field-emission-gun SEM with windowless Bruker Quantax XFlash EDX
+        isotope_analysis: 193 nm ATLEX 300si excimer laser with Thermo-Scientific NeptunePlus MC-ICP-MS
+        ablation_spot_size_um: 110
+        ablation_repetition_rate_Hz: 4
+        helium_flow_L_per_min: 1.2
+        laser_fluence_J_per_cm2: 4.05
+        laser_burst_shots_per_spot: 400
+        washout_time_s: 10
+        pause_after_spot_s: 60
+        mass_resolution_M_over_delta_M: 5000
+        isotope_integration_cycles: {Mg: 13, Si: 21}
+        integration_time_s_per_cycle: 4
+    - observation_id: ryerson_2022_fractionation_factors_table2
+      type: alpha
+      class_tag: measured_reduced
+      locator:
+        pdf_page_index: 14
+        table: '2'
+        section: Isotopic fractionation factors
+      phase: glass
+      regime: aerodynamic_levitation_evaporation
+      units: dimensionless alpha; 2SD dimensionless
+      values:
+        quantity: isotope_fractionation_factors
+        method_class: measured_reduced
+        generator: Rayleigh_evaporation_fit_to_measured_isotope_ratios
+        rows:
+        - {isotope_pair: d30Si, alpha_advective: 0.9943, uncertainty_2SD: 0.0006, comparison_vacuum: 0.9780, comparison_1_atm_diffusive: 0.9933}
+        - {isotope_pair: d29Si, alpha_advective: 0.9970, uncertainty_2SD: 0.0004, comparison_vacuum: 0.9888, comparison_1_atm_diffusive: 0.9966}
+        - {isotope_pair: d26Mg, alpha_advective: 0.9906, uncertainty_2SD: 0.0008, comparison_vacuum: 0.9608, comparison_1_atm_diffusive: 0.9841}
+        - {isotope_pair: d25Mg, alpha_advective: 0.9950, uncertainty_2SD: 0.0006, comparison_vacuum: 0.9798, comparison_1_atm_diffusive: 0.9918}
+    - observation_id: ryerson_2022_modified_HKL_saturation_factor
+      type: rate_series
+      class_tag: model_derived
+      locator:
+        pdf_page_index: 13
+        section: 4.2 Isotopic fractionation
+      phase: glass
+      regime: advective_HKL
+      units: dimensionless
+      values:
+        quantity: vapor_to_saturation_pressure_ratio
+        method_class: model_derived
+        generator: modified_Hertz_Knudsen_Langmuir_inverted_from_isotope_fractionation
+        Mg: {value: 0.74, uncertainty: 0.02}
+        Si: {value: 0.76, uncertainty: 0.04, gas_species: SiO}
+        abstract_summary: 0.75
+        note: p_i and p_i,eq were not measured; saturation factors were constrained from isotope data using Eq. 19.
+    - observation_id: ryerson_2022_aerodynamic_transport_conditions
+      type: rate_series
+      class_tag: measured_direct
+      locator:
+        pdf_page_index: 4
+        section: 2. Experimental setup
+      phase: glass
+      regime: aerodynamic_levitation
+      units: as printed
+      values:
+        quantity: furnace_geometry_and_transport_conditions
+        method_class: measured_direct
+        gas_flow_sccm: [800, 1000]
+        gas_flow_cm3_per_s: [14, 18]
+        nozzle_hole_diameter_mm: 1.5
+        advective_velocity_m_per_s: [8, 10]
+        sample_radius_mm_typical: 1.0
+        sample_radius_assumption: typical_sample_size_used in transport estimate; not an individual measured sample record
+        argon_density_kg_per_m3: 1.7
+        melt_density_kg_per_m3: 2800
+        drag_coefficient_assumed: 0.47
+        gravity_m_per_s2: 9.8
+        calculated_levitation_velocity_m_per_s: 9.5
+        argon_kinematic_viscosity_room_m2_per_s: 1.4e-5
+        argon_kinematic_viscosity_at_1600C_m2_per_s: 8.0e-5
+        reynolds_number_room_temperature_range: [1000, 1500]
+        reynolds_number_near_sample_at_1600C_range: [200, 300]
+        schmidt_number_order_of_magnitude: 0.05
+        diffusion_coefficient_m2_per_s_order_of_magnitude: 1.0e-4
+        peclet_number_levitation_order_of_magnitude: 10
+        peclet_number_tube_furnace: 0.1
+        peclet_number_vacuum_furnace: 0
+        note: Values labelled assumed, typical, order-of-magnitude, or calculated remain distinct from direct measurements.

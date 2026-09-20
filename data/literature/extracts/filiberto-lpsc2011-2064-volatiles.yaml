@@ -1,0 +1,250 @@
+schema_version: literature_extract.v1
+source_id: filiberto-lpsc2011-2064-volatiles
+source:
+  citation: >-
+    Filiberto, J., Treiman, A. H. & Dasgupta, R. (2011), "Comparing the effects
+    of H2O, F, and Cl on near-liquidus phase equilibria of a model high-Fe
+    basalt: implications for volatile induced mantle melting", 42nd Lunar and
+    Planetary Science Conference, abstract 2064.
+  year: 2011
+extraction:
+  method: layout-preserving pdftotext transcription; explicit prose and figure captions only
+  date: '2026-09-20'
+  worker: i1-filiberto-lpsc2011-2064-volatiles
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+review_status: draft
+scope_assessment:
+  document_type: 2-page LPSC conference abstract reporting experiments, not a full experimental paper
+  measured_direct_observations: 0
+  method_observations: 3
+  figure_only_observations: 2
+  quoted_attributed_observations: 2
+  model_derived_observations: 2
+  absent_from_source:
+  - sample mass
+  - capsule dimensions and geometry
+  - run durations
+  - temperature measurement and calibration
+  - oxygen fugacity control
+  - numerical tables of liquidus temperatures or Fe-Mg partition coefficients
+  - digitized values from Figures 1 and 2
+  open_question: >-
+    Controller was asked whether a conference abstract should be admitted as an
+    extract; no reply was present when this conservative extract was prepared.
+  note: >-
+    The abstract explicitly states experimental starting materials and pressure
+    conditions. No apparatus parameter was inferred, and figure values were not
+    digitized. Nominal volatile additions are retained as printed, not relabeled
+    as measured concentrations.
+unmapped_lab_parameter_names:
+- capsule_pressure_GPa
+- volatile_addition_wt_pct
+species:
+  F:
+    observations:
+    - observation_id: filiberto_2011_experimental_method_fluorine
+      type: method_reference
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 1
+        section: Experimental technique
+      phase: synthetic_Humphrey_basalt
+      regime: high_pressure_graphite_capsule_experiment
+      units: as printed
+      values:
+        method_class: method_only
+        starting_material: Martian Adirondack-class basalt Humphrey
+        volatile_condition: nominally volatile free and fluorine-bearing comparison
+        volatile_addition_wt_pct: 1.75
+        additive: AgF2
+        capsule: graphite
+        pressure_GPa_range: [0.5, 2]
+        note: Nominal starting addition and experiment condition; not a tabulated measured melt concentration.
+      uncertainty:
+        reported_status: not_reported
+  Cl:
+    observations:
+    - observation_id: filiberto_2011_experimental_method_chlorine
+      type: method_reference
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 1
+        section: Experimental technique
+      phase: synthetic_Humphrey_basalt
+      regime: high_pressure_graphite_capsule_experiment
+      units: as printed
+      values:
+        method_class: method_only
+        starting_material: Martian Adirondack-class basalt Humphrey
+        volatile_condition: chlorine-bearing comparison
+        volatile_addition_wt_pct: 0.7
+        additive: AgCl
+        capsule: graphite
+        pressure_GPa_range: [0.5, 2]
+        note: Nominal starting addition and experiment condition; not a tabulated measured melt concentration.
+      uncertainty:
+        reported_status: not_reported
+  H2O:
+    observations:
+    - observation_id: filiberto_2011_experimental_method_water
+      type: method_reference
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 1
+        section: Experimental technique
+      phase: similar_high_Fe_basalt
+      regime: high_pressure_experiment
+      units: wt% and GPa as printed
+      values:
+        method_class: method_only
+        volatile_condition: hydrous comparison
+        bulk_H2O_wt_pct: 0.8
+        pressure_GPa_range: [0.5, 2]
+        note: The abstract says hydrous experiments were conducted on a similar bulk composition; it does not state graphite capsules for this arm.
+      uncertainty:
+        reported_status: not_reported
+  F_Cl_H2O:
+    observations:
+    - observation_id: filiberto_2011_figure1_near_liquidus_relations
+      type: phase_relation
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 1
+        figure: '1'
+        section: Results
+      phase: synthetic_Humphrey_basalt_near_liquidus
+      regime: high_pressure_graphite_capsule_experiment
+      units: figure_only; axes in °C and GPa
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: experimentally_determined_near_liquidus_phase_relations
+        series:
+        - nominally_volatile_free
+        - F_1.75_wt_pct
+        - Cl_0.7_wt_pct
+        - H2O_0.8_wt_pct
+        phase_fields_printed: [Liquid, Olivine_plus_Liquid, Olivine_plus_Pyroxene_plus_Liquid, Pyroxene_plus_Liquid]
+        numeric_points: not_digitized
+        note: Figure caption and plotted phase fields retained; no values read from the graph.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: filiberto_2011_figure2_liquidus_depression_relation
+      type: liquidus_depression
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 1
+        figure: '2'
+        section: Liquidus Depression
+      phase: volatile_bearing_basalt_melt
+      regime: high_pressure_experiment_and_comparison_models
+      units: figure_only; ΔT in °C as printed
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: liquidus_temperature_depression
+        definition: volatile_free_liquidus_temperature_minus_experimental_run_temperature
+        qualitative_result: F and Cl have, within error, the same effect on liquidus depression on a weight-percent basis; F and Cl are about twice as effective as H on an atomic-fraction basis.
+        regression_line: ΔT = Volatile-free liquidus T - experimental run temperature in °C
+        numeric_points: not_digitized
+      uncertainty:
+        reported_status: within_error_statement_only
+  Fe-Mg:
+    observations:
+    - observation_id: filiberto_2011_figure1_fe_mg_partitioning
+      type: partitioning_trend
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 2
+        figure: '1'
+        section: Fe-Mg Partitioning
+      phase: olivine_and_pyroxene_coexisting_with_melt
+      regime: volatile_bearing_basalt_experiment_comparison
+      units: figure_only; Kd Fe-Mg dimensionless as printed
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: KDmin_Fe-Mg_mineral_minus_melt
+        qualitative_result: F increases Kd; Cl decreases Kd; water has no significant effect compared with volatile-free systems.
+        numeric_points: not_digitized
+      uncertainty:
+        reported_status: qualitative_comparison_only
+    - observation_id: filiberto_2011_author_calculated_martian_effects
+      type: planetary_implication
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 2
+        section: Implications
+      phase: Martian_basalt_melt_and_minerals
+      regime: author_calculation_from_volatile_abundances
+      units: °C and dimensionless Kd as printed
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: authors' calculation using cited Martian volatile abundances and the experimental trends
+        liquidus_shift_C: 30
+        KDmin_Fe-Mg_shift: -0.01
+        affected_minerals: [pyroxene, olivine]
+        note: Printed expectation, not a new measurement; source says the Fe-Mg shift applies to both pyroxene and olivine.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: filiberto_2011_author_calculated_lunar_effects
+      type: planetary_implication
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 2
+        section: Implications
+      phase: lunar_magma
+      regime: author_calculation_from_volatile_abundances
+      units: °C and dimensionless Kd as printed
+      values:
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: authors' calculation using cited lunar volatile abundances and the experimental trends
+        liquidus_shift_C: '< 10'
+        KDmin_Fe-Mg_shift: -0.005
+        note: Printed bound and estimate retained separately; no point value substituted for the liquidus bound.
+      uncertainty:
+        reported_status: not_reported
+  planetary_volatile_abundances:
+    observations:
+    - observation_id: filiberto_2011_quoted_martian_volatile_abundances
+      type: composition_reference
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 2
+        section: Fe-Mg Partitioning
+      phase: Martian_basalt
+      regime: quoted_literature_composition
+      units: wt% as printed
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        generator: cited literature [3, 18]
+        upper_bounds_or_typical_values:
+          F_wt_pct: 0.2
+          Cl_wt_pct: 0.3
+          H2O_wt_pct: 0.2
+        note: Attributed in source to cited literature; not measured by this abstract.
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: filiberto_2011_quoted_lunar_volatile_abundances
+      type: composition_reference
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+        published_page: 2
+        section: Fe-Mg Partitioning
+      phase: lunar_magma
+      regime: quoted_literature_composition
+      units: ppm as printed
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        generator: cited literature [5, 7, 9]
+        reported_values:
+          H2O_ppm: '< 850'
+          Cl_ppm: similar_amounts_to_H2O
+          F_ppm: 10
+        note: Bounds and qualitative comparison retained as printed; no point estimate substituted for similar amounts.
+      uncertainty:
+        reported_status: not_reported

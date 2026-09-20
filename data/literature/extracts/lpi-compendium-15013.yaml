@@ -1,0 +1,227 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-15013
+source:
+  citation: 'Meyer, C. (2010), Lunar Sample Compendium entry 15013, Lunar and Planetary Institute/NASA.'
+  year: 2010
+extraction:
+  method: 'pdftotext -layout transcription checked against rendered PDF pages; plotted curves and image-only particle dimensions not digitized'
+  date: '2026-09-20'
+  worker: i2-lpi-compendium-15013
+  source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  source_pdf_pages: 6
+  provenance_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  scope: 'secondary lunar sample compendium entry; sample provenance and characterization are retained as measurements, cited analyses as attributed/compiled values'
+review_status: draft
+fidelity_samples:
+- path: species.sample_15013.observations[lpi_15013_sample_mass_and_collection].values.sample_mass_g
+  value: 296.2
+  locator: {pdf_page_index: 1, section: Introduction, figure: '1'}
+source_locators:
+  page_1: &page_1
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 1
+  page_2: &page_2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 2
+  page_3: &page_3
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 3
+  table_1: &table_1
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 4
+    table: '1'
+  page_5: &page_5
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 5
+  page_6: &page_6
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    pdf_page_index: 6
+coverage:
+  evidence_classes:
+  - measured_tabulated
+  - quoted_attributed
+  - compilation_assessed
+  - figure_only
+  absent_parameters:
+  - thermal_vaporization_apparatus
+  - crucible_or_effusion_orifice_geometry
+  - exposed_area_for_a_vaporization_run
+  - vacuum_level_during_a_vaporization_run
+  - pumping_speed
+  - run_duration
+  - temperature_calibration_for_a_vaporization_run
+  - fO2_control
+sample_characterization:
+  sample_15013:
+    observations: &sample_15013_observations
+    - observation_id: lpi_15013_sample_mass_and_collection
+      type: sample_characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+      units: as_published
+      values:
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        sample_id: '15013'
+        sample_form: lunar soil
+        sample_mass_g: 296.2
+        collection_location: surface under the Lunar Module
+        collection_container: special environmental sample container (SESC)
+        container_status_on_opening: 'wire caught in seal; container was not under vacuum when opened'
+      quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
+    - observation_id: lpi_15013_maturity_and_grain_size
+      type: sample_characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
+      units: as_published
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        sample_id: '15013'
+        maturity_index_Is_FeO: 77
+        average_grain_size_micrometres: 52
+        maturity_index_source: Morris 1978
+        note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
+      disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
+    - observation_id: lpi_15013_carbon_and_nitrogen
+      type: sample_characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
+      units: as_published
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        sample_id: '15013'
+        carbon_ppm:
+        - {value: 150, source: 'Moore et al. 1973'}
+        - {value: 103, source: 'Des Marais et al. 1973'}
+        nitrogen_ppm:
+        - {value: 98, source: 'Kothari and Goel 1972'}
+        - {value: 113, source: 'Muller 1973'}
+      note: 'These are attributed reported analyses; the compendium does not state an apparatus or uncertainty for the original determinations here.'
+  figure_only_characterization:
+    observations: &sample_15013_figure_observations
+    - observation_id: lpi_15013_grain_size_distribution_figure_only
+      type: sample_characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
+      units: as_published
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: grain_size_distribution
+        sample_id: '15013'
+        source_attribution: 'Graf 1993'
+        plotted_values: not_digitized
+    - observation_id: lpi_15013_maturity_carbon_figure_only
+      type: sample_characterization
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
+      units: as_published
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: maturity_index_vs_carbon_content
+        plotted_values: not_digitized
+        source_attribution: 'Moore et al. 1973; Morris 1978'
+    - observation_id: lpi_15013_ree_normalized_pattern_figure_only
+      type: composition_pattern
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
+      units: normalized_to_chondrite_as_plotted
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: rare_earth_element_pattern
+        sample_id: '15013'
+        source_attribution: 'Korotev 1987'
+        plotted_values: not_digitized
+chemical_composition:
+  sample_15013_and_reference_materials:
+    observations: &sample_15013_chemistry_observations
+    - observation_id: lpi_15013_table1_major_oxide_composition
+      type: composition_table
+      locator: *table_1
+      units: wt_percent_as_published
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        quantity: chemical_composition
+        sample_scope: '15013 and 15020; Table 1 also labels a 15021 reference column'
+        column_identity_note: 'The printed layout labels source columns Christian76, Korotev87, Laul73, and Wanke73. The Laul73/Wanke73 columns are retained by printed source label; this extract does not infer which of the 15013/15020/15021 sample headings each subcolumn represents.'
+        oxide_rows:
+          SiO2: {Christian76: 46.94, Wanke73: 47.07}
+          TiO2: {Christian76: 1.72, Korotev87: 1.97, Laul73: [1.8, 1.8], Wanke73: 1.75}
+          Al2O3: {Christian76: 14.46, Korotev87: 14.8, Laul73: [14.1, 14.1], Wanke73: 14.17}
+          FeO: {Christian76: 14.98, Korotev87: 14.8, Laul73: [15, 15], Wanke73: 14.92}
+          MnO: {Christian76: 0.21, Korotev87: 0.2, Laul73: [0.19, 0.184], Wanke73: 0.18}
+          MgO: {Christian76: 10.35, Korotev87: 10.8, Laul73: [10], Wanke73: 10.44}
+          CaO: {Christian76: 10.38, Korotev87: 10, Laul73: [10.8, 10.7], Wanke73: 8.95}
+          Na2O: {Christian76: 0.44, Korotev87: 0.46, Laul73: [0.434, 0.426], Wanke73: 0.39}
+          K2O: {Christian76: 0.22, Laul73: [0.22, 0.22], Wanke73: 0.2}
+          P2O5: {Christian76: 0.22}
+        analytical_technique_key: {a: microchemical, b: INAA}
+      note: 'Blank cells are absent, not zero. The table is a compilation of cited analyses, not a new apparatus record.'
+    - observation_id: lpi_15013_table1_trace_element_composition
+      type: composition_table
+      locator: *table_1
+      units: mixed_ppm_and_ppb_as_published
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        quantity: trace_element_composition
+        column_identity_note: 'Values remain under the printed source columns; no sample identity is inferred for the ambiguous Laul73/Wanke73 subcolumns.'
+        rows:
+          Sc_ppm: {Korotev87: 28.7, Laul73: [28, 27], Wanke73: 26.6}
+          V_ppm: {Korotev87: 115, Laul73: [114, 113]}
+          Cr_ppm: {Christian76: 2395, Korotev87: 2780, Laul73: [2737, 2668], Wanke73: 2500}
+          Co_ppm: {Korotev87: 76.5, Laul73: [40, 42], Wanke73: 42}
+          Ni_ppm: {Korotev87: 278}
+          Sr_ppm: {Korotev87: 140}
+          Zr_ppm: {Korotev87: 410, Laul73: [350, 400]}
+          Cs_ppm: {Korotev87: 0.27}
+          Ba_ppm: {Korotev87: 290, Laul73: [320, 300]}
+          La_ppm: {Korotev87: 27.2, Laul73: [26, 27], Wanke73: 25}
+          Ce_ppm: {Korotev87: 70, Laul73: [73, 71], Wanke73: 65}
+          Nd_ppm: {Korotev87: 40}
+          Sm_ppm: {Korotev87: 13.2, Laul73: [12.9, 12.9], Wanke73: 8.8}
+          Eu_ppm: {Korotev87: 1.455, Laul73: [1.4, 1.4], Wanke73: 1.34}
+          Tb_ppm: {Korotev87: 2.43, Laul73: [2.3, 2.3]}
+          Dy_ppm: {Wanke73: 15}
+          Ho_ppm: {Wanke73: 2.3}
+          Yb_ppm: {Korotev87: 8.2, Laul73: [9.5, 8.7], Wanke73: 8.3}
+          Lu_ppm: {Korotev87: 1.23, Laul73: [1.3, 1.3], Wanke73: 1.2}
+          Hf_ppm: {Korotev87: 10, Laul73: [9.9, 10]}
+          Ta_ppm: {Korotev87: 1.34, Laul73: [1.2, 1.2]}
+          Ir_ppb: {Korotev87: 7.9}
+          Au_ppb: {Korotev87: 2.6}
+          Th_ppm: {Korotev87: 5.2}
+          U_ppm: {Korotev87: 1.1}
+        analytical_technique_key: {a: microchemical, b: INAA}
+      note: 'Blank cells are absent, not zero. Units are part of each row label because the printed table changes units.'
+  volatile_context:
+    observations: &sample_15013_volatile_observations
+    - observation_id: lpi_15013_lm_exhaust_release_context
+      type: volatile_release_context
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
+      units: as_published
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        quantity: low_temperature_vacuum_release_of_lm_exhaust_breakdown_products
+        species_reported: [NO2, H2O, CO2]
+        source_attribution: 'Simoneit et al. 1973'
+        note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
+    - observation_id: lpi_15013_volatile_release_curve_figure_only
+      type: volatile_release_context
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
+      units: as_plotted
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        quantity: volatile_release_curve
+        comparison_sample: '15020'
+        source_attribution: 'Gibson and Moore 1972'
+        plotted_values: not_digitized
+species:
+  sample_15013: {observations: *sample_15013_observations}
+  sample_15013_figure_only: {observations: *sample_15013_figure_observations}
+  sample_15013_chemistry: {observations: *sample_15013_chemistry_observations}
+  sample_15013_volatile_context: {observations: *sample_15013_volatile_observations}
+notes:
+  - 'No thermal vaporization run, apparatus, pressure history, pumping, temperature calibration, fO2 control, or run uncertainty is reported in this six-page entry.'
+  - 'Figure-only curves and image-only particle sketches were not converted into numbers.'

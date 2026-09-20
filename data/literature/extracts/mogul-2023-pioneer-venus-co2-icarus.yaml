@@ -1,0 +1,239 @@
+schema_version: literature_extract.v1
+source_id: mogul-2023-pioneer-venus-co2-icarus
+source:
+  citation: "Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), \"Venus (atmosphere): analytical model for mass spectra obtained by the Pioneer Venus Large Probe Neutral Mass Spectrometer\", Icarus 392:115374."
+  doi: 10.1016/j.icarus.2022.115374
+  url: https://doi.org/10.1016/j.icarus.2022.115374
+  year: 2023
+extraction:
+  method: manual transcription from pdftotext -layout; printed tables and prose retained; plotted profiles were not digitized
+  date: '2026-09-20'
+  worker: extract-mogul-2023-pioneer-venus-co2-icarus
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/mogul-2023-pioneer-venus-co2-icarus/mogul-2023-pioneer-venus-co2-icarus.pdf
+review_status: draft
+evidence_policy:
+  classification: mixed_measured_and_modelled
+  measurement_claim: LNMS ion counts, fitted peak positions/widths, and isotope/count ratios are measurements or directly reduced measurements; CO2 density and methane mixing-ratio conversions are model_derived.
+  model_generator: authors' analytical LNMS model using Gauss-function peak fitting, 136Xe normalization, calibration curves, equation-of-state conversion, and power regressions; comparison values retain their cited generators.
+  figure_policy: Figures 1, 2, 5-10 are not numerically digitized. Values described in prose as approximate remain approximate strings.
+  apparatus_scope: Pioneer Venus Large Probe Neutral Mass Spectrometer; no furnace, crucible, vaporization cell, effusion orifice, sample mass, or thermal-run apparatus is reported.
+  absent_not_zero: sample mass, sample composition, crucible, orifice, exposed sample area, chamber vacuum, pumping speed, temperature calibration, fO2 control, and run duration are not stated for this atmospheric-instrument study.
+  scope_note: Venus atmospheric composition and instrument-characterisation data are retained because the brief requires routing all relevant data classes, including non-lunar species; they are not silicate-vaporization measurements.
+species:
+  CO2:
+    observations:
+    - observation_id: mogul_2023_lnms_operations_and_sampling
+      type: apparatus_characterisation
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        section: 2.1
+        note: LNMS operations and inlet description
+      phase: Venus_atmosphere
+      regime: magnetic_sector_neutral_mass_spectrometry
+      units: as published
+      values:
+        quantity: instrument_sampling_conditions
+        method_class: measured_direct
+        instrument: Pioneer Venus Large Probe Neutral Mass Spectrometer (LNMS)
+        mass_range_mz: '1-208'
+        preselected_mass_positions: 232
+        mass_channels: 'm/z 1-16 and 15-208'
+        inlet_tubes: 2
+        inlet_material: ceramic-coated tantalum
+        inlet_diameter_mm: 3.2
+        primary_inlet_rate_nL_per_s: 0.1
+        secondary_inlet_rate_nL_per_s: 1
+        secondary_inlet_control: Valve 1
+        valve_1_closure_altitude_km: '~47'
+        variable_conductance_valve_getter: zirconium-aluminum getter G1
+        getter_material: zirconium-aluminum
+        electron_energy_eV: [70, 30, 22]
+        complete_spectra_at_70_eV: 39
+        incomplete_spectra_at_70_eV: 1
+        spectra_at_30_eV: 3
+        spectra_at_22_eV: 3
+        total_spectra: 46
+        sweep_duration_s: 64
+        stepped_measurement_duration_s: 59
+        recalibration_duration_s: 5
+        ion_acceleration_tolerance: '~0.02%'
+        internal_calibrants: 'CH4 and 136Xe'
+        note: Inlet flow and transmission changed with valve configuration; do not treat this as a constant-pressure experiment.
+    - observation_id: mogul_2023_presampling_internal_counts
+      type: calibration_series
+      locator:
+        table: '1'
+        published_page: 6
+        pdf_page_index: 6
+        section: 3.3
+        note: averaged pre-sampling counts from four mass sweeps; fitted values are identified as fitted in the paper
+      phase: LNMS_internal_calibrant_and_fragmentation_standards
+      regime: electron_ionization_mass_spectrometry
+      units: raw ion counts as published; mean ± standard deviation
+      values:
+        quantity: presampling_counts
+        method_class: measured_direct
+        spectra: 3-4
+        rows:
+        - {species: 13CH4+, counts: '127 ± 18', representation: raw}
+        - {species: CH4+, counts: '15707 ± 355', representation: fitted}
+        - {species: CH3+, counts: '12613 ± 454', representation: fitted}
+        - {species: CH2+, counts: '3571 ± 110', representation: fitted}
+        - {species: C+, counts: '613 ± 9', representation: fitted}
+        - {species: H+, counts: '1952 ± 69', representation: fitted}
+        - {species: 136Xe+, counts: '8671 ± 137', representation: fitted}
+        - {species: 136Xe2+, counts: '3840 ± 111', representation: fitted}
+        - {species: 136Xe3+, counts: '32 ± 2', representation: fitted}
+        uncertainty_note: Combined standard deviations were 1.4-3.6% for fitted species; the authors applied a minimum 3.6% error to higher-count descent species and reported 6.3-14.2% for one-point low-count species.
+    - observation_id: mogul_2023_table3_internal_peak_standards
+      type: calibration_series
+      locator:
+        table: '3'
+        published_page: 7
+        pdf_page_index: 7
+        section: 3.3
+        note: fitted internal standards across descent profile
+      phase: LNMS_internal_standards
+      regime: electron_ionization_mass_spectrometry
+      units: Da or m/z as published; mean ± standard deviation; FWHM ranges as published
+      values:
+        quantity: fitted_mass_and_peak_width
+        method_class: measured_reduced
+        rows:
+        - {standard: CH3+, averaged_mass_mz: '15.023 ± 0.001', mass_error_range_mz: '-0.003 to 0.001', averaged_FWHM_mz: '0.018 ± 0.001', FWHM_range_mz: '0.015-0.020'}
+        - {standard: CO+, averaged_mass_mz: '27.995 ± 0.001', mass_error_range_mz: '-0.017 to 0.001', averaged_FWHM_mz: '0.040 ± 0.003', FWHM_range_mz: '0.033-0.042'}
+        - {standard: N2+, averaged_mass_mz: '28.006 ± 0.003', mass_error_range_mz: '-0.019 to 0.009', averaged_FWHM_mz: '0.041 ± 0.004', FWHM_range_mz: '0.033-0.042'}
+        - {standard: 40Ar+, averaged_mass_mz: '39.967 ± 0.002', mass_error_range_mz: '-0.001 to 0.012', averaged_FWHM_mz: '0.065 ± 0.005', FWHM_range_mz: '0.058-0.081'}
+        - {standard: 136Xe+, averaged_mass_mz: '135.934 ± 0.027', mass_error_range_mz: '-0.046 to 0.086', averaged_FWHM_mz: '0.277 ± 0.031', FWHM_range_mz: '0.214-0.327'}
+    - observation_id: mogul_2023_co2_isotope_ratios
+      type: isotope_ratio
+      locator:
+        published_page: 13
+        pdf_page_index: 13
+        section: 3.9
+        note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
+      phase: Venus_atmosphere_CO2
+      regime: mass_spectral_isotope_analysis
+      units: dimensionless ratio as published; mean ± standard deviation
+      values:
+        quantity: isotope_ratios
+        method_class: measured_reduced
+        spectra: 25
+        rows:
+        - {ratio: 13C/12C, value: '1.260e-2 ± 0.072e-2', relative_error: 5.7%, altitude_range_km: '55.4-0.9'}
+        - {ratio: 18O/16O, value: '2.195e-3 ± 0.156e-3', relative_error: 7.1%, altitude_range_km: '55.4-0.9'}
+        derived_combined_ratio: '13CO2+/CO2 = 1.363e-2 ± 0.132e-2; 13CO+/CO+ = 1.487e-2 ± 0.111e-2; C18O+/CO+ = 2.558e-3 ± 0.283e-3'
+        disagreement_note: 13CO+/CO+ was higher than the CO2-isotopologue ratio and was interpreted as possible isobaric interference; both printed results are retained.
+    - observation_id: mogul_2023_co2_density_profile
+      type: density_profile
+      locator:
+        published_page: 16
+        pdf_page_index: 16
+        section: 3.12
+        figure: '9'
+        note: prose prints selected density points and ranges; full 14-point profile is in Figure 9 and was not digitized
+      phase: Venus_atmosphere_CO2
+      regime: normalized_LNMS_count_to_density_conversion
+      units: kg m^-3 and % w/w as published
+      values:
+        quantity: CO2_density_and_relative_abundance
+        method_class: model_derived
+        generator: authors' LNMS calibration-curve model; raw CO2+ counts normalized to 136Xe2+, then converted using Hoffman control data, PVGC composition, Seiff pressure-temperature data, equation of state, and power regressions
+        printed_points:
+        - {altitude_km: 58.3, co2_density_kg_m3: '0.38 ± 0.06', atmospheric_density_kg_m3: 0.58, relative_co2_w_w: '66 ± 7%'}
+        - {altitude_km: 55.4, co2_density_kg_m3: '0.80 ± 0.12', atmospheric_density_kg_m3: 0.85, relative_co2_w_w: '95 ± 15%'}
+        - {altitude_km: 51.3, co2_density_kg_m3: '1.41 ± 0.22', atmospheric_density_kg_m3: 1.38, relative_co2_w_w: '102 ± 16%'}
+        - {altitude_km: '23.0-17.9', co2_density_kg_m3: '15.9-22.4', relative_co2_w_w: '96.4 ± 5.5%', n: 5}
+        - {altitude_km: 13.3, co2_density_kg_m3: '29.3 ± 1.7', relative_co2_w_w: '95.2 ± 5.6%'}
+        - {altitude_km: '7.0-4.5', co2_density_kg_m3: '46.0 ± 2.0', relative_co2_w_w: '96.2 ± 5.5%'}
+        - {altitude_km: '1.5-0.9', co2_density_kg_m3: '56.7 ± 3.6', relative_co2_w_w: '96.9 ± 5.7%', n: 2}
+        - {altitude_km: 0.9, co2_density_kg_m3: 60.46, note: maximum profile endpoint stated in discussion; no point uncertainty printed here}
+        averaged_optimal_profile: '96.3 ± 5.7% w/w, propagated standard error, n=12'
+        averaged_profile_standard_deviation: '96.3 ± 1.6% w/w, n=12'
+        full_profile: '14 measures between 55.4 and 0.9 km; numeric values in Figure 9 not digitized'
+        calibration_uncertainty: '15.6% clouds; 5.9% lower atmosphere'
+    - observation_id: mogul_2023_lnms_haze_clog_observations
+      type: anomaly_profile
+      locator:
+        published_page: 17
+        pdf_page_index: 17
+        section: 3.13
+        note: printed prose describing count spikes and partial-clog altitudes
+      phase: Venus_atmosphere_aerosol_instrument_interaction
+      regime: LNMS_descent_sampling
+      units: km, fold change, and km^-1 as published
+      values:
+        quantity: inlet_clog_and_mass_signal_anomalies
+        method_class: measured_reduced
+        partial_clog_altitudes_km: ['~15 ± 2', '~10 ± 3', '~3 ± 1']
+        affected_mass_positions: '>37 between m/z 10-208'
+        count_spike_range: '~5-500-fold'
+        extinction_coefficients_km_minus_1: 'V13/V14 comparison values ~0.6-2.0; V13/V14 spikes ~2.24-2.30 near ~2 km'
+        interpretation: authors interpret the spikes as chemical signatures of a deep atmospheric haze, not as furnace vaporization.
+    - observation_id: mogul_2023_ch4_mixing_ratio_model
+      type: mixing_ratio_series
+      locator:
+        published_page: 19
+        pdf_page_index: 19
+        section: 4.3
+        note: preliminary external methane conversion; upper/lower correction outcomes retained
+      phase: Venus_atmosphere_CH4
+      regime: corrected_LNMS_count_conversion
+      units: ppm as published
+      values:
+        quantity: external_CH4_mixing_ratio
+        method_class: model_derived
+        generator: authors' preliminary LNMS model correcting apparent m/z-dependent getter efficiency and converting counts against CO2/N2
+        rows:
+        - {altitude_km: 51.3, value: '~15 ± 12 ppm'}
+        - {altitude_km: 21.6, value: '~130 ± 100 ppm'}
+        - {altitude_km: 0.9, value: '~1200 ± 1000 ppm'}
+        quoted_comparison: 'Donahue and Hodges (1993): ~980 ppm at 51.3 km and ~2800 ppm at 0.9 km; quoted_attributed, not this model'
+        missing_control: PVGC and VeNeRa upper limits are cited as ~10 ppm, ~0.6 ppm, and ~0.5 ppm at stated altitudes; these are quoted comparisons, not new LNMS measurements.
+    - observation_id: mogul_2023_lnms_model_scope_and_fit_quality
+      type: model_diagnostics
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        sections: 2.4-2.6
+        note: targeted fit, normalization, and calibration method
+      phase: Venus_atmosphere_mass_spectral_model
+      regime: analytical_model
+      units: dimensionless R2 and percent as published
+      values:
+        quantity: fitted_model_diagnostics
+        method_class: model_derived
+        generator: authors' Gauss-function regressions and calibration-curve model
+        rows:
+        - {fit_coverage: 'each minimized mass-cluster fit accounted for ≥95% of included counts'}
+        - {FWHM_mass_regression_R2: '0.998 ± 0.002 across 64.2-0.9 km'}
+        - {R2_30_eV: '0.996 ± 0.006, 3 spectra'}
+        - {R2_22_eV: '0.995 ± 0.008, 3 spectra'}
+        - {CO2_calibration_power_regression_R2: '≥0.987'}
+        - {atmospheric_density_regression_R2: '≥0.999'}
+        normalization: 136Xe2+ primary; 136Xe+ and 136Xe3+ comparative; main-clog normalization used 134Xe2+/136Xe2+ at 49.4 km
+    - observation_id: mogul_2023_quoted_reference_conditions
+      type: quoted_attributed
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        section: 3.2
+        note: conditions and values attributed to earlier Pioneer Venus literature
+      phase: Venus_atmosphere
+      regime: quoted_literature
+      units: as published
+      values:
+        quantity: quoted_probe_and_pvgc_conditions
+        method_class: quoted_attributed
+        model_generator_for_converted_rows: authors' equation-of-state mass-percent conversion using quoted PVGC volume percent, molecular weights, and quoted N2 composition
+        rows:
+        - {probe_internal_pressure_initial_bar: 1.3, status: quoted_attributed}
+        - {probe_internal_pressure_touchdown_bar: 1.8, status: quoted_attributed}
+        - {probe_void_volume_L: '~180', status: quoted_attributed}
+        - {PVGC_carrier_gas: He, flow_mL_per_min: 35, pressure_bar: 17, temperature_C: 18, operation_time_min: 60, status: quoted_attributed}
+        - {PVGC_CO2_volume_percent_at_51.6_km: '95.4%', pressure_bar: 0.698, status: quoted_attributed}
+        - {PVGC_CO2_volume_percent_at_21.6_km: '96.4%', pressure_bar: 17.8, status: quoted_attributed}
+        - {PVGC_CO2_mass_percent_at_51.6_km: '97.0% w/w', status: model_converted_from_quoted_volume_percent}
+        - {PVGC_CO2_mass_percent_at_21.6_km: '97.7% w/w', status: model_converted_from_quoted_volume_percent}
+        note: These values are context/calibration inputs and are not reclassified as direct measurements from Mogul et al.

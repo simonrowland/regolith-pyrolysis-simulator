@@ -1,0 +1,205 @@
+schema_version: literature_extract.v1
+source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+source:
+  citation: Tachibana, S. & Tsuchiyama, A. (1998), "Evaporation Behavior of Forsterite Dust in the Primordial Solar Nebula", Lunar and Planetary Science XXIX, abstract 1538.
+  year: 1998
+  source_type: conference_abstract
+extraction:
+  method: layout-preserving pdftotext transcription; no figure digitization
+  date: '2026-09-20'
+  worker: i3-tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  source_path: raw/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.pdf
+  note: This two-page abstract reports theoretical calculations and cites prior experiments; it contains no own apparatus or direct numeric measurement table.
+review_status: draft
+species:
+  forsterite:
+    observations:
+    - observation_id: tachibana_1998_forsterite_hkl_flux_equation
+      type: evaporation_rate
+      class: model
+      locator:
+        page: 1
+        equation: '1'
+        section: Evaporation rates
+      quote: jFo = alpha(peSiO-pSiO)/(2 pi mSiO k T)^(1/2)
+      phase: forsterite_dust
+      regime: free_or_buffered_evaporation_model
+      units: mol cm^-2 s^-1
+      values:
+        quantity: evaporation_rate
+        method_class: model_derived
+        generator: Hertz-Knudsen equation coupled to forsterite stoichiometry and equilibrium vapor pressures
+        gas_species: SiO(g)
+        evaporation_coefficient_symbol: alpha
+        variables:
+          peSiO: equilibrium SiO(g) vapor pressure over forsterite at T
+          pSiO: SiO(g) partial pressure in the solar nebula
+          mSiO: SiO(g) molecular mass
+          k: Boltzmann constant
+        note: The equation is printed as the model definition; no numeric flux value is printed in the prose.
+    - observation_id: tachibana_1998_forsterite_hbd_alpha_assumption
+      type: evaporation_coefficient
+      class: model
+      locator:
+        page: 1
+        section: Evaporation rates
+        paragraph: In the HBD regime
+      quote: We assumed here that alpha is approximately 0.1 in the HBD regimes too.
+      phase: forsterite_dust
+      regime: H2O_H2_buffer_dominated
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        generator: author assumption used by the Hertz-Knudsen evaporation model
+        alpha: 0.1
+        qualifier: approximate
+        note: Assumed model input, not a measured evaporation coefficient.
+    - observation_id: tachibana_1998_forsterite_prior_experiment_alpha_constraint
+      type: evaporation_coefficient
+      class: quoted_attributed
+      locator:
+        page: 1
+        section: Evaporation rates
+        paragraph: In the FED and HRD regimes
+      quote: alpha approximately 0.1 irrespective of T; alpha = 0.03-0.2 at T = 1200-1800 degrees C and pH2 <= 8.6 x 10^-5 bar.
+      phase: forsterite_dust
+      regime: free_evaporation_dominated_or_hydrogen_reaction_dominated
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        attribution: experimental studies [1-4] as summarized by the authors; source-specific provenance is not resolved in this abstract
+        alpha_range:
+        - 0.03
+        - 0.2
+        alpha_nominal: 0.1
+        temperature_range_C:
+        - 1200
+        - 1800
+        pH2_upper_bound_bar: '8.6 x 10^-5'
+        qualifier: approximately; range and bound retained as printed
+        note: This is a reported constraint from cited experiments, not a direct measurement performed in this abstract.
+    - observation_id: tachibana_1998_forsterite_gas_chemistry_species_model
+      type: vapor_composition
+      class: model
+      locator:
+        page: 1
+        section: Evaporation rates
+        paragraph: Eighteen gas species
+      quote: Eighteen gas species for H, Mg, Si, and O, He(g) and CO(g) were considered to calculate peSiO.
+      phase: forsterite_dust
+      regime: thermochemical_gas_equilibrium
+      units: count and species labels as printed
+      values:
+        quantity: equilibrium_vapor_composition
+        method_class: model_derived
+        generator: gas chemistry calculation using Chase et al. (1985) JANAF Thermochemical Tables, 3rd Ed.
+        modeled_species_count: 18
+        explicitly_named_species_groups:
+        - H
+        - Mg
+        - Si
+        - O
+        - He(g)
+        - CO(g)
+        note: The abstract does not print the complete 18-species list.
+    - observation_id: tachibana_1998_forsterite_regime_model
+      type: regime_classification
+      class: model
+      locator:
+        page: 1
+        section: Evaporation rates
+        paragraphs: Free evaporation and hydrogen reaction regimes; H2O/H2 buffer regime
+      phase: forsterite_dust
+      regime: nebular_evaporation_regime_map
+      units: as printed
+      values:
+        quantity: evaporation_regime
+        method_class: model_derived
+        generator: authors' Hertz-Knudsen plus thermochemical gas-chemistry model
+        regimes:
+        - name: free_evaporation_dominated
+          condition: ptotal sufficiently smaller than equilibrium vapor pressure peFo
+          rate_dependence: jFo is only a function of T
+        - name: hydrogen_reaction_dominated
+          condition: ptotal much greater than peFo
+          rate_dependence: H2(g) acts as reducing agent; jFo increases with pH2 approximately equal to ptotal
+        - name: H2O_H2_buffer_dominated
+          condition: increasing ptotal where peH2O approximately equals pH2O
+          rate_dependence: jFo becomes constant when pH2O is buffered by constant H2O/H2 ratio
+    - observation_id: tachibana_1998_forsterite_fig1_model_grid
+      type: evaporation_rate
+      class: figure_only
+      locator:
+        page: 2
+        figure: '1'
+        caption: Calculated evaporation rate of forsterite, jFo, with alpha=0.1 plotted in the T-ptotal condition
+      phase: forsterite_dust
+      regime: FED_HRD_HBD_model_grid
+      units: mol cm^-2 s^-1; temperature K; total pressure bar
+      values:
+        quantity: evaporation_rate_vs_temperature_and_pressure
+        method_class: figure_only
+        generator: authors' Hertz-Knudsen plus 18-species thermochemical gas-chemistry calculation
+        alpha: 0.1
+        digitized: false
+        note: Contours and paths are not transcribed as numeric data; the figure is retained as a qualitative model result.
+    - observation_id: tachibana_1998_forsterite_dynamic_model_dust_size
+      type: model_input
+      class: model_derived
+      locator:
+        page: 2
+        figure: '2'
+        caption: Results by dynamic models which includes dust movement and evaporation of 100 micrometre forsterite
+      phase: forsterite_dust
+      regime: dynamic_and_equilibrium_nebula_model
+      units: micrometre
+      values:
+        quantity: modeled_dust_size
+        method_class: model_derived
+        generator: dynamic dust-transport/evaporation model cited as [7]
+        dust_diameter_um: 100
+    - observation_id: tachibana_1998_forsterite_nebula_model_paths
+      type: model_input
+      class: model_derived
+      locator:
+        page: 2
+        figure: '1'
+        caption: solar-nebula model paths at the active stage
+      phase: forsterite_dust
+      regime: protoplanetary_disk_active_stage
+      units: K at stated AU locations
+      values:
+        quantity: model_temperature_paths
+        method_class: model_derived
+        generator: four cited solar-nebula models [7]
+        model_temperatures_K:
+          at_1_AU:
+            Model-1: 1176
+            Model-2: 678
+            Model-3: 420
+            Model-4: 1573
+          at_0_5_AU:
+            Model-1: 1661
+            Model-2: 1356
+            Model-3: 840
+            Model-4: 1910
+        note: Values are printed in the Figure 1 caption; model identity follows the caption's Models-1 through 4 order.
+    - observation_id: tachibana_1998_forsterite_fig2_dynamic_static_comparison
+      type: mass_loss_fraction
+      class: figure_only
+      locator:
+        page: 2
+        figure: '2'
+        caption: The amount of forsterite evaporated, dust/(dust+gas) ratio, plotted against distance from the protosun
+      phase: forsterite_dust
+      regime: dynamic_and_equilibrium_nebula_model
+      units: dust/(dust+gas) ratio vs r/AU
+      values:
+        quantity: evaporated_forsterite_fraction
+        method_class: figure_only
+        generator: dynamic and equilibrium (static) models [7]
+        digitized: false
+        qualitative_result: dynamic-model evaporated amount is almost the same as the equilibrium static model along the modeled mid-plane paths
+        note: No numeric curve read-offs are recorded.

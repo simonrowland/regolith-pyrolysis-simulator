@@ -1,0 +1,200 @@
+schema_version: literature_extract.v1
+source_id: arxiv-2509-sio-flame-nucleation
+source:
+  citation: "Haugen, N. E. L., Brandenburg, A., Friede, B. & Birkeland, R. G. (2025), Silicon-monoxide flames: the nucleation and condensation of silica fume, arXiv:2509.03106v2."
+  url: https://arxiv.org/abs/2509.03106
+  year: 2025
+extraction:
+  method: manual transcription from pdftotext -layout; page and equation/table locators retained
+  date: '2026-09-20'
+  worker: i1-arxiv-2509-sio-flame-nucleation
+review_status: draft
+evidence_policy:
+  classification: mixed_model_and_figure_only
+  measurement_claim: The paper is a numerical study. Model inputs and outputs are model_derived; the real-furnace particle-size distribution is retained as figure_only because no numeric points are printed.
+  missing_values: Values absent from the paper are not inferred; figure curves are not digitized.
+model_generators:
+  - authors' Lagrangian and Eulerian silica-fume particle solver
+  - classical homogeneous nucleation model used by the authors
+  - Panjwani and Olsen reaction mechanism, with NOx reactions omitted
+species:
+  SiO2:
+    observations:
+    - observation_id: haugen_2025_sio2_nucleation_model
+      type: rate_series
+      locator: {page: 5, equation: '18-21', section: '2.1.1 Particle nucleation'}
+      phase: gas_to_silica_fume_particle
+      regime: homogeneous_nucleation
+      units: as printed in equations
+      values:
+        method_class: model_derived
+        generator: authors' classical homogeneous nucleation implementation
+        quantity: critical_radius_and_nucleation_rate
+        critical_radius_expression: r_min = 2 gamma v_c / (k_B T ln S_e)
+        nucleation_rate_expression: J = J_0 exp[-16 pi gamma^3 v_c^2 / (3 (k_B T)^3 (ln S_e)^2)]
+        source_inputs:
+          v_c_m3_per_SiO2_molecule: 4.5e-29
+          S_e_definition: C_SiO2 / C_sat
+        source_term_expression: rho_dot_nucl = (4 pi r_min^3 / 3) rho_ms J
+        semantics: equations_and_model_inputs_not_measurements
+    - observation_id: haugen_2025_sio2_surface_energy_temperature_model
+      type: rate_series
+      locator: {page: 8, equation: '31', section: '3.1 Surface energy'}
+      phase: silica_fume_particle
+      units: J m^-2 and J m^-2 K^-1
+      values:
+        method_class: model_derived
+        generator: Kingery temperature-dependent expression as adopted by authors
+        quantity: surface_energy
+        expression: gamma = gamma_0 + gamma_T (T - T_gamma)
+        gamma_0_J_m2: 0.307
+        gamma_T_J_m2_K: 3.1e-5
+        T_gamma_K: 2073.0
+        alternate_sensitivity_value_gamma_J_m2: 3.2e-2
+        alternate_sensitivity_locator: page 16, figure 12 discussion
+        semantics: model_parameter_and_sensitivity_case
+    - observation_id: haugen_2025_sio2_saturation_pressure_model
+      type: psat_series
+      locator: {page: 9, equation: '35-36', section: '3.3 Saturation concentration'}
+      phase: silica_fume
+      regime: Clausius_Clapeyron_saturation_model
+      units: Pa, Torr, J mol^-1, mol m^-3
+      values:
+        method_class: model_derived
+        generator: authors' Clausius-Clapeyron model with ideal-gas conversion
+        quantity: p_sat
+        pressure_expression: P_sat = P_boil exp[-DeltaH/R_gas (1/T - 1/T_boil)]
+        concentration_expression: C_sat = P_sat / (R_gas T)
+        P_boil_Pa: 101325.0
+        T_boil_K: 2503.0
+        DeltaH_options_J_per_mol: [7.06e5, 5.99e5, 5.78e5]
+        DeltaH_used_J_per_mol: 7.06e5
+        reference_pressure_as_printed: 10^-4 Torr at 1025 deg C
+        DeltaH_from_reference_point_J_per_mol: 3.55e5
+        reference_point_semantics: author-reported reference used to show an alternative blue curve; authors call its applicability questionable because 1025 deg C is below the silica-fume melting point
+        R_gas_J_per_mol_K: 8.314
+    - observation_id: haugen_2025_sio2_transition_thresholds
+      type: transition_point
+      locator: {page: 6, section: '2.2 Silica fume particle interactions'}
+      phase: silica_fume
+      units: K
+      values:
+        method_class: model_derived
+        generator: authors' droplet approximation for silica fume particle interactions
+        quantity: transition_temperature
+        coalescence_lower_limit_K: 1823.0
+        upper_limit_semantics: above the boiling point of quartz no silica-fume particles can exist
+        semantics: model thresholds, not direct transition measurements
+    - observation_id: haugen_2025_sio2_melting_threshold_result
+      type: transition_point
+      locator: {page: 13, section: '5.2 Growth of silica fume particles'}
+      phase: silica_fume
+      units: deg C and K
+      values:
+        method_class: model_derived
+        generator: authors' zero-dimensional simulation rule
+        quantity: transition_temperature
+        melting_temperature_as_printed: 1560 deg C (=1833 K)
+        semantics: competing_internal_value_do_not_reconcile
+        disagreement: page 6 uses 1823 K as the silica melting-point lower limit; page 13 uses 1560 deg C (=1833 K)
+    - observation_id: haugen_2025_sio2_particle_density
+      type: transition_point
+      locator: {page: 20, equation: '52', section: 'B.2 Validation of expression for Brownian motion'}
+      phase: silica_fume_particle
+      units: g cm^-3
+      values:
+        method_class: model_derived
+        generator: authors' particle-mass and volume model
+        quantity: density
+        density_g_cm3: 2.196
+        density_kg_m3_also_printed: 2196.0
+    - observation_id: haugen_2025_sio2_condensation_growth_model
+      type: rate_series
+      locator: {page: 20, equations: '59-63', section: 'C.1 Molecular/kinematic regime'}
+      phase: gas_to_silica_fume_particle
+      regime: molecular_kinematic_condensation
+      units: mol m^-2 s^-1, m s^-1, kg m^-3
+      values:
+        method_class: model_derived
+        generator: authors' molecular/kinematic condensation model
+        quantity: particle_radius_growth
+        molecular_flux_expression: F = N u / 4
+        mean_speed_expression: u = sqrt(8 k_B T / (pi m_SiO2))
+        radius_growth_expression: dr/dt = A (C_SiO2 - C_sat) sqrt(T)
+        A_expression: A = sqrt(8 k_B M_SiO2 / (pi m_SiO2 4 rho_ms))
+        M_SiO2_kg_per_kmol: 60.0
+        rho_ms_kg_m3: 2196.0
+        m_SiO2_as_printed: 60 mu
+        mu_kg: 1.67e-27
+        semantics: model_equations_and_constants
+    - observation_id: haugen_2025_sio2_reaction_mechanism
+      type: rate_series
+      locator: {page: 7, table: '1', section: '2.3 Fluid equations'}
+      phase: gas_reaction_mixture
+      units: 'as printed: A, n, E'
+      values:
+        method_class: model_derived
+        generator: Panjwani and Olsen reaction mechanism as used by authors; NOx elements omitted
+        quantity: Arrhenius_reaction_mechanism
+        rows_as_printed:
+        - {i: 1, reaction: 'CO + O2 <=> CO2 + O', A: 2.50e12, n: 0.00, E: 47800.0}
+        - {i: 2, reaction: 'OH + OH <=> H2O + O', A: 3.57e4, n: 2.40, E: -2110.0}
+        - {i: 3, reaction: 'CO + OH <=> CO2 + H', A: 4.76e7, n: 1.23, E: 70.0}
+        - {i: 4, reaction: 'H + O2 <=> O + OH', A: 2.65e16, n: -0.67, E: 17041.0}
+        - {i: 5, reaction: 'H + O + M <=> OH + M', A: 5.00e17, n: -1.00, E: 0.0}
+        - {i: 6, reaction: 'O + O + M <=> O2 + M', A: 1.20e17, n: -1.00, E: 0.0}
+        - {i: 7, reaction: 'CO + O <=> CO2', A: 1.80e10, n: 0.00, E: 2385.0}
+        - {i: 8, reaction: 'H + OH + M <=> H2O + M', A: 2.20e22, n: -2.00, E: 0.0}
+        - {i: 9, reaction: 'O2 + SiO <=> O + SiO2', A: 2.31e13, n: 0.00, E: 26016.0}
+        - {i: 10, reaction: 'OH + SiO <=> H + SiO2', A: 1.80e10, n: 0.78, E: 1218.0}
+        third_body_efficiencies: unity
+    - observation_id: haugen_2025_sio2_nonreactive_validation_setup
+      type: rate_series
+      locator: {page: 10, table: '2', section: '4.1 Lagrangian vs. Eulerian particle tracking'}
+      phase: gas_to_silica_fume_particle
+      units: kg, 10^11, s, mol m^-3
+      values:
+        method_class: model_derived
+        generator: authors' Lagrangian and Eulerian zero-dimensional solver
+        quantity: validation_case_parameters_and_runtime
+        initial_mass_fractions: {N2: 0.767, O2: 0.142, SiO2: 0.091}
+        constant_saturation_concentration_mol_m3: 0.01
+        table_rows_as_printed:
+        - {case: 'Eul. 200', nbins: 200, mthr: null, Nsw: null, Nphys_1e11: 3.0, time_s: 1.85}
+        - {case: 'Eul. 1200', nbins: 1200, mthr: null, Nsw: null, Nphys_1e11: 3.0, time_s: 8.60}
+        - {case: 'Lagr. 10', nbins: 5, mthr_kg: 1e-10, Nsw: 2, Nphys_1e11: 2.7, time_s: 0.50}
+        - {case: 'Lagr. 11', nbins: 10, mthr_kg: 1e-11, Nsw: 22, Nphys_1e11: 3.0, time_s: 0.56}
+        - {case: 'Lagr. 12', nbins: 40, mthr_kg: 1e-12, Nsw: 204, Nphys_1e11: 3.0, time_s: 1.03}
+    - observation_id: haugen_2025_sio2_furnace_particle_size_distribution
+      type: rate_series
+      locator: {page: 15, figure: '10', section: '5.3 Particle size distributions'}
+      phase: silica_fume_particle
+      units: figure only; numeric axis values not transcribed
+      values:
+        method_class: figure_only
+        generator: Malvern Panalytical Mastersizer 3000 laser-diffraction measurement; sample from Elkem silicon-furnace bag filter
+        quantity: measured_particle_size_distribution
+        measured_data: present_in_figure_only
+        digitized_values: absent
+        semantics: measured direct provenance retained without inventing point values
+    - observation_id: haugen_2025_brownian_validation
+      type: rate_series
+      locator: {page: 20, figure: '14', section: 'B.2 Validation of expression for Brownian motion'}
+      phase: silica_fume_particle
+      units: nm, K, count
+      values:
+        method_class: model_derived
+        generator: authors' Brownian-motion particle solver
+        quantity: Brownian_motion_validation_setup
+        particle_diameter_nm: 10.0
+        fluid_temperature_K: 750.0
+        tracked_particles: 1000
+        measured_output: mean_displacement curves shown in Figure 14; numerical points not printed
+        semantics: simulation validation, not apparatus measurement
+fidelity_samples:
+- species: SiO2
+  observable: psat_series
+  observation_id: haugen_2025_sio2_saturation_pressure_model
+  field: DeltaH_used_J_per_mol
+  value: 7.06e5
+  locator: {page: 9, equation: '35', section: '3.3 Saturation concentration'}

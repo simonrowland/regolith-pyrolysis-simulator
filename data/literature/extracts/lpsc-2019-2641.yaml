@@ -1,0 +1,303 @@
+schema_version: literature_extract.v1
+source_id: lpsc-2019-2641
+source:
+  citation: Verchovsky, A. B., Anand, M. & Barber, S. J. (2019), "A quantitative evolved gas analysis for meteorites and lunar samples", 50th Lunar and Planetary Science Conference, LPI Contribution No. 2132, abstract 2641.
+  year: 2019
+extraction:
+  method: pdftotext -layout transcription of the clean two-page PDF; printed equations and prose retained; plotted curves were not digitized.
+  date: '2026-09-20'
+  worker: extract-lpsc-2019-2641
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpsc-2019-2641/lpsc-2019-2641.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Murchison_CM2_meteorite
+  observable: sample_characterisation
+  observation_id: lpsc_2019_2641_murchison_sample_mass
+  field: sample_mass_mg
+  value: 3
+  locator:
+    pdf_page_index: 2
+    section: Analysis of the PROSPECT reference Murchison meteorite sample
+- species: Murchison_CM2_meteorite
+  observable: rate_series
+  observation_id: lpsc_2019_2641_murchison_heating_program
+  field: heating_rate_C_per_min
+  value: 6
+  locator:
+    pdf_page_index: 2
+    section: Analysis of the PROSPECT reference Murchison meteorite sample
+species:
+  calibration_reference_gases:
+    observations:
+    - observation_id: lpsc_2019_2641_calibration_gas_mixture
+      type: composition
+      locator:
+        pdf_page_index: 1
+        section: Calibration procedures
+        paragraph: reference-gas mixture composition
+      phase: calibration_gas
+      standard_state: reference gas composition as printed
+      regime: qms_calibration
+      units: vol% as printed
+      values:
+        quantity: calibration_reference_gas_composition
+        method_class: measured_direct
+        evidence_class: authors_own_calibration
+        gas_species:
+          H2: 56.78
+          He: 15.91
+          CH4: 1.452
+          Ne: 0.1011
+          N2: 15.42
+          CO: 1.03
+          O2: 2.98
+          Ar: 1.002
+          CO2: 5.288
+          Kr: 0.02022
+          Xe: 0.01516
+        abundance_unit: vol%
+        abundance_uncertainty_as_printed: approximately 1% relative
+        source_note: Single gases or this 11-species mixture were used; the printed list is split across the two-column page.
+      uncertainty:
+        relative_abundance: approximately 1% relative
+      equipment:
+        reference_gas_pressure:
+          value: 5-10
+          units: bar
+          bound_kind: range_as_printed
+          locator:
+            pdf_page_index: 1
+            section: Experimental technique
+        vessel_and_restriction:
+          value: vessel connected to the vacuum system via a capillary leak or piezo-electric (PZT) metering valve
+          locator:
+            pdf_page_index: 1
+            section: Experimental technique
+    - observation_id: lpsc_2019_2641_flow_calibration_range
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+      phase: calibration_gas
+      standard_state: continuous-flow QMS calibration
+      regime: qms_calibration
+      units: mbar/s as printed
+      values:
+        quantity: reference_gas_flow_rate_calibration
+        method_class: measured_direct
+        evidence_class: authors_own_calibration
+        flow_rate_range_mbar_per_s: 1e-8 to 1e-4
+        flow_rate_determination: reference gas accumulated in the Baratron volume for a stated accumulation time; pressure recorded after equilibration; procedure repeated for different accumulation times
+        pressure_instrument: high-sensitivity and high-precision MKS Baratron capacitance manometer
+        conversion_note: flow rate can be converted into ml/s only if the accumulation volume is determined
+        concentration_note: integrating release curves gives gas concentrations in ml/g
+      uncertainty:
+        note: no numerical uncertainty printed for the flow-rate range
+    - observation_id: lpsc_2019_2641_qms_calibration_power_law_fits
+      type: calibration_fit
+      locator:
+        pdf_page_index: 1
+        figure: '2'
+        note: Figure 1 also prints the two pressure-versus-time calibration lines below.
+      phase: calibration_gas
+      standard_state: QMS signal calibration against reference-gas flow
+      regime: qms_calibration
+      units: signal intensity in cps; flow rate in mbar/s as printed
+      values:
+        quantity: author_power_law_calibration_fits
+        method_class: model_derived
+        model_generator: authors' power-law fit to calibration data
+        x_definition: gas flow rate in mbar/s
+        y_definition: QMS signal intensity at the named mass in cps
+        fits:
+        - gas: H2
+          mass_as_printed: 2
+          expression_as_printed: y = 2.9654e+9 * x^(0.91649)
+          R: 0.98853
+        - gas: N2
+          mass_as_printed: 28
+          expression_as_printed: y = 9.1723e+9 * x^(0.99396)
+          R: 0.99171
+        - gas: CO
+          mass_as_printed: 12
+          expression_as_printed: y = 1.0564e+8 * x^(0.92995)
+          R: 0.99996
+        - gas: He
+          mass_as_printed: 4
+          expression_as_printed: y = 2.4383e+8 * x^(0.91815)
+          R: 0.99956
+        figure_1_pressure_time_lines:
+        - valve: PZT
+          expression_as_printed: y = -0.0039292 + 0.00073213x
+          R: 0.99908
+        - valve: capillary
+          expression_as_printed: y = 9.5333e-6 + 3.2248e-6x
+          R: 0.99999
+        calibration_interference_observations:
+        - CO contribution to mass 28 was not observed above scatter in pure-N2 versus mixture calibration
+        - mass 12 was used for CO because pure CO also gives mass 12, about 30 times less than mass 28
+        - second-order masses: N2 -> 14; CO -> 12; O2 -> 16; CO2 -> 28 and 16 in nearly equal amounts
+      uncertainty:
+        fit_residuals: R values are printed for each fit; no parameter uncertainties are printed
+        calibration_coefficient_variation: approximately +/-30% from the average coefficient across gases
+        water_calibration: not made; uniform heating of the vacuum line to 100 °C was challenging, so average calibration coefficient was used to estimate water content
+    - observation_id: lpsc_2019_2641_calibration_figures_not_digitized
+      type: figure_only
+      locator:
+        pdf_page_index: 1
+        figure: '1-2'
+      phase: calibration_gas
+      standard_state: graphical calibration curves
+      regime: qms_calibration
+      units: as printed on figures
+      values:
+        quantity: calibration_curve_shapes
+        method_class: figure_only
+        evidence_class: figure_only_graphical_data
+        status: curves not digitized; no point values inferred
+        note: Figure 1 shows pressure versus time for PZT-valve and capillary delivery; Figure 2 shows signal intensity versus flow rate for H2, N2, CO and He.
+      uncertainty:
+        note: not printed
+  Murchison_CM2_meteorite:
+    observations:
+    - observation_id: lpsc_2019_2641_murchison_apparatus
+      type: apparatus
+      locator:
+        pdf_page_index: 1
+        section: Experimental technique
+      phase: powdered_meteorite_sample
+      standard_state: custom-built QEGA apparatus as printed
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: as printed
+      values:
+        quantity: evolved_gas_apparatus
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        instrument: custom-built Finesse mass-spectrometer system
+        qms: Hiden Analytical quadrupole mass spectrometer with electron multiplier
+        pumping: turbomolecular and ion pumps
+        sample_container: pure Pt foil
+        furnace: linear heating furnace capable of reaching 1500 °C
+        qms_operation: continuous flow, peak-jumping mode and ion counting
+        water_calibration: not made; water could condense in the vacuum line because uniform heating to 100 °C was challenging
+        recorded_mass_range: 2 to 132
+        recorded_masses_as_printed: [2, 4, 12, 14, 16, 18, 20, 22, 28, 29, 30, 32, 36, 40, 44, 84, 132]
+        temperature_measurement_and_calibration: not stated
+        sample_form: not separately stated for the calibration samples; Murchison sample is stated as powdered
+        exposed_area: not stated
+        gas_identity_and_pressure_during_sample_run: not stated
+        fO2_control: not stated
+        run_duration: not stated
+      uncertainty:
+        note: no numerical uncertainty printed for apparatus geometry or temperature calibration
+    - observation_id: lpsc_2019_2641_murchison_heating_program
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Analysis of the PROSPECT reference Murchison meteorite sample
+      T_range_K:
+      - 473.15
+      - 1673.15
+      phase: powdered_Murchison_CM2_meteorite
+      standard_state: linear-heating evolved-gas analysis
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: mg, °C, °C/min, scans and seconds as printed
+      values:
+        quantity: Murchison_run_conditions
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        sample_mass_mg: 3
+        sample_form: powdered sample
+        heating_rate_C_per_min: 6
+        temperature_start_C: 200
+        temperature_end_C: 1400
+        monitored_mass_channels: 17
+        acquisition_interval_s: 1
+        scans_per_temperature: about 10
+        blank_correction: signal from an empty-furnace blank analysis was subtracted
+        temperature_measurement_and_calibration: not stated
+        vacuum_pressure_during_run: not stated
+        pumping_configuration: continuously pumped through the mass spectrometer; pump types are described on page 1
+        crucible_or_container: sample wrapped in pure Pt foil
+      uncertainty:
+        note: no numerical uncertainty printed for sample mass, heating rate or run conditions
+    - observation_id: lpsc_2019_2641_murchison_major_gas_release_patterns
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Analysis of the PROSPECT reference Murchison meteorite sample
+        figure: '3'
+      T_range_K:
+      - 473.15
+      - 1673.15
+      phase: powdered_Murchison_CM2_meteorite
+      standard_state: blank-corrected release pattern recalculated to flow-rate variation
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: qualitative temperature intervals and flow-rate caveats as printed
+      values:
+        quantity: major_gas_release_pattern
+        method_class: measured_direct_qualitative
+        evidence_class: authors_own_measurement
+        gases:
+        - gas: H2
+          release_temperature_as_printed: mostly 200-600 °C
+          mass_channel_as_printed: 2
+        - gas: N2
+          release_temperature_as_printed: mostly 200-600 °C
+          mass_channel_used_for_amounts: 14
+        - gas: H2O
+          release_temperature_as_printed: mostly 200-600 °C
+          mass_channel_as_printed: 18
+          quantification_status: lower limit only; some water condensed in the vacuum line between furnace and QMS
+          condensation_effect: release pattern stated not to be affected by condensation
+        - gas: CO2
+          release_temperature_as_printed: higher temperatures; mass 16 pattern almost identical
+          mass_channel_as_printed: 44 and 16
+          interpretation_as_printed: mass 16 similarity suggests a small amount of methane
+        - gas: CO
+          release_temperature_as_printed: higher temperatures
+          mass_channel_as_printed: 12
+          note: mass 28 is essentially CO because it has an identical spectrum to mass 12
+        common_feature: except for water and CO, most gases show a spike at approximately 700 °C, probably reflecting chemical reactions or structural transformation
+      uncertainty:
+        water_amount: lower limit only; no numerical uncertainty printed
+    - observation_id: lpsc_2019_2641_murchison_minor_gas_release_patterns
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        section: Analysis of the PROSPECT reference Murchison meteorite sample
+        figure: '4'
+      T_range_K:
+      - 473.15
+      - 1673.15
+      phase: powdered_Murchison_CM2_meteorite
+      standard_state: minor-component release pattern
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: qualitative temperature interval as printed
+      values:
+        quantity: minor_gas_release_pattern
+        method_class: measured_direct_qualitative
+        evidence_class: authors_own_measurement
+        observed_minor_components: [He-4, O2, Ar, Kr]
+        mass_20_assignment: almost exclusively H2-18O
+        release_pattern_data_status: figure shows the pattern; no curve points digitized
+      uncertainty:
+        note: no numerical uncertainty printed
+    - observation_id: lpsc_2019_2641_murchison_figures_not_digitized
+      type: figure_only
+      locator:
+        pdf_page_index: 2
+        figure: '3-4'
+      phase: powdered_Murchison_CM2_meteorite
+      standard_state: graphical gas-release curves
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: gas flow rate in mbar/s and temperature in °C as printed on figures
+      values:
+        quantity: gas_release_curves
+        method_class: figure_only
+        evidence_class: figure_only_graphical_data
+        status: curves not digitized; no values read off the figures
+        figures: Figure 3 major components (H2, CO, N2, H2O, CO2); Figure 4 minor components (He, O2, Ar, Kr)
+      uncertainty:
+        note: not printed

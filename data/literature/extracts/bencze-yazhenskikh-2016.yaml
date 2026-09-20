@@ -1,0 +1,186 @@
+schema_version: literature_extract.v1
+source_id: bencze-yazhenskikh-2016
+source:
+  citation: 'Bencze, L., Rys-Matejczuk, M., Yazhenskikh, E., Ziegner, M. & Muller, M. (2016), Investigation of Vaporization of Alkali Metals from Solidified Gasifier Slags by Knudsen Effusion Mass Spectrometry, Energy & Fuels, DOI 10.1021/acs.energyfuels.5b01620'
+  doi: 10.1021/acs.energyfuels.5b01620
+  year: 2016
+extraction:
+  method: pdftotext -layout transcription of the supplied seven-page supplemental PDF; Tables S-I and S-II only
+  date: '2026-09-20'
+  worker: i1-bencze-yazhenskikh-2016
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+review_status: draft
+scope_assessment:
+  document_type: supplemental parameter tables from a primary Knudsen-effusion mass-spectrometry study of alkali vaporization from solidified gasifier slags
+  measured_direct_observations: 0
+  measured_reduced_observations: 0
+  model_derived_observations: 4
+  note: The supplied PDF contains fitted vapor-pressure equations, 1273 K pressure/activity values, selected-subsample means, and printed fit uncertainties. It does not contain the primary article's methods or raw ion-current data.
+  absent_from_source:
+  - sample mass or sample form
+  - slag composition or named oxide analysis
+  - effusion-cell dimensions or orifice geometry
+  - exposed sample area
+  - vacuum level, pumping system, gas identity, or gas pressure
+  - temperature measurement, calibration, or run duration
+  - raw KEMS intensities or calibration constants
+  - uncertainty for individual Table S-I rows
+  - uncertainty for individual Table S-II rows other than the printed mean rows
+  note_on_absence: Absence in this supplement is not treated as zero or inferred from the primary article.
+species:
+  Na:
+    observations:
+    - observation_id: bencze_2016_table_s1_na_all_subsamples
+      type: psat_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+        page: 1-6
+        table: S-I
+        note: 'Columns: ln(p(Na(g))/Pa)=A+B/T; vapor pressure p(Na(g))/Pa at 1273 K; activity a(Na2O) at 1273 K.'
+      phase: solidified_gasifier_slag_subsamples
+      condensed_form:
+        state: unresolved
+        metastable: false
+        basis: source_supplement_only
+        note: The supplement identifies solidified gasifier slags but does not print the phase assemblage or run-state phase.
+      standard_state: Na2O activity and Na(g) vapor pressure basis as printed in Table S-I
+      regime: knudsen_effusion_mass_spectrometry
+      units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        generator: author-fitted KEMS vapor-pressure relation ln(p(Na(g))/Pa)=A+B/T; a(Na2O) obtained from the authors' KEMS calibration
+        gas_species: Na(g)
+        source_form_as_printed: 'ln(p(Na(g))/Pa)=A+B/T'
+        reference_temperature_K: 1273
+        rows:
+        - {sample: S1-1, subsample: 1, run: 1, temperature_range_K: '1367-1273', A: 45.439, B: -63030, p_Na_at_1273_K_Pa: '1.70·10-2', a_Na2O_at_1273_K: '7.57·10-9'}
+        - {sample: S1-1, subsample: 1, run: 2, temperature_range_K: '1367-1275', A: 34.261, B: -50034, p_Na_at_1273_K_Pa: '6.45·10-3', a_Na2O_at_1273_K: '6.76·10-10'}
+        - {sample: S1-1, subsample: 1, run: 3, temperature_range_K: '1784-1656', A: 63.168, B: -118354, p_Na_at_1273_K_Pa: '1.14·10-13', a_Na2O_at_1273_K: '9.84·10-37'}
+        - {sample: S1-1, subsample: 1, run: selected, temperature_range_K: '1273-1367', A: 39.850, B: -56532, p_Na_at_1273_K_Pa: '1.17·10-2', a_Na2O_at_1273_K: '3.00·10-9'}
+        - {sample: S1-1, subsample: 2, run: 1, temperature_range_K: '1243-1194', A: 26.595, B: -36588, p_Na_at_1273_K_Pa: '1.17·10-1', a_Na2O_at_1273_K: '9.37·10-7'}
+        - {sample: S1-1, subsample: 2, run: 2, temperature_range_K: '1269-1202', A: 26.028, B: -35951, p_Na_at_1273_K_Pa: '1.09·10-1', a_Na2O_at_1273_K: '7.93·10-7'}
+        - {sample: S1-1, subsample: 2, run: 3, temperature_range_K: '1180-1454', A: 24.236, B: -33945, p_Na_at_1273_K_Pa: '8.81·10-2', a_Na2O_at_1273_K: '4.62·10-7'}
+        - {sample: S1-1, subsample: 2, run: selected, temperature_range_K: '1180-1454', A: 25.620, B: -35495, p_Na_at_1273_K_Pa: '1.05·10-1', a_Na2O_at_1273_K: '7.13·10-7'}
+        - {sample: S1-1, subsample: 3, run: 1, temperature_range_K: '1270-1189', A: 28.859, B: -39706, p_Na_at_1273_K_Pa: '9.71·10-2', a_Na2O_at_1273_K: '5.88·10-7'}
+        - {sample: S1-1, subsample: 3, run: 2, temperature_range_K: '1274-1190', A: 32.524, B: -44586, p_Na_at_1273_K_Pa: '8.21·10-2', a_Na2O_at_1273_K: '3.86·10-7'}
+        - {sample: S1-1, subsample: 3, run: 3, temperature_range_K: '1194-1443', A: 23.367, B: -33353, p_Na_at_1273_K_Pa: '5.88·10-2', a_Na2O_at_1273_K: '1.68·10-7'}
+        - {sample: S1-1, subsample: 3, run: 4, temperature_range_K: '1170-1447', A: 30.358, B: -44927, p_Na_at_1273_K_Pa: '7.20·10-3', a_Na2O_at_1273_K: '8.94·10-10'}
+        - {sample: S1-1, subsample: 3, run: selected, temperature_range_K: '1194-1454', A: 23.367, B: -33353, p_Na_at_1273_K_Pa: '5.88·10-2', a_Na2O_at_1273_K: '1.68·10-7'}
+        - {sample: S1-1, subsample: 4, run: 1, temperature_range_K: '1259-1184', A: 29.341, B: -40524, p_Na_at_1273_K_Pa: '8.27·10-2', a_Na2O_at_1273_K: '3.93·10-7'}
+        - {sample: S1-1, subsample: 4, run: 2, temperature_range_K: '1259-1180', A: 33.365, B: -45649, p_Na_at_1273_K_Pa: '8.25·10-2', a_Na2O_at_1273_K: '3.90·10-7'}
+        - {sample: S1-1, subsample: 4, run: 3, temperature_range_K: '1173-1464', A: 25.002, B: -35636, p_Na_at_1273_K_Pa: '5.02·10-2', a_Na2O_at_1273_K: '1.13·10-7'}
+        - {sample: S1-1, subsample: 4, run: selected, temperature_range_K: '1173-1464', A: 25.002, B: -35636, p_Na_at_1273_K_Pa: '5.02·10-2', a_Na2O_at_1273_K: '1.13·10-7'}
+        - {sample: S1-2, subsample: 1, run: 1, temperature_range_K: '1392-1303', A: 33.481, B: -48421, p_Na_at_1273_K_Pa: '1.05·10-2', a_Na2O_at_1273_K: '2.45·10-9'}
+        - {sample: S1-2, subsample: 2, run: 1, temperature_range_K: '1362-1265', A: 38.399, B: -54709, p_Na_at_1273_K_Pa: '1.03·10-2', a_Na2O_at_1273_K: '2.70·10-9'}
+        - {sample: S1-2, subsample: 2, run: 2, temperature_range_K: '1351-1236', A: 36.228, B: -52632, p_Na_at_1273_K_Pa: '5.99·10-3', a_Na2O_at_1273_K: '6.20·10-10'}
+        - {sample: S1-2, subsample: 2, run: 3, temperature_range_K: '1256-1469', A: 36.258, B: -52796, p_Na_at_1273_K_Pa: '5.43·10-3', a_Na2O_at_1273_K: '4.83·10-10'}
+        - {sample: S1-2, subsample: 2, run: selected, temperature_range_K: '1236-1469', A: 36.243, B: -52714, p_Na_at_1273_K_Pa: '5.71·10-3', a_Na2O_at_1273_K: '5.49·10-10'}
+        - {sample: S1-2, subsample: 3, run: 1, temperature_range_K: '1256-1346', A: 32.225, B: -47246, p_Na_at_1273_K_Pa: '7.53·10-3', a_Na2O_at_1273_K: '1.37·10-9'}
+        - {sample: S1-2, subsample: 3, run: 2, temperature_range_K: '1259-1351', A: 33.519, B: -49251, p_Na_at_1273_K_Pa: '5.69·10-3', a_Na2O_at_1273_K: '6.02·10-10'}
+        - {sample: S1-2, subsample: 3, run: 3, temperature_range_K: '1245-1476', A: 40.078, B: -57882, p_Na_at_1273_K_Pa: '4.56·10-3', a_Na2O_at_1273_K: '3.27·10-10'}
+        - {sample: S1-2, subsample: 3, run: selected, temperature_range_K: '1245-1476', A: 36.799, B: -53567, p_Na_at_1273_K_Pa: '5.12·10-3', a_Na2O_at_1273_K: '4.52·10-10'}
+        - {sample: S1-2, subsample: 4, run: 1, temperature_range_K: '1247-1356', A: 34.061, B: -48853, p_Na_at_1273_K_Pa: '1.34·10-2', a_Na2O_at_1273_K: '5.64·10-9'}
+        - {sample: S1-2, subsample: 4, run: 2, temperature_range_K: '1361-1259', A: 34.863, B: -49899, p_Na_at_1273_K_Pa: '1.31·10-2', a_Na2O_at_1273_K: '4.63·10-9'}
+        - {sample: S1-2, subsample: 4, run: 3, temperature_range_K: '1260-1476', A: 36.277, B: -51844, p_Na_at_1273_K_Pa: '1.17·10-2', a_Na2O_at_1273_K: '3.57·10-9'}
+        - {sample: S1-2, subsample: 4, run: selected, temperature_range_K: '1247-1476', A: 35.570, B: -50872, p_Na_at_1273_K_Pa: '1.24·10-2', a_Na2O_at_1273_K: '4.08·10-9'}
+        - {sample: S1-3, subsample: 1, run: 1, temperature_range_K: '1390-1298', A: 19.791, B: -33770, p_Na_at_1273_K_Pa: '1.19·10-3', a_Na2O_at_1273_K: '1.05·10-11'}
+        - {sample: S1-3, subsample: 1, run: 2, temperature_range_K: '1377-1283', A: 15.979, B: -29070, p_Na_at_1273_K_Pa: '1.05·10-3', a_Na2O_at_1273_K: '7.72·10-12'}
+        - {sample: S1-3, subsample: 1, run: 3, temperature_range_K: '1294-1564', A: 22.838, B: -38507, p_Na_at_1273_K_Pa: '6.05·10-4', a_Na2O_at_1273_K: '1.92·10-12'}
+        - {sample: S1-3, subsample: 1, run: selected, temperature_range_K: '1294-1564', A: 22.838, B: -38507, p_Na_at_1273_K_Pa: '6.05·10-4', a_Na2O_at_1273_K: '1.92·10-12'}
+        - {sample: S1-3, subsample: 2, run: 1, temperature_range_K: '1401-1332', A: 32.247, B: -51036, p_Na_at_1273_K_Pa: '3.92·10-4', a_Na2O_at_1273_K: '6.23·10-13'}
+        - {sample: S1-3, subsample: 2, run: 2, temperature_range_K: '1406-1334', A: 22.29, B: -37770, p_Na_at_1273_K_Pa: '6.24·10-4', a_Na2O_at_1273_K: '2.01·10-12'}
+        - {sample: S1-3, subsample: 2, run: 3, temperature_range_K: '1337-1575', A: 21.434, B: -36657, p_Na_at_1273_K_Pa: '6.35·10-4', a_Na2O_at_1273_K: '2.10·10-12'}
+        - {sample: S1-3, subsample: 2, run: selected, temperature_range_K: '1332-1575', A: 21.862, B: -37214, p_Na_at_1273_K_Pa: '6.29·10-4', a_Na2O_at_1273_K: '2.05·10-12'}
+        - {sample: S1-3, subsample: 3, run: 1, temperature_range_K: '1409-1322', A: 35.504, B: -55886, p_Na_at_1273_K_Pa: '2.26·10-4', a_Na2O_at_1273_K: '1.58·10-13'}
+        - {sample: S1-3, subsample: 3, run: 2, temperature_range_K: '1404-1327', A: 27.549, B: -45269, p_Na_at_1273_K_Pa: '3.32·10-4', a_Na2O_at_1273_K: '4.07·10-13'}
+        - {sample: S1-3, subsample: 3, run: 3, temperature_range_K: '1320-1591', A: 22.604, B: -38506, p_Na_at_1273_K_Pa: '4.79·10-4', a_Na2O_at_1273_K: '1.02·10-12'}
+        - {sample: S1-3, subsample: 3, run: 4, temperature_range_K: '1353-1590', A: 22.442, B: -39227, p_Na_at_1273_K_Pa: '2.31·10-4', a_Na2O_at_1273_K: '1.64·10-13'}
+        - {sample: S1-3, subsample: 3, run: selected, temperature_range_K: '1320-1591', A: 22.604, B: -38506, p_Na_at_1273_K_Pa: '4.79·10-4', a_Na2O_at_1273_K: '1.02·10-12'}
+        - {sample: S1-4, subsample: 1, run: 1, temperature_range_K: '1286-1210', A: 29.013, B: -38811, p_Na_at_1273_K_Pa: '2.29·10-1', a_Na2O_at_1273_K: '5.27·10-6'}
+        - {sample: S1-4, subsample: 1, run: 2, temperature_range_K: '1307-1224', A: 31.7, B: -42799, p_Na_at_1273_K_Pa: '1.47·10-1', a_Na2O_at_1273_K: '1.70·10-6'}
+        - {sample: S1-4, subsample: 1, run: 3, temperature_range_K: '1363-1451', A: 7.5235, B: -11204, p_Na_at_1273_K_Pa: '2.79·10-1', a_Na2O_at_1273_K: '8.26·10-6'}
+        - {sample: S1-4, subsample: 1, run: selected, temperature_range_K: '1307-1210', A: 30.357, B: -40805, p_Na_at_1273_K_Pa: '1.88·10-1', a_Na2O_at_1273_K: '1.70·10-6'}
+        - {sample: S1-4, subsample: 2, run: 1, temperature_range_K: '1272-1198', A: 25.994, B: -34396, p_Na_at_1273_K_Pa: '3.59·10-1', a_Na2O_at_1273_K: '1.65·10-5'}
+        - {sample: S1-4, subsample: 2, run: 2, temperature_range_K: '1256-1195', A: 30.762, B: -40475, p_Na_at_1273_K_Pa: '3.56·10-1', a_Na2O_at_1273_K: '1.61·10-5'}
+        - {sample: S1-4, subsample: 2, run: 3, temperature_range_K: '1175-1362', A: 24.412, B: -32808, p_Na_at_1273_K_Pa: '2.57·10-1', a_Na2O_at_1273_K: '6.98·10-6'}
+        - {sample: S1-4, subsample: 2, run: selected, temperature_range_K: '1175-1362', A: 24.412, B: -32808, p_Na_at_1273_K_Pa: '2.57·10-1', a_Na2O_at_1273_K: '6.98·10-6'}
+        - {sample: S1-4, subsample: 3, run: 1, temperature_range_K: '1278-1200', A: 26.448, B: -35683, p_Na_at_1273_K_Pa: '2.05·10-1', a_Na2O_at_1273_K: '3.99·10-6'}
+        - {sample: S1-4, subsample: 3, run: 2, temperature_range_K: '1179-1373', A: 22.232, B: -30719, p_Na_at_1273_K_Pa: '1.50·10-1', a_Na2O_at_1273_K: '1.79·10-6'}
+        - {sample: S1-4, subsample: 3, run: 3, temperature_range_K: '1204-1377', A: 23.624, B: -32743, p_Na_at_1273_K_Pa: '1.23·10-1', a_Na2O_at_1273_K: '1.09·10-6'}
+        - {sample: S1-4, subsample: 3, run: 4, temperature_range_K: '1173-1374', A: 22.739, B: -32356, p_Na_at_1273_K_Pa: '6.87·10-2', a_Na2O_at_1273_K: '2.52·10-7'}
+        - {sample: S1-4, subsample: 3, run: 5, temperature_range_K: '1175-1423', A: 27.654, B: -38552, p_Na_at_1273_K_Pa: '7.21·10-2', a_Na2O_at_1273_K: '2.85·10-7'}
+        - {sample: S1-4, subsample: 3, run: selected, temperature_range_K: '1179-1377', A: 22.928, B: -31731, p_Na_at_1273_K_Pa: '1.36·10-1', a_Na2O_at_1273_K: '1.40·10-6'}
+        - {sample: S1-4, subsample: 4, run: 1, temperature_range_K: '1236-1134', A: 29.178, B: -38806, p_Na_at_1273_K_Pa: '2.71·10-1', a_Na2O_at_1273_K: '8.02·10-6'}
+        - {sample: S1-4, subsample: 4, run: 2, temperature_range_K: '1273-1178', A: 28.757, B: -38579, p_Na_at_1273_K_Pa: '2.13·10-1', a_Na2O_at_1273_K: '4.38·10-6'}
+        - {sample: S1-4, subsample: 4, run: 3, temperature_range_K: '1134-1384', A: 23.067, B: -31728, p_Na_at_1273_K_Pa: '1.56·10-1', a_Na2O_at_1273_K: '2.02·10-6'}
+        - {sample: S1-4, subsample: 4, run: selected, temperature_range_K: '1134-1384', A: 23.067, B: -31728, p_Na_at_1273_K_Pa: '1.56·10-1', a_Na2O_at_1273_K: '2.02·10-6'}
+      uncertainty:
+        reported_status: not_reported_for_individual_rows
+        note: Table S-I prints no uncertainty for individual fitted rows.
+    - observation_id: bencze_2016_table_s2_na_selected_means
+      type: psat_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
+      phase: solidified_gasifier_slag_selected_subsamples
+      regime: knudsen_effusion_mass_spectrometry
+      units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        generator: author mean of selected KEMS vapor-pressure fits
+        gas_species: Na(g)
+        source_form_as_printed: 'ln(p(Na(g))/Pa)=A+B/T'
+        reference_temperature_K: 1273
+        rows:
+        - {sample: S1-1, selected_subsamples: '3 and 4', temperature_range_K: '1173-1464', A: '24.2±1.2', B: '-34500±1600', p_Na_at_1273_K_Pa: '(5.45±0.61)·10-2', a_Na2O_at_1273_K: '(1.40±0.39)·10-7'}
+        - {sample: S1-2, selected_subsamples: '2 and 3', temperature_range_K: '1236-1476', A: '36.52±0.39', B: '-53140±600', p_Na_at_1273_K_Pa: '(5.42±0.42)·10-3', a_Na2O_at_1273_K: '(5.01±0.69)·10-10'}
+        - {sample: S1-3, selected_subsamples: mean, temperature_range_K: '1294-1591', A: '22.44±0.51', B: '-38080±750', p_Na_at_1273_K_Pa: '(5.71±0.81)·10-4', a_Na2O_at_1273_K: '(1.66±0.56)·10-12'}
+        - {sample: S1-4, selected_subsamples: mean, temperature_range_K: '1134-1384', A: '23.47±0.82', B: '-32100±620', p_Na_at_1273_K_Pa: '(1.83±0.65)·10-1', a_Na2O_at_1273_K: '(3.5±3.1)·10-6'}
+      uncertainty: {reported_status: printed, note: Uncertainties are printed only for the Table S-II mean rows and are retained verbatim.}
+  K:
+    observations:
+    - observation_id: bencze_2016_table_s1_k_all_subsamples
+      type: psat_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
+      phase: solidified_gasifier_slag_subsamples
+      regime: knudsen_effusion_mass_spectrometry
+      units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        generator: author-fitted KEMS vapor-pressure relation ln(p(K(g))/Pa)=A+B/T; a(K2O) obtained from the authors' KEMS calibration
+        gas_species: K(g)
+        source_form_as_printed: 'ln(p(K(g))/Pa)=A+B/T'
+        reference_temperature_K: 1273
+        rows: []
+        table_transcription: data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml
+      uncertainty: {reported_status: not_reported_for_individual_rows, note: Table S-I prints no uncertainty for individual fitted rows.}
+    - observation_id: bencze_2016_table_s2_k_selected_means
+      type: psat_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
+      phase: solidified_gasifier_slag_selected_subsamples
+      regime: knudsen_effusion_mass_spectrometry
+      units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        generator: author mean of selected KEMS vapor-pressure fits
+        gas_species: K(g)
+        source_form_as_printed: 'ln(p(K(g))/Pa)=A+B/T'
+        reference_temperature_K: 1273
+        rows:
+        - {sample: S1-1, selected_subsamples: '3 and 4', temperature_range_K: '1173-1464', A: '31.5±1.1', B: '-48500±1700', p_K_at_1273_K_Pa: '(1.40±0.24)·10-3', a_K2O_at_1273_K: '(1.34±0.52)·10-13'}
+        - {sample: S1-2, selected_subsamples: '2 and 3', temperature_range_K: '1236-1476', A: '38.0±2.6', B: '-56000±3700', p_K_at_1273_K_Pa: '(2.57±0.88)·10-3', a_K2O_at_1273_K: '(1.7±1.1)·10-13'}
+        - {sample: S1-3, selected_subsamples: mean, temperature_range_K: '1294-1591', A: '21.3±1.9', B: '-39400±3300', p_K_at_1273_K_Pa: '(7.5±4.8)·10-5', a_K2O_at_1273_K: '(5.3±5.6)·10-17'}
+        - {sample: S1-4, selected_subsamples: mean, temperature_range_K: '1134-1384', A: '24.4±3.4', B: '-35800±3800', p_K_at_1273_K_Pa: '(2.6±1.1)·10-2', a_K2O_at_1273_K: '(1.01±0.99)·10-10'}
+      uncertainty: {reported_status: printed, note: Uncertainties are printed only for the Table S-II mean rows and are retained verbatim.}
+not_found:
+- direct raw KEMS ion intensities
+- directly measured partial-pressure points independent of the fitted A+B/T relation
+- sample chemistry, mass, form, area, crucible, or cell/orifice dimensions
+- chamber pressure, pumping, sweep gas, temperature calibration, fO2, and run durations
+- measured uncertainty for individual Table S-I rows
+notes:
+- 'The supplied PDF is a supplement: its PDF metadata title is Table S-I and its pages contain only Tables S-I and S-II plus the graphite-cell footnote.'
+- 'The graphite footnote states that a thin graphite coating on the inner surface of the iridium-cell lid was used for S1-1* and a thin graphite disc replaced the coating for S1-4#, but the supplement does not identify which full experimental conditions those marks encode.'
+- 'The K Table S-I rows are preserved in the source-faithful companion sidecar because the main extract already carries the complete Na/K source table layout and no K numeric value is inferred or recomputed.'

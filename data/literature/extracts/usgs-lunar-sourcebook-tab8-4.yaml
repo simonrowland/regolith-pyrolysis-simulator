@@ -1,0 +1,346 @@
+schema_version: literature_extract.v1
+source_id: usgs-lunar-sourcebook-tab8-4
+source:
+  citation: 'Lunar Sourcebook, Chapter 8, Table A8.4, "Statistical summary of the database for concentrations of frequently determined siderophile elements in mare basalts (MBAS) and in soils and regolith breccias (S&RB)" (TAB8_4R.DOC; USGS Lunar Consortium copy)'
+  doi: null
+  url: https://lunar-consortium.astrogeology.usgs.gov/data/chem_min/tab8_4.pdf
+  year: 1991
+extraction:
+  method: 'pdftotext -layout transcription of the three-page Table A8.4 PDF; fixed-width table cells retained as printed strings; blank cells remain absent; no arithmetic, OCR, or value imputation'
+  date: '2026-09-20'
+  worker: i3-usgs-lunar-sourcebook-tab8-4
+  source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/usgs-lunar-sourcebook-tab8-4/usgs-lunar-sourcebook-tab8-4.pdf
+review_status: draft
+fidelity_samples:
+- path: species.siderophile_elements.observations[usgs_tab8_4_apollo11_mbas].values.rows[1].Fe
+  value: '15.2'
+  locator: {page: 1, table: A8.4, row: 'Apollo 11 MBAS Average', column: Fe}
+- path: species.siderophile_elements.observations[usgs_tab8_4_apollo14_srb].values.rows[1].Sb
+  value: '3.01'
+  locator: {page: 2, table: A8.4, row: 'Apollo 14 S&RB Average', column: Sb}
+- path: species.siderophile_elements.observations[usgs_tab8_4_amet_srb].values.rows[1].W
+  value: '<130'
+  locator: {page: 3, table: A8.4, row: 'AMET S&RB Average', column: W}
+coverage:
+  evidence_class: compilation_assessed
+  table: A8.4
+  sample_groups: 18
+  element_columns: [Fe, Co, Ni, Ge, Mo, W, Re, Os, Ir, Au, Sb, Ru, Pd]
+  statistics: [N, average, standard_deviation, minimum, maximum]
+  printed_units: 'Fe wt.%; Co/Ni µg/g; Ge/Mo/W/Re/Os/Ir/Au/Sb/Ru/Pd ng/g, as printed per page header'
+  source_scope: 'Compiled concentrations of siderophile elements in lunar mare basalts, soils and regolith breccias, and Antarctic lunar meteorites; underlying analytical papers are listed in the table references and are not reclassified as direct measurements here.'
+  absent_from_source:
+  - primary_sample_identifiers
+  - apparatus
+  - sample_mass
+  - sample_form
+  - container_or_crucible
+  - cell_or_orifice_geometry
+  - exposed_area
+  - vacuum_level
+  - pumping
+  - gas_identity_or_pressure
+  - temperature_measurement_or_calibration
+  - fO2_control
+  - run_duration
+  - measurement_uncertainties_for_individual_analyses
+  - individual_measurement_values
+  notes:
+  - 'N is the number of analyses contributing to each compiled statistic, not a number of furnace runs.'
+  - 'Blank cells are absent from the source and are not zero.'
+  - 'The source warns that standard deviations are omitted when N < 3 and that HMCT/BX statistics are practically meaningless; those categories are not present in this table extract.'
+species:
+  siderophile_elements:
+    observations:
+    - observation_id: usgs_tab8_4_apollo11_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 11 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 11 MBAS
+        rows:
+        - {statistic: N, Fe: '79', Co: '10', Ge: '2', Mo: '1', W: '3', Ir: '7', Au: '6'}
+        - {statistic: average, Fe: '15.2', Co: '20.6', Ge: '60', Mo: '129', W: '357', Ir: '0.027', Au: '0.056'}
+        - {statistic: standard_deviation, Fe: '1.0', Co: '9.9', W: '83', Ir: '0.027', Au: '0.035'}
+        - {statistic: minimum, Fe: '12.8', Co: '5.7', Ge: '60', W: '240', Ir: '0.005', Au: '0.015'}
+        - {statistic: maximum, Fe: '16.8', Co: '38.5', Ge: '60', W: '430', Ir: '0.090', Au: '0.120'}
+    - observation_id: usgs_tab8_4_apollo12_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 12 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 12 MBAS
+        rows:
+        - {statistic: N, Fe: '21', Co: '31', Ni: '23', Ge: '17', Mo: '4', W: '11', Re: '11', Os: '2917'}
+        - {statistic: average, Fe: '15.7', Co: '45.3', Ni: '46.7', Ge: '31.8', Mo: '42.5', W: '161', Re: '0.0098', Os: '0.060', Ir: '0.024'}
+        - {statistic: standard_deviation, Fe: '1.0', Co: '12.9', Ni: '39.7', Ge: '40.5', Mo: '8.3', W: '55', Re: '0.0151', Os: '0.051', Ir: '0.019'}
+        - {statistic: minimum, Fe: '13.4', Co: '25', Ni: '1', Ge: '0.7', Mo: '30', W: '104', Re: '0.0004', Os: '0.00190.', Ir: '.0046'}
+        - {statistic: maximum, Fe: '17.2', Co: '69', Ni: '150', Ge: '100', Mo: '50', W: '290', Re: '0.056', Os: '0.20', Ir: '0.072'}
+    - observation_id: usgs_tab8_4_apollo14_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 14 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 14 MBAS
+        rows:
+        - {statistic: N, Fe: '3', Co: '2', Ni: '2', Ge: '3', W: '2', Re: '2', Os: '1', Ir: '3', Au: '3'}
+        - {statistic: average, Fe: '12.8', Co: '28.9', Ni: '21.5', Ge: '428', W: '350', Re: '0.00580', Os: '.011', Ir: '0.021', Au: '0.186'}
+        - {statistic: standard_deviation, Fe: '0.8', Ge: '192', Ir: '0.018', Au: '0.082'}
+        - {statistic: minimum, Fe: '12.1', Co: '28.7', Ni: '4', Ge: '175', W: '150', Re: '0.0051', Ir: '0.00150', Au: '.11'}
+        - {statistic: maximum, Fe: '13.9', Co: '29.0', Ni: '39', Ge: '640', W: '550', Re: '0.0066', Ir: '0.0440', Au: '.30'}
+    - observation_id: usgs_tab8_4_apollo15_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 15 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 15 MBAS
+        rows:
+        - {statistic: N, Fe: '14', Co: '22', Ni: '23', Ge: '28', Mo: '1', W: '6', Re: '23', Os: '3', Ir: '29', Au: '29'}
+        - {statistic: average, Fe: '15.9', Co: '49.6', Ni: '57.5', Ge: '11.0', Mo: '21', W: '342', Re: '0.022', Os: '0.026', Ir: '0.043', Au: '0.073'}
+        - {statistic: standard_deviation, Fe: '1.7', Co: '13.5', Ni: '28.5', Ge: '10.2', W: '403', Re: '0.072', Os: '0.005', Ir: '0.044', Au: '0.082'}
+        - {statistic: minimum, Fe: '12.9', Co: '34.4', Ni: '16', Ge: '2.8', W: '59', Re: '0.00060', Os: '.020', Ir: '0.0043', Au: '0.005'}
+        - {statistic: maximum, Fe: '18.8', Co: '89', Ni: '150', Ge: '50', W: '1200', Re: '0.36', Os: '0.032', Ir: '0.144', Au: '0.36'}
+    - observation_id: usgs_tab8_4_apollo16_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 16 MBAS (clast in breccia 60639)'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 16 MBAS (clast in breccia 60639)
+        rows:
+        - {statistic: N, Fe: '1', Co: '1', Ge: '1', Re: '1', Ir: '1', Au: '1'}
+        - {statistic: average, Fe: '15.55', Co: '20', Ge: '2.53', Re: '0.0057', Ir: '0.048', Au: '0.04'}
+        - {statistic: standard_deviation}
+        - {statistic: minimum}
+        - {statistic: maximum}
+    - observation_id: usgs_tab8_4_apollo17_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Apollo 17 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 17 MBAS
+        rows:
+        - {statistic: N, Fe: '15', Co: '15', Ni: '6', Ge: '6', Mo: '1', W: '10', Re: '3', Ir: '5', Au: '9'}
+        - {statistic: average, Fe: '14.5', Co: '19.7', Ni: '2.0', Ge: '2.78', Mo: '39', W: '83.4', Re: '0.0018', Ir: '0.053', Au: '0.079'}
+        - {statistic: standard_deviation, Fe: '0.7', Co: '2.9', Ni: '1.1', Ge: '1.49', W: '16.2', Re: '0.0010', Ir: '0.049', Au: '0.088'}
+        - {statistic: minimum, Fe: '12.6', Co: '13.7', Ni: '1.0', Ge: '1.27', W: '60', Re: '0.0007', Ir: '0.003', Au: '0.007'}
+        - {statistic: maximum, Fe: '15.5', Co: '22.5', Ni: '3.6', Ge: '5.7', W: '120', Re: '0.0031', Ir: '0.140', Au: '0.26'}
+    - observation_id: usgs_tab8_4_luna16_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Luna 16 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Luna 16 MBAS
+        rows:
+        - {statistic: N, Fe: '4', Co: '4', Ni: '1'}
+        - {statistic: average, Fe: '14.7', Co: '18.2', Ni: '79'}
+        - {statistic: standard_deviation, Fe: '0.6', Co: '2.0'}
+        - {statistic: minimum, Fe: '14.0', Co: '17.0'}
+        - {statistic: maximum, Fe: '15.7', Co: '21.7'}
+    - observation_id: usgs_tab8_4_luna24_mbas
+      type: compiled_statistics
+      locator: {page: 1, table: A8.4, row_group: 'Luna 24 MBAS'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Luna 24 MBAS
+        rows:
+        - {statistic: N, Fe: '12', Co: '12', Ni: '5', Ir: '1'}
+        - {statistic: average, Fe: '16.3', Co: '40.7', Ni: '43.0', Ir: '30'}
+        - {statistic: standard_deviation, Fe: '0.9', Co: '6.3', Ni: '26.8'}
+        - {statistic: minimum, Fe: '14.7', Co: '36.0', Ni: '15'}
+        - {statistic: maximum, Fe: '17.4', Co: '59.3', Ni: '80'}
+    - observation_id: usgs_tab8_4_apollo11_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 11 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 11 S&RB
+        rows:
+        - {statistic: N, Co: '7', Ni: '5', Ge: '7', W: '1', Ru: '4', Pd: '4', Re: '3', Os: '9', Ir: '11'}
+        - {statistic: average, Co: '31.0', Ni: '199', Ge: '511', W: '220', Ru: '10.5', Pd: '0.74', Re: '7.83', Os: '8.6', Ir: '2.9'}
+        - {statistic: standard_deviation, Co: '3.0', Ni: '48', Ge: '367', Pd: '2.3', Re: '0.21', Os: '1.9', Ir: '1.9'}
+        - {statistic: minimum, Co: '27.2', Ni: '150', Ge: '240', Pd: '7', Re: '7.6', Os: '5.4', Ir: '1.4'}
+        - {statistic: maximum, Co: '34.8', Ni: '280', Ge: '1400', Pd: '13', Re: '8.1', Os: '11.6', Ir: '8.5'}
+    - observation_id: usgs_tab8_4_apollo12_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 12 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 12 S&RB
+        rows:
+        - {statistic: N, Co: '21', Ni: '10', Ge: '4', W: '5', Ru: '3', Pd: '3', Re: '7', Os: '5', Ir: '15', Au: '18'}
+        - {statistic: average, Co: '40.8', Ni: '260', Ge: '247', W: '592', Ru: '47', Pd: '9.7', Re: '0.44', Os: '5.2', Ir: '5.6', Au: '2.4'}
+        - {statistic: standard_deviation, Co: '4.4', Ni: '165', Ge: '63', W: '104', Ru: '30', Pd: '2.9', Re: '0.13', Os: '1.6', Ir: '2.1', Au: '1.1'}
+        - {statistic: minimum, Co: '34', Ni: '130', Ge: '200', W: '450', Ru: '5.5', Pd: '6.5', Re: '0.25', Os: '3.8', Ir: '2.7', Au: '0.82'}
+        - {statistic: maximum, Co: '55', Ni: '730', Ge: '355', W: '740', Ru: '71', Pd: '13.5', Re: '0.67', Os: '7.5', Ir: '11', Au: '5.7'}
+    - observation_id: usgs_tab8_4_apollo14_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 14 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 14 S&RB
+        rows:
+        - {statistic: N, Co: '25', Ni: '29', Ge: '8', Sb: '8', W: '8', Ru: '2', Pd: '2', Re: '12', Os: '1', Ir: '19', Au: '18'}
+        - {statistic: average, Co: '34.6', Ni: '411', Ge: '671', Sb: '3.01', W: '1331', Ru: '19.5', Pd: '24', Re: '1.13', Os: '12.0', Ir: '12.5', Au: '6.2'}
+        - {statistic: standard_deviation, Co: '3.3', Ni: '101', Ge: '68', Sb: '1.13', W: '509', Pd: '0.14', Ir: '2.8', Au: '2.0'}
+        - {statistic: minimum, Co: '27.5', Ni: '273', Ge: '590', Sb: '2', W: '500', Ru: '17', Pd: '20', Re: '0.86', Ir: '7.3', Au: '2.3'}
+        - {statistic: maximum, Co: '43.5', Ni: '700', Ge: '790', Sb: '5.7', W: '1950', Ru: '22', Pd: '28', Re: '1.34', Ir: '19', Au: '11'}
+    - observation_id: usgs_tab8_4_apollo15_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 15 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 15 S&RB
+        rows:
+        - {statistic: N, Co: '51', Ni: '52', Ge: '27', Sb: '8', W: '15', Ru: '7', Pd: '2', Re: '18', Os: '8', Ir: '38', Au: '36'}
+        - {statistic: average, Co: '44.6', Ni: '216', Ge: '340', Sb: '1.67', W: '628', Ru: '15.9', Pd: '6.5', Re: '0.61', Os: '6.3', Ir: '6.4', Au: '3.0'}
+        - {statistic: standard_deviation, Co: '6.5', Ni: '52', Ge: '127', Sb: '0.66', W: '473', Ru: '6.1', Pd: '0.3', Re: '0.20', Os: '1.0', Ir: '1.8', Au: '1.5'}
+        - {statistic: minimum, Co: '35.4', Ni: '90', Ge: '120', Sb: '0.85', W: '130', Ru: '5', Pd: '6.2', Re: '0.2', Os: '4.0', Ir: '2.1', Au: '1.0'}
+        - {statistic: maximum, Co: '66', Ni: '360', Ge: '790', Sb: '2.7', W: '1800', Ru: '25', Pd: '6.8', Re: '1.2', Os: '7.3', Ir: '11', Au: '8'}
+    - observation_id: usgs_tab8_4_apollo16_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 16 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 16 S&RB
+        rows:
+        - {statistic: N, Co: '40', Ni: '44', Ge: '33', Sb: '9', W: '4', Ru: '8', Pd: '3', Re: '18', Os: '6', Ir: '50', Au: '51'}
+        - {statistic: average, Co: '27', Ni: '378', Ge: '763', Sb: '1.93', W: '209', Ru: '18.1', Pd: '13.3', Re: '0.9', Os: '5.9', Ir: '11.6', Au: '7.8'}
+        - {statistic: standard_deviation, Co: '10', Ni: '151', Ge: '364', Sb: '0.94', W: '119', Ru: '7.4', Pd: '4.7', Re: '0.6', Os: '1.4', Ir: '4.9', Au: '3.5'}
+        - {statistic: minimum, Co: '9', Ni: '80', Ge: '245', Sb: '0.73', W: '74', Ru: '9', Pd: '8.4', Re: '0.37', Os: '4.5', Ir: '2.8', Au: '1.5'}
+        - {statistic: maximum, Co: '59', Ni: '693', Ge: '1630', Sb: '4.23', W: '350', Ru: '34', Pd: '19.6', Re: '2.6', Os: '8.5', Ir: '26', Au: '16.6'}
+    - observation_id: usgs_tab8_4_apollo17_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Apollo 17 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Apollo 17 S&RB
+        rows:
+        - {statistic: N, Co: '69', Ni: '68', Ge: '23', Sb: '8', W: '13', Ru: '6', Pd: '3', Re: '14', Ir: '47', Au: '59'}
+        - {statistic: average, Co: '33.8', Ni: '211', Ge: '346', Sb: '0.93', W: '203', Ru: '13.3', Pd: '8.3', Re: '0.56', Ir: '9.7', Au: '4.1'}
+        - {statistic: standard_deviation, Co: '6.7', Ni: '83', Ge: '133', Sb: '0.39', W: '110', Ru: '5.5', Pd: '2.4', Re: '0.28', Ir: '4.5', Au: '2.5'}
+        - {statistic: minimum, Co: '24.5', Ni: '64', Ge: '105', Sb: '0.55', W: '88', Ru: '3', Pd: '5', Re: '0.052', Ir: '0.021', Au: '0.7'}
+        - {statistic: maximum, Co: '68', Ni: '550', Ge: '625', Sb: '1.81', W: '520', Ru: '19', Pd: '10', Re: '1.07', Ir: '25', Au: '13'}
+    - observation_id: usgs_tab8_4_luna16_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Luna 16 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Luna 16 S&RB
+        rows:
+        - {statistic: N, Co: '7', Ni: '3', Ge: '2', Sb: '2', Ru: '1', Pd: '1', Re: '2', Ir: '2', Au: '4'}
+        - {statistic: average, Co: '35.2', Ni: '174', Ge: '1300', Sb: '3.8', Ru: '20', Pd: '10.2', Re: '3.6', Ir: '9.7', Au: '2.5'}
+        - {statistic: standard_deviation, Co: '10.3', Ni: '30', Ir: '0.5'}
+        - {statistic: minimum, Co: '26', Ni: '132', Ge: '1300', Sb: '3.3', Pd: '3.4', Ir: '9.6', Au: '1.7'}
+        - {statistic: maximum, Co: '57.3', Ni: '200', Ge: '1300', Sb: '4.2', Pd: '3.7', Ir: '9.8', Au: '2.9'}
+    - observation_id: usgs_tab8_4_luna20_srb
+      type: compiled_statistics
+      locator: {page: 2, table: A8.4, row_group: 'Luna 20 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Luna 20 S&RB
+        rows:
+        - {statistic: N, Co: '3', Ni: '3', Ge: '3', Sb: '2', W: '1', Pd: '2', Ir: '3', Au: '5'}
+        - {statistic: average, Co: '30.0', Ni: '252', Ge: '448', Sb: '5.7', W: '100', Pd: '1.04', Ir: '9.51', Au: '5.4'}
+        - {statistic: standard_deviation, Co: '2.9', Ni: '16', Ge: '26', Ir: '0.01', Au: '2.0'}
+        - {statistic: minimum, Co: '27', Ni: '230', Ge: '430', Sb: '1.5', Pd: '1.04', Ir: '9.5', Au: '3.29'}
+        - {statistic: maximum, Co: '34', Ni: '267', Ge: '485', Sb: '9.8', Pd: '1.04', Ir: '9.52', Au: '7.8'}
+    - observation_id: usgs_tab8_4_luna24_srb
+      type: compiled_statistics
+      locator: {page: 3, table: A8.4, row_group: 'Luna 24 S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: Luna 24 S&RB
+        rows:
+        - {statistic: N, Co: '14', Ni: '13', W: '1', Ru: '1', Ir: '2', Au: '2'}
+        - {statistic: average, Co: '49.4', Ni: '158', W: '53', Ru: '6.2', Ir: '7.7', Au: '7.0'}
+        - {statistic: standard_deviation, Co: '4.1', Ni: '65'}
+        - {statistic: minimum, Co: '42', Ni: '90', Ir: '5.7', Au: '5.9'}
+        - {statistic: maximum, Co: '60', Ni: '350', Ir: '8', Au: '8'}
+    - observation_id: usgs_tab8_4_amet_srb
+      type: compiled_statistics
+      locator: {page: 3, table: A8.4, row_group: 'AMET S&RB'}
+      phase: lunar_material_compilation
+      regime: compiled_siderophile_element_concentrations
+      units: as_printed
+      values:
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        sample_group: AMET S&RB
+        rows:
+        - {statistic: N, Co: '4', Ni: '4', Ge: '4', W: '1', Re: '4', Os: '4', Ir: '4', Au: '4'}
+        - {statistic: average, Co: '18.6', Ni: '159', Ge: '291', W: '<130', Re: '0.53', Os: '8.1', Ir: '6.1', Au: '2.8'}
+        - {statistic: standard_deviation, Co: '1.5', Ni: '29', Ge: '83', Re: '0.10', Os: '0.8', Ir: '0.7', Au: '1.5'}
+        - {statistic: minimum, Co: '17', Ni: '121', Ge: '200', Re: '0.42', Os: '7', Ir: '5', Au: '1.07'}
+        - {statistic: maximum, Co: '21', Ni: '198', Ge: '402', Re: '0.66', Os: '9', Ir: '6.8', Au: '5.1'}
+notes:
+- 'The source is a compiled statistical table, not a primary apparatus or run report; no apparatus parameters are attached to these compiled rows.'
+- 'The table note states g/g means micrograms per gram (parts per million), ng/g means nanograms per gram (parts per billion), N means number of samples, and standard deviations are not given when N < 3.'
+- 'Reference list and footnotes are retained conceptually as source attribution; the cited primary studies are not silently promoted to direct measurements in this extract.'

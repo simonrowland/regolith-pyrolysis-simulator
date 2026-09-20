@@ -1,0 +1,306 @@
+schema_version: literature_extract.v1
+source_id: ta-flemetakis-2024
+source:
+  citation: >-
+    Flemetakis, S., Renggli, C. J., Pangritz, P., Berndt, J. & Klemme, S. (2024),
+    "The effect of oxygen fugacity on the evaporation of boron from
+    aluminoborosilicate melt", European Journal of Mineralogy 36, 173-181,
+    DOI 10.5194/ejm-36-173-2024.
+  doi: 10.5194/ejm-36-173-2024
+  url: https://doi.org/10.5194/ejm-36-173-2024
+  year: 2024
+extraction:
+  method: pdftotext -layout transcription of the 9-page clean text-layer PDF; tables checked against printed layout
+  date: '2026-09-20'
+  worker: extract-ta-flemetakis-2024
+review_status: draft
+fidelity_samples:
+- path: species.B.observations[flemetakis_2024_starting_glass_composition].values.composition_wt_pct.B2O3
+  value: 10.55
+  locator: {published_page: 174, pdf_page_index: 2, section: 2.1 Starting material, table: '1'}
+  note: Table 1 median starting-glass B2O3 concentration
+source_locators:
+  abstract: &abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 173
+    pdf_page_index: 1
+    section: Abstract
+  starting: &starting
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 174
+    pdf_page_index: 2
+    section: 2.1 Starting material
+    table: '1'
+  apparatus: &apparatus
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 174
+    pdf_page_index: 2
+    section: 2.2 Experimental techniques
+  analyses: &analyses
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 175
+    pdf_page_index: 3
+    section: 2.3 Analytical methods
+  table2: &table2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 176
+    pdf_page_index: 4
+    table: '2'
+  table3: &table3
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 176
+    pdf_page_index: 4
+    table: '3'
+  hsc: &hsc
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 178
+    pdf_page_index: 6
+    section: 4.2 Evaporation reactions
+  pressure: &pressure
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 179
+    pdf_page_index: 7
+    section: 4.3 Implications for evaporative B loss
+  table4: &table4
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+    published_page: 180
+    pdf_page_index: 8
+    table: '4'
+species:
+  B:
+    observations:
+    - observation_id: flemetakis_2024_starting_glass_composition
+      type: rate_series
+      class_tag: measured
+      locator: *starting
+      quote: The initial B2O3 concentration was 10.55 +/- 0.27 wt % (SD); median composition is given in Table 1.
+      phase: aluminoborosilicate_glass
+      condensed_form: {state: glass, basis: explicit_author}
+      units: wt % as printed
+      values:
+        quantity: starting_glass_composition
+        method_class: measured_direct
+        composition_wt_pct: {SiO2: 44.97, Al2O3: 13.74, MgO: 9.49, CaO: 20.62, B2O3: 10.55, total: 99.38}
+        composition_uncertainty_sd_wt_pct: {SiO2: 0.17, Al2O3: 0.06, MgO: 0.04, CaO: 0.07, B2O3: 0.27, total: 0.35}
+        composition_basis: EPMA median of 20 analyses; named glass PPG14
+    - observation_id: flemetakis_2024_sample_and_furnace_apparatus
+      type: rate_series
+      class_tag: measured
+      locator: *apparatus
+      quote: Glass shards with diameters of approximately 2 mm and a mass of approximately 40 mg were hooked on Pt-wire loops with a diameter of 0.1 mm; gases were introduced at the top of the tube furnace with an outflow at the lower end.
+      phase: aluminoborosilicate_glass
+      units: as printed
+      values:
+        quantity: open_system_evaporation_apparatus
+        method_class: measured_direct
+        sample_form: glass shard
+        sample_diameter_mm: {value: 2, qualifier: approximate}
+        sample_mass_mg: {value: 40, qualifier: approximate}
+        sample_container: Pt-wire loop on Pt chandelier
+        pt_wire_diameter_mm: 0.1
+        support: alumina rod
+        furnace: vertical gas-mixing tube furnace, GERO GmbH
+        gas_flow_sccm: {value: 100, qualifier: typical}
+        gas_delivery: gases introduced at top; outflow at lower end
+        oxygen_fugacity_control: CO/CO2 gas mixing using a Tylan mass-flow controller
+        temperature_controller: Eurotherm 2416, Schneider Electric
+        thermocouple: Pt70Rh30-Pt94Rh6 type B external thermocouple
+        preheat_min: 30
+        temperature_stability_C: {value: 1, semantics: less_than}
+        initial_position: cold zone for approximately 2 min while CO-CO2 mixture equilibrated
+        quench: gas flow stopped approximately 40 s before opening furnace lid; sample quenched in cold-water bath
+        experimental_pressure: {value: 1, units: bar, qualifier: atmospheric_pressure_as_discussed, locator: *pressure}
+        exposed_area: {status: absent, reason: no exposed evaporating area printed; no geometry inferred from approximate diameter}
+        orifice_geometry: {status: not_applicable, reason: tube furnace experiment, no Knudsen effusion orifice}
+    - observation_id: flemetakis_2024_analytical_measurement_conditions
+      type: rate_series
+      class_tag: measured
+      locator: *analyses
+      quote: The EMPA measurements were made at an acceleration voltage of 15 kV, a 60 nA beam current and a 10 micrometre beam size; B was measured for 120 s on the peak and 60 s on the background.
+      phase: aluminoborosilicate_glass
+      units: as printed
+      values:
+        quantity: post_run_composition_measurement
+        method_class: measured_direct
+        cross_section_imaging: JEOL 6510 LA scanning electron microscope
+        electron_microprobe: JEOL JXA-8530F, five spectrometers
+        empa_acceleration_voltage_kV: 15
+        empa_beam_current_nA: 60
+        empa_beam_size_um: 10
+        boron_counting_peak_s: 120
+        boron_counting_background_s: 60
+        other_element_counting_peak_s: 20
+        other_element_counting_background_s: 10
+        boron_standard: Astimex BN
+        la_icp_ms: Thermo Fisher Element 2 with Photon Machines Analyte G2 193 nm ArF excimer laser
+        la_icp_ms_spot_size_um: 50
+        la_icp_ms_pulse_rate_Hz: 10
+        la_icp_ms_isotopes: [29Si, 11B]
+        la_icp_ms_internal_standard: 29Si
+        la_icp_ms_primary_standards: {NIST610_B_ppm: {value: 350, uncertainty: 7}, NIST612_B_ppm: {value: 34.6, uncertainty: 0.78}}
+        la_cell: dual-volume Helex cell
+        la_cell_He_flow_L_min: {large_cell: 1, small_cell: 0.33}
+        la_counting_s: {background: 20, sample: 40}
+    - observation_id: flemetakis_2024_table2_b2o3_concentrations
+      type: rate_series
+      class_tag: measured
+      locator: *table2
+      quote: Experimental run conditions and B2O3 concentrations measured in weight percent (wt %).
+      temperature_range_C_as_printed: [1245, 1361]
+      phase: aluminoborosilicate_melt
+      regime: open_system_constant_CO_CO2_flow
+      units: T in degC; fO2 relative to FMQ; time in min; B2O3 and errors in wt %
+      values:
+        quantity: experimental_run_results
+        method_class: measured_direct
+        columns: [exp_series, exp_no, T_C, fO2_1FMQ, log10_fO2, time_min, B2O3_wt_pct, B2O3_error_wt_pct]
+        rows:
+        - [fO2, B1a, 1245, 6.62, -0.68, 60, 8.43, 0.73]
+        - [fO2, B1b, 1249, 1.5, -6.3, 60, 9.96, 0.75]
+        - [fO2, B1c, 1249, 0, -7.8, 60, 9.65, 0.75]
+        - [fO2, B1d, 1249, -2, -9.8, 60, 10.27, 0.76]
+        - [fO2, B1e, 1249, -4, -11.8, 60, 10.20, 0.76]
+        - [fO2, B1f, 1249, -6, -13.8, 60, 10.57, 0.76]
+        - [fO2, B3a, 1361, 5.62, -0.68, 60, 3.80, 0.67]
+        - [fO2, B3b, 1361, 1.5, -5.3, 60, 7.95, 0.72]
+        - [fO2, B3c, 1361, 0, -6.8, 60, 8.53, 0.73]
+        - [fO2, B3d, 1361, -2, -8.8, 60, 8.71, 0.73]
+        - [fO2, B3e, 1361, -4, -10.8, 60, 8.86, 0.73]
+        - [fO2, B3f, 1361, -6, -12.8, 60, 9.66, 0.74]
+        - [time, B1a, 1245, 6.62, -0.68, 60, 8.43, 0.73]
+        - [time, B2a, 1245, 6.62, -0.68, 120, 6.53, 0.71]
+        - [time, B2b, 1245, 6.62, -0.68, 240, 5.03, 0.68]
+        - [time, B2c, 1245, 6.62, -0.68, 1020, 0.37, 0.35]
+        - [time, B1e, 1249, -4, -11.8, 60, 10.20, 0.76]
+        - [time, B2d, 1249, -4, -11.8, 120, 9.41, 0.74]
+        - [time, B2e, 1249, -4, -11.8, 240, 9.07, 0.74]
+        - [time, B2f, 1249, -4, -11.8, 1020, 6.78, 0.71]
+        - [time, B3a, 1361, 5.62, -0.68, 60, 3.80, 0.67]
+        - [time, B4a, 1350, 5.62, -0.68, 120, 2.38, 0.65]
+        - [time, B4b, 1350, 5.62, -0.68, 240, 1.11, 0.63]
+        - [time, B4c, 1350, 5.62, -0.68, 1020, 0.006, 0.08]
+        - [time, B3e, 1361, -4, -10.8, 60, 8.86, 0.73]
+        - [time, B4d, 1361, -4, -10.8, 120, 8.07, 0.73]
+        - [time, B4e, 1361, -4, -10.8, 240, 7.51, 0.72]
+        - [time, B4f, 1361, -4, -10.8, 1020, 3.18, 0.66]
+        note: Table 2 repeats shared runs in the fO2 and time series; repetitions retained because printed under both series.
+    - observation_id: flemetakis_2024_table2_normalized_boron_loss
+      type: rate_series
+      class_tag: measured_reduced
+      locator: *table2
+      quote: Xt/X0 is calculated from the B2O3/Al2O3 ratios in the final and starting glass; ln(Xt/X0) is also printed.
+      phase: aluminoborosilicate_melt
+      regime: open_system_constant_CO_CO2_flow
+      units: dimensionless ratios as printed
+      values:
+        quantity: normalized_boron_retention_and_log_loss
+        method_class: measured_reduced
+        generator: authors' Al2O3-normalized ratio and natural-log transform, Eq. (1), applied to measured compositions
+        columns: [exp_no, Xt_over_X0, error, ln_Xt_over_X0, error_plus, error_minus]
+        rows:
+        - [B1a, 0.77, 0.07, -0.26, 0.090, 0.099]
+        - [B1b, 0.92, 0.08, -0.08, 0.081, 0.088]
+        - [B1c, 0.89, 0.08, -0.12, 0.082, 0.090]
+        - [B1d, 0.95, 0.08, -0.05, 0.079, 0.086]
+        - [B1e, 0.95, 0.08, -0.06, 0.080, 0.086]
+        - [B1f, 0.99, 0.08, -0.01, 0.078, 0.084]
+        - [B3a, 0.33, 0.06, -1.11, 0.166, 0.199]
+        - [B3b, 0.72, 0.07, -0.33, 0.094, 0.104]
+        - [B3c, 0.77, 0.07, -0.26, 0.090, 0.098]
+        - [B3d, 0.79, 0.07, -0.23, 0.088, 0.096]
+        - [B3e, 0.81, 0.07, -0.21, 0.087, 0.095]
+        - [B3f, 0.89, 0.08, -0.12, 0.082, 0.089]
+        - [B2a, 0.58, 0.07, -0.54, 0.109, 0.122]
+        - [B2b, 0.44, 0.06, -0.81, 0.133, 0.154]
+        - [B2c, 0.01, 0.00, -4.61, 0.181, 0.221]
+        - [B2d, 0.87, 0.08, -0.14, 0.084, 0.091]
+        - [B2e, 0.83, 0.07, -0.18, 0.086, 0.094]
+        - [B2f, 0.61, 0.07, -0.50, 0.106, 0.118]
+        - [B4a, 0.20, 0.01, -1.59, 0.057, 0.060]
+        - [B4b, 0.09, 0.01, -2.38, 0.063, 0.067]
+        - [B4c, 0.001, 0.00, -6.66, 0.027, 0.028]
+        - [B4d, 0.73, 0.07, -0.31, 0.094, 0.103]
+        - [B4e, 0.68, 0.07, -0.39, 0.099, 0.109]
+        - [B4f, 0.27, 0.06, -1.29, 0.194, 0.241]
+    - observation_id: flemetakis_2024_evaporation_rate_constants
+      type: rate_series
+      class_tag: model
+      locator: *table3
+      quote: Calculated evaporation rate constants ki from t-series experiments, calculated by linear regression from slopes (-3ki/r) of trend lines in Fig. 4.
+      temperature_range_C_as_printed: [1245, 1361]
+      phase: aluminoborosilicate_melt
+      regime: open_system_constant_CO_CO2_flow
+      units: ki in cm min^-1; r in cm; slope in min^-1
+      values:
+        quantity: evaporation_rate_constant
+        method_class: model_derived
+        generator: authors' linear regression using Eq. (2), spherical-sample assumption r = 0.1 cm
+        columns: [glass_no, exp_no, T_C, fO2_1FMQ, ki_cm_min, r_cm, slope_min^-1]
+        rows:
+        - [B1_B2, 'B1a; B2a,b,c', 1245, air, 1.67e-4, 0.1, -4.58e-3]
+        - [B1_B2, 'B1e; B2d,e,f', 1249, FMQ-4, 1.48e-5, 0.1, -4.30e-4]
+        - [B3_B4, 'B3a*; B4a,b,c', '1350; 1361*', air, 2.09e-4, 0.1, -5.68e-3]
+        - [B3_B4, 'B3e; B4d,e,f', 1361, FMQ-4, 4.46e-5, 0.1, -1.12e-3]
+    - observation_id: flemetakis_2024_hsc_boron_gas_speciation
+      type: gibbs_table
+      class_tag: model
+      locator: *hsc
+      quote: Gibbs free energy minimization calculations used HSC Chemistry 9; the thermodynamic database is largely based on NIST-JANAF data.
+      temperature_range_C_as_printed: [1250, 1350]
+      phase: gas
+      regime: thermodynamic_equilibrium_calculation
+      units: log10 fO2 and mole fractions as printed
+      values:
+        quantity: boron_gas_phase_speciation
+        method_class: model_derived
+        generator: HSC Chemistry 9 Gibbs free-energy minimization, Metso Outotec; database largely based on NIST-JANAF
+        calculation_temperatures_C: [1250, 1350]
+        log10_fO2_range: [-26, -0.5]
+        input_species: [CO2, CO, O2, O3, B, B2, BC, BC2, B2C, BCO, BO, BO2, B2O, B2O2, B2O3]
+        stable_species_in_plotted_range: [B2O3, BO2, B2O2, BO, B2O]
+        dominant_above_log10_fO2: -18
+        dominant_species_above_log10_fO2: B2O3
+        increasingly_oxidized_minor_species: BO2
+        boron_mole_fraction_input: 0.01
+        model_reactions: [B2O3(l) = B2O3(g), B2O3(l) + 0.5 O2(g) = 2 BO2(g)]
+        note: Figure 5 is model output; no plotted mole-fraction points were digitized.
+    - observation_id: flemetakis_2024_radius_loss_time_model
+      type: rate_series
+      class_tag: model
+      locator: *table4
+      quote: Evaporation rates of B2O3 from samples with different radii in oxidizing conditions in air and reducing conditions at FMQ-4.
+      temperature_C_as_printed: 1350
+      phase: aluminoborosilicate_melt
+      regime: open_system_rate_model
+      units: radius r in cm; duration d in min; values are model-derived
+      values:
+        quantity: time_to_boron_loss
+        method_class: model_derived
+        generator: authors' Eq. (2) with Table 3 ki and spherical samples
+        columns: [r_cm, loss_pct, d_min_air_1350C, d_min_FMQminus4_1350C]
+        rows:
+        - [0.01, 5, 0.001, 0.003]
+        - [0.01, 50, 0.008, 0.036]
+        - [0.1, 5, 0.006, 0.027]
+        - [0.1, 50, 0.0765, 0.360]
+        - [1, 5, 0.057, 0.266]
+        - [1, 50, 0.765, 3.60]
+        - [10, 5, 0.57, 2.66]
+        - [10, 50, 7.65, 35.95]
+        - [100, 5, 5.67, 26.6]
+        - [100, 50, 76.7, 359.5]
+        - [1000, 5, 57, 266]
+        - [1000, 50, 765, 3595]
+        note: Table 4 prints log(r) and log(d) alongside d; only printed d values are retained here.
+source_conclusions:
+  - statement: No concentration zoning was observed; diffusion and advection were not rate-limiting, and surface evaporation was rate-limiting under these conditions.
+    evidence_class: author_stated_conclusion
+    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf, published_page: 175, pdf_page_index: 3, section: 3 Results}
+  - statement: B evaporation increased with oxygen fugacity and temperature; air was approximately five times faster than FMQ-4 at 1350 C.
+    evidence_class: author_stated_conclusion
+    locator: *abstract
+absent_parameters:
+  - exposed_evaporating_area: sample diameter is approximate and no area is printed; no area inferred
+  - vacuum_orifice_geometry: not applicable to this open tube-furnace experiment
+  - independent_fO2_calibration: no separate calibration or sensor stated beyond CO/CO2 mixing control
+  - run_specific_sample_mass_after_hooking: only approximate shard mass is printed
