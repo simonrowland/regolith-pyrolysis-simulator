@@ -1,0 +1,285 @@
+schema_version: literature_extract.v1
+source_id: ammin-73-470-oneill-1988
+source:
+  citation: O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486.
+  url: http://www.minsocam.org/ammin/AM73/AM73_470.pdf
+  year: 1988
+extraction:
+  method: layout-preserving pdftotext transcription of source-printed equations, tables, apparatus details, and uncertainty statements
+  date: '2026-09-20'
+  worker: i1-ammin-73-470
+  provenance_path: raw/ammin-73-470/ammin-73-470.pdf
+review_status: draft
+fidelity_samples:
+- path: species.Cu.observations[oneill_1988_cu_cu2o_measured_relation].values.relation
+  value: mu_O2 + 62 = -347705 + 246.096 T - 12.9053 T ln(T)
+  locator:
+    published_page: 476
+    section: Cu + Cu2O; equation 9
+    note: Printed relation transcribed from the source equation.
+scope_assessment:
+  document_type: primary electrochemical thermodynamics experiment
+  measured_direct_observations: 6
+  model_derived_observations: 2
+  compilation_assessed_observations: 1
+  subject_scope: Fe-O and Cu-O oxygen-buffer thermodynamics; relevant to oxide redox and Ellingham/reference-buffer validation, not a vaporization or mass-spectrometry study
+  absent_from_source:
+  - vaporization fluxes or vapor-pressure measurements
+  - Knudsen orifice, effusion geometry, or Clausing factor
+  - silicate-melt composition
+  - sample mass and pellet dimensions
+  - furnace pressure other than the 1 bar reference convention and the stated Ar cell atmosphere
+  note: The source reports solid-metal/oxide electrochemical cells. It does not report a regolith or silicate sample.
+evidence_policy:
+  classification: mixed_primary_measurement_and_thermochemical_comparison
+  measurement_claim: Oxygen potentials and emf values from the authors' cells are measured_direct. Third-law regressions and JANAF/Robie comparisons are retained separately as model_derived or compilation_assessed.
+  model_generators:
+  - third-law analysis using Robie et al. (1978) entropy and heat-capacity data
+  - JANAF thermochemical tables (Chase et al., 1982)
+  - Gibbs-Duhem correction using Dieckmann (1982) magnetite nonstoichiometry
+species:
+  Fe:
+    observations:
+    - observation_id: oneill_1988_fe_fe3o4_measured_relation
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 470
+        section: Abstract; equation printed in abstract
+        note: Equation is reported from the Fe + Fe3O4 cells; the source's table and discussion identify 750-833 K as the stable Fe-Fe3O4 interval.
+      phase: pure_Fe_plus_Fe3O4
+      regime: solid_state_emf_oxygen_buffer
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: measured_direct
+        quantity: chemical_potential_of_oxygen
+        reaction: 1.5 Fe + O2 = 0.5 Fe3O4
+        relation: mu_O2 = -607673 + 1060.994 T - 132.3909 T ln(T) + 0.066577 T^2
+        T_range_K:
+        - 750.0
+        - 833.0
+        uncertainty_J_per_mol: 197.0
+        uncertainty_convention: one-standard-deviation uncertainty printed in the abstract
+        reference_pressure_bar: 1.0
+        measured_table: Table 3, Fe + Fe3O4 cells, published page 476
+      uncertainty:
+        mu_O2_J_per_mol: 197.0
+        reported_status: printed abstract uncertainty; table includes flagged points above the invariant point as metastable Fe + Fe3O4
+    - observation_id: oneill_1988_fe_feo_measured_relation
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 477
+        section: Fe + "FeO"; equation 11
+      phase: pure_Fe_plus_nonstoichiometric_FeO
+      regime: solid_state_emf_oxygen_buffer
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: measured_direct
+        quantity: chemical_potential_of_oxygen
+        reaction: 2 Fe + O2 = 2 "FeO"
+        piecewise_relation:
+        - T_range_K: [833.0, 1042.0]
+          relation: mu_O2 + 100 = -605812 + 1366.718 T - 182.7955 T ln(T) + 0.103592 T^2
+        - T_range_K: [1042.0, 1184.0]
+          relation: mu_O2 + 100 = -519357 + 59.4277 T + 8.9276 T ln(T)
+        - T_range_K: [1184.0, 1450.0]
+          relation: mu_O2 + 100 = -551159 + 269.4047 T - 16.9484 T ln(T)
+        uncertainty_J_per_mol: 100.0
+        uncertainty_convention: printed equation uncertainty; regression difference from earlier measurements is separately reported as 90 J mol^-1 standard deviation
+        measured_table: Table 2 and Table 3, published pages 476-477
+      uncertainty:
+        mu_O2_J_per_mol: 100.0
+        regression_standard_deviation_J_per_mol: 90.0
+        reported_status: both printed values retained; not reconciled
+    - observation_id: oneill_1988_feo_fe3o4_measured_relation
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 480
+        section: '"FeO" + Fe3O4; equation 16'
+      phase: nonstoichiometric_FeO_plus_Fe3O4
+      regime: solid_state_emf_oxygen_buffer
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: measured_direct
+        quantity: chemical_potential_of_oxygen
+        reaction: 6 "FeO" + O2 = 2 Fe3O4
+        relation: mu_O2 + 306 = -581927 - 65.618 T + 38.7410 T ln(T)
+        T_range_K: [833.0, 1270.0]
+        uncertainty_J_per_mol: 306.0
+        uncertainty_convention: source states this is the larger-than-usual standard deviation of the regression
+        measured_table: Table 6, published page 479
+      uncertainty:
+        mu_O2_J_per_mol: 306.0
+        reported_status: source warns of uncertain high-temperature behavior and discards data above 1270 K
+    - observation_id: oneill_1988_fe3o4_fe2o3_measured_points_and_third_law
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 481
+        section: Fe3O4 + Fe2O3; Table 7 and following analysis
+      phase: Fe3O4_plus_alpha_Fe2O3
+      regime: solid_state_emf_oxygen_buffer
+      units: emf in mV and T in K as printed; derived enthalpy in kJ mol^-1
+      values:
+        method_class: measured_direct
+        quantity: measured_emf_points_for_magnetite_hematite_buffer
+        reaction: 4 Fe3O4 + O2 = 6 Fe2O3
+        successful_runs: 3
+        measured_temperature_range_K: [1013.0, 1322.0]
+        measured_data_locator: Table 7, published page 481
+        equilibration: one week initial equilibration; readings at 48 h after increasing temperature to 1200 K and 24 h intervals thereafter
+        measured_emf_stability_mV: 0.2
+        uncertainty_convention: source states results are less certain because equilibrium is exceptionally sluggish; no single equation is reported
+      uncertainty:
+        emf_stability_mV: 0.2
+        reported_status: direct measurements retained without collapsing the table to a fitted relation
+    - observation_id: oneill_1988_fe3o4_fe2o3_third_law_enthalpy
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 482
+        section: Fe3O4 + Fe2O3; third-law analysis below Figure 10
+      phase: Fe3O4_plus_alpha_Fe2O3
+      regime: third_law_analysis_of_emf_measurements
+      units: kJ mol^-1 as printed
+      values:
+        method_class: model_derived
+        generator: third-law analysis using Robie et al. (1978) entropy and heat-capacity data; Gibbs-Duhem correction based on Dieckmann (1982)
+        quantity: standard_enthalpy_of_reaction_at_298_15_K
+        reaction: 4 Fe3O4 + O2 = 6 Fe2O3
+        mean_delta_H_J_per_mol_O2: -494.46
+        mean_delta_H_uncertainty_kJ_per_mol: 0.2
+        inferred_delta_Hf_Fe2O3_kJ_per_mol: -826.0
+        comparison_bomb_calorimetry_kJ_per_mol: -826.8
+        temperature_points_for_R_ln_activity_J_per_mol: {1173: 66, 1273: 165, 1373: 318}
+      uncertainty:
+        mean_delta_H_uncertainty_kJ_per_mol: 0.2
+        reported_status: source calls agreement less convincing because of the small temperature interval and large stoichiometric coefficients
+  Cu:
+    observations:
+    - observation_id: oneill_1988_cu_cu2o_measured_relation
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 476
+        section: Cu + Cu2O; equation 9
+      phase: pure_Cu_plus_Cu2O
+      regime: solid_state_emf_oxygen_buffer
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: measured_direct
+        quantity: chemical_potential_of_oxygen
+        reaction: 4 Cu + O2 = 2 Cu2O
+        relation: mu_O2 + 62 = -347705 + 246.096 T - 12.9053 T ln(T)
+        T_range_K: [750.0, 1330.0]
+        uncertainty_J_per_mol: 62.0
+        uncertainty_convention: one-standard-deviation uncertainty printed in abstract
+        measured_table: Table 1, published page 474
+      uncertainty:
+        mu_O2_J_per_mol: 62.0
+        regression_standard_deviation_J_per_mol: 38.0
+        reported_status: both printed values retained; regression scatter is not substituted for the abstract uncertainty
+    - observation_id: oneill_1988_cu2o_cuo_measured_relation
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 484
+        section: Cu2O + CuO; equation 21
+      phase: Cu2O_plus_CuO
+      regime: solid_state_emf_oxygen_buffer
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: measured_direct
+        quantity: chemical_potential_of_oxygen
+        reaction: 2 Cu2O + O2 = 4 CuO
+        relation: mu_O2 + 117 = -292245 + 377.012 T - 23.1976 T ln(T)
+        T_range_K: [800.0, 1300.0]
+        uncertainty_J_per_mol: 117.0
+        uncertainty_convention: one-standard-deviation uncertainty printed in abstract
+        measured_table: Table 8, published page 484
+      uncertainty:
+        mu_O2_J_per_mol: 117.0
+        regression_standard_deviation_J_per_mol: 99.0
+        reported_status: source says deviation from JANAF is within its uncertainty limits
+  O2:
+    observations:
+    - observation_id: oneill_1988_shared_emf_cell_conditions
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 471
+        section: Experimental details; design of electrochemical cells with air reference electrodes
+      units: mixed as printed
+      values:
+        method_class: measured_direct
+        quantity: electrochemical_cell_apparatus_and_conditions
+        apparatus:
+          electrolyte: two calcia-stabilized-zirconia tubes, 8 mm outside diameter x 5 mm inside diameter x 300 mm length, 11 mol% CaO
+          sample_electrode: upper CSZ tube; sample electrode on one side of the solid electrolyte
+          reference_electrode: lower CSZ tube with air electrode; YDT pellet used for low-temperature air electrode
+          guide_tube: thick-walled alumina, 3 mm wall thickness
+          furnace: Deltech DT-31-VT tube furnace
+          thermocouples: two, one above sample electrode and one below air reference electrode; beads separated by 8 mm
+          constant_temperature_zone: approximately 10 mm within 0.5 K of peak temperature as measured in the furnace
+          electrical_leads: platinum
+          atmosphere_sample_compartment: evacuated, then filled with highly purified Ar; static Ar atmosphere
+          reference_atmosphere: air
+          pressure_reference_bar: 1.0
+        temperature_measurement:
+          range_recorded_K: [750.0, 1450.0]
+          reading_precision_K: 0.1
+          calibration: Au melting point 1337.58 K, IPTS-68; 18 calibrations on eight thermocouples; mean Au-point emf 10.275 +/- 0.002 mV
+          calibration_uncertainty_K: 0.3
+        pressure_environment:
+          atmospheric_pressure_measurement: Hg barometer, corrected for local gravity; accuracy +/- 2 mbar
+          water_vapor_measurement: wet-and-dry-bulb psychrometer
+          atmospheric_water_vapor_range_mbar: [5.0, 20.0]
+          typical_atmospheric_water_vapor_mbar: 8.0
+          inferred_air_fugacity_error_J_per_mol: 40.0
+        run_conditions:
+          equilibration_time_h_by_temperature: '<12 h below 900 K; approximately 6 h at 900-1050 K; approximately 3 h at 1050-1300 K'
+          high_temperature_reading_delay_min: '30-40 min after furnace-temperature change above 1300 K'
+          emf_stability_requirement_mV: 0.05
+          cell_reversibility_checks: temperature increase/decrease, small imposed current, and evacuation/refill with air or Ar-CH4 above 1000 K
+        materials:
+          Cu2O_and_FeO_preparation: Cu + CuO and Fe + Fe2O3 mixed with slight metal excess and sintered at 1000 C for approximately 8 h under purified flowing Ar
+          Fe2O3_preparation: sintered in air at 1000 C for approximately 24 h; XRD identified well-crystallized alpha-Fe2O3
+          Fe3O4: as supplied or sintered in flowing CO-CO2 QFM buffer; no performance difference observed
+          purity: chemicals stated >99.9 percent except Fe metal >99.5 percent
+        absent_from_source:
+        - sample mass
+        - pellet dimensions
+        - exposed electrode area
+        - pumping speed
+        - absolute sample-compartment pressure after Ar refill
+      uncertainty:
+        total_measurement_precision_J_per_mol: 75.0
+        reported_status: source separates precision from absolute accuracy and warns that oxygen leakage/electronic conductivity can bias high-temperature cells
+  JANAF:
+    observations:
+    - observation_id: oneill_1988_cu2o_janaf_compilation_fit
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-73-470/ammin-73-470.pdf
+        published_page: 474
+        section: Cu + Cu2O; JANAF comparison and equation 7
+      phase: Cu2O_standard_state
+      regime: calorimetric_compilation_comparison
+      units: J mol^-1 for chemical potential of O2; T in K; reference pressure 1 bar
+      values:
+        method_class: compilation_assessed
+        generator: JANAF thermochemical tables, Chase et al. (1982), values assessed primarily from Mah et al. (1967)
+        quantity: JANAF_fit_for_chemical_potential_of_oxygen
+        reaction: 4 Cu + O2 = 2 Cu2O
+        relation: mu_O2 = -348195 + 246.301 T - 12.9053 T ln(T)
+        T_range_K: [700.0, 1300.0]
+        fit_standard_deviation_J_per_mol: 12.0
+        fit_maximum_deviation_J_per_mol: 16.0
+        experimental_minus_JANAF_regression_intercept_J_per_mol: 490.0
+        experimental_minus_JANAF_regression_slope_J_per_mol_K: -0.205
+        experimental_minus_JANAF_standard_deviation_J_per_mol: 38.0
+      uncertainty:
+        fit_standard_deviation_J_per_mol: 12.0
+        reported_status: compilation comparison, not a new measurement
