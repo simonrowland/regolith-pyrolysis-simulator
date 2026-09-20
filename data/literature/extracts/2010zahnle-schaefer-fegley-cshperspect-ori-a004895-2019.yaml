@@ -1,0 +1,224 @@
+schema_version: literature_extract.v1
+source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+source:
+  citation: 'Zahnle, K., Schaefer, L. & Fegley, B. (2010), "Earth''s Earliest Atmospheres", Cold Spring Harb Perspect Biol, doi: 10.1101/cshperspect.a004895.'
+  doi: 10.1101/cshperspect.a004895
+  year: 2010
+extraction:
+  method: Manual transcription from clean-text-layer PDF using pdftotext -layout; printed prose and figure captions were checked against the PDF pages. This is a review and no apparatus is attributed to the review authors.
+  date: '2026-09-20'
+  worker: i1-2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  provenance_path: raw/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.ordinary_chondrite.observations[zahnle_2010_ordinary_chondrite_volatile_composition].values
+  value:
+    quantity: volatile_bulk_composition
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    source_attribution: Schaefer and Fegley (2007)
+    components:
+    - component: C
+      value_as_printed: about 0.1%
+    - component: H2O
+      value_as_printed: 0.3%
+  note: Reviewer-verified sample of the printed ordinary-chondrite volatile composition values.
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: The Secondary Atmosphere
+species:
+  ordinary_chondrite:
+    observations:
+    - observation_id: zahnle_2010_ordinary_chondrite_volatile_composition
+      type: gibbs_table
+      locator:
+        published_page: 5
+        pdf_page_index: 5
+        section: The Secondary Atmosphere
+        note: Prose immediately after the discussion of Schaefer and Fegley (2007); values are attributed to that prior compilation.
+      phase: ordinary_chondrite_bulk_material
+      regime: quoted_compilation
+      units: wt% as printed
+      values:
+        quantity: volatile_bulk_composition
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        source_attribution: Schaefer and Fegley (2007)
+        components:
+        - component: C
+          value_as_printed: about 0.1%
+        - component: H2O
+          value_as_printed: 0.3%
+      uncertainty:
+        note: The prose says "about"; no uncertainty is printed.
+  CI_chondrite:
+    observations:
+    - observation_id: zahnle_2010_ci_volatile_composition
+      type: gibbs_table
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        section: The Secondary Atmosphere
+        note: Prose sentence cites Hashimoto et al. (2007); values are not measurements made in this review.
+      phase: CI_carbonaceous_chondrite_bulk_material
+      regime: quoted_compilation
+      units: wt% as printed
+      values:
+        quantity: volatile_bulk_composition
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        source_attribution: Hashimoto et al. (2007)
+        components:
+        - component: reduced carbon
+          value_as_printed: 3.5%
+        - component: H2O
+          value_as_printed: up to 10%
+      uncertainty:
+        note: Water is an upper bound as printed; no uncertainty is printed.
+    - observation_id: zahnle_2010_impact_degas_velocity_threshold
+      type: transition_point
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        section: The Secondary Atmosphere
+        note: Review reports the experimental finding of Lange et al. (1985) and Tyburczy et al. (1986).
+      phase: carbonaceous_chondrite_impact_degassing
+      regime: quoted_experiment
+      units: km/s as printed
+      values:
+        quantity: impact_velocity_for_water_degas
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        source_attribution:
+        - Lange et al. (1985)
+        - Tyburczy et al. (1986)
+        threshold_as_printed: exceeds 5 km/s
+      uncertainty:
+        note: Threshold is a bound, not a point estimate.
+  ordinary_chondrite_gas:
+    observations:
+    - observation_id: zahnle_2010_ordinary_chondrite_equilibrium_gas
+      type: gibbs_table
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        section: The Secondary Atmosphere
+        note: Review summarizes Schaefer and Fegley (2007) chemical-equilibrium calculations.
+      T_range_K:
+      - 1225
+      - 1225
+      phase: ordinary_chondritic_material_at_solidus
+      regime: gas_solid_chemical_equilibrium
+      units: K and qualitative gas ranking as printed
+      values:
+        quantity: equilibrium_gas_species
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: Schaefer and Fegley (2007) chemical equilibrium calculations
+        temperature_context: approximately 1225 K, where Fe-Ni sulfide begins to melt
+        major_gases_as_printed:
+        - CH4
+        - H2
+        - H2O
+        - N2
+        - NH3
+      uncertainty:
+        note: Temperature is approximate; no quantitative uncertainty is printed.
+    - observation_id: zahnle_2010_co_ch4_equal_ratio_pressure_shift
+      type: gibbs_table
+      locator:
+        published_page: 6
+        pdf_page_index: 6
+        section: The Secondary Atmosphere
+        note: Examples reported from the Schaefer and Fegley (2007) model.
+      phase: ordinary_chondritic_material_gas
+      regime: gas_solid_chemical_equilibrium
+      units: K, bar, and mole ratio as printed
+      values:
+        quantity: CO_to_CH4_ratio
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: Schaefer and Fegley (2007) chemical equilibrium calculations
+        rows:
+        - total_pressure_bar_as_printed: 1
+          temperature_K_as_printed: approximately 1000
+          ratio_as_printed: 'CO:CH4 = 1:1'
+        - total_pressure_bar_as_printed: 100
+          temperature_K_as_printed: approximately 1200
+          ratio_as_printed: 'CO:CH4 = 1:1'
+      uncertainty:
+        note: Both temperatures are approximate; no uncertainty is printed.
+  silicate_rock_vapor:
+    observations:
+    - observation_id: zahnle_2010_hot_rock_vapor_species
+      type: gibbs_table
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+        section: The Moon-Forming Impact
+        note: Qualitative result attributed to Schaefer and Fegley (2009), not a direct measurement.
+      phase: hot_silicate_rock_vapor
+      regime: chemical_equilibrium_model
+      units: qualitative abundance statement as printed
+      values:
+        quantity: abundant_gas_species
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: Schaefer and Fegley (2009) silicate-atmosphere calculations
+        species_as_printed:
+        - SiO
+        - O2
+        note: Sodium remains abundant in the gas phase as the vapor cools.
+      uncertainty:
+        note: No numerical abundance or uncertainty is printed.
+  Hadean_Earth:
+    observations:
+    - observation_id: zahnle_2010_hadean_timeline_and_co2_model
+      type: gibbs_table
+      locator:
+        published_page: 9
+        pdf_page_index: 9
+        figure: '3'
+        note: Figure 3 caption; schematic but energetically self-consistent history after Zahnle et al. (2006).
+      phase: post_moon_forming_impact_Earth
+      regime: author_model_synthesis
+      units: years, Myr, K, and bar as printed
+      values:
+        quantity: Hadean_thermal_atmospheric_history
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: Zahnle et al. (2006) model as summarized in Figure 3
+        stages:
+        - stage: rock_vapor
+          duration_as_printed: 100–1000 yr
+        - stage: magma_ocean
+          duration_as_printed: some 2 million years
+        - stage: liquid_water_ocean
+          temperature_as_printed: approximately 500 K
+          atmosphere_as_printed: approximately 100 bar CO2
+        - stage: CO2_subduction
+          timescale_as_printed: 20 Myr or 100 Myr
+      uncertainty:
+        note: Schematic model ranges and approximate values are retained as printed.
+    - observation_id: zahnle_2010_post_solidification_co2_estimate
+      type: gibbs_table
+      locator:
+        published_page: 10
+        pdf_page_index: 10
+        section: The Moon-Forming Impact
+        note: Authors state this was estimated from modest CO2 solubility in magma; this is not a direct measurement.
+      phase: post_solidification_Earth_atmosphere
+      regime: author_estimate
+      units: bar and K as printed
+      values:
+        quantity: atmospheric_CO2_and_surface_temperature
+        method_class: author_estimate
+        evidence_class: author_estimate
+        CO2_pressure_as_printed: 100–200 bars
+        surface_temperature_as_printed: approximately 500 K
+        basis_as_printed: modest solubility of CO2 in magma
+        redox_condition: preference for CO2 over CO or CH4 assumes a QFM-like or CI- or CV-like redox buffer
+      uncertainty:
+        note: Range and approximation retained; no statistical uncertainty is printed.
