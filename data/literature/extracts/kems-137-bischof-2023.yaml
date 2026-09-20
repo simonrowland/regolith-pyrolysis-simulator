@@ -14,7 +14,9 @@ extraction:
     transcribed from AM/supplement text layer. Figures listed figure-only, not digitised. Measured p(i)
     vs derived gamma vs FactSage T50c / Henrian A,B kept distinct. Round 2 preferred-gamma locators on AM
     page 23 (not Table 8 page 22); T50c retyped transition_point (FactSage model, not gamma); Henrian A,B
-    retyped gibbs_table; mmc1 filed beside AM.
+    retyped gibbs_table; mmc1 filed beside AM. Round 3 harvested printed KEMS laboratory parameters from
+    AM §2.1–2.2.1, Table 2 and eqs. 2–3 (AM p. 8); supplement has no apparatus section. Orifice area not
+    invented from the printed 0.4 mm diameter; chamber pressure kept as the printed nominal ~10^-6 mbar.
   date: '2026-09-06'
   worker: wave-W2-kems-137-bischof-2023-r2
   provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-137-bischof-2023/
@@ -65,6 +67,30 @@ fidelity_samples:
     table: '9'
     pdf_page_index: 30
     note: Table 9 Ga Tc50 ADeu 1874 K at 10^-6 bar; FactSage 8.2 model, not a KEMS gamma
+- path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.orifice_diameter_mm
+  value: 0.4
+  locator:
+    pdf_page_index: 5
+    section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+    paragraph: a lid with a 0.4 mm orifice at its centre
+- path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.ionizing_electron_energy_eV
+  value: 60.0
+  locator:
+    pdf_page_index: 5
+    section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+    paragraph: Given an electron ionisation energy E(e-) of 60 eV
+- path: species.Ga.observations[bischof_2023_kems_geometry_and_calibration].values.emission_current_mA
+  value: 0.468
+  locator:
+    pdf_page_index: 5
+    section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+    paragraph: a constant electron emission i(em) of 0.468 mA
+- path: species.Ga.observations[bischof_2023_gao15_gamma_s1_1low_polytherm].values.initial_weight_mg
+  value: 79.1
+  locator:
+    table: '2'
+    pdf_page_index: 6
+    paragraph: 'Table 2 1_low initial weight [mg] 79.1'
 - species: Ga
   observable: rate_series
   observation_id: bischof_2023_ga_ion_currents_table4_r2
@@ -207,22 +233,255 @@ species:
           value: Ir
           locator:
             pdf_page_index: 4
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: the iridium Knudsen cell (KC)
-        orifice_area:
-          value: 1.256637e-07
-          units: m2
-          inferred: true
-          inference: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+        orifice_diameter_mm:
+          value: 0.4
           locator:
             pdf_page_index: 5
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: a lid with a 0.4 mm orifice at its centre
         chamber_pressure:
-          value: 1.0e-06
+          value: "~10^-6"
           units: mbar
-          note: KC chamber (~10^-6 mbar) as printed; other compartments ~10^-9 mbar
+          kind: nominal
+          note: printed as KC chamber (~10^-6 mbar); other compartments (~10^-9 mbar); not collapsed to a point
           locator:
             pdf_page_index: 5
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: The KC chamber (~10-6 mbar)
+        sample:
+          form: powdered glasses packed into the KC
+          container: iridium Knudsen cell (crucible and lid)
+          locator:
+            pdf_page_index: 5
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with low trace element concentrations, were then packed into the KC
+        starting_glass_wt_pct:
+          SiO2: 50.34
+          Al2O3: 15.40
+          MgO: 10.80
+          CaO: 23.46
+          locator:
+            pdf_page_index: 4
+            section: 2.1. Sample preparation
+            paragraph: 'nominal composition, in wt. %, of SiO2 = 50.34, Al2O3 = 15.40, MgO = 10.80, CaO = 23.46'
+    - observation_id: bischof_2023_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        table: '2'
+        pdf_page_index: 6
+        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+        note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
+      T_range_K:
+      - 1400.0
+      - 1742.0
+      phase: anorthite_diopside_eutectic_silicate_melt
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: FINNIGAN MAT 271 Knudsen effusion mass spectrometer at Forschungszentrum, Jülich
+        cell_material_as_published: iridium
+        crucible_height_mm: 8.5
+        crucible_outer_diameter_mm: 7.8
+        wall_thickness_mm: 0.2
+        orifice_diameter_mm: 0.4
+        housing: W housing; heated by a W wire; three nested Ta heatshields
+        heating_as_printed: W wire radiative heating below ~600 °C and electron bombardment above this temperature
+        bakeout_T_K: 1930
+        bakeout_t_h: 12
+        sample_form_as_published: powdered glasses packed into the KC
+        sample_mass_mg_nominal_high: 40
+        sample_mass_mg_nominal_low: 80
+        initial_weight_mg_1_low: 79.1
+        final_weight_mg_1_low: 79.1
+        initial_weight_mg_2_low: 72.92
+        final_weight_mg_2_low: 71.97
+        initial_weight_mg_3_high: 38.69
+        final_weight_mg_3_high: 38.69
+        starting_glass_wt_pct:
+          SiO2: 50.34
+          Al2O3: 15.40
+          MgO: 10.80
+          CaO: 23.46
+        epma_table6_start_wt_pct_1_low:
+          SiO2: 50.47
+          Al2O3: 15.38
+          MgO: 10.42
+          CaO: 23.63
+          Total: 99.90
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16'
+        epma_table6_end_wt_pct_1_low:
+          SiO2: 50.60
+          Al2O3: 15.31
+          MgO: 10.38
+          CaO: 23.65
+          Total: 99.94
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 1_low End SiO2 50.60 ± 0.18, Al2O3 15.31 ± 0.09, MgO 10.38 ± 0.10, CaO 23.65 ± 0.27, Total 99.94 ± 0.35'
+        epma_table6_start_wt_pct_2_low:
+          SiO2: 50.47
+          Al2O3: 15.38
+          MgO: 10.42
+          CaO: 23.63
+          Total: 99.90
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 2_low Start identical to 1_low Start (same starting glass)'
+        epma_table6_end_wt_pct_2_low:
+          SiO2: 50.46
+          Al2O3: 15.48
+          MgO: 10.72
+          CaO: 23.25
+          Total: 99.91
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 2_low End SiO2 50.46 ± 0.17, Al2O3 15.48 ± 0.07, MgO 10.72 ± 0.08, CaO 23.25 ± 0.05, Total 99.91 ± 0.21'
+        epma_table6_start_wt_pct_3_high:
+          SiO2: 49.72
+          Al2O3: 15.15
+          MgO: 10.27
+          CaO: 23.28
+          Total: 98.42
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 3_high Start SiO2 49.72 ± 0.09, Al2O3 15.15 ± 0.08, MgO 10.27 ± 0.04, CaO 23.28 ± 0.09, Total 98.42 ± 0.16'
+        epma_table6_end_wt_pct_3_high:
+          SiO2: 49.92
+          Al2O3: 15.22
+          MgO: 10.70
+          CaO: 22.98
+          Total: 98.82
+          locator:
+            table: '6'
+            pdf_page_index: 15
+            section: 4.1. EPMA
+            paragraph: 'Table 6 3_high End SiO2 49.92 ± 0.39, Al2O3 15.22 ± 0.12, MgO 10.70 ± 0.07, CaO 22.98 ± 0.08, Total 98.82 ± 0.42'
+        laicpms_table7_start_ppm:
+          Ga_1_low: 720
+          In_1_low: 47
+          Ga_2_low: 720
+          In_2_low: 47
+          Ga_3_high: 7185
+          In_3_high: 5296
+          locator:
+            table: '7'
+            pdf_page_index: 16
+            section: 4.2. LA-ICP-MS
+            paragraph: 'Table 7 Start Ga 720 ± 12 (1_low, 2_low), 7185 ± 618 (3_high); In 47 ± 9 (1_low, 2_low), 5296 ± 560 (3_high)'
+        dopant_as_printed: spiked with 1000 or 10000 ppm of each Ga, In and Tl (added as their sesquioxides); Tl completely evaporated below ~700 °C
+        chamber_pressure_mbar_as_printed: "~10^-6"
+        other_compartments_mbar_as_printed: "~10^-9"
+        shutter: KC chamber isolated through a shutter from other compartments; sample = shutter open, background = shutter closed
+        ionizing_electron_energy_eV: 60.0
+        emission_current_mA: 0.468
+        ionization_method: electron impact
+        ion_acceleration_kV: 6
+        detector: ion-counter
+        mass_scan_amu_range: 10-250
+        mass_window_percent: 1
+        scan_steps: 301
+        counting_time_s_per_step: 0.1
+        thermocouple: W97Re3/W75Re25
+        thermocouple_monitors: W heating wire
+        pyrometer: IGA-12 (LUMASENSE TECHNOLOGIES)
+        pyrometer_monitors: Ir cell
+        pyrometer_error_K: 5
+        calibration_standards_as_printed: melting points Tm of pure Ag (1235 K) and Ni (1728 K) and the counts of Ag+ and Ni+ at Tm; before and after sample measurements in-situ
+        sensitivity_factor_k_as_printed: k = 1.52(6) × 10^-7 × T_pyr + 2.9(6) × 10^-5
+        T_real_as_printed: T_real = 1.060(4) × T_pyr + 53(4)
+        multiplier_factor_gamma_m_i: 1
+        sigma_O2_A2: 2.8
+        sigma_O2_source: Fite and Brackmann (1959); error 17% (= 0.5)
+        ionization_cross_section_A2_table3:
+          Ga+: 7.96
+          GaO+: 6.24
+          Ga2+: 11.94
+          Ga2O+: 13.20
+          In+: 9.74
+          InO+: 7.50
+          In2+: 14.61
+          In2O+: 16.03
+          locator:
+            table: '3'
+            pdf_page_index: 9
+            section: 3.1. Determination of partial pressures
+            paragraph: 'Table 3: Summary of ionisation cross sections of measured species (Bischof et al., 2023).'
+        ionization_cross_section_A2_table3_as_printed:
+          Ga+: 7.96 ± 1.38
+          GaO+: 6.24 ± 1.35
+          Ga2+: 11.94 ± 1.97
+          Ga2O+: 13.20 ± 2.08
+          In+: 9.74 ± 1.48
+          InO+: 7.50 ± 1.45
+          In2+: 14.61 ± 2.09
+          In2O+: 16.03 ± 2.22
+        fO2_control: none
+        fO2_channel_as_printed: no buffer gas or gas mix in the KEMS cell; p(O2) calculated from dissociative vaporisation
+        fO2_range_as_printed: ΔIW+1.5 to ΔIW+2.5
+        isotherm_1_low_T_K: 1742
+        isotherm_1_low_t_h: 15
+        polytherm_T_step_K: 10
+        polytherm_equilibration_min: 5
+        polytherm_ramp: up
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - pump_type
+        - pumping_speed
+        as_printed:
+          instrument: Experiments were carried out with a FINNIGAN MAT 271 Knudsen effusion mass spectrometer at Forschungszentrum, Jülich.
+          cell_material_as_published: Briefly, the iridium Knudsen cell (KC) is composed of a crucible 8.5 mm high
+          crucible_height_mm: a crucible 8.5 mm high
+          crucible_outer_diameter_mm: an outer diameter of 7.8 mm
+          wall_thickness_mm: 0.2 mm wall thickness
+          orifice_diameter_mm: a lid with a 0.4 mm orifice at its centre
+          housing: The KC is contained in W housing and is heated by a W wire
+          thermocouple: whose temperature is monitored by a W97Re3/W75Re25 thermocouple
+          pyrometer: the temperature at the Ir cell is determined using a single wavelength pyrometer (IGA-12, LUMASENSE TECHNOLOGIES)
+          heatshields: The entirely assembly is surrounded by three nested Ta heatshields
+          heating_as_printed: Heating was achieved by means of a W wire and radiative heating below ~600 °C and electron bombardment above this temperature
+          chamber_pressure_mbar_as_printed: The KC chamber (~10-6 mbar)
+          other_compartments_mbar_as_printed: all other compartments of the device (~10-9 mbar)
+          ionization_method: Ionisation of the molecular beam effusing from the KC is achieved by electron impact
+          ion_acceleration_kV: Ions are accelerated towards the entrance slit of the mass spectrometer by an electrical potential of 6 kV
+          detector: The resulting signal intensity of the ions was determined using an ion-counter
+          bakeout: empty iridium KCs were heated to 1930 K for 12 h
+          sample_form_as_published: Powdered glasses, 40 mg for the runs with high trace elements concentrations and 80 mg for the runs with low trace element concentrations, were then packed into the KC
+          ionizing_electron_energy_eV: Given an electron ionisation energy E(e-) of 60 eV
+          emission_current_mA: a constant electron emission i(em) of 0.468 mA
+          calibration_standards_as_printed: measuring i) the melting points, Tm, of pure Ag (1235 K) and Ni (1728 K) and ii) the counts of Ag+ and Ni+ at Tm
+          sensitivity_factor_k_as_printed: k = 1.52(6) × 10^-7 × T_pyr + 2.9(6) × 10^-5
+          T_real_as_printed: T_real = 1.060(4) × T_pyr + 53(4)
+          starting_glass_wt_pct: 'nominal composition, in wt. %, of SiO2 = 50.34, Al2O3 = 15.40, MgO = 10.80, CaO = 23.46'
+          epma_table6: "Table 6: Summary of the results from EPMA. ‘Start’ denotes the starting glass material pre-experiment, while ‘End’ indicates the composition post-KEMS experiment."
+          laicpms_table7: "Table 7: Summary of the results from LA-ICP-MS analysis."
+          fO2_range_as_printed: using Ir cells at 1550-1740 K over the log(fO2) range ΔIW+1.5 to ΔIW+2.5
+        note: >-
+          Equipment metadata for this GCA An-Di melt KEMS paper (kems-137). Methodology
+          is referred to Bischof et al. (2023) Calphad (kems-138); only values printed
+          in this paper are stored here. Supplement mmc1 has no apparatus section.
+      uncertainty:
+        note: orifice diameter 0.4 mm printed, area not computed; KC chamber pressure is the nominal ~10^-6 mbar; Table 2 masses are per-run (not one charge)
+      equipment: *id001
     - observation_id: bischof_2023_table8_x_gao15
       type: activity_coefficient
       locator:
@@ -266,6 +525,13 @@ species:
         oxide_formula_as_published: GaO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 1_low
+        initial_weight_mg:
+          value: 79.1
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 1_low, initially 1000 ppm; initial weight [mg] 79.1'
         protocol: polytherm
         gamma: 0.0632
         series:
@@ -378,6 +644,13 @@ species:
         oxide_formula_as_published: GaO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 1_low
+        initial_weight_mg:
+          value: 79.1
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 1_low, initially 1000 ppm; initial weight [mg] 79.1'
         protocol: isotherm
         gamma: 0.0353
         series:
@@ -529,6 +802,13 @@ species:
         oxide_formula_as_published: GaO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 2_low
+        initial_weight_mg:
+          value: 72.92
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 2_low, initially 1000 ppm; initial weight [mg] 72.92'
         protocol: polytherm
         gamma: 270.0
         note: First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T
@@ -710,6 +990,13 @@ species:
         oxide_formula_as_published: GaO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 3_high
+        initial_weight_mg:
+          value: 38.69
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 3_high, initially 10000 ppm; initial weight [mg] 38.69'
         protocol: polytherm
         gamma: 0.356
         series:
@@ -1579,6 +1866,13 @@ species:
         oxide_formula_as_published: InO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 1_low
+        initial_weight_mg:
+          value: 79.1
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 1_low, initially 1000 ppm; initial weight [mg] 79.1'
         protocol: polytherm
         gamma: 0.0527
         series:
@@ -1690,6 +1984,13 @@ species:
         oxide_formula_as_published: InO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 1_low
+        initial_weight_mg:
+          value: 79.1
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 1_low, initially 1000 ppm; initial weight [mg] 79.1'
         protocol: isotherm
         gamma: 0.0211
         series:
@@ -1841,6 +2142,13 @@ species:
         oxide_formula_as_published: InO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 2_low
+        initial_weight_mg:
+          value: 72.92
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 2_low, initially 1000 ppm; initial weight [mg] 72.92'
         protocol: polytherm
         gamma: 29.6
         series:
@@ -2032,6 +2340,13 @@ species:
         oxide_formula_as_published: InO1.5
         method_class: derived_from_kems_equilibrium_constants
         run: 3_high
+        initial_weight_mg:
+          value: 38.69
+          locator:
+            table: '2'
+            pdf_page_index: 6
+            section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
+            paragraph: 'Table 2 3_high, initially 10000 ppm; initial weight [mg] 38.69'
         protocol: polytherm
         gamma: 0.0335
         series:
