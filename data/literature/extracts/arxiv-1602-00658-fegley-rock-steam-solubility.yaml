@@ -1,0 +1,390 @@
+schema_version: literature_extract.v1
+source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+source:
+  citation: Fegley, B., Jr., Jacobson, N. S., Williams, K. B., Plane, J. M., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", submitted to the Astrophysical Journal, arXiv:1602.00658.
+  url: https://arxiv.org/abs/1602.00658
+  year: 2016
+extraction:
+  method: Full-table transcription from pdftotext -layout; PDF pages 120-125 contain the author-supplied table pages. Printed strings, bounds, ranges, and table footnotes retained without inference.
+  date: '2026-09-19'
+  worker: w2-arxiv-1602-00658
+  provenance_path: raw/arxiv-1602-00658/arxiv-1602-00658.pdf
+review_status: draft
+evidence_policy:
+  classification: mixed_compilation_and_model
+  measurement_claim: This paper reports calculations and literature comparisons, not a new laboratory experiment. Values from cited experiments remain attributed literature evidence and are not promoted to measured_direct here.
+  model_generators:
+  - IVTAN chemical-equilibrium code and thermodynamic database
+  - FactSage comparison calculation
+  - pMELTS/rhyolite-MELTS activity calculation
+  - quantum-chemistry/statistical-mechanics photolysis calculation
+  numeric_encoding: Numeric cells remain as printed, including scientific notation, inequalities, ranges, and footnote qualifiers.
+  apparatus_status: No new sample, apparatus, cell, crucible, or run-condition record is present in this computational paper; cited experimental apparatus was not attached to this source.
+fidelity_samples:
+- species: BSE
+  observable: gibbs_table
+  observation_id: fegley_2016_table_1_model
+  field: rows_as_printed[0].SiO_A_bar
+  value: 8.6 × 10-6
+  locator:
+    page: 120
+    table: '1'
+    note: Table 1, SiO row, condition A
+- species: BSE
+  observable: gibbs_table
+  observation_id: fegley_2016_table_3_compilation
+  field: rows_as_printed[0].MgO_mole_percent
+  value: '47.67'
+  locator:
+    page: 122
+    table: '3'
+    note: Table 3, MgO mole-percent cell
+- species: BSE
+  observable: gibbs_table
+  observation_id: fegley_2016_table_4_model
+  field: rows_as_printed[1].MgOH2_1500_K_bar
+  value: 2.7 × 10-5
+  locator:
+    page: 123
+    table: '4'
+    note: Table 4, Mg(OH)2 at 1500 K
+- species: BSE
+  observable: gibbs_table
+  observation_id: fegley_2016_table_5_model
+  field: rows_as_printed[0].Si_logD_2000K_BSE_270bar
+  value: −5.332
+  locator:
+    page: 124
+    table: '5'
+    note: Table 5, Si row, BSE 270 bar, 2000 K
+- species: BSE
+  observable: gibbs_table
+  observation_id: fegley_2016_table_6_model
+  field: rows_as_printed[0].J_s-1
+  value: 2.3 × 10-3
+  locator:
+    page: 125
+    table: '6'
+    note: Table 6, Fe(OH)2 photodissociation row
+model_tables:
+- table: '1'
+  locator:
+    page: 120
+    table: '1'
+  classification: model_derived
+  generator: IVTAN chemical-equilibrium calculations; the methods state that the IVTAN results were compared with FactSage.
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_output
+    quantity: estimated_partial_pressures_of_Si_bearing_gases
+    units: bar
+    rows_as_printed:
+    - gas: SiO
+      A_bar: 8.6 × 10-6
+      B_bar: 1.6 × 10-13
+      C_bar: 4.4 × 10-14
+      D_bar: 2.9 × 10-8
+    - gas: SiO2
+      A_bar: 6.9 × 10-7
+      B_bar: 6.4 × 10-11
+      C_bar: 7.6 × 10-12
+      D_bar: 6.9 × 10-7
+    - gas: SiO(OH)
+      A_bar: 3.4 × 10-11
+      B_bar: 6.7 × 10-15
+      C_bar: 1.9 × 10-14
+      D_bar: 1.3 × 10-8
+    - gas: SiO(OH)2
+      A_bar: 3.3 × 10-11
+      B_bar: 5.9 × 10-9
+      C_bar: 4.9 × 10-7
+      D_bar: 1.5 × 10-3
+    - gas: Si(OH)4
+      A_bar: 3.9 × 10-15
+      B_bar: 4.1 × 10-6
+      C_bar: 3.0 × 10-1
+      D_bar: '8.25'
+    - gas: Si2O(OH)6
+      A_bar: 7.5 × 10-26
+      B_bar: 2.0 × 10-11
+      C_bar: 5.4 × 10-4
+      D_bar: 7.2 × 10-3
+    - gas: Σall Si-gases
+      A_bar: 9.3 × 10-6
+      B_bar: 4.1 × 10-6
+      C_bar: 3.0 × 10-1
+      D_bar: '8.25'
+    conditions_as_printed:
+    - A: T = 2000 K, total P = 4 × 10-5 bar, liquid silica + steam
+    - B: T = 1573 K, total P = 1 bar, cristobalite + 90% steam - 10% O2 gas mixture
+    - C: T = 1500 K, total P = 270 bar, cristobalite + steam
+    - D: T = 2000 K, total P = 1,100 bar, liquid silica in steam (75%) - CO2 (25%) atmosphere
+    quote_as_printed: >-
+      Table 1. Estimated partial pressures of Si-bearing gases. Pi (bar): SiO A 8.6 × 10-6, B 1.6 × 10-13, C 4.4 × 10-14, D 2.9 × 10-8; SiO2 A 6.9 × 10-7, B 6.4 × 10-11, C 7.6 × 10-12, D 6.9 × 10-7; SiO(OH) A 3.4 × 10-11, B 6.7 × 10-15, C 1.9 × 10-14, D 1.3 × 10-8; SiO(OH)2 A 3.3 × 10-11, B 5.9 × 10-9, C 4.9 × 10-7, D 1.5 × 10-3; Si(OH)4 A 3.9 × 10-15, B 4.1 × 10-6, C 3.0 × 10-1, D 8.25; Si2O(OH)6 A 7.5 × 10-26, B 2.0 × 10-11, C 5.4 × 10-4, D 7.2 × 10-3; Σall Si-gases A 9.3 × 10-6, B 4.1 × 10-6, C 3.0 × 10-1, D 8.25.
+- table: '2'
+  locator:
+    page: 121
+    table: '2'
+  classification: compilation_assessed
+  generator: Secondary compilation from Wedepohl (1995), as stated in the table footnote.
+  values:
+    method_class: compilation_assessed
+    evidence_class: compilation_assessed
+    measurement_kind: compiled_composition
+    quantity: Earth_continental_crust_composition
+    units: mole percent; volatiles separately as printed
+    rows_as_printed:
+    - oxide: SiO2
+      mole_percent: '68.92'
+    - oxide: Al2O3
+      mole_percent: '9.92'
+    - oxide: CaO
+      mole_percent: '6.46'
+    - oxide: MgO
+      mole_percent: '6.08'
+    - oxide: Na2O
+      mole_percent: '3.45'
+    - oxide: Fe2O3
+      mole_percent: '2.60'
+      footnote: 25% Fe3+ in the crust; most Fe in the BSE is Fe2+
+    - oxide: K2O
+      mole_percent: '1.84'
+    - oxide: TiO2
+      mole_percent: '0.56'
+    - oxide: MnO
+      mole_percent: '0.09'
+    - oxide: P2O5
+      mole_percent: '0.08'
+    - component: Total
+      mole_percent: '100.01%'
+    volatiles_not_in_sum_as_printed: 1.91% H2O, 0.64% C, 0.44% CO2, 0.028% N, 0.18% F, 0.14% S, and 0.086% Cl
+    quote_as_printed: >-
+      Table 2. Composition of Earth’s continental crust. Oxide mole %: SiO2 68.92, Al2O3 9.92, CaO 6.46, MgO 6.08, Na2O 3.45, Fe2O3 2.60, K2O 1.84, TiO2 0.56, MnO 0.09, P2O5 0.08, Total 100.01%. Also includes 0.008% Cr2O3 and 0.0062% NiO. Volatiles not included in the sum are 1.91% H2O, 0.64% C, 0.44% CO2, 0.028% N, 0.18% F, 0.14% S, and 0.086% Cl.
+- table: '3'
+  locator:
+    page: 122
+    table: '3'
+  classification: compilation_assessed
+  generator: Calculated from Palme and O’Neill (2014), as stated in the table footnote.
+  values:
+    method_class: compilation_assessed
+    evidence_class: compilation_assessed
+    measurement_kind: compiled_composition
+    quantity: bulk_silicate_Earth_composition
+    units: mole percent
+    rows_as_printed:
+    - oxide: MgO
+      mole_percent: '47.67'
+    - oxide: SiO2
+      mole_percent: '39.48'
+    - oxide: FeO
+      mole_percent: '5.90'
+      footnote: Most Fe in the BSE is Fe2+
+    - oxide: CaO
+      mole_percent: '3.40'
+    - oxide: Al2O3
+      mole_percent: '2.30'
+    - oxide: Na2O
+      mole_percent: '0.29'
+    - oxide: NiO
+      mole_percent: '0.17'
+    - oxide: TiO2
+      mole_percent: '0.14'
+    - oxide: Cr2O3
+      mole_percent: '0.13'
+    - oxide: MnO
+      mole_percent: '0.10'
+    - oxide: K2O
+      mole_percent: '0.0174'
+    - oxide: H2O
+      mole_percent: '0.31'
+    - oxide: CO2
+      mole_percent: '0.044'
+    - oxide: N
+      mole_percent: 7.5 × 10-4
+    - oxide: F
+      mole_percent: 6.9 × 10-3
+    - oxide: Cl
+      mole_percent: 4.4 × 10-3
+    - oxide: S
+      mole_percent: '0.0326'
+    - oxide: P2O5
+      mole_percent: 7.3 × 10-3
+    - oxide: Total
+      mole_percent: '100.00%'
+    quote_as_printed: >-
+      Table 3. Composition of the Bulk Silicate Earth (BSE). MgO 47.67, SiO2 39.48, FeO 5.90, CaO 3.40, Al2O3 2.30, Na2O 0.29, NiO 0.17, TiO2 0.14, Cr2O3 0.13, MnO 0.10, K2O 0.0174, H2O 0.31, CO2 0.044, N 7.5 × 10-4, F 6.9 × 10-3, Cl 4.4 × 10-3, S 0.0326, P2O5 7.3 × 10-3, Total 100.00%.
+- table: '4'
+  locator:
+    page: 123
+    table: '4'
+  classification: model_derived
+  generator: IVTAN chemical-equilibrium calculations using thermodynamic data for metal hydroxide gases.
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_output
+    quantity: hydroxide_gas_partial_pressures
+    conditions: 220.64 bars steam
+    units: bar
+    rows_as_printed:
+    - gas: Si(OH)4
+      at_1000_K_bar: '0.029'
+      at_1500_K_bar: '0.20'
+      at_2000_K_bar: '0.59'
+    - gas: Mg(OH)2
+      at_1000_K_bar: 2.0 × 10-10
+      at_1500_K_bar: 2.7 × 10-5
+      at_2000_K_bar: '0.010'
+    - gas: Fe(OH)2
+      at_1000_K_bar: 1.5 × 10-6
+      at_1500_K_bar: 3.5 × 10-3
+      at_2000_K_bar: '0.11'
+    - gas: Ca(OH)2
+      at_1000_K_bar: 1.7 × 10-10
+      at_1500_K_bar: 1.2 × 10-4
+      at_2000_K_bar: '0.040'
+    - gas: Al(OH)3
+      at_1000_K_bar: 2.3 × 10-7
+      at_1500_K_bar: 5.0 × 10-4
+      at_2000_K_bar: '0.024'
+    - gas: Ni(OH)2
+      at_1000_K_bar: 1.3 × 10-7
+      at_1500_K_bar: 1.6 × 10-3
+      at_2000_K_bar: '0.19'
+    quote_as_printed: >-
+      Table 4. Hydroxide gas partial pressures at 220.64 bars steam. Columns are 1000 K, 1500 K, and 2000 K; rows are Si(OH)4 0.029, 0.20, 0.59; Mg(OH)2 2.0 × 10-10, 2.7 × 10-5, 0.010; Fe(OH)2 1.5 × 10-6, 3.5 × 10-3, 0.11; Ca(OH)2 1.7 × 10-10, 1.2 × 10-4, 0.040; Al(OH)3 2.3 × 10-7, 5.0 × 10-4, 0.024; Ni(OH)2 1.3 × 10-7, 1.6 × 10-3, 0.19.
+- table: '5'
+  locator:
+    page: 124
+    table: '5'
+  classification: model_derived
+  generator: IVTAN gas/magma equilibrium using pMELTS/rhyolite-MELTS oxide activities; table values are the authors’ calculated outputs.
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_output
+    quantity: gas_magma_molar_distribution_coefficients_log10_D
+    units: log D, D = moles in gas / moles in magma
+    rows_as_printed:
+    - atmosphere: BSE 270 bars steam
+      values_by_element_and_temperature: Si [-5.332, -5.229, -5.199, -5.268, -5.334, -5.400]; Mg [-6.967, -6.319, -5.729, -5.205, -4.758, -4.347]; Fe [-5.443, -5.061, -4.727, -4.441, -4.197, -3.984]; Na [-3.116, -2.950, -2.806, -2.673, -2.541, -2.405]; K [-2.607, -2.440, -2.295, -2.158, -2.023, -1.889]; Al [-6.023, -5.584, -5.250, -5.030, -4.835, -4.667]; Ca [-7.046, -6.415, -5.862, -5.377, -4.949, -4.569]; Ni [-5.416, -4.870, -4.451, -4.090, -3.772, -3.491]
+    - atmosphere: BSE 1100 bars steam
+      values_by_element_and_temperature: Si [-4.692, -4.609, -4.550, -4.509, -4.482, -4.465]; Mg [-6.989, -6.316, -5.712, -5.187, -4.734, -4.340]; Fe [-5.400, -5.015, -4.687, -4.409, -4.173, -3.971]; Na [-3.450, -3.278, -3.127, -2.988, -2.854, -2.721]; K [-2.909, -2.732, -2.576, -2.432, -2.294, -2.158]; Al [-5.721, -5.276, -4.941, -4.722, -4.538, -4.384]; Ca [-7.012, -6.370, -5.815, -5.329, -4.902, -4.531]; Ni [-5.444, -4.927, -4.539, -4.206, -3.913, -3.652]
+    - atmosphere: Continental crust 270 bars steam
+      values_by_element_and_temperature: Si [-4.661, -4.562, -4.481, -4.419, -4.364, -4.292]; Mg [-5.188, -4.761, -4.367, -3.992, -3.791, -3.691]; Fe [-4.108, -3.953, -3.765, -3.570, -3.381, -3.208]; Na [-2.695, -2.530, -2.393, -2.279, -2.174, -2.075]; K [-3.271, -3.089, -2.940, -2.811, -2.693, -2.580]; Al [-5.136, -4.844, -4.592, -4.427, -4.278, -4.144]; Ca [-5.766, -5.256, -4.814, -4.425, -4.079, -3.774]; Ni [-4.258, -3.950, -3.692, -3.426, -3.154, -2.885]
+    - atmosphere: Continental crust 1100 bars steam
+      values_by_element_and_temperature: Si [-4.000, -3.913, -3.837, -3.775, -3.729, -3.697]; Mg [-5.320, -4.822, -4.354, -3.975, -3.618, -3.287]; Fe [-4.084, -3.926, -3.734, -3.545, -3.363, -3.200]; Na [-3.284, -3.110, -2.963, -2.844, -2.737, -2.639]; K [-3.576, -3.376, -3.212, -3.078, -3.024, -2.845]; Al [-5.057, -4.639, -4.284, -4.120, -3.974, -3.849]; Ca [-5.816, -5.276, -4.791, -4.396, -4.047, -3.740]; Ni [-4.227, -3.912, -3.661, -3.416, -3.178, -2.953]
+    temperatures_K: [2000, 2200, 2400, 2600, 2800, 3000]
+    quote_as_printed: >-
+      Table 5. Gas/magma molar distribution coefficients (log D), with D = moles in gas / moles in magma. Four blocks are BSE 270 bars, BSE 1100 bars, continental crust 270 bars, and continental crust 1100 bars; each block has columns 2000, 2200, 2400, 2600, 2800, and 3000 K. The full printed row values are retained in values_by_element_and_temperature.
+- table: '6'
+  locator:
+    page: 125
+    table: '6'
+  classification: model_derived
+  generator: Quantum-chemistry/statistical-mechanics molecular data combined with calculated solar photodissociation rates.
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    measurement_kind: model_output
+    quantity: photodissociation_coefficients
+    units: ΔH°0 K in kJ mol-1; threshold wavelength in nm; J in s-1
+    rows_as_printed:
+    - reaction: Fe(OH)2 + hv → FeOH + OH
+      delta_H0_K_kJ_per_mol: '435'
+      lambda_threshold_nm: '275'
+      J_s-1: 2.3 × 10-3
+    - reaction: Mg(OH)2 + hv → MgOH + OH
+      delta_H0_K_kJ_per_mol: '450'
+      lambda_threshold_nm: '266'
+      J_s-1: 1.3 × 10-3
+    - reaction: Si(OH)4 + hv → Si(OH)3 + OH
+      delta_H0_K_kJ_per_mol: '529'
+      lambda_threshold_nm: '226'
+      J_s-1: 4.4 × 10-6
+    quote_as_printed: >-
+      Table 6. Photodissociation coefficients for Fe(OH)2, Mg(OH)2 and Si(OH)4. Fe(OH)2 + hv → FeOH + OH: 435 kJ mol-1, 275 nm, 2.3 × 10-3 s-1; Mg(OH)2 + hv → MgOH + OH: 450 kJ mol-1, 266 nm, 1.3 × 10-3 s-1; Si(OH)4 + hv → Si(OH)3 + OH: 529 kJ mol-1, 226 nm, 4.4 × 10-6 s-1.
+species:
+  BSE:
+    observations:
+    - observation_id: fegley_2016_table_1_model
+      type: gibbs_table
+      locator:
+        page: 120
+        table: '1'
+      phase: steam_atmosphere_in_equilibrium_with_silica
+      regime: thermochemical_equilibrium_model
+      units: bar
+      values:
+        method_class: model_derived
+        generator: IVTAN
+        quantity: estimated_partial_pressures_of_Si_bearing_gases
+        rows_as_printed:
+        - gas: SiO
+          SiO_A_bar: 8.6 × 10-6
+          SiO_B_bar: 1.6 × 10-13
+          SiO_C_bar: 4.4 × 10-14
+          SiO_D_bar: 2.9 × 10-8
+    - observation_id: fegley_2016_table_3_compilation
+      type: gibbs_table
+      locator:
+        page: 122
+        table: '3'
+      phase: bulk_silicate_Earth_composition
+      regime: compiled_composition
+      units: mole percent
+      values:
+        method_class: compilation_assessed
+        quantity: bulk_silicate_Earth_composition
+        rows_as_printed:
+        - oxide: MgO
+          MgO_mole_percent: '47.67'
+    - observation_id: fegley_2016_table_4_model
+      type: gibbs_table
+      locator:
+        page: 123
+        table: '4'
+      phase: steam_at_220_64_bar
+      regime: thermochemical_equilibrium_model
+      units: bar
+      values:
+        method_class: model_derived
+        generator: IVTAN
+        quantity: hydroxide_gas_partial_pressures
+        rows_as_printed:
+        - gas: Si(OH)4
+          SiOH4_1500_K_bar: '0.20'
+        - gas: Mg(OH)2
+          MgOH2_1500_K_bar: 2.7 × 10-5
+    - observation_id: fegley_2016_table_5_model
+      type: gibbs_table
+      locator:
+        page: 124
+        table: '5'
+      phase: BSE_or_continental_crust_magma_plus_steam
+      regime: thermochemical_equilibrium_model
+      units: log D
+      values:
+        method_class: model_derived
+        generator: IVTAN_with_pMELTS_or_rhyolite_MELTS_activities
+        quantity: gas_magma_molar_distribution_coefficients
+        rows_as_printed:
+        - element: Si
+          Si_logD_2000K_BSE_270bar: −5.332
+    - observation_id: fegley_2016_table_6_model
+      type: gibbs_table
+      locator:
+        page: 125
+        table: '6'
+      phase: gas_photolysis
+      regime: photochemical_model
+      units: as printed in table headers
+      values:
+        method_class: model_derived
+        generator: quantum_chemistry_statistical_mechanics_and_solar_photolysis
+        quantity: photodissociation_coefficients
+        rows_as_printed:
+        - reaction: Fe(OH)2 + hv → FeOH + OH
+          J_s-1: 2.3 × 10-3
