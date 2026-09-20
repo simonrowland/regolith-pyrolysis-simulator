@@ -1,0 +1,669 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
+observations:
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_argon_isotope_ratio_range
+  experiment_id: 10.1126/sciadv.abo7239::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_ratio'
+    species:
+      formula: Ar
+      phase:
+        tag: unknown
+        reason: phase string 'container_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratio'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 4
+    figure: '3'
+    note: range stated for container-gas 40Ar/36Ar measurements
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_dimensions_and_sampling
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'container_dimensions_and_collectable_sample_size'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'container_dimensions_and_collectable_sample_size';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 1
+    section: Introduction
+    note: sample-container dimensions and Hayabusa2 sampler size range are printed design/provenance facts, not furnace measurements
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_helium_isotope_ratio
+  experiment_id: 10.1126/sciadv.abo7239::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_ratio'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'container_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratio'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      ratio_3He_4He: +/- 0.010 x 10^-4 (1 sigma)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 3
+    figure: '2'
+    note: weighted arithmetic mean of measured container-gas 3He/4He ratios
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_ne_isotope_ratios
+  experiment_id: 10.1126/sciadv.abo7239::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_ratios'
+    species:
+      formula: Ne
+      phase:
+        tag: unknown
+        reason: phase string 'container_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratios'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      ratio_20Ne_22Ne: +/- 0.0055
+      ratio_21Ne_22Ne: +/- 0.00015
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 3
+    figure: '2'
+    note: weighted mean container-gas neon isotope ratios
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_and_extraction_geometry
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_sampling_geometry_and_timing'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_sampling_geometry_and_timing'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 6
+    section: Gas sampling and on-site measurement at the QLF in WPA
+    note: inner volume, vacuum-line volume, collection fraction, bottle volume, aliquot volume, and timing are printed in
+      Materials and Methods
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_direct
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'container_gas_pressure'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'container_gas_pressure'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 3
+    section: Results
+    note: Pirani-gauge measurement 30 hours after atmospheric entry
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_increase_and_leak
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pressure_change_and_leak_rate'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pressure_change_and_leak_rate'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 4
+    section: Discussion, Timing and contribution of the terrestrial atmosphere leakage
+    note: pressure increase and inferred continuing leak rate are both printed; no reconciliation with the separate 1.9-2.3
+      Pa/hour range attempted
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_seal_force
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'seal_force'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'seal_force'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 2
+    section: Introduction
+    note: metal sealing-system design force
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_fragmentation_assumptions_and_model_output
+  experiment_id: 10.1126/sciadv.abo7239::S2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solar_wind_layer_fragmentation_model'
+    species:
+      formula: Ryugu_SW_layer
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solar_wind_layer_fragmentation_model'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 8
+    table: S2
+    section: Materials and Methods, Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+    note: numerical assumptions and outputs are author geometric/abundance calculations; table S2 is cited but not present
+      in the supplied PDF, so only values printed in the prose are recorded
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derived_from:
+  - okazaki-2022-ryugu-gas-treasure-box::author geometric calculation from assumed cube dimensions, density, and implanted-layer
+    thickness
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_maximum_temperature_history
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'maximum_temperature_history'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'maximum_temperature_history'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 5
+    section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+    note: temperature values used to assess thermal release; the TD-site maximum is attributed to cited prior work, while
+      the container monitor value is reported as an observed upper bound
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_methane_detection_limit
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'detection_limit_and_abundance_bound'
+    species:
+      formula: CH4
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'detection_limit_and_abundance_bound'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 7
+    section: Analysis procedures of the volatile compositions in the sample gas pipettes, At JAMSTEC
+    note: methane and ethane were not detected; the detection limit and abundance bound are printed
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_nitrogen_delta15_range
+  experiment_id: 10.1126/sciadv.abo7239::3
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'container_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, delta_15N_range_per_mil'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 4
+    figure: '3'
+    note: range stated for container-gas nitrogen isotope composition
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'recovered_sample_mass_density_and_size_distribution'
+    species:
+      formula: Ryugu_sample_container
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'recovered_sample_mass_density_and_size_distribution';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 5
+    section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+    note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
+      cited size distribution and density are retained as quoted literature
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_helium_abundance
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'released_gas_abundance'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'released_gas_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 5
+    section: Origin of the He and Ne stored in the sample container
+    note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_neon_abundance
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'released_gas_abundance'
+    species:
+      formula: Ne
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'released_gas_abundance'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 5
+    section: Origin of the He and Ne stored in the sample container
+    note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+- observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_surface_pulverization_model
+  experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pulverized_surface_area_estimate'
+    species:
+      formula: Ryugu_SW_layer
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pulverized_surface_area_estimate'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: okazaki-2022-ryugu-gas-treasure-box
+  locator:
+    published_page: 8
+    section: Materials and Methods, Expected fraction of pulverized surface area
+    note: author estimate from measured SW-4He abundance and assumed grain population; printed quantities retained as assumptions/model
+      outputs
+  read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derived_from:
+  - okazaki-2022-ryugu-gas-treasure-box::author estimate constrained by measured blank-corrected SW-4He abundance and assumed
+    grain population

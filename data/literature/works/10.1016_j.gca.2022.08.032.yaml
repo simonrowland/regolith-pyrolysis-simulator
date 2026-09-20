@@ -1,0 +1,180 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2022.08.032
+  citation: Boulliung, J. & Wood, B. J. (2022), "SO2 solubility and degassing behavior in silicate melts", Geochimica et Cosmochimica
+    Acta 336:150-164, DOI 10.1016/j.gca.2022.08.032
+  source_ids:
+  - boulliung-wood-2022-so2-solubility-silicate-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:boulliung-wood-2022-so2-solubility-silicate-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2022.08.032
+experiments:
+- experiment_id: 10.1016/j.gca.2022.08.032::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2022.08.032
+  locator:
+    page: 151
+    table: '1'
+    note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are
+      1-sigma uncertainty on the last digit, b.d.l. means below detection limit.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+- experiment_id: 10.1016/j.gca.2022.08.032::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    pumping:
+      pumping:
+        state:
+          tag: value
+          value: not stated
+        locator:
+          page: 152
+          table: '2'
+          section: 2.2 Experimental conditions
+          note: Every value below is transcribed from the printed Table 2 cell under its column header.
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  work_id: 10.1016/j.gca.2022.08.032
+  locator:
+    page: 152
+    table: '2'
+    section: 2.2 Experimental conditions
+    note: Every value below is transcribed from the printed Table 2 cell under its column header.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  apparatus:
+    temperature_measurement:
+      temperature_calibration:
+        state:
+          tag: value
+          value: not stated
+        locator:
+          page: 152
+          table: '2'
+          section: 2.2 Experimental conditions
+          note: Every value below is transcribed from the printed Table 2 cell under its column header.
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+- experiment_id: 10.1016/j.gca.2022.08.032::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2022.08.032
+  locator:
+    page: 153
+    table: '3'
+    note: Table continues on printed pages 154-155. Every value below remains in the printed column order; values in parentheses
+      are 1-sigma uncertainty on the last digit(s), b.d.l. is not zero, and EPMA/SIMS is the stated analytical method.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+- experiment_id: 10.1016/j.gca.2022.08.032::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2022.08.032
+  locator:
+    page: 158
+    table: '4'
+    note: Every value below is transcribed from the printed Table 4 cell under its column header; the table reports final
+      glass products at 1573 K for Air/SO2 4.00 and 0.11.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf

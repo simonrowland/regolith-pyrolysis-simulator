@@ -1,0 +1,374 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  citation: Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek,
+    Randburg, 20–21 May 1997.
+  source_ids:
+  - 1997jonesthermo
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:1997jonesthermo
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::/Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'gas_solid_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '86126.25'
+      locator:
+        published_page: 17
+        section: 5.2 Example 4 – Gas-solid reaction
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=0.85 atm
+        - printed=total_pressure_atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.85'
+            locator:
+              published_page: 17
+              section: 5.2 Example 4 – Gas-solid reaction
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 17
+              section: 5.2 Example 4 – Gas-solid reaction
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 17
+    section: 5.2 Example 4 – Gas-solid reaction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'equilibrium_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 18
+    figure: '10'
+    section: 5.3 Example 5 – Vapour pressure of manganese
+    note: Explicit value in prose; Figure 10 is not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'IMCC_model_and_experimental_comparison' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 24
+    figure: '11'
+    section: 7.1 Ideal Mixing of Complex Components
+    note: Qualitative comparison only; curve coordinates and activity values are not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'standard_enthalpy_heating_example' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 7
+    figure: '2'
+    section: 3.3 Example 1 – Melting of iron
+    note: Text immediately below Figure 2 prints the values; Figure 2 is not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'standard_enthalpy_heating_example' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 8
+    figure: '3'
+    section: 3.3 Example 1 – Melting of iron
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'idealized_energy_balance' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 8
+    figure: '4'
+    section: 3.4 Example 2 – Energy requirement for a simple reacting system
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'idealized_energy_balance' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 10
+    figure: '5'
+    section: 3.6 Example 3 – Roasting of zinc sulphide
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'adiabatic_energy_balance' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 11
+    figure: '6'
+    section: 3.7 Example 4 – Adiabatic flame temperature
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+- experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'gas_phase_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '202650'
+      locator:
+        published_page: 14
+        figure: '7'
+        section: 5.1 Example 5 – Gas phase reaction
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=2.0 atm
+        - printed=total_pressure_atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 14
+              figure: '7'
+              section: 5.1 Example 5 – Gas phase reaction
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 14
+              figure: '7'
+              section: 5.1 Example 5 – Gas phase reaction
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
+  locator:
+    published_page: 14
+    figure: '7'
+    section: 5.1 Example 5 – Gas phase reaction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf

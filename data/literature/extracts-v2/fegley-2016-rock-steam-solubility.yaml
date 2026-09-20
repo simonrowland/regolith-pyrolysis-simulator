@@ -1,0 +1,290 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/fegley-2016-rock-steam-solubility.yaml
+observations:
+- observation_id: fegley-2016-rock-steam-solubility::fegley_2016_table1_si_bearing_gas_partial_pressures
+  experiment_id: 10.3847/0004-637x/824/2/103::1
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'silica_plus_steam_or_steam_co2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1500.0, 2000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, model, conditions, rows'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric uncertainty printed in Table 1
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fegley-2016-rock-steam-solubility
+  locator:
+    pdf_page_index: 119
+    table: '1'
+    note: Estimated partial pressures of Si-bearing gases; manuscript table conditions A-D are printed below the table.
+  read_from: unknown:fegley-2016-rock-steam-solubility
+- observation_id: fegley-2016-rock-steam-solubility::fegley_2016_table2_continental_crust_composition
+  experiment_id: 10.3847/0004-637x/824/2/103::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'composition'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'earth_continental_crust' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'composition'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fegley-2016-rock-steam-solubility
+  locator:
+    pdf_page_index: 120
+    table: '2'
+  read_from: unknown:fegley-2016-rock-steam-solubility
+- observation_id: fegley-2016-rock-steam-solubility::fegley_2016_table3_bse_composition
+  experiment_id: 10.3847/0004-637x/824/2/103::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'composition'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_earth' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'composition'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fegley-2016-rock-steam-solubility
+  locator:
+    pdf_page_index: 121
+    table: '3'
+  read_from: unknown:fegley-2016-rock-steam-solubility
+- observation_id: fegley-2016-rock-steam-solubility::fegley_2016_table4_hydroxide_partial_pressures
+  experiment_id: 10.3847/0004-637x/824/2/103::4
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: unknown
+        reason: phase string 'pure_oxide_in_steam' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1000.0, 2000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, model, rows'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fegley-2016-rock-steam-solubility
+  locator:
+    pdf_page_index: 122
+    table: '4'
+  read_from: unknown:fegley-2016-rock-steam-solubility
+- observation_id: fegley-2016-rock-steam-solubility::fegley_2016_table5_gas_magma_distribution_coefficients
+  experiment_id: 10.3847/0004-637x/824/2/103::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'distribution_coefficient'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_or_continental_crust_magma_equilibrated_with_steam' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'distribution_coefficient'; refusing to pick a
+      number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed for Table 5 values
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fegley-2016-rock-steam-solubility
+  locator:
+    pdf_page_index: 123
+    table: '5'
+  read_from: unknown:fegley-2016-rock-steam-solubility

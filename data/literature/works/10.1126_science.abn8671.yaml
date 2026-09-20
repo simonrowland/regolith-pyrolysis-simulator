@@ -1,0 +1,120 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1126/science.abn8671
+  citation: 'Nakamura, T. et al. (2023), "Formation and evolution of carbonaceous asteroid Ryugu: Direct evidence from returned
+    samples", Science 379, eabn8671.'
+  source_ids:
+  - nakamura-2022-science-ryugu-thermal
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:nakamura-2022-science-ryugu-thermal
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1126/science.abn8671
+experiments:
+- experiment_id: 10.1126/science.abn8671::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mechanical_thermal_electrical_magnetic_measurements' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1126/science.abn8671
+  locator:
+    published_page: 5
+    pdf_page_index: 8
+    table: '1'
+    note: Table 1 Summary of the physical properties measured from the Ryugu samples.
+- experiment_id: 10.1126/science.abn8671::nakamura-2022-science-ryugu-thermal
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'dry_glove_box_mass_and_SR_CT_volume' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0001266'
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Three-dimensional structure and density
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=126.6 mg
+        - printed=sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '126.6'
+            locator:
+              published_page: 3
+              pdf_page_index: 6
+              section: Three-dimensional structure and density
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 3
+              pdf_page_index: 6
+              section: Three-dimensional structure and density
+        output_unit: kg
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1126/science.abn8671
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Three-dimensional structure and density

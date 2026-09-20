@@ -1,0 +1,382 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml
+observations:
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_laser_levitation_apparatus
+  experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'experimental_apparatus_and_conditions'
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_apparatus_and_conditions'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      trace_element_analysis: typically better than 5 percent based on BCR-2 and NIST 1640a standards
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+  locator:
+    published_page: 5
+    section: 2.1 Laser melting experiments
+    note: Apparatus and run schedule; pressure and imposed flow rate are not printed.; pdf_page=6
+  read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows
+  experiment_id: 10.1016/j.gca.2019.06.016::1
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, evidence_class, row_columns,
+      rows'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+  locator:
+    published_page: 33
+    table: '1'
+    note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.; pdf_page=35
+  read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+  experiment_id: 10.1016/j.gca.2019.06.016::2
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: quantity, method_class, evidence_class, rows'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+  locator:
+    published_page: 34
+    table: '2'
+    note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
+  read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
+  experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.99879'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+  locator:
+    published_page: 24
+    section: 6 Conclusions
+    note: pdf_page=25
+  read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+  derived_from:
+  - wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_kinetic_theory_and_pressure_model
+  experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.985'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: model values and pressure relation are author calculations or quoted framework, not direct measurements.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
+  locator:
+    published_page: 18
+    section: 4.3.1 Suppression of Zn isotope fractionation factor
+    note: pdf_page=19
+  read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+  derived_from:
+  - wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary

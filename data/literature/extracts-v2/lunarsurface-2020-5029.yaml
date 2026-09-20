@@ -1,0 +1,84 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lunarsurface-2020-5029.yaml
+observations:
+- observation_id: lunarsurface-2020-5029::lunarsurface_2020_crd_extraction_conditions
+  experiment_id: b905ab5beb75930e6571b23413d2ce95dc7fc2fa5768a965a4cf5540a15f187b::lunarsurface-2020-5029
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'crd_water_extraction_and_analysis_conditions'
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_water_samples_from_Zag_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'crd_water_extraction_and_analysis_conditions';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lunarsurface-2020-5029
+  locator:
+    pdf_page_index: 1
+    section: Introduction
+  read_from: unknown:lunarsurface-2020-5029
+- observation_id: lunarsurface-2020-5029::lunarsurface_2020_crd_isotope_figures
+  experiment_id: b905ab5beb75930e6571b23413d2ce95dc7fc2fa5768a965a4cf5540a15f187b::4-5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'extracted_water_isotopic_composition'
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: phase string 'H2O_extracted_from_Zag_meteorite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'extracted_water_isotopic_composition'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: statistical uncertainties shown in Figures 4-5
+      limitation: do not yet include systematic shifts introduced by the analysis method
+      future_work: controlled experiments to determine the systematic shift induced by incomplete sample recovery and analysis
+        using the ICE apparatus vacuum line and rock crushing device
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lunarsurface-2020-5029
+  locator:
+    pdf_page_index: 2
+    figure: 4-5
+    section: Example Results
+  read_from: unknown:lunarsurface-2020-5029

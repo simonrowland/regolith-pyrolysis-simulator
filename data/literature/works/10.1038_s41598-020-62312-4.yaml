@@ -1,0 +1,329 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1038/s41598-020-62312-4
+  citation: 'Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. & Sperl, M. (2020), "EAC-1A:
+    A novel large-volume lunar regolith simulant", Scientific Reports 10:5473, DOI 10.1038/s41598-020-62312-4.'
+  source_ids:
+  - engelschion-2020-eac1a-simulant
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:engelschion-2020-eac1a-simulant
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1038/s41598-020-62312-4
+experiments:
+- experiment_id: 10.1038/s41598-020-62312-4::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ambient_characterization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 2
+    figure: '1'
+    section: Grain size distribution
+- experiment_id: 10.1038/s41598-020-62312-4::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'petrographic_characterization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 3
+    figure: '2'
+    section: Mineralogical analysis / Thin sections
+- experiment_id: 10.1038/s41598-020-62312-4::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'xrf_bulk_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.2804926162987529488022540351'
+          - - SiO2
+            - '0.6909592732843177969083779173'
+          - - TiO2
+            - '0.02854811041692925428936804799'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        figure: '3'
+        section: Mineralogical analysis / XRF
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.9'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.7'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '2.4'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 4
+              figure: '3'
+              section: Mineralogical analysis / XRF
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '11.9'
+          Na2O_plus_K2O: '4.2'
+          SiO2: '43.7'
+          TiO2: '2.4'
+      locator:
+        page: 4
+        figure: '3'
+        section: Mineralogical analysis / XRF
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 4
+    figure: '3'
+    section: Mineralogical analysis / XRF
+- experiment_id: 10.1038/s41598-020-62312-4::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'sem_edx_characterization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 4
+    figure: '5'
+    section: Mineralogical analysis / EDX during SEM imaging
+- experiment_id: 10.1038/s41598-020-62312-4::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'argon_dsc' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 5
+    figure: '6'
+    section: DSC
+- experiment_id: 10.1038/s41598-020-62312-4::Supplemental Fig. 1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'powder_and_solid_xrd' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 4
+    figure: Supplemental Fig. 1
+    section: Mineralogical analysis / XRD
+- experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'air_drying_before_density_measurement' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 2
+    section: Density
+    note: standard=ASTM D4442

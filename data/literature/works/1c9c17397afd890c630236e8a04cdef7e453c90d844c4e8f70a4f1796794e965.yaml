@@ -1,0 +1,151 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965
+  citation: Kulcinski, Gerald L. (1992), "A Resource Assessment and Extraction of Lunar 3He", UWFDM-879, Fusion Technology
+    Institute, University of Wisconsin-Madison; presented at the US-USSR Workshop on D-3He Reactor Studies, Moscow, 25 September-2
+    October 1991.
+  source_ids:
+  - fdm879
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:fdm879
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_compiled_reserve_table' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965
+  locator:
+    page: 3
+    table: '1'
+    note: Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions
+- experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_heating_experiment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965
+  locator:
+    page: 5
+    figure: '3'
+    section: 4. Extraction of the Lunar 3He
+    note: Prose description of early experiments; Fig. 3 is not digitized
+- experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_engineering_design' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965
+  locator:
+    page: 5
+    figure: '4'
+    section: 4. Extraction of the Lunar 3He
+    note: Description of the proposed University of Wisconsin miner
+- experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_prior_work' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965
+  locator:
+    page: 2
+    section: 2. 3He Resource Estimates on the Lunar Surface
+    note: Printed prose attributes the solar-wind source and exposure duration

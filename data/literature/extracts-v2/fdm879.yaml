@@ -1,0 +1,251 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/fdm879.yaml
+observations:
+- observation_id: fdm879::fdm879_pepin_3he_evolution
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity '3He_evolved_by_heating'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity '3He_evolved_by_heating'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Approximately signs are retained; no numerical uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_unattributed
+    attribution: Pepin found that heating the lunar regolith to temperatures of approximately 700 C would cause approximately
+      85% of the 3He to be evolved.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 5
+    figure: '3'
+    section: 4. Extraction of the Lunar 3He
+    note: Prose description of early experiments; Fig. 3 is not digitized
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_table1_lunar_3he_reserves
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'lunar_3He_reserves_by_surface_region'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'lunar_3He_reserves_by_surface_region'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 3
+    table: '1'
+    note: Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_text_solar_wind_helium_inventory
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solar_wind_helium_inventory'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solar_wind_helium_inventory'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Approximately signs are retained as prose; no uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_unattributed
+    attribution: The source of the 3He comes from the solar wind which has been incident on the lunar surface for approximately
+      4 billion years and has showered the moon with approximately 500 million tonnes of 3He.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 2
+    section: 2. 3He Resource Estimates on the Lunar Surface
+    note: Printed prose attributes the solar-wind source and exposure duration
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_text_solar_wind_isotope_ratio
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity '3He_to_4He_ratio'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity '3He_to_4He_ratio'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: None printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_unattributed
+    attribution: The 3He/4He ratio was essentially the same as in the solar wind, approximately 480 ppm.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 3
+    section: 2. 3He Resource Estimates on the Lunar Surface
+    note: Prose immediately preceding Table 1
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_uw_miner_grain_size_and_heat
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miner_feed_grain_size_and_heating_temperature'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'miner_feed_grain_size_and_heating_temperature';
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Bound and approximate notation are retained; no uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_unattributed
+    attribution: The equipment is capable of collecting loose regolith, separating the material to grains less than 50 microns
+      in diameter, and heating the regolith to approximately 700 C.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 5
+    figure: '4'
+    section: 4. Extraction of the Lunar 3He
+    note: Description of the proposed University of Wisconsin miner
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_volatile_byproducts_mass_per_3he
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'volatile_byproduct_mass'
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_volatiles' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_byproduct_mass'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 7
+    section: 5. Important By-Products from Lunar 3He Mining
+    note: Reported gas mass per tonne of collected 3He
+  read_from: unknown:fdm879

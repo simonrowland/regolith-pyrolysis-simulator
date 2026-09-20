@@ -1,0 +1,505 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml
+observations:
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_feo_model_scope
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::no27-fegley-cameron-1987-epsl
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxide_in_model'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '208'
+    section: 2.1 Description of thermodynamic model
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+  derived_from:
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_mgo_model_scope
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::no27-fegley-cameron-1987-epsl
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxide_in_model'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '208'
+    section: 2.1 Description of thermodynamic model
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+  derived_from:
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::no27-fegley-cameron-1987-epsl
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_magma_composition_and_model_scope'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_magma_composition_and_model_scope'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: model input and method description; no experimental uncertainty applies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '208'
+    section: 2.1 Description of thermodynamic model
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+  derived_from:
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table1_pure_liquid_oxide_vaporization
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table2_gas_formation_data
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_printed_model_results
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::no27-fegley-cameron-1987-epsl
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'vaporization_model_results'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vaporization_model_results'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: model outputs; no model uncertainty is printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: 212-215
+    note: figures=['1', '2', '3', '4', '5', '6', '7', '8', '9']; sections=['2.3', '2.4']
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+  derived_from:
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table4_predicted_compositions
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table1_pure_liquid_oxide_vaporization
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::1
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, evidence_class, method_class, source_generators,
+      rows'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '209'
+    table: '1'
+    section: Thermodynamic data for pure liquid oxide vaporization to constituent atoms
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table2_gas_formation_data
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::2
+  identity:
+    quantity:
+      tag: value
+      value: log10_Kf
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_Kf does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_Kf does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_Kf does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_Kf does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_Kf does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_Kf does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_Kf does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped log10_Kf field selected; source fields: quantity, evidence_class, method_class, source_generators,
+      rows'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '209'
+    table: '2'
+    section: Thermodynamic data for formation of gases included in the vaporization calculations
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table3_imcc_pseudo_species
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::3
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, evidence_class, method_class,
+      model_generator, rows, note'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '211'
+    table: '3'
+    section: Thermodynamic data relating the activities of pseudospecies
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+- observation_id: no27-fegley-cameron-1987-epsl::fegley_cameron_1987_table4_predicted_compositions
+  experiment_id: b4433a9b22841a51afd77a82826b6f90be7c2d35cce9f6596b69e98347428d3e::4
+  identity:
+    quantity:
+      tag: value
+      value: condensate_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile condensate_composition does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile condensate_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile condensate_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile condensate_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile condensate_composition does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile condensate_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile condensate_composition does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped condensate_composition field selected; source fields: quantity, evidence_class, method_class,
+      derivation, model_generator, condition, model_columns, rows'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: no27-fegley-cameron-1987-epsl
+  locator:
+    published_page: '213'
+    table: '4'
+    section: Predicted mantle and crust compositions from different vaporization models
+  read_from: unknown:no27-fegley-cameron-1987-epsl
+  derived_from:
+  - no27-fegley-cameron-1987-epsl::fegley_cameron_1987_model_setup_initial_oxide_magma

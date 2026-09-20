@@ -1,0 +1,164 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml
+observations:
+- observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_air_so2_ratio_measurements
+  experiment_id: 10.1016/j.gca.2022.08.032::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'final_glass_composition_sulfur_and_sulfate_capacity_vs_air_so2'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'final_glass_composition_sulfur_and_sulfate_capacity_vs_air_so2';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_direct_with_author_calculated_capacity
+    original_method_class: measured_direct_with_author_calculated_capacity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+  locator:
+    page: 158
+    table: '4'
+    note: Every value below is transcribed from the printed Table 4 cell under its column header; the table reports final
+      glass products at 1573 K for Air/SO2 4.00 and 0.11.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  read_from: unknown:boulliung-wood-2022-so2-solubility-silicate-melts
+- observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_equilibrated_glass_measurements
+  experiment_id: 10.1016/j.gca.2022.08.032::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'final_equilibrated_glass_major_oxides_sulfur_and_sulfate_capacity'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'final_equilibrated_glass_major_oxides_sulfur_and_sulfate_capacity';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_direct_with_author_calculated_capacity
+    original_method_class: measured_direct_with_author_calculated_capacity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+  locator:
+    page: 153
+    table: '3'
+    note: Table continues on printed pages 154-155. Every value below remains in the printed column order; values in parentheses
+      are 1-sigma uncertainty on the last digit(s), b.d.l. is not zero, and EPMA/SIMS is the stated analytical method.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  read_from: unknown:boulliung-wood-2022-so2-solubility-silicate-melts
+- observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_run_conditions
+  experiment_id: 10.1016/j.gca.2022.08.032::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'atmosphere_controlled_sulfate_equilibration_runs'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'atmosphere_controlled_sulfate_equilibration_runs';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_condition_or_author_calculated_condition
+    original_method_class: measured_condition_or_author_calculated_condition
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+  locator:
+    page: 152
+    table: '2'
+    section: 2.2 Experimental conditions
+    note: Every value below is transcribed from the printed Table 2 cell under its column header.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  read_from: unknown:boulliung-wood-2022-so2-solubility-silicate-melts
+- observation_id: boulliung-wood-2022-so2-solubility-silicate-melts::boulliung_wood_2022_starting_material_compositions
+  experiment_id: 10.1016/j.gca.2022.08.032::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fused_starting_material_major_oxide_composition'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fused_starting_material_major_oxide_composition';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: boulliung-wood-2022-so2-solubility-silicate-melts
+  locator:
+    page: 151
+    table: '1'
+    note: Every value below is transcribed from the printed Table 1 cell under its column header; parenthesized values are
+      1-sigma uncertainty on the last digit, b.d.l. means below detection limit.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+  read_from: unknown:boulliung-wood-2022-so2-solubility-silicate-melts

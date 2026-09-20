@@ -1,0 +1,399 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml
+observations:
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_figure_only_adsorption
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::6-7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'adsorption_curves'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'regolith_simulant_and_constituent_minerals' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'adsorption_curves'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=typed_refusal is not a closed v2.1 token
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 8
+    figure: 6-7
+    section: Gas Adsorption Behavior and ISRU-Relevant Implications
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_lhs1_table1_reported_mineral_composition
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reported_mineral_composition'
+    species:
+      formula: LHS-1
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_highlands_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reported_mineral_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 2
+    table: '1'
+    section: Materials and Methods
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_lhs2_table1_reported_mineral_composition
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reported_mineral_composition'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_highlands_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reported_mineral_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 2
+    table: '1'
+    section: Materials and Methods
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_table1_lsp2_reported_mineral_composition
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reported_mineral_composition'
+    species:
+      formula: LSP-2
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_south_pole_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reported_mineral_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: em dashes retained as not reported
+      not zero; no uncertainty printed: null
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 2
+    table: '1'
+    section: Materials and Methods
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_table2_lhs2_elemental_composition
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_concentration'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_highlands_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_concentration'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    section: Simulant Validation Outcomes
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_table2_lsp2_elemental_composition
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'elemental_concentration'
+    species:
+      formula: LSP-2
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_south_pole_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_concentration'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    section: Simulant Validation Outcomes
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_table3_bet_texture
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'textural_properties'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_highlands_simulant_and_constituent_minerals' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'textural_properties'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 7
+    table: '3'
+    section: Textural Properties and Gas-Solid Accessibility
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_table4_gas_adsorption
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_adsorption_properties'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'LHS-2_and_constituent_mineral_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_adsorption_properties'; refusing to pick a
+      number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 9
+    table: '4'
+    section: Gas Adsorption Behavior and ISRU-Relevant Implications
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_tpr_oxygen_yields_and_conditions
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::deguzman-2026-simulant-physicochemical
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reduction_program_and_oxygen_yield'
+    species:
+      formula: LHS-2
+      phase:
+        tag: unknown
+        reason: phase string 'LHS-2_and_LSP-2_simulant_mixtures_and_ilmenite_olivine_phases' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reduction_program_and_oxygen_yield'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed; LHS yield explicitly approximate
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 3
+    section: Materials and Methods
+  read_from: unknown:deguzman-2026-simulant-physicochemical
+- observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_xrd_lhs1
+  experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::deguzman-2026-simulant-physicochemical
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'xrd_measurement_conditions'
+    species:
+      formula: LHS-1
+      phase:
+        tag: unknown
+        reason: phase string 'particulate_lunar_highlands_simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'xrd_measurement_conditions'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numerical uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: deguzman-2026-simulant-physicochemical
+  locator:
+    pdf_page_index: 3
+    section: Materials and Methods
+  read_from: unknown:deguzman-2026-simulant-physicochemical

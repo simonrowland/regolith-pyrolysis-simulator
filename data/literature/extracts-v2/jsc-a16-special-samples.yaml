@@ -1,0 +1,118 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jsc-a16-special-samples.yaml
+observations:
+- observation_id: jsc-a16-special-samples::jsc_a16_special_samples_document_scope
+  experiment_id: b07d7a89ffd69528e74f4074666a32ffd3413b9eb14a1d20266b9072132fd89e::/Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_provenance_and_characterization'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-a16-special-samples
+  locator:
+    pdf_page_index: 2
+    section: Introduction
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+  read_from: unknown:jsc-a16-special-samples
+- observation_id: jsc-a16-special-samples::jsc_a16_table_I_returned_core_characterization
+  experiment_id: b07d7a89ffd69528e74f4074666a32ffd3413b9eb14a1d20266b9072132fd89e::I
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'returned_core_characterization'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'returned_core_characterization'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-a16-special-samples
+  locator:
+    pdf_page_index: 45
+    table: I
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+  read_from: unknown:jsc-a16-special-samples
+- observation_id: jsc-a16-special-samples::jsc_a16_xradiographic_grain_size_characterization
+  experiment_id: b07d7a89ffd69528e74f4074666a32ffd3413b9eb14a1d20266b9072132fd89e::/Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'grain_size_and_stratigraphy'
+    species:
+      formula: regolith
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'grain_size_and_stratigraphy'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-a16-special-samples
+  locator:
+    pdf_page_index: 15
+    section: Detailed Core Log, drive tube 60009/60010
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+  read_from: unknown:jsc-a16-special-samples

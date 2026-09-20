@@ -1,0 +1,181 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ntrs-19650014783.yaml
+observations:
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_fit_pooled_prior_studies
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure_fit'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_vapor_pressure_fit'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      standard_deviation: 1.6 percent in p
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 8
+    pdf_page_index: 10
+    equation: '2'
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_fit_this_work
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure_fit'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_vapor_pressure_fit'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      standard_deviation: 3.2 percent in p
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 7
+    pdf_page_index: 9
+    equation: '1'
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_method_and_apparatus
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'vapor_pressure_measurement_method'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier measurement_method does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vapor_pressure_measurement_method'; refusing to
+      pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_measurement: ±0.25 percent on the Kelvin scale
+      pressure_runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      pressure_run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 2
+    pdf_page_index: 4
+    section: Experiment - Apparatus and Procedure
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::I
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: 'source column census (run: 49 numeric cells, T_K: 49 numeric cells, inv_T_1_per_K: 49 numeric cells,
+      p_atm: 49 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+  uncertainty:
+    kind: printed
+    verbatim:
+      runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+      temperature: ±0.25 percent on the Kelvin scale
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+  read_from: unknown:ntrs-19650014783

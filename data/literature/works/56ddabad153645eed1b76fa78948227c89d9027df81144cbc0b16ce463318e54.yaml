@@ -1,0 +1,54 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54
+  citation: 'Singerling, S. A., Brenker, F. E., Tkalcec, H., Connolly Jr., H. C. & Lauretta, D. S. (2024), "Nanoscale studies
+    of sulfides and carbonates in OSIRIS-REx samples: What can they tell us about alteration on Bennu?", 86th Annual Meeting
+    of the Meteoritical Society, LPI Contribution No. 3036, abstract 6131.'
+  source_ids:
+  - metsoc-2024-6131
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:metsoc-2024-6131
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54::metsoc-2024-6131
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'TEM_EDS_characterization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Fine-particle Bennu aggregates were prepared for TEM by depositing crushed powders from OREX-800045-102 onto TEM
+      copper mesh grids with a lacey carbon support.

@@ -1,0 +1,21 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/maps.13994
+  citation: 'van Buchem, C. P. A., Miguel, Y., Zilinskas, M. & van Westenen, W. (2023), "LavAtmos: An open-source chemical
+    equilibrium vaporization code for lava worlds", Meteoritics & Planetary Science 58:1149-1161.'
+  source_ids:
+  - vanbuchem-2023-lavatmos
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:vanbuchem-2023-lavatmos
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/maps.13994
+experiments: []

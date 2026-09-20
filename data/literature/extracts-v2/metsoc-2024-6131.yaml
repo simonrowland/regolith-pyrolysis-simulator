@@ -1,0 +1,127 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/metsoc-2024-6131.yaml
+observations:
+- observation_id: metsoc-2024-6131::metsoc_2024_6131_carbonate_aggregate_characterization
+  experiment_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54::metsoc-2024-6131
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'carbonate_phase_occurrence_and_characterization'
+    species:
+      formula: Bennu_sample
+      phase:
+        tag: unknown
+        reason: phase string 'Bennu_carbonate_bearing_aggregates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'carbonate_phase_occurrence_and_characterization';
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Phase identification of gaylussite versus pirssonite is unresolved in the source; grain-size bounds and approximate
+        values are retained as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2024-6131
+  locator:
+    pdf_page_index: 1
+    section: Results and Discussion
+    note: The abstract reports carbonate-bearing aggregate counts, preliminary phase identifications, grain-size descriptions,
+      and EDS minor-element contents.
+  read_from: unknown:metsoc-2024-6131
+- observation_id: metsoc-2024-6131::metsoc_2024_6131_sulfide_aggregate_characterization
+  experiment_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54::metsoc-2024-6131
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'aggregate_size_and_sulfide_occurrence'
+    species:
+      formula: Bennu_sample
+      phase:
+        tag: unknown
+        reason: phase string 'Bennu_sulfide_bearing_aggregates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'aggregate_size_and_sulfide_occurrence'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; qualitative size bounds and proportions retained as printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2024-6131
+  locator:
+    pdf_page_index: 1
+    section: Results and Discussion
+    note: The abstract reports analysis of 22 aggregates, their size range, and the observed sulfide occurrences and textures.
+  read_from: unknown:metsoc-2024-6131
+- observation_id: metsoc-2024-6131::metsoc_2024_6131_tem_sample_preparation
+  experiment_id: 56ddabad153645eed1b76fa78948227c89d9027df81144cbc0b16ce463318e54::metsoc-2024-6131
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'TEM_EDS_sample_preparation_and_instrument'
+    species:
+      formula: Bennu_sample
+      phase:
+        tag: unknown
+        reason: phase string 'Bennu_asteroid_fine_particle_aggregates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'TEM_EDS_sample_preparation_and_instrument'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: metsoc-2024-6131
+  locator:
+    pdf_page_index: 1
+    section: Methods
+    note: Fine-particle Bennu aggregates were prepared for TEM by depositing crushed powders from OREX-800045-102 onto TEM
+      copper mesh grids with a lacey carbon support.
+  read_from: unknown:metsoc-2024-6131

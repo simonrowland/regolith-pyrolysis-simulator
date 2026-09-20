@@ -1,0 +1,193 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml
+observations:
+- observation_id: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model
+  experiment_id: b8133a10b57a3b238a382701e6bc5aa92a811f9f2940f57503a64e5b5f0f9afb::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'estimated_partial_pressures_of_Si_bearing_gases'
+    species:
+      formula: BSE
+      phase:
+        tag: unknown
+        reason: phase string 'steam_atmosphere_in_equilibrium_with_silica' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'estimated_partial_pressures_of_Si_bearing_gases';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+  locator:
+    page: 120
+    table: '1'
+  read_from: unknown:arxiv-1602-00658-fegley-rock-steam-solubility
+- observation_id: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation
+  experiment_id: b8133a10b57a3b238a382701e6bc5aa92a811f9f2940f57503a64e5b5f0f9afb::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_silicate_Earth_composition'
+    species:
+      formula: BSE
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_Earth_composition' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_silicate_Earth_composition'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+  locator:
+    page: 122
+    table: '3'
+  read_from: unknown:arxiv-1602-00658-fegley-rock-steam-solubility
+- observation_id: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model
+  experiment_id: b8133a10b57a3b238a382701e6bc5aa92a811f9f2940f57503a64e5b5f0f9afb::4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'hydroxide_gas_partial_pressures'
+    species:
+      formula: BSE
+      phase:
+        tag: unknown
+        reason: phase string 'steam_at_220_64_bar' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'hydroxide_gas_partial_pressures'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+  locator:
+    page: 123
+    table: '4'
+  read_from: unknown:arxiv-1602-00658-fegley-rock-steam-solubility
+- observation_id: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model
+  experiment_id: b8133a10b57a3b238a382701e6bc5aa92a811f9f2940f57503a64e5b5f0f9afb::5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_magma_molar_distribution_coefficients'
+    species:
+      formula: BSE
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_or_continental_crust_magma_plus_steam' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_magma_molar_distribution_coefficients'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+  locator:
+    page: 124
+    table: '5'
+  read_from: unknown:arxiv-1602-00658-fegley-rock-steam-solubility
+- observation_id: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model
+  experiment_id: b8133a10b57a3b238a382701e6bc5aa92a811f9f2940f57503a64e5b5f0f9afb::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'photodissociation_coefficients'
+    species:
+      formula: BSE
+      phase:
+        tag: unknown
+        reason: phase string 'gas_photolysis' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'photodissociation_coefficients'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: arxiv-1602-00658-fegley-rock-steam-solubility
+  locator:
+    page: 125
+    table: '6'
+  read_from: unknown:arxiv-1602-00658-fegley-rock-steam-solubility

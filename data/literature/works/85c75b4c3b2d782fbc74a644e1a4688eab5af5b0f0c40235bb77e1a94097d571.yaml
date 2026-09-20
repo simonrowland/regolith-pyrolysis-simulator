@@ -1,0 +1,113 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  citation: Bowles, K. J. & Rosenblum, L. (1965), "Vapor Pressure of Sodium from 0.5 to 120 Atmospheres", NASA Technical Note
+    D-2849, Lewis Research Center.
+  source_ids:
+  - ntrs-19650014783
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ntrs-19650014783
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::I
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'static_capsule_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 2
+    pdf_page_index: 4
+    section: Experiment - Apparatus and Procedure
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 90 percent tantalum and 10 percent tungsten alloy capsule
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment - Apparatus
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: all transducers calibrated at 120 C with a standard dead-weight piston gage
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus and Procedure
+    temperature_measurement:
+      temperature_calibration:
+        state:
+          tag: value
+          value: Pt-Pt-13Rh against NBS standardized thermocouple; W-Re against Pt-Pt-13Rh from 845 to 1820 K, extrapolated
+            to 2200 K with deviation no more than 6 K
+        locator:
+          published_page: 4
+          pdf_page_index: 6
+          section: Temperature measurements

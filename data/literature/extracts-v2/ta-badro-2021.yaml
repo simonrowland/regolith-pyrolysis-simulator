@@ -1,0 +1,2836 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ta-badro-2021.yaml
+observations:
+- observation_id: ta-badro-2021::badro_2021_fit_25mg_24mg
+  experiment_id: 10.5802/crgeos.56::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotopic_fractionation_factor'
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_SD: '0.0006'
+      units: dimensionless
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 25Mg, 2SD
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 0.9950 | 0.0006
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 112
+    pdf_page_index: 12
+    table: '2'
+    paragraph: delta 25Mg, Advective (this study), 2SD
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 25Mg, Advective (this study), 2SD
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  derived_from:
+  - ta-badro-2021::badro_2021_vp1_delta25mg
+  - ta-badro-2021::badro_2021_vp2_delta25mg
+  - ta-badro-2021::badro_2021_vp3_delta25mg
+  - ta-badro-2021::badro_2021_vp4_delta25mg
+  - ta-badro-2021::badro_2021_vp5_delta25mg
+  - ta-badro-2021::badro_2021_vp6_delta25mg
+- observation_id: ta-badro-2021::badro_2021_fit_26mg_24mg
+  experiment_id: 10.5802/crgeos.56::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotopic_fractionation_factor'
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_SD: '0.0008'
+      units: dimensionless
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 26Mg, 2SD
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 0.9906 | 0.0008
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 112
+    pdf_page_index: 12
+    table: '2'
+    paragraph: delta 26Mg, Advective (this study), 2SD
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 26Mg, Advective (this study), 2SD
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  derived_from:
+  - ta-badro-2021::badro_2021_vp1_delta26mg
+  - ta-badro-2021::badro_2021_vp2_delta26mg
+  - ta-badro-2021::badro_2021_vp3_delta26mg
+  - ta-badro-2021::badro_2021_vp4_delta26mg
+  - ta-badro-2021::badro_2021_vp5_delta26mg
+  - ta-badro-2021::badro_2021_vp6_delta26mg
+- observation_id: ta-badro-2021::badro_2021_fit_29si_28si
+  experiment_id: 10.5802/crgeos.56::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotopic_fractionation_factor'
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_SD: '0.0004'
+      units: dimensionless
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 29Si, 2SD
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 0.9970 | 0.0004
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 112
+    pdf_page_index: 12
+    table: '2'
+    paragraph: delta 29Si, Advective (this study), 2SD
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 29Si, Advective (this study), 2SD
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  derived_from:
+  - ta-badro-2021::badro_2021_vp1_delta29si
+  - ta-badro-2021::badro_2021_vp2_delta29si
+  - ta-badro-2021::badro_2021_vp3_delta29si
+  - ta-badro-2021::badro_2021_vp4_delta29si
+  - ta-badro-2021::badro_2021_vp5_delta29si
+  - ta-badro-2021::badro_2021_vp6_delta29si
+- observation_id: ta-badro-2021::badro_2021_fit_30si_28si
+  experiment_id: 10.5802/crgeos.56::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotopic_fractionation_factor'
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_SD: '0.0006'
+      units: dimensionless
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 30Si, 2SD
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 0.9943 | 0.0006
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 112
+    pdf_page_index: 12
+    table: '2'
+    paragraph: delta 30Si, Advective (this study), 2SD
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 112
+        pdf_page_index: 12
+        table: '2'
+        paragraph: delta 30Si, Advective (this study), 2SD
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  derived_from:
+  - ta-badro-2021::badro_2021_vp1_delta30si
+  - ta-badro-2021::badro_2021_vp2_delta30si
+  - ta-badro-2021::badro_2021_vp3_delta30si
+  - ta-badro-2021::badro_2021_vp4_delta30si
+  - ta-badro-2021::badro_2021_vp5_delta30si
+  - ta-badro-2021::badro_2021_vp6_delta30si
+- observation_id: ta-badro-2021::badro_2021_vp1_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP1
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.12'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.98 | 0.12
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP1, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp1_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP1
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.19'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -3.78 | 0.19
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP1, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp1_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP1
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.02'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -0.78 | 0.02
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP1, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp1_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP1
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.04'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.73 | 0.04
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP1, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP1, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp2_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP2
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.12'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.29 | 0.12
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP2, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp2_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP2
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.21'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -4.39 | 0.21
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP2, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp2_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP2
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.08'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.27 | 0.08
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP2, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp2_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP2
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.17'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.63 | 0.17
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP2, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP2, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp3_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP3
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.14'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.49 | 0.14
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP3, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp3_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP3
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.22'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -4.80 | 0.22
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP3, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp3_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP3
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.3'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.17 | 0.30
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP3, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp3_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP3
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.31'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.68 | 0.31
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP3, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP3, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp4_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP4
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.13'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.40 | 0.13
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP4, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp4_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP4
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.22'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -4.62 | 0.22
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP4, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp4_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP4
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.05'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.33 | 0.05
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP4, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp4_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP4
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.07'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.79 | 0.07
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP4, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP4, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp5_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP5
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.15'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.19 | 0.15
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP5, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp5_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP5
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.28'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -4.22 | 0.28
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP5, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp5_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP5
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.26'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -0.97 | 0.26
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP5, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp5_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP5
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.28'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.26 | 0.28
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP5, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP5, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp6_delta25mg
+  experiment_id: 10.5802/crgeos.56::1::VP6
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.1'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, 2se adjacent to d25Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.15 | 0.10
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP6, d25Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, d25Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp6_delta26mg
+  experiment_id: 10.5802/crgeos.56::1::VP6
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.14'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, 2se adjacent to d26Mg-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -2.27 | 0.14
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP6, d26Mg-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, d26Mg-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp6_delta29si
+  experiment_id: 10.5802/crgeos.56::1::VP6
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.06'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, 2se adjacent to d29Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -0.40 | 0.06
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP6, d29Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, d29Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+- observation_id: ta-badro-2021::badro_2021_vp6_delta30si
+  experiment_id: 10.5802/crgeos.56::1::VP6
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: composition_id, quantity, method_class, system_class,
+      isotope_ratio, isotope_delta, reference_standard, T_K, temperature_locator, run'
+  uncertainty:
+    kind: printed
+    verbatim:
+      two_se: '0.11'
+      units: permil
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, 2se adjacent to d30Si-BHVO-2G
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: -1.04 | 0.11
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-badro-2021
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+    paragraph: VP6, d30Si-BHVO-2G and adjacent 2se
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+  read_from: unknown:ta-badro-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: VP6, d30Si-BHVO-2G and adjacent 2se
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf

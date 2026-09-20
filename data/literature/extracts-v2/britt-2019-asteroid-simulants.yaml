@@ -1,0 +1,457 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/britt-2019-asteroid-simulants.yaml
+observations:
+- observation_id: britt-2019-asteroid-simulants::britt_2019_ci_table3_xrf_major_oxide_composition
+  experiment_id: 10.1111/maps.13345::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'major_oxide_bulk_composition'
+    species:
+      formula: CI_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CI_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3033994463846653047360345565'
+        - - TiO2
+          - '0.004564990656014485820936621614'
+        - - Al2O3
+          - '0.02216960338509847185141337593'
+        - - MnO
+          - '0.003083717264079373621114829244'
+        - - MgO
+          - '0.5463679018472819911021694726'
+        - - CaO
+          - '0.03900882487393372087469899142'
+        - - Na2O
+          - '0.07529480746609653759414639841'
+        - - K2O
+          - '0.003096390733686897562850946628'
+        - - P2O5
+          - '0.002054820322923782934583985275'
+        - - Cr2O3
+          - '0.0009594970662194339020508209697'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'major_oxide_bulk_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
+  experiment_id: 10.1111/maps.13345::6a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'total_integrated_mass_loss'
+    species:
+      formula: CI_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CI_asteroid_simulant_prototype' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [273.15, 1273.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'total_integrated_mass_loss'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 11
+    figure: 6a
+    section: Thermogravimetry and Evolved Gas Analysis
+    note: Body text prints CI total integrated mass loss from 0 to 1000 °C.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_cm_table3_xrf_major_oxide_composition
+  experiment_id: 10.1111/maps.13345::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'major_oxide_bulk_composition'
+    species:
+      formula: CM_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CM_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.3521791876429390450623220629'
+        - - TiO2
+          - '0.002445663456831561719379856952'
+        - - Al2O3
+          - '0.0197953632099075830051483142'
+        - - MnO
+          - '0.001835645627596705577584844344'
+        - - MgO
+          - '0.518547826067989192359446543'
+        - - CaO
+          - '0.03599223847789903429440984937'
+        - - Na2O
+          - '0.06513018228628410549693506489'
+        - - K2O
+          - '0.001382392326745995755769712353'
+        - - P2O5
+          - '0.001834760591644891970435460213'
+        - - Cr2O3
+          - '0.0008567403121618847585682914328'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'major_oxide_bulk_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
+  experiment_id: 10.1111/maps.13345::6a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'total_integrated_mass_loss'
+    species:
+      formula: CM_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CM_asteroid_simulant_prototype' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [273.15, 1273.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'total_integrated_mass_loss'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 11
+    figure: 6a
+    section: Thermogravimetry and Evolved Gas Analysis
+    note: Body text prints CM total integrated mass loss from 0 to 1000 °C.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_cr_table3_xrf_major_oxide_composition
+  experiment_id: 10.1111/maps.13345::3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'major_oxide_bulk_composition'
+    species:
+      formula: CR_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CR_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.2766531417313088484520738136'
+        - - TiO2
+          - '0.004313535753408288284808581045'
+        - - Al2O3
+          - '0.01013633599784216357151938964'
+        - - MnO
+          - '0.003642319797107202661273537052'
+        - - MgO
+          - '0.643203282656385446256807233'
+        - - CaO
+          - '0.01228669625500482954328857419'
+        - - Na2O
+          - '0.04585667011255374143287604299'
+        - - K2O
+          - '0.0009143222532314485598749764457'
+        - - P2O5
+          - '0.002427042462311443142405182944'
+        - - Cr2O3
+          - '0.0005666529808465880950726692964'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'major_oxide_bulk_composition'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 9
+    table: '3'
+    note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
+  experiment_id: 10.1111/maps.13345::6a
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'total_integrated_mass_loss'
+    species:
+      formula: CR_Asteroid_Simulant
+      phase:
+        tag: unknown
+        reason: phase string 'CR_asteroid_simulant_prototype' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [273.15, 1273.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'total_integrated_mass_loss'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 11
+    figure: 6a
+    section: Thermogravimetry and Evolved Gas Analysis
+    note: Body text prints CR total integrated mass loss from 0 to 1000 °C.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_table2_prototype_recipes
+  experiment_id: 10.1111/maps.13345::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'prototype_mineral_recipe'
+    species:
+      formula: asteroid_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'prototype_mineral_recipe'; refusing to pick a
+      number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 5
+    table: '2'
+    note: Initial prototype mineral recipes and suggested future updates; all values wt% as printed.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_tga_ega_release_patterns
+  experiment_id: 10.1111/maps.13345::6b-d
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'evolved_gas_release_pattern'
+    species:
+      formula: asteroid_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'evolved_gas_release_pattern'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed; temperature descriptions are retained as ranges or approximate wording.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_qualitative_from_text_and_figure
+    original_method_class: measured_qualitative_from_text_and_figure
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 11
+    figure: 6b-d
+    section: Thermogravimetry and Evolved Gas Analysis
+    note: Text description of the measured EGA traces; curves were not digitized.
+  read_from: unknown:britt-2019-asteroid-simulants
+- observation_id: britt-2019-asteroid-simulants::britt_2019_tga_ega_thermal_program
+  experiment_id: 10.1111/maps.13345::6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tga_ega_experimental_conditions'
+    species:
+      formula: asteroid_simulants
+      phase:
+        tag: unknown
+        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [273.15, 1273.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'tga_ega_experimental_conditions'; refusing to
+      pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the TG/EGA conditions or total integrated mass losses.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: britt-2019-asteroid-simulants
+  locator:
+    pdf_page_index: 11
+    figure: '6'
+    section: Thermogravimetry and Evolved Gas Analysis
+    note: TG/EGA method paragraph; Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer.
+  read_from: unknown:britt-2019-asteroid-simulants

@@ -1,0 +1,380 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lpi-lunar-sourcebook-chapter08.yaml
+observations:
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_appendix_statistical_table_coverage
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::A8.1-A8.6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'statistical_compilation_coverage'
+    species:
+      formula: appendix_tables
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'statistical_compilation_coverage'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 449
+    table: A8.1-A8.6
+    section: appendix
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_incompatible_trace_element_methods
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compiled_measurement_method_summary'
+    species:
+      formula: compiled_analytical_methods
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_measurement_method_summary'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 374
+    figure: '8.7'
+    section: '8.4'
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_major_element_atom_abundances
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'lunar_major_element_atom_abundance_summary'
+    species:
+      formula: lunar_major_elements
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'lunar_major_element_atom_abundance_summary'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: More than 60% of the atoms are O; Si contributes 16-17%; Al is about 10% in highlands and 4.5% in mare basalts;
+      Ca and Mg are about 5% each; Fe is approximately 2.5% in highlands and 6% in maria.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 362
+    section: 8.3.1
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_major_element_weight_abundances
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'lunar_major_element_weight_abundance_summary'
+    species:
+      formula: lunar_major_elements
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'lunar_major_element_weight_abundance_summary';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: O is about 45% by weight, Si 21%, Al about 13% for highlands and 5% for maria, Ca about 10% for highlands
+      and 8% for maria, Fe about 6% for highlands and 15% for maria, and Mg 5.5% for both.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 363
+    section: 8.3.1
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_miscellaneous_minor_methods
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compiled_measurement_method_summary'
+    species:
+      formula: compiled_analytical_methods
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_measurement_method_summary'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 390
+    section: 8.5.1
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_noble_gas_stp_conversion
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'noble_gas_concentration_reporting_convention'
+    species:
+      formula: compiled_analytical_methods
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'noble_gas_concentration_reporting_convention';
+      refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 437
+    section: 8.8.2
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_ree_chondrite_standard_table8_1
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chondritic_ree_reference_composition'
+    species:
+      formula: rare_earth_elements
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'chondritic_ree_reference_composition'; refusing
+      to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 379
+    table: '8.1'
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_ree_kreep_standard_table8_1
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'kreep_ree_reference_composition'
+    species:
+      formula: rare_earth_elements
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'kreep_ree_reference_composition'; refusing to
+      pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 379
+    table: '8.1'
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_typical_analytical_sample_size
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::lpi-lunar-sourcebook-chapter08
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'analytical_sample_size_context'
+    species:
+      formula: lunar_major_elements
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'analytical_sample_size_context'; refusing to pick
+      a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 359
+    section: 8.1.2
+  read_from: unknown:lpi-lunar-sourcebook-chapter08
+- observation_id: lpi-lunar-sourcebook-chapter08::lpi_1991_vapor_mobilized_sample_counts
+  experiment_id: 68953654a5349beabcb8ac0ae664ae3a3ea3062cd0a56aa699002669e62c9a98::8.26
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compiled_sample_count'
+    species:
+      formula: compiled_analytical_methods
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_sample_count'; refusing to pick a number
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lpi-lunar-sourcebook-chapter08
+  locator:
+    published_page: 420
+    figure: '8.26'
+    section: 8.7.2
+  read_from: unknown:lpi-lunar-sourcebook-chapter08

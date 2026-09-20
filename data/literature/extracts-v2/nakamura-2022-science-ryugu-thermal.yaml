@@ -1,0 +1,138 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml
+observations:
+- observation_id: nakamura-2022-science-ryugu-thermal::nakamura_2023_calculated_thermal_properties
+  experiment_id: 10.1126/science.abn8671::nakamura-2022-science-ryugu-thermal
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'calculated_thermal_properties'
+    species:
+      formula: Ryugu
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_sample_C0002' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'calculated_thermal_properties'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed for the calculated conductivity or inertia in this paragraph.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakamura-2022-science-ryugu-thermal
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Mechanical, thermal, electrical, and magnetic properties
+  read_from: unknown:nakamura-2022-science-ryugu-thermal
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Mechanical, thermal, electrical, and magnetic properties
+- observation_id: nakamura-2022-science-ryugu-thermal::nakamura_2023_sample_provenance_and_density
+  experiment_id: 10.1126/science.abn8671::nakamura-2022-science-ryugu-thermal
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sample_characterization'
+    species:
+      formula: Ryugu
+      phase:
+        tag: unknown
+        reason: phase string 'coarse_Ryugu_particles' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_characterization'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      bulk_density_g_cm3: ±0.08
+      note: The range and average uncertainty are printed in the paragraph.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakamura-2022-science-ryugu-thermal
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Three-dimensional structure and density
+  read_from: unknown:nakamura-2022-science-ryugu-thermal
+- observation_id: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+  experiment_id: 10.1126/science.abn8671::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_physical_properties'
+    species:
+      formula: Ryugu
+      phase:
+        tag: unknown
+        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_physical_properties'; refusing to pick
+      a number
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Every row retains the uncertainty printed in the Table 1 uncertainty column.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakamura-2022-science-ryugu-thermal
+  locator:
+    published_page: 5
+    pdf_page_index: 8
+    table: '1'
+    note: Table 1 Summary of the physical properties measured from the Ryugu samples.
+  read_from: unknown:nakamura-2022-science-ryugu-thermal

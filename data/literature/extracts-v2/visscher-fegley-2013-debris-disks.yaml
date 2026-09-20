@@ -1,0 +1,921 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/visscher-fegley-2013-debris-disks.yaml
+observations:
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_bse_total_vapor_pressure_fit
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO2_melt
+      phase:
+        tag: unknown
+        reason: phase string 'BSE_composition_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, composition'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 4
+    section: '3.2'
+    equation: '6'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_bsm_total_vapor_pressure_fit
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO2_melt
+      phase:
+        tag: unknown
+        reason: phase string 'BSM_composition_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, composition'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 4
+    section: '3.2'
+    equation: '7'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_carbon_dioxide_ratio_constraint
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: unknown
+      reason: source units 'dimensionless ratio; fO2 in bar' do not denote pressure
+    species:
+      formula: CO2
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source units 'dimensionless ratio; fO2 in bar' do not denote pressure;
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 5
+    section: '3.3'
+    equation: '12'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_figure2_vapor_species_trends
+  experiment_id: 10.1088/2041-8205/767/1/l12::2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'vapor_species_map'
+    species:
+      formula: SiO2_melt
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'vapor_species_map'; refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim: no figure uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only_no_digitization is not a closed v2.1 token
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 3
+    figure: '2'
+    section: '3.1'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, lower_temperature_dominant_species,
+      lower_temperature_regime, transition_temperature_K_as_printed'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 3
+    section: '3.1'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance_zinc
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: Zn
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, dominant_with_lower_temperature_volatile_species,
+      composition_sensitivity'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 3
+    section: '3.1'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_o2_vapor_fraction
+  experiment_id: 10.1088/2041-8205/767/1/l12::2
+  identity:
+    quantity:
+      tag: value
+      value: evolved_gas_yield
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evolved_gas_yield does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, mole_fraction_range_as_printed,
+      note'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 3
+    figure: '2'
+    section: '3.1'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity
+  experiment_id: 10.1088/2041-8205/767/1/l12::3b
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, generator, expression,
+      model_approximation, qualitative_result'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 5
+    figure: 3b
+    section: '3.3'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_sio2_pure_melt_vapor_pressure_fit
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'pure_molten_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, coefficients'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 4
+    section: '3.2'
+    equation: '2'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_sio_partial_pressure_equilibrium
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, generator, expression,
+      terms'
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 4
+    section: '3.2'
+    equation: '5'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+  experiment_id: 10.1088/2041-8205/767/1/l12::1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compiled_bulk_silicate_compositions'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'bulk_silicate_composition_input' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'compiled_bulk_silicate_compositions'; refusing
+      to pick a number
+  uncertainty:
+    kind: printed
+    verbatim: not reported for compiled input values in this paper
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 2
+    table: '1'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_total_vapor_pressure_sum
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO2_melt
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, species_scope'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 4
+    section: '3.2'
+    equation: '3'
+  read_from: unknown:visscher-fegley-2013-debris-disks
+- observation_id: visscher-fegley-2013-debris-disks::visscher_2013_water_ratio_constraint
+  experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
+  identity:
+    quantity:
+      tag: unknown
+      reason: source units 'dimensionless ratio; fO2 in bar' do not denote pressure
+    species:
+      formula: H2O
+      phase:
+        tag: unknown
+        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source units 'dimensionless ratio; fO2 in bar' do not denote pressure;
+      refusing to pick a number
+  uncertainty:
+    kind: printed
+    verbatim: no model uncertainty reported
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: visscher-fegley-2013-debris-disks
+  locator:
+    published_page: 5
+    section: '3.3'
+    equation: '10'
+  read_from: unknown:visscher-fegley-2013-debris-disks
