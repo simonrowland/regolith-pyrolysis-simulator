@@ -1,0 +1,251 @@
+schema_version: literature_extract.v1
+source_id: kems-046-van-limpt-2007
+source:
+  citation: "van Limpt, J. A. C. (2007), Modeling of evaporation processes in glass melting furnaces, PhD thesis, TU Eindhoven, DOI 10.6100/IR630685"
+  doi: 10.6100/IR630685
+  year: 2007
+extraction:
+  method: "MinerU VLM transcription, bounded to Chapter 3, Tables 4.2-4.4, and laboratory results §§4.3-4.6; model output excluded from measured rows"
+  date: '2026-09-19'
+  worker: extract-van-limpt-2007
+  provenance_path: docs-private/research/ocr-artifacts/kems-046-van-limpt-2007/
+  page_image_checks:
+    - "p.154 Fig. 4.5 image checked: square sodium-silicate measurements and triangle soda-lime-silica measurements are distinct from solid/dashed model lines"
+    - "p.161 Fig. 4.8 image checked: diamond markers are measured boron rates; fitted line excluded"
+  scope_stop: "Stopped after laboratory §4.6 and Appendix I setup context; §§4.7-4.9, Appendix II, and all Chapter 5 industrial-furnace results are not extracted."
+  null_hypothesis_check: "No existing extract or INDEX.yaml entry matched DOI 10.6100/IR630685 or van Limpt before this file was added."
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[2].values.sodium_disilicate_1416C[1].p_NaOH_Pa_approx
+    value: 40.0
+    locator: {page: 154, figure: '4.5', note: 'measured sodium-silicate square; page image checked'}
+species:
+  Na:
+    observations:
+    - observation_id: van_limpt_2007_setup_c_and_sodium_conditions
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 127
+        section: '3.2.1-3.2.2'
+        figure: '3.2'
+      phase: silicate_melt
+      regime: transpiration_evaporation
+      units: as_printed
+      values:
+        quantity: laboratory_transpiration_setup_C
+        measurement_status: measured_setup_parameter
+        sample_mass_g: 25
+        sample_mass_note: "boat filled with 25 gram glass grains; value is printed"
+        raw_material_batch_mass_g: 200
+        raw_material_melt_temperature_C: 1400
+        raw_material_melt_time_h: [1, 4]
+        remelt_temperature_C: [1400, 1450]
+        remelt_time_min: [30, 60]
+        tube_length_m: 3
+        tube_inner_diameter_m: 0.10
+        boat_material: Pt_10_Rh
+        boat_dimensions_m: [0.050, 0.030, 0.015]
+        tube_coating_material: Pt_90_Rh_10
+        tube_coating_axial_position_m: [2.00, 2.30]
+        carrier_gas: [N2, O2, H2O]
+        carrier_gas_flow_m3n_s: [0.0009, 0.0018]
+        gas_flow_reynolds_number: [42, 77]
+        furnace_temperature_C: [1300, 1500]
+        measurement_status_note: "All values above are apparatus or operating conditions stated in the experimental procedure, not model output."
+    - observation_id: van_limpt_2007_table42_float_and_tableware_compositions
+      type: gibbs_table
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 141
+        table: '4.2'
+      phase: silicate_melt
+      regime: transpiration_evaporation
+      units: mass_pct
+      values:
+        quantity: measured_average_glass_composition_XRF
+        measurement_status: measured_direct
+        composition_basis: mass_percent_as_printed
+        samples:
+        - glass_family: float_glass_without_SO3
+          composition_wt_pct: {SiO2: 72.85, Na2O: 13.98, CaO: 7.46, MgO: 4.52, Al2O3: 0.86, K2O: 0.22, Fe2O3: 0.095, SO3: '<0.01', Cl: '<0.01', Sb2O3: '<0.01', BaO: '<0.01'}
+        - glass_family: float_glass_with_SO3
+          composition_wt_pct: {SiO2: 72.16, Na2O: 14.18, CaO: 7.88, MgO: 4.32, Al2O3: 0.85, K2O: 0.20, Fe2O3: 0.087, SO3: 0.25, Cl: '<0.01', Sb2O3: '<0.01', BaO: '<0.01'}
+        - glass_family: tableware_glass_A
+          composition_wt_pct: {SiO2: 70.1, Na2O: 10.5, CaO: 8.00, MgO: '<0.01', Al2O3: 1.09, K2O: 4.98, Fe2O3: '<0.01', SO3: 0.01, Cl: '<0.01', Sb2O3: 0.22, BaO: 5.07}
+        - glass_family: tableware_glass_B
+          composition_wt_pct: {SiO2: 67.2, Na2O: 10.0, CaO: 8.00, MgO: 0, Al2O3: 0.97, K2O: 5.03, Fe2O3: 0, SO3: 0, Cl: 0.42, Sb2O3: 0, BaO: 8.41}
+          value_status: theoretical_batch_value_in_parentheses_not_measured
+        - glass_family: tableware_glass_C
+          composition_wt_pct: {SiO2: 70.4, Na2O: 10.4, CaO: 8.25, MgO: '<0.01', Al2O3: 1.06, K2O: 4.67, Fe2O3: '<0.01', SO3: 0.13, Cl: 0.03, Sb2O3: 0.06, BaO: 4.98}
+    - observation_id: van_limpt_2007_fig45_naoh_saturation_measured
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 154
+        figure: '4.5'
+        note: "figure reading; measured markers only, approximate values from plotted points"
+      T_range_K: null
+      phase: silicate_melt
+      regime: transpiration_evaporation
+      units: Pa
+      values:
+        quantity: measured_NaOH_saturation_pressure_vs_sqrt_water_pressure
+        measurement_status: measured_figure_only
+        sodium_disilicate_1416C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 12.0}, {p_H2O_sqrt_bar_sqrt: 0.3, p_NaOH_Pa_approx: 40.0}, {p_H2O_sqrt_bar_sqrt: 0.5, p_NaOH_Pa_approx: 70.0}, {p_H2O_sqrt_bar_sqrt: 0.8, p_NaOH_Pa_approx: 90.0}]
+        soda_lime_silica_1463C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 0.0}, {p_H2O_sqrt_bar_sqrt: 0.43, p_NaOH_Pa_approx: 20.0}, {p_H2O_sqrt_bar_sqrt: 0.58, p_NaOH_Pa_approx: 24.0}, {p_H2O_sqrt_bar_sqrt: 0.68, p_NaOH_Pa_approx: 26.0}]
+        glass_composition_mol_pct: {SiO2: 74, Na2O: 16, CaO: 10}
+    - observation_id: van_limpt_2007_table44_sodium_mass_balance
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 158
+        table: '4.4'
+      phase: silicate_melt
+      regime: transpiration_evaporation
+      units: mg
+      values:
+        quantity: sodium_disilicate_total_weight_loss
+        measurement_status: measured_direct
+        rows:
+        - {temperature_C: 1416, extractive_weight_loss_mg: 112, gravimetric_weight_loss_mg: 125, ratio_extractive_to_gravimetric: 0.90}
+        - {temperature_C: 1437, extractive_weight_loss_mg: 146, gravimetric_weight_loss_mg: 153, ratio_extractive_to_gravimetric: 0.96}
+        - {temperature_C: 1439, extractive_weight_loss_mg: 166, gravimetric_weight_loss_mg: 170, ratio_extractive_to_gravimetric: 0.98}
+        - {temperature_C: 1354, extractive_weight_loss_mg: 69, gravimetric_weight_loss_mg: 79, ratio_extractive_to_gravimetric: 0.87}
+        - {temperature_C: 1454, extractive_weight_loss_mg: 188, gravimetric_weight_loss_mg: 188, ratio_extractive_to_gravimetric: 1.00}
+        - {temperature_C: 1356, extractive_weight_loss_mg: 85, gravimetric_weight_loss_mg: 71, ratio_extractive_to_gravimetric: 1.21}
+        fitted_relation: 'm_gravimetric = (1.02 ± 0.04) × m_extractive'
+    - observation_id: van_limpt_2007_sodium_transpiration_operating_window
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 153
+        section: '4.3.1'
+      phase: silicate_melt_sodium_disilicate
+      regime: transpiration_evaporation
+      units: as_printed
+      values:
+        quantity: measured_sodium_evaporation_test_conditions
+        measurement_status: measured_condition
+        carrier_gas: [N2, H2O]
+        comparison_carrier_gas: air_H2O
+        p_H2O_bar: 0.25
+        p_H2O_uncertainty_bar: 0.01
+        p_O2_bar_N2_H2O: '<0.01'
+        p_O2_bar_air_H2O: 0.16
+        gas_flow_m3n_s: 0.00016
+        temperature_C: [1400, 1460]
+        total_Na_evaporation_rate_mol_m2_s: {at_1400C_approx: 7.0e-05, at_1450_1460C_approx: 1.2e-04}
+        dominant_species_statement: NaOH_in_humid_atmosphere; Na_in_dry_oxygen_lean_atmosphere
+    - observation_id: van_limpt_2007_fig46_elemental_sodium_measured
+      type: psat_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        page: 156
+        figure: '4.6'
+        note: "figure reading; measured markers only, approximate values"
+      phase: sodium_disilicate_melt
+      regime: transpiration_evaporation
+      units: Pa
+      values:
+        quantity: measured_Na_saturation_pressure
+        measurement_status: measured_figure_only
+        rows:
+        - {temperature_C: 1300, p_Na_Pa_approx: 3.0}
+        - {temperature_C: 1300, p_Na_Pa_approx: 4.0}
+        - {temperature_C: 1400, p_Na_Pa_approx: 11.5}
+        - {temperature_C: 1450, p_Na_Pa_approx: 3.0}
+        - {temperature_C: 1450, p_Na_Pa_approx: 3.5}
+        - {temperature_C: 1450, p_Na_Pa_approx: 4.0}
+  K:
+    observations:
+    - observation_id: van_limpt_2007_table42_potassium_bearing_glasses
+      type: gibbs_table
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.2'}
+      phase: alkali_lime_silicate_melt
+      regime: transpiration_evaporation
+      units: mass_pct
+      values:
+        quantity: measured_K2O_composition_range_used_for_activity_tests
+        measurement_status: measured_direct
+        K2O_mass_pct_range: [4.67, 4.98]
+        source_rows: [tableware_glass_A, tableware_glass_C]
+        main_measured_species_under_oxidized_humid_conditions: KOH
+    - observation_id: van_limpt_2007_fig15_potassium_activity_measured
+      type: activity_coefficient
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 172, figure: '4.15', note: 'figure reading; measured markers kept separate from ASM model'}
+      phase: alkali_lime_silicate_melt
+      regime: transpiration_evaporation
+      units: dimensionless_activity_as_printed
+      values:
+        quantity: measured_K2O_activity_vs_temperature
+        measurement_status: measured_figure_only
+        rows: [{temperature_C: 1400, a_K2O_approx: 0.5e-11}, {temperature_C: 1500, a_K2O_approx: 1.0e-11}, {temperature_C: 1520, a_K2O_approx: 1.5e-11}]
+        reported_relative_standard_deviation_pct: [24, 31]
+  B:
+    observations:
+    - observation_id: van_limpt_2007_table43_borosilicate_compositions
+      type: gibbs_table
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.3'}
+      phase: alkali_lean_borosilicate_melt
+      regime: transpiration_evaporation
+      units: mass_pct
+      values:
+        quantity: measured_initial_glass_composition_XRF_NAA
+        measurement_status: measured_direct
+        glass_family: alkali_free_borosilicate
+        samples:
+        - {glass: '1', composition_wt_pct: {B2O3: 2.6, Na2O: 0.10, Al2O3: 14.1, SiO2: 59.7, CaO: 23.5}}
+        - {glass: '2', composition_wt_pct: {B2O3: 5.0, Na2O: 0.10, Al2O3: 13.7, SiO2: 58.8, CaO: 22.4}}
+        - {glass: '3', composition_wt_pct: {B2O3: 7.6, Na2O: 0.15, Al2O3: 13.8, SiO2: 54.1, CaO: 24.3}}
+    - observation_id: van_limpt_2007_fig48_boron_evaporation_measured
+      type: rate_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 161, figure: '4.8', note: 'page image checked; diamond markers measured, line excluded; approximate plot readings'}
+      phase: alkali_free_borosilicate_melt
+      regime: transpiration_evaporation
+      units: mol_s
+      values:
+        quantity: measured_total_boron_evaporation_rate_vs_sqrt_water_pressure
+        measurement_status: measured_figure_only
+        temperature_C: 1450
+        B2O3_mass_pct_range: [4.6, 5.0]
+        rows: [{p_H2O_bar: 0.0, boron_rate_mol_s: 3.7e-08}]
+        refused_figure_points: "The remaining Fig. 4.8 points were not admitted: the OCR chart table does not preserve the plotted marker count/coordinates reliably, and the thesis prints no numeric point values."
+    - observation_id: van_limpt_2007_boron_operating_conditions_and_uncertainties
+      type: rate_series
+      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 183, section: '4.6', table: 'maximum errors table'}
+      phase: silicate_melt
+      regime: transpiration_evaporation
+      units: as_printed
+      values:
+        quantity: printed_measurement_uncertainties
+        measurement_status: measured_parameter_uncertainty
+        temperature_uncertainty_K: 2
+        water_vapor_pressure_uncertainty_bar: 0.005
+        furnace_tube_inner_diameter_uncertainty_pct: 2
+        normalized_gas_flow_rate_uncertainty_pct: 5
+        measured_evaporation_rate_uncertainty_pct: [5, 10]
+        diffusion_coefficient_uncertainty_pct: 10
+        carrier_gas_dynamic_viscosity_uncertainty_pct: 2
+        Sherwood_number_uncertainty_pct: 2
+        calibration_statement: "mass-flow controllers, gas-volume meters, O2 analyzer, and thermocouples were calibrated"
+vocabulary_gaps:
+  - carrier_gas_flow_m3n_s
+  - carrier_gas_identity
+  - furnace_type
+  - boat_material
+  - boat_dimensions_m
+  - temperature_ramp_rate_C_per_min
+  - sampling_duration_min
+  - gas_sampling_method
+  - measured_evaporation_rate_uncertainty_pct
+  - temperature_uncertainty_K
+  - water_vapor_pressure_uncertainty_bar
+  - printed_composition_mass_pct
+  - figure_only_measured_value
+  - measurement_status
+  - source_page_image_check
+notes:
+  measured_vs_model_boundary: "Rows tagged measured_direct, measured_condition, or measured_figure_only are experimental. ASM, FactSage, CFD, fitted lines, and calculated average compositions are excluded or explicitly marked as derived/model context."
+  exclusions: "Borosilicate values are retained for provenance but are outside the IMCC-SF04 parent-oxide engine coverage; BaO, Sb2O3, SO3, Cl, B2O3 and other non-parent components are not silently mapped to parent oxides."
+  absent_parameters: "No total pressure, crucible/boat fill depth, independent exposed melt surface area, carrier-gas volumetric flow uncertainty per glass run, or furnace temperature calibration curve was stated in the bounded pages; none was inferred."
