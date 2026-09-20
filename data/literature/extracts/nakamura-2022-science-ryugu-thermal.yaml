@@ -1,0 +1,226 @@
+schema_version: literature_extract.v1
+source_id: nakamura-2022-science-ryugu-thermal
+source:
+  citation: >-
+    Nakamura, T. et al. (2023), "Formation and evolution of carbonaceous asteroid
+    Ryugu: Direct evidence from returned samples", Science 379, eabn8671.
+  doi: 10.1126/science.abn8671
+  url: https://doi.org/10.1126/science.abn8671
+  year: 2023
+  source_pdf_path: /Users/simonrowland/Repos/regolith-corpus/raw/nakamura-2022-science-ryugu-thermal/nakamura-2022-science-ryugu-thermal.pdf
+extraction:
+  method: >-
+    Manual transcription from the clean-text PDF with pdftotext -layout and a
+    rendered-table check. Printed values, uncertainties, ranges, and conditions
+    are retained; no geometry or unit values are inferred.
+  date: '2026-09-19'
+  worker: codex-extract-ingest
+  provenance_path: docs-private/research/2026-09-19-nakamura-2022-science-ryugu-thermal/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Ryugu
+  observable: rate_series
+  observation_id: nakamura_2023_table1_physical_properties
+  field: heat_capacity_at_298K_value_as_printed
+  value: 865
+  locator:
+    published_page: 5
+    pdf_page_index: 8
+    table: '1'
+    note: Table 1 Heat capacity at 298K value cell.
+- species: Ryugu
+  observable: rate_series
+  observation_id: nakamura_2023_sample_provenance_and_density
+  field: bulk_density_average_g_cm3_as_printed
+  value: 1.79
+  locator:
+    published_page: 3
+    pdf_page_index: 6
+    section: Three-dimensional structure and density
+    note: Average bulk density printed as 1.79 ± 0.08 g cm−3.
+species:
+  Ryugu:
+    observations:
+    - observation_id: nakamura_2023_sample_provenance_and_density
+      type: rate_series
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Three-dimensional structure and density
+      phase: coarse_Ryugu_particles
+      regime: dry_glove_box_mass_and_SR_CT_volume
+      units: as printed (mm, mg, g cm^-3)
+      values:
+        quantity: sample_characterization
+        method_class: measured_direct
+        evidence_class: measured_direct
+        sample_count_as_printed: 17
+        particle_size_mm_as_printed: 1 to ~8
+        coarse_sample_density_range_g_cm3_as_printed: 1.7 to 1.9
+        bulk_density_average_g_cm3_as_printed: 1.79
+        bulk_density_average_g_cm3: 1.79
+        bulk_density_uncertainty_g_cm3_as_printed: 0.08
+        bulk_density_definition: mass per total volume, including cracks and pores
+        sample_mass_measurement_condition: dry conditions in a glove box
+        sample_volume_method: synchrotron x-ray computed tomography (SR-CT)
+        sr_ct_resolution_as_printed: 0.85 mm per voxel
+        sample_mass_mg: 126.6
+        sample_mass_sample_id: C0002
+        comparison: >-
+          The paper says the 1.79 ± 0.08 g cm−3 average is higher than an earlier
+          1.3 g cm−3 estimate that did not include the full 3D structure; the
+          comparison is retained as prose, not reconciled.
+        quote: >-
+          The mass of each coarse sample particle was measured under dry conditions
+          in a glove box, and the density was calculated from the sample volume
+          determined by using SR-CT (table S1). The bulk density ... ranged from
+          1.7 to 1.9 g cm−3 with an average of 1.79 ± 0.08 g cm−3.
+      uncertainty:
+        bulk_density_g_cm3: ±0.08
+        note: The range and average uncertainty are printed in the paragraph.
+    - observation_id: nakamura_2023_table1_physical_properties
+      type: rate_series
+      locator:
+        published_page: 5
+        pdf_page_index: 8
+        table: '1'
+        note: Table 1 Summary of the physical properties measured from the Ryugu samples.
+      phase: Ryugu_samples_A0026_and_C0002
+      regime: mechanical_thermal_electrical_magnetic_measurements
+      units: as printed in Table 1
+      values:
+        quantity: measured_physical_properties
+        method_class: measured_direct
+        evidence_class: measured_direct
+        rows:
+        - property: compressive_hardness
+          value_as_printed: 0.18
+          uncertainty_as_printed: 0.1
+          unit: GPa
+          condition: Ambient
+          measured_samples: C0002 plate 3*
+        - property: Youngs_modulus
+          value_as_printed: 5.3
+          uncertainty_as_printed: 1.6
+          unit: GPa
+          condition: Ambient
+          measured_samples: C0002 plate 3*
+        - property: bending_strength
+          value_as_printed: 4.9
+          uncertainty_as_printed: 1.9
+          unit: MPa
+          condition: Ambient
+          measured_samples: C0002 plate 3 and 4
+        - property: longitudinal_velocity
+          value_as_printed: 2.08
+          uncertainty_as_printed: 0.13
+          unit: km/s
+          condition: Ambient
+          measured_samples: Average of C0002 plate 3 and 4†
+        - property: shear_velocity
+          value_as_printed: 1.37
+          uncertainty_as_printed: 0.15
+          unit: km/s
+          condition: Ambient
+          measured_samples: Average of C0002 plate 3 and 4†
+        - property: thermal_expansivity
+          value_as_printed: 2.6 × 10^-5
+          uncertainty_as_printed: 2 × 10^-6
+          unit: /K
+          condition: 210 to 400 K, nitrogen gas
+          measured_samples: C0002 plate 3
+        - property: cohesive_force
+          value_as_printed: 0.17
+          uncertainty_as_printed: 0.02
+          unit: μN
+          condition: Ambient
+          measured_samples: C0002 plate 4
+        - property: heat_capacity_at_298K
+          value_as_printed: 865
+          uncertainty_as_printed: 16
+          unit: J/kg/K
+          condition: 213 to 373 K, nitrogen gas
+          measured_samples: Average of C0002 plate 4 and A0026
+        - property: thermal_diffusivity
+          value_as_printed: 3.2 × 10^-7
+          uncertainty_as_printed: 0.3 × 10^-7
+          unit: m^2/s
+          condition: 300 K, vacuum
+          measured_samples: Average of C0002 plate 3 and 4
+        - property: resistivity
+          value_as_printed: 2.5 × 10^6
+          uncertainty_as_printed: 0.3 × 10^-6
+          unit: ohm·m
+          condition: 300 K, vacuum
+          measured_samples: Average of C0002 plate 3 and 4
+        - property: relative_permittivity
+          value_as_printed: 6.8
+          uncertainty_as_printed: 0.8
+          unit: —
+          condition: 300 K, vacuum
+          measured_samples: Average of C0002 plate 3 and 4
+        - property: magnetic_susceptibility
+          value_as_printed: 8.39 × 10^-5
+          uncertainty_as_printed: 4.0 × 10^-6
+          unit: m^3/kg
+          condition: 300 K, direct current, alternating current (1 to 1000 Hz)
+          measured_samples: Average of C0002 and A0026
+        - property: saturation_magnetization
+          value_as_printed: 11.6
+          uncertainty_as_printed: 5.1 × 10^-3
+          unit: Am^2/kg
+          condition: 300 K
+          measured_samples: Average of C0002 and A0026
+        - property: saturation_remanence
+          value_as_printed: 1.05
+          uncertainty_as_printed: 6.3 × 10^-3
+          unit: Am^2/kg
+          condition: 300 K
+          measured_samples: Average of C0002 and A0026
+        - property: coercivity
+          value_as_printed: 12.2
+          uncertainty_as_printed: 9.3 × 10^-2
+          unit: mT
+          condition: 300 K
+          measured_samples: Average of C0002 and A0026
+        - property: coercivity_of_remanence
+          value_as_printed: 61.3
+          uncertainty_as_printed: 4.1 × 10^-1
+          unit: mT
+          condition: 300 K
+          measured_samples: Average of C0002 and A0026
+        footnotes:
+        - '* Average is of 26 analyses of fine-grained matrix.'
+        - '† Two fragments from plate 4 were used.'
+        heat_capacity_at_298K_value_as_printed: 865
+        quote: >-
+          Table 1. Summary of the physical properties measured from the Ryugu
+          samples (7). Values, uncertainties, units, measurement conditions, and
+          measured samples are transcribed row by row.
+      uncertainty:
+        note: Every row retains the uncertainty printed in the Table 1 uncertainty column.
+    - observation_id: nakamura_2023_calculated_thermal_properties
+      type: rate_series
+      locator:
+        published_page: 3
+        pdf_page_index: 6
+        section: Mechanical, thermal, electrical, and magnetic properties
+      phase: Ryugu_sample_C0002
+      regime: author_calculation_from_measured_properties
+      units: as printed
+      values:
+        quantity: calculated_thermal_properties
+        method_class: model_derived
+        evidence_class: model_derived
+        generator: authors_calculation_from_table1_thermal_diffusivity_and_bulk_density
+        temperature_K: 298
+        thermal_conductivity_W_m_K: 0.5
+        thermal_inertia_J_m2_s05_K: 890
+        input_note: The paper says the thermal diffusivity and C0002 bulk density were used to calculate these values.
+        quote: >-
+          The thermal diffusivity (Table 1) and the bulk density of sample C0002
+          (table S1) were used to calculate the thermal conductivity of 0.5 W m−1
+          K−1 and thermal inertia of 890 J m−2 s−0.5 K−1 at a temperature of 298 K.
+      uncertainty:
+        note: No uncertainty is printed for the calculated conductivity or inertia in this paragraph.
