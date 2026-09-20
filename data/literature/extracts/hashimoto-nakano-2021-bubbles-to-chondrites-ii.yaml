@@ -1,0 +1,193 @@
+schema_version: literature_extract.v1
+source_id: hashimoto-nakano-2021-bubbles-to-chondrites-ii
+source:
+  citation: 'Hashimoto, A. & Nakano, Y. (2021), "Bubbles to Chondrites-II. Chemical fractionations in chondrites", Progress in Earth and Planetary Science 8:9.'
+  doi: 10.1186/s40645-020-00382-8
+  year: 2021
+extraction:
+  method: manual_from_pdftotext_layout
+  date: '2026-09-20'
+  worker: i1-hashimoto-nakano-2021-bubbles-to-chondrites-ii
+  provenance_path: corpus/raw/hashimoto-nakano-2021-bubbles-to-chondrites-ii/hashimoto-nakano-2021-bubbles-to-chondrites-ii.pdf
+  scope_note: >-
+    This is a numerical/modeling paper, not an apparatus experiment. No
+    laboratory apparatus, run conditions, or direct measurements by this paper
+    were attached to its model outputs. Printed compiled compositions and
+    printed model inputs/outputs are retained with separate evidence classes.
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: rate_series
+    observation_id: hashimoto_2021_table1_silicate_compositions
+    field: quantity
+    value: bulk_and_chondrule_silicate_compositions
+    locator: {page: 4, table: '1', note: 'CI bulk chondrite SiO2 column'}
+  - species: SiO2
+    observable: gibbs_table
+    observation_id: hashimoto_2021_table4_calculation_results
+    field: quantity
+    value: fitted_vaporization_and_component_proportions
+    locator: {page: 10, table: '4', note: 'CV row, VD% column'}
+  - species: SiO2
+    observable: rate_series
+    observation_id: hashimoto_2021_model_setup
+    field: step_size_q
+    value: 1.001
+    locator: {page: 2, section: '2.1 Methods', note: 'q step size'}
+species:
+  SiO2:
+    observations:
+      - observation_id: hashimoto_2021_table1_silicate_compositions
+        type: rate_series
+        locator: {page: 4, table: '1'}
+        phase: chondrite_silicate_or_average_chondrule_silicate
+        regime: compiled_composition_normalized_to_100_mol_pct
+        units: mol_pct
+        values:
+          quantity: bulk_and_chondrule_silicate_compositions
+          method_class: compilation_assessed
+          source_basis: >-
+            Bulk compositions are compiled from cited wet-chemical analyses;
+            chondrule compositions are averages of cited EPMA analyses. Values
+            are on the ten-element silicate basis and normalized to 100 mol%.
+          columns:
+            - NaO0.5
+            - MgO
+            - AlO1.5
+            - SiO2
+            - KO0.5
+            - CaO
+            - TiO2
+            - CrO1.5
+            - MnO
+            - FeO
+          bulk_chondrite:
+            L: {NaO0.5: 1.917, MgO: 38.366, AlO1.5: 2.760, SiO2: 41.335, KO0.5: 0.146, CaO: 2.063, TiO2: 0.094, CrO1.5: 0.436, MnO: 0.300, FeO: 12.584, total: 100}
+            H: {NaO0.5: 1.921, MgO: 39.938, AlO1.5: 2.905, SiO2: 42.155, KO0.5: 0.132, CaO: 2.147, TiO2: 0.104, CrO1.5: 0.474, MnO: 0.302, FeO: 9.921, total: 100}
+            LL: {NaO0.5: 1.838, MgO: 37.512, AlO1.5: 2.634, SiO2: 40.508, KO0.5: 0.127, CaO: 2.053, TiO2: 0.098, CrO1.5: 0.426, MnO: 0.296, FeO: 14.510, total: 100}
+            CV: {NaO0.5: 0.518, MgO: 39.356, AlO1.5: 4.243, SiO2: 36.656, KO0.5: 0.041, CaO: 3.045, TiO2: 0.137, CrO1.5: 0.465, MnO: 0.172, FeO: 15.368, total: 100}
+            E: {NaO0.5: 1.956, MgO: 39.890, AlO1.5: 3.811, SiO2: 49.636, KO0.5: 0.119, CaO: 1.595, TiO2: 0.098, CrO1.5: 0.387, MnO: 0.259, FeO: 2.248, total: 100}
+            CO: {NaO0.5: 1.369, MgO: 36.873, AlO1.5: 3.629, SiO2: 35.612, KO0.5: 0.084, CaO: 2.431, TiO2: 0.105, CrO1.5: 0.391, MnO: 0.221, FeO: 19.285, total: 100}
+            CM: {NaO0.5: 1.422, MgO: 35.450, AlO1.5: 3.188, SiO2: 35.180, KO0.5: 0.082, CaO: 2.383, TiO2: 0.112, CrO1.5: 0.403, MnO: 0.244, FeO: 21.536, total: 100}
+            CI: {NaO0.5: 1.835, MgO: 33.208, AlO1.5: 2.653, SiO2: 31.931, KO0.5: 0.114, CaO: 1.906, TiO2: 0.077, CrO1.5: 0.419, MnO: 0.293, FeO: 27.563, total: 100}
+            CI_star: {NaO0.5: 2.128, MgO: 38.517, AlO1.5: 3.077, SiO2: 37.035, KO0.5: 0.133, CaO: 2.210, TiO2: 0.090, CrO1.5: 0.486, MnO: 0.340, FeO: 15.984, total: 100}
+          average_chondrule:
+            L: {NaO0.5: 1.765, MgO: 39.358, AlO1.5: 2.631, SiO2: 42.223, KO0.5: 0.134, CaO: 1.864, TiO2: 0.089, CrO1.5: 0.456, MnO: 0.284, FeO: 11.197, total: 100}
+            H: {NaO0.5: 1.913, MgO: 39.393, AlO1.5: 2.735, SiO2: 43.740, KO0.5: 0.147, CaO: 2.023, TiO2: 0.104, CrO1.5: 0.435, MnO: 0.301, FeO: 9.208, total: 100}
+            LL: {NaO0.5: 1.763, MgO: 41.238, AlO1.5: 2.415, SiO2: 42.859, KO0.5: 0.175, CaO: 1.654, TiO2: 0.097, CrO1.5: 0.627, MnO: 0.295, FeO: 8.878, total: 100}
+            CV: {NaO0.5: 0.485, MgO: 51.884, AlO1.5: 2.814, SiO2: 40.330, KO0.5: 0.041, CaO: 2.782, TiO2: 0.145, CrO1.5: 0.228, MnO: 0.058, FeO: 1.233, total: 100}
+            E: {NaO0.5: 1.237, MgO: 43.853, AlO1.5: 1.939, SiO2: 48.802, KO0.5: 0.129, CaO: 1.373, TiO2: 0.046, CrO1.5: 0.257, MnO: 0.155, FeO: 2.208, total: 100}
+            CO: {NaO0.5: 1.386, MgO: 41.717, AlO1.5: 4.240, SiO2: 40.456, KO0.5: 0.047, CaO: 3.689, TiO2: 0.145, CrO1.5: 0.440, MnO: 0.167, FeO: 7.712, total: 100}
+            CM: {NaO0.5: 0.039, MgO: 52.775, AlO1.5: 1.422, SiO2: 41.518, KO0.5: 0.000, CaO: 2.161, TiO2: 0.203, CrO1.5: 0.328, MnO: 0.087, FeO: 1.467, total: 100}
+        note: >-
+          These are not direct measurements made by Hashimoto and Nakano; the
+          paper states their source datasets in Appendix A (pages 25-26).
+      - observation_id: hashimoto_2021_table2_depletion_factors
+        type: rate_series
+        locator: {page: 6, table: '2'}
+        phase: primordial_CI_like_silicate
+        regime: authors_3_plus_2_component_numerical_fitting
+        units: dimensionless
+        values:
+          quantity: imposed_Cr_and_Mn_depletion_factors
+          method_class: model_derived
+          generator: authors_3_plus_2_component_numerical_fitting
+          factors:
+            Cr: {CV: 1.17, CM: 1, E: 0.55, CO: 0.95, LL: 0.8, H: 0.83, L: 0.78}
+            Mn: {CV: 0.5, CM: 0.75, E: 0.46, CO: 0.65, LL: 0.72, H: 0.73, L: 0.74}
+      - observation_id: hashimoto_2021_table3_ghost_cai_inputs
+        type: rate_series
+        locator: {page: 9, table: '3'}
+        phase: primordial_CI_like_silicate
+        regime: authors_3_plus_2_component_numerical_fitting
+        units: mol_pct
+        values:
+          quantity: oxide_elements_entered_as_ghost_CAIs
+          method_class: model_derived
+          generator: authors_3_plus_2_component_numerical_fitting
+          rows:
+            CO: {AlO1.5: 3.109, CaO: 2.234, TiO2: 0.091, MgO: 1.117, SiO2: 2.234}
+            LL: {AlO1.5: 0.102, CaO: 0.073, TiO2: 0.028, MgO: null, SiO2: null}
+            H: {AlO1.5: null, CaO: 0.073, TiO2: 0.024, MgO: null, SiO2: null}
+            L: {AlO1.5: null, CaO: 0.131, TiO2: 0.020, MgO: null, SiO2: null}
+          null_semantics: em_dash_in_source_means_not_entered_not_zero
+      - observation_id: hashimoto_2021_table4_calculation_results
+        type: gibbs_table
+        locator: {page: 10, table: '4'}
+        phase: chondrite_bulk_and_chondrule_mixture
+        regime: authors_3_plus_2_component_numerical_fitting
+        units: VD_percent_and_molar_proportion
+        values:
+          quantity: fitted_vaporization_and_component_proportions
+          method_class: model_derived
+          generator: authors_3_plus_2_component_numerical_fitting
+          rows:
+            CV: {VD_pct: 32, fs: 0.03, fw: 0.1, Cdls: 0.84, Mtx: 0.11, CAIs: 0.0552, Ghost_CAIs: 0}
+            CM: {VD_pct: 42, fs: 0.04, fw: 0.1, Cdls: 0.25, Mtx: 0.68, CAIs: 0.0741, Ghost_CAIs: 0}
+            E: {VD_pct: 30, fs: 0.04, fw: 1, Cdls: 0.62, Mtx: 0.35, CAIs: 0.0226, Ghost_CAIs: 0}
+            CO: {VD_pct: 43, fs: 0.20, fw: 0.35, Cdls: 0.68, Mtx: 0.26, CAIs: 0.0156, Ghost_CAIs: 0.0391}
+            LL: {VD_pct: 32, fs: 0.21, fw: 0.65, Cdls: 0.74, Mtx: 0.25, CAIs: 0.0060, Ghost_CAIs: 0.0009}
+            H: {VD_pct: 24, fs: 0.22, fw: 1, Cdls: 0.80, Mtx: 0.20, CAIs: 0, Ghost_CAIs: 0.0005}
+            L: {VD_pct: 24, fs: 0.27, fw: 1, Cdls: 0.66, Mtx: 0.34, CAIs: 0, Ghost_CAIs: 0.0007}
+      - observation_id: hashimoto_2021_table5_component_fractions
+        type: gibbs_table
+        locator: {page: 11, table: '5'}
+        phase: chondrite_bulk_and_average_chondrule
+        regime: authors_3_plus_2_component_numerical_fitting
+        units: molar_fraction
+        values:
+          quantity: fitted_component_molar_fractions
+          method_class: model_derived
+          generator: authors_3_plus_2_component_numerical_fitting
+          bulk_chondrite_total_1:
+            CV: {F1: 0.521, F2: 0.367, F3: 0.040, F4: 0.027, F5: 0.045}
+            CM: {F1: 0.126, F2: 0.200, F3: 0.001, F4: 0.584, F5: 0.089}
+            E: {F1: 0.276, F2: 0.357, F3: 0.089, F4: 0.273, F5: 0.005}
+            CO: {F1: 0.311, F2: 0.262, F3: 0.213, F4: 0.134, F5: 0.081}
+            LL: {F1: 0.392, F2: 0.210, F3: 0.178, F4: 0.069, F5: 0.151}
+            H: {F1: 0.549, F2: 0.154, F3: 0.150, F4: 0.000, F5: 0.147}
+            L: {F1: 0.428, F2: 0.158, F3: 0.108, F4: 0.015, F5: 0.291}
+          average_chondrule_total_1:
+            CV: {F1: 0.562, F2: 0.396, F3: 0.043}
+            CM: {F1: 0.386, F2: 0.611, F3: 0.002}
+            E: {F1: 0.382, F2: 0.495, F3: 0.123}
+            CO: {F1: 0.396, F2: 0.333, F3: 0.271}
+            LL: {F1: 0.503, F2: 0.269, F3: 0.228}
+            H: {F1: 0.644, F2: 0.180, F3: 0.175}
+            L: {F1: 0.617, F2: 0.227, F3: 0.156}
+      - observation_id: hashimoto_2021_model_setup
+        type: rate_series
+        locator: {page: 2, section: '2.1 Methods'}
+        phase: primordial_CI_like_dust_aggregate
+        regime: authors_3_plus_2_component_numerical_fitting
+        units: as_published
+        values:
+          quantity: numerical_model_parameters_and_constraints
+          method_class: model_derived
+          generator: authors_3_plus_2_component_numerical_fitting
+          components: [jet-droplet, differential_vapor, integrated_vapor, final_integrated_vapor, CI_star]
+          oxide_elements: [Na, Mg, Al, Si, K, Ca, Ti, Cr, Mn, Fe]
+          linear_system: 'A_m,n F_n = B_m; m=1-5, n=1-5'
+          step_size_q: 1.001
+          q_definition: 'X_Al,k / X_Al,k-1'
+          CI_star_fs_temporarily: 0.5
+          CI_star_fs_solution_range: '0.3-1.0'
+          final_vaporization_degree_relation: 'final VD is twice the VD producing average chondrule composition'
+          positive_solution_constraint: 'all F_n positive'
+          fit_constraints: [average_chondrule_Na, average_chondrule_Fe, bulk_chondrite_composition]
+      - observation_id: hashimoto_2021_appendix_sample_provenance
+        type: rate_series
+        locator: {page: 25, section: 'Appendix (A) Data'}
+        phase: bulk_chondrite_powder
+        regime: quoted_wet_chemical_analysis_method
+        units: g
+        values:
+          quantity: bulk_rock_sample_mass_used_in_compiled_analyses
+          method_class: quoted_attributed
+          source: Jarosewich_1990_method_description_as_reported_by_authors
+          sample_mass_range_g: '8-20'
+          routine_allocation_g: 20
+          note: >-
+            This is a characterization of the source analyses, not a new
+            Hashimoto and Nakano experiment; range and nominal allocation stay
+            distinct.
