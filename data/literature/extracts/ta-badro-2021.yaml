@@ -1,0 +1,1117 @@
+schema_version: literature_extract.v1
+source_id: ta-badro-2021
+source:
+  citation: >-
+    Badro, J., Sossi, P. A., Deng, Z., Borensztajn, S., Wehr, N. and Ryerson,
+    F. J. (2021). Experimental investigation of elemental and isotopic evaporation
+    processes by laser heating in an aerodynamic levitation furnace.
+    Comptes Rendus Geoscience 353(1), 101-114.
+  doi: 10.5802/crgeos.56
+  year: 2021
+extraction:
+  method: pdftotext -layout transcription with visual verification of printed tables
+  date: '2026-09-19'
+  worker: extract-badro-2021
+review_status: draft
+# Legacy rate_series is a curation container; quantity identifies the observable.
+# Isotopic fractionation factors are NOT Hertz-Knudsen evaporation coefficients.
+source_locators:
+  abstract: &abstract
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 101
+    pdf_page_index: 1
+    section: Abstract
+  apparatus: &apparatus
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 102
+    pdf_page_index: 2
+    section: 2. Experimental setup
+  flow: &flow
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 103
+    pdf_page_index: 3
+    section: 2. Experimental setup
+    figure: '1'
+  pyrometer: &pyrometer
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 104
+    pdf_page_index: 4
+    figure: '2'
+    paragraph: Caption
+  methods: &methods
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  table1: &table1
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 105
+    pdf_page_index: 5
+    table: '1'
+  analyses: &analyses
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 106
+    pdf_page_index: 6
+    section: 3. Experiments and analyses
+    figure: '3'
+  elemental: &elemental
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 107
+    pdf_page_index: 7
+    section: 4.1. Elemental fractionation
+    figure: '4'
+  rayleigh: &rayleigh
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 110
+    pdf_page_index: 10
+    section: 4.2. Isotopic fractionation
+    equation: '17-19'
+  table2: &table2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    published_page: 112
+    pdf_page_index: 12
+    table: '2'
+experimental_conditions: &conditions
+  temperature:
+    value: 1873
+    units: K
+    locator: *table1
+    quote: at the same temperature (1873 K)
+  oxygen_partial_pressure:
+    value: '10^-9.1'
+    units: atm
+    locator: *abstract
+    quote: an oxygen partial pressure of 10^-9.1 atm
+  log_fO2:
+    value: -9.1
+    units: log10
+    locator: *methods
+    quote: At 1873 K, the oxygen fugacity of that mixture is log fO2 = -9.1
+  oxygen_fugacity_control:
+    value: Fixed Ar-CO2-H2 molar mixture using multiple gas flow controllers.
+    locator: *flow
+    mixture_locator: *methods
+  oxygen_fugacity_verification:
+    state: unknown
+    reason: No independent oxygen sensor, calibration or verification procedure is stated.
+    locator: *methods
+  run_duration_s: &duration_absence
+    state: unknown
+    reason: No duration-to-VP-sample assignment; abstract and Methods ranges conflict.
+    locator: *table1
+  duration_ranges_as_printed:
+    abstract:
+      value: [60, 600]
+      units: s
+      semantics: range_not_individual_run_durations
+      locator: *abstract
+      quote: durations ranging from 60 to 600 s
+    methods:
+      value: [180, 900]
+      units: s
+      semantics: range_not_individual_run_durations
+      locator: *methods
+      quote: durations varying between 180 and 900 s
+shared_equipment: &equipment
+  chamber_pressure:
+    value: 1
+    units: atm
+    locator: *elemental
+    quote: vacuum evaporation versus 1-atm evaporation in an advective flow
+laboratory_parameters: &laboratory_parameters
+  starting_composition:
+    composition_wt_pct: {MgO: 12, SiO2: 46, Al2O3: 19, CaO: 23}
+    units: wt%
+    locator: {<<: *table1, paragraph: Starting}
+    quote: Starting | 12 | 46 | 19 | 23 | 0.6316 | 2.4211
+    note: Nominal starting recipe; not a measured post-prefusion composition.
+  precursor_chunk_mass_mg:
+    value: 15
+    units: mg
+    locator: *methods
+    quote: six 15-mg chunks of the pellet
+    note: Before oxygen prefusion; not an individual evaporation-run initial mass.
+  sample_diameter_mm:
+    value: 2
+    units: mm
+    qualifier: approximate
+    locator: *methods
+    quote: spherical glass samples (~2 mm diameter)
+  levitation_gas_molar_percent:
+    value: {Ar: 92, CO2: 1.6, H2: 6.4}
+    units: molar_percent
+    locator: *methods
+    quote: a fixed molar ratio of 92% Ar, 1.6% CO2, and 6.4% H2
+  levitation_gas_flow_sccm:
+    value: [800, 1000]
+    units: sccm
+    semantics: range
+    locator: *flow
+    quote: gas flow is in the range of 800-1000 sccm (14-18 cm3/s)
+  levitation_gas_flow_cm3_s:
+    value: [14, 18]
+    units: cm3/s
+    semantics: range_as_printed_not_recalculated
+    locator: *flow
+  nozzle_gas_inlet_diameter_mm:
+    value: 1.5
+    units: mm
+    locator: *flow
+    quote: through a 1.5 mm diameter hole in the nozzle
+    note: Levitation gas inlet; not an effusion or Knudsen orifice.
+  laser_heating:
+    value: Infrared CO2 laser melts a contactless sample supported by upward gas in a conical nozzle.
+    locator: *apparatus
+  temperature_measurement:
+    value: Pyrometer measures above 900 degC and returns a baseline of 900 degC below.
+    locator: *pyrometer
+    note: No calibration procedure, emissivity or stated temperature uncertainty.
+  prefusion:
+    value:
+      temperature: {value: 1600, units: degC}
+      duration: {value: 30, units: s}
+      gas: pure O2
+      cooling_rate: {value: 850, units: degC/s}
+    locator: *methods
+    note: Preparation step; 30 s is not an evaporation-run duration.
+  elemental_analysis:
+    value: Standardised SEM-EDX using Mg, Si, Ca and Al K-lines; glasses homogeneous without crystal nucleation.
+    locator: *analyses
+  isotope_analysis:
+    value: Laser-ablation MC-ICP-MS; isotope deltas relative to bracketing BHVO-2G.
+    locator: *analyses
+absent_parameters:
+  initial_evaporation_run_mass:
+    state: unknown
+    reason: Only precursor chunk mass is stated; samples already evaporate during levitation preparation.
+    locator: *rayleigh
+  final_sample_mass:
+    state: unknown
+    reason: No per-run weights printed.
+    locator: *elemental
+  mass_loss:
+    state: unknown
+    reason: Direct weighing rejected as too uncertain; no measured mass-loss values tabulated.
+    locator: *elemental
+    quote: the uncertainties on these measurements are so large, if at all resolvable, that they disqualify the use of this method
+  initial_area_mm2:
+    state: unknown
+    reason: No exposed area printed; no sphere-area calculation made from approximate diameter.
+    locator: *methods
+  container:
+    state: not_applicable
+    reason: Contactless aerodynamic levitation; no crucible.
+    locator: *apparatus
+  knudsen_orifice:
+    state: not_applicable
+    reason: No Knudsen cell; nozzle hole delivers levitating gas.
+    locator: *flow
+  clausing_factor:
+    state: not_applicable
+    reason: No Knudsen effusion orifice.
+    locator: *flow
+  temperature_calibration:
+    state: unknown
+    reason: No calibration procedure, emissivity or temperature uncertainty printed.
+    locator: *pyrometer
+  laser_power_and_wavelength:
+    state: unknown
+    reason: Heating laser identified as infrared CO2 only; no power or wavelength stated.
+    locator: *apparatus
+  composition_uncertainty:
+    state: unknown
+    reason: No numerical uncertainty on Table 1 oxide compositions.
+    locator: *elemental
+    quote: The uncertainties on the analytical data are on the order of symbol size.
+  starting_isotope_composition:
+    state: unknown
+    reason: Table 1 Starting row has no isotope cells; Rayleigh fits use a free intercept.
+    locator: *rayleigh
+source_conclusions:
+  - statement: Relative SiO2/MgO evaporation is independent of pressure, oxygen fugacity and furnace hydrodynamical regime.
+    evidence_class: author_stated_conclusion
+    locator: *abstract
+    supporting_locator: *elemental
+    note: Recorded without evaluation; does not change measurement classifications.
+source_discrepancies:
+  - duration_ranges: Both conflicting printed ranges retained; no run ordering or midpoint inferred.
+  - abstract_fit_uncertainties:
+      Mg_26_24: {value: 0.9906, uncertainty: 0.0004}
+      Si_30_28: {value: 0.9943, uncertainty: 0.0003}
+      units: dimensionless
+      uncertainty_convention: not_explicitly_labelled_in_abstract
+      locator: *abstract
+      note: Table 2 separately prints 2SD of 0.0008 and 0.0006; no uncertainty conversion made.
+starting_ratios:
+  MgO_Al2O3: 0.6316
+  SiO2_Al2O3: 2.4211
+  units: dimensionless
+  evidence_class: author_reported_recipe_ratio
+  locator: {<<: *table1, paragraph: Starting}
+runs:
+  VP1: &vp1
+    laboratory_parameters: *laboratory_parameters
+    sample: VP1
+    locator: {<<: *table1, paragraph: 'VP1, This study'}
+    quote: 'VP1 | 11.61 | 37.62 | 22.99 | 27.78 | 0.5050 | 1.6364 | 0.800 | 0.676 | -3.78 | 0.19 | -1.98 | 0.12 | -1.73 | 0.04 | -0.78 | 0.02'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 11.61, SiO2: 37.62, Al2O3: 22.99, CaO: 27.78}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.5050
+      SiO2_Al2O3: 1.6364
+      f_Mg: 0.800
+      f_Si: 0.676
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP1, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+  VP2: &vp2
+    laboratory_parameters: *laboratory_parameters
+    sample: VP2
+    locator: {<<: *table1, paragraph: 'VP2, This study'}
+    quote: 'VP2 | 12.05 | 40.03 | 21.74 | 26.18 | 0.5543 | 1.8413 | 0.878 | 0.761 | -4.39 | 0.21 | -2.29 | 0.12 | -2.63 | 0.17 | -1.27 | 0.08'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 12.05, SiO2: 40.03, Al2O3: 21.74, CaO: 26.18}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.5543
+      SiO2_Al2O3: 1.8413
+      f_Mg: 0.878
+      f_Si: 0.761
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP2, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+  VP3: &vp3
+    laboratory_parameters: *laboratory_parameters
+    sample: VP3
+    locator: {<<: *table1, paragraph: 'VP3, This study'}
+    quote: 'VP3 | 11.9 | 41.45 | 21.16 | 25.49 | 0.5624 | 1.9589 | 0.890 | 0.809 | -4.80 | 0.22 | -2.49 | 0.14 | -2.68 | 0.31 | -1.17 | 0.30'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 11.9, SiO2: 41.45, Al2O3: 21.16, CaO: 25.49}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.5624
+      SiO2_Al2O3: 1.9589
+      f_Mg: 0.890
+      f_Si: 0.809
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP3, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+  VP4: &vp4
+    laboratory_parameters: *laboratory_parameters
+    sample: VP4
+    locator: {<<: *table1, paragraph: 'VP4, This study'}
+    quote: 'VP4 | 11.94 | 41.68 | 21.08 | 25.31 | 0.5664 | 1.9772 | 0.897 | 0.817 | -4.62 | 0.22 | -2.40 | 0.13 | -2.79 | 0.07 | -1.33 | 0.05'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 11.94, SiO2: 41.68, Al2O3: 21.08, CaO: 25.31}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.5664
+      SiO2_Al2O3: 1.9772
+      f_Mg: 0.897
+      f_Si: 0.817
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP4, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+  VP5: &vp5
+    laboratory_parameters: *laboratory_parameters
+    sample: VP5
+    locator: {<<: *table1, paragraph: 'VP5, This study'}
+    quote: 'VP5 | 11.9 | 39.08 | 22.25 | 26.77 | 0.5348 | 1.7564 | 0.847 | 0.725 | -4.22 | 0.28 | -2.19 | 0.15 | -2.26 | 0.28 | -0.97 | 0.26'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 11.9, SiO2: 39.08, Al2O3: 22.25, CaO: 26.77}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.5348
+      SiO2_Al2O3: 1.7564
+      f_Mg: 0.847
+      f_Si: 0.725
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP5, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+  VP6: &vp6
+    laboratory_parameters: *laboratory_parameters
+    sample: VP6
+    locator: {<<: *table1, paragraph: 'VP6, This study'}
+    quote: 'VP6 | 10.77 | 34.81 | 24.51 | 29.92 | 0.4394 | 1.4202 | 0.696 | 0.587 | -2.27 | 0.14 | -1.15 | 0.10 | -1.04 | 0.11 | -0.40 | 0.06'
+    conditions: *conditions
+    run_duration_s: *duration_absence
+    residue_composition_wt_pct: {MgO: 10.77, SiO2: 34.81, Al2O3: 24.51, CaO: 29.92}
+    composition_basis: Measured residue, wt%; not the initial recipe.
+    published_reduction:
+      method_class: directly_reduced_measurement
+      MgO_Al2O3: 0.4394
+      SiO2_Al2O3: 1.4202
+      f_Mg: 0.696
+      f_Si: 0.587
+      units: dimensionless
+      locator: {<<: *table1, paragraph: 'VP6, ratio and f columns'}
+      definition_locator: *rayleigh
+      note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+species:
+  Mg:
+    observations:
+    - observation_id: badro_2021_vp1_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP1, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-3.78 | 0.19'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP1
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -3.78
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp1
+      uncertainty:
+        two_se: 0.19
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp2_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP2, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-4.39 | 0.21'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP2
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -4.39
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp2
+      uncertainty:
+        two_se: 0.21
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp3_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP3, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-4.80 | 0.22'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP3
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -4.80
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp3
+      uncertainty:
+        two_se: 0.22
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp4_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP4, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-4.62 | 0.22'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP4
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -4.62
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp4
+      uncertainty:
+        two_se: 0.22
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp5_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP5, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-4.22 | 0.28'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP5
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -4.22
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp5
+      uncertainty:
+        two_se: 0.28
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp6_delta26mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP6, d26Mg-BHVO-2G and adjacent 2se'}
+      quote: '-2.27 | 0.14'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP6
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '26Mg/24Mg'
+        isotope_delta: -2.27
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp6
+      uncertainty:
+        two_se: 0.14
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d26Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_fit_26mg_24mg
+      derived_from:
+      - badro_2021_vp1_delta26mg
+      - badro_2021_vp2_delta26mg
+      - badro_2021_vp3_delta26mg
+      - badro_2021_vp4_delta26mg
+      - badro_2021_vp5_delta26mg
+      - badro_2021_vp6_delta26mg
+      derivation_note: Table 1 isotope deltas and fractions remaining fitted by equations 17-18; page 110 and Figure 6, page 111.
+      type: rate_series
+      class_tag: derived
+      locator: {<<: *table2, paragraph: 'delta 26Mg, Advective (this study), 2SD'}
+      quote: '0.9906 | 0.0008'
+      units: dimensionless
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      values:
+        laboratory_parameters: *laboratory_parameters
+        quantity: isotopic_fractionation_factor
+        method_class: model_derived
+        isotope_ratio: '26Mg/24Mg'
+        isotopic_fractionation_factor: 0.9906
+        model: Rayleigh fit with free starting-isotope intercept; equations 17 and 18.
+        model_locator: *rayleigh
+        T_K: 1873
+        temperature_locator: *table1
+        conditions: *conditions
+        note: Fitted isotope fractionation factor, not a measured isotope delta or an HKL evaporation coefficient.
+      uncertainty:
+        two_SD: 0.0008
+        units: dimensionless
+        locator: {<<: *table2, paragraph: 'delta 26Mg, 2SD'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp1_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP1, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-1.98 | 0.12'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP1
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -1.98
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp1
+      uncertainty:
+        two_se: 0.12
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp2_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP2, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-2.29 | 0.12'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP2
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -2.29
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp2
+      uncertainty:
+        two_se: 0.12
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp3_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP3, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-2.49 | 0.14'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP3
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -2.49
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp3
+      uncertainty:
+        two_se: 0.14
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp4_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP4, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-2.40 | 0.13'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP4
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -2.40
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp4
+      uncertainty:
+        two_se: 0.13
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp5_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP5, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-2.19 | 0.15'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP5
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -2.19
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp5
+      uncertainty:
+        two_se: 0.15
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp6_delta25mg
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP6, d25Mg-BHVO-2G and adjacent 2se'}
+      quote: '-1.15 | 0.10'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP6
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '25Mg/24Mg'
+        isotope_delta: -1.15
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp6
+      uncertainty:
+        two_se: 0.10
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d25Mg-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_fit_25mg_24mg
+      derived_from:
+      - badro_2021_vp1_delta25mg
+      - badro_2021_vp2_delta25mg
+      - badro_2021_vp3_delta25mg
+      - badro_2021_vp4_delta25mg
+      - badro_2021_vp5_delta25mg
+      - badro_2021_vp6_delta25mg
+      derivation_note: Table 1 isotope deltas and fractions remaining fitted by equations 17-18; page 110 and Figure 6, page 111.
+      type: rate_series
+      class_tag: derived
+      locator: {<<: *table2, paragraph: 'delta 25Mg, Advective (this study), 2SD'}
+      quote: '0.9950 | 0.0006'
+      units: dimensionless
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      values:
+        laboratory_parameters: *laboratory_parameters
+        quantity: isotopic_fractionation_factor
+        method_class: model_derived
+        isotope_ratio: '25Mg/24Mg'
+        isotopic_fractionation_factor: 0.9950
+        model: Rayleigh fit with free starting-isotope intercept; equations 17 and 18.
+        model_locator: *rayleigh
+        T_K: 1873
+        temperature_locator: *table1
+        conditions: *conditions
+        note: Fitted isotope fractionation factor, not a measured isotope delta or an HKL evaporation coefficient.
+      uncertainty:
+        two_SD: 0.0006
+        units: dimensionless
+        locator: {<<: *table2, paragraph: 'delta 25Mg, 2SD'}
+      equipment: *equipment
+  Si:
+    observations:
+    - observation_id: badro_2021_vp1_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP1, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-1.73 | 0.04'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP1
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -1.73
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp1
+      uncertainty:
+        two_se: 0.04
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp2_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP2, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-2.63 | 0.17'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP2
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -2.63
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp2
+      uncertainty:
+        two_se: 0.17
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp3_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP3, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-2.68 | 0.31'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP3
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -2.68
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp3
+      uncertainty:
+        two_se: 0.31
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp4_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP4, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-2.79 | 0.07'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP4
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -2.79
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp4
+      uncertainty:
+        two_se: 0.07
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp5_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP5, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-2.26 | 0.28'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP5
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -2.26
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp5
+      uncertainty:
+        two_se: 0.28
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp6_delta30si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP6, d30Si-BHVO-2G and adjacent 2se'}
+      quote: '-1.04 | 0.11'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP6
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '30Si/28Si'
+        isotope_delta: -1.04
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp6
+      uncertainty:
+        two_se: 0.11
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d30Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_fit_30si_28si
+      derived_from:
+      - badro_2021_vp1_delta30si
+      - badro_2021_vp2_delta30si
+      - badro_2021_vp3_delta30si
+      - badro_2021_vp4_delta30si
+      - badro_2021_vp5_delta30si
+      - badro_2021_vp6_delta30si
+      derivation_note: Table 1 isotope deltas and fractions remaining fitted by equations 17-18; page 110 and Figure 6, page 111.
+      type: rate_series
+      class_tag: derived
+      locator: {<<: *table2, paragraph: 'delta 30Si, Advective (this study), 2SD'}
+      quote: '0.9943 | 0.0006'
+      units: dimensionless
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      values:
+        laboratory_parameters: *laboratory_parameters
+        quantity: isotopic_fractionation_factor
+        method_class: model_derived
+        isotope_ratio: '30Si/28Si'
+        isotopic_fractionation_factor: 0.9943
+        model: Rayleigh fit with free starting-isotope intercept; equations 17 and 18.
+        model_locator: *rayleigh
+        T_K: 1873
+        temperature_locator: *table1
+        conditions: *conditions
+        note: Fitted isotope fractionation factor, not a measured isotope delta or an HKL evaporation coefficient.
+      uncertainty:
+        two_SD: 0.0006
+        units: dimensionless
+        locator: {<<: *table2, paragraph: 'delta 30Si, 2SD'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp1_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP1, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-0.78 | 0.02'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP1
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -0.78
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp1
+      uncertainty:
+        two_se: 0.02
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp2_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP2, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-1.27 | 0.08'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP2
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -1.27
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp2
+      uncertainty:
+        two_se: 0.08
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp3_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP3, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-1.17 | 0.30'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP3
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -1.17
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp3
+      uncertainty:
+        two_se: 0.30
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp4_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP4, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-1.33 | 0.05'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP4
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -1.33
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp4
+      uncertainty:
+        two_se: 0.05
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp5_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP5, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-0.97 | 0.26'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP5
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -0.97
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp5
+      uncertainty:
+        two_se: 0.26
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_vp6_delta29si
+      type: rate_series
+      class_tag: measured
+      locator: {<<: *table1, paragraph: 'VP6, d29Si-BHVO-2G and adjacent 2se'}
+      quote: '-0.40 | 0.06'
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      units: permil
+      values:
+        composition_id: VP6
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: '29Si/28Si'
+        isotope_delta: -0.40
+        reference_standard: BHVO-2G
+        T_K: 1873
+        temperature_locator: *table1
+        run: *vp6
+      uncertainty:
+        two_se: 0.06
+        units: permil
+        locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d29Si-BHVO-2G'}
+      equipment: *equipment
+    - observation_id: badro_2021_fit_29si_28si
+      derived_from:
+      - badro_2021_vp1_delta29si
+      - badro_2021_vp2_delta29si
+      - badro_2021_vp3_delta29si
+      - badro_2021_vp4_delta29si
+      - badro_2021_vp5_delta29si
+      - badro_2021_vp6_delta29si
+      derivation_note: Table 1 isotope deltas and fractions remaining fitted by equations 17-18; page 110 and Figure 6, page 111.
+      type: rate_series
+      class_tag: derived
+      locator: {<<: *table2, paragraph: 'delta 29Si, Advective (this study), 2SD'}
+      quote: '0.9970 | 0.0004'
+      units: dimensionless
+      phase: condensed_liquid
+      regime: aerodynamic_levitation
+      values:
+        laboratory_parameters: *laboratory_parameters
+        quantity: isotopic_fractionation_factor
+        method_class: model_derived
+        isotope_ratio: '29Si/28Si'
+        isotopic_fractionation_factor: 0.9970
+        model: Rayleigh fit with free starting-isotope intercept; equations 17 and 18.
+        model_locator: *rayleigh
+        T_K: 1873
+        temperature_locator: *table1
+        conditions: *conditions
+        note: Fitted isotope fractionation factor, not a measured isotope delta or an HKL evaporation coefficient.
+      uncertainty:
+        two_SD: 0.0004
+        units: dimensionless
+        locator: {<<: *table2, paragraph: 'delta 29Si, 2SD'}
+      equipment: *equipment
+fidelity_samples:
+- species: Mg
+  observation_id: badro_2021_vp1_delta26mg
+  field: isotope_delta
+  value: -3.78
+  locator: {<<: *table1, paragraph: 'VP1, d26Mg-BHVO-2G'}
+- species: Mg
+  observation_id: badro_2021_vp6_delta25mg
+  field: isotope_delta
+  value: -1.15
+  locator: {<<: *table1, paragraph: 'VP6, d25Mg-BHVO-2G'}
+- species: Si
+  observation_id: badro_2021_vp3_delta30si
+  field: isotope_delta
+  value: -2.68
+  locator: {<<: *table1, paragraph: 'VP3, d30Si-BHVO-2G'}
+- species: Si
+  observation_id: badro_2021_vp4_delta29si
+  field: isotope_delta
+  value: -1.33
+  locator: {<<: *table1, paragraph: 'VP4, d29Si-BHVO-2G'}
+- species: Mg
+  observation_id: badro_2021_fit_26mg_24mg
+  field: isotopic_fractionation_factor
+  value: 0.9906
+  locator: {<<: *table2, paragraph: 'delta 26Mg, Advective (this study)'}
+extraction_scope:
+  source_observations: 28
+  measured_isotope_deltas: 24
+  fitted_isotope_fractionation_factors: 4
+  distinct_evaporation_runs: 6
+  residue_oxide_cells: 24
+  printed_derived_ratio_and_remaining_fraction_cells: 24
+  digitized_figure_points: 0
+  comparison_data: Richter-2007 rows in Table 1 and comparison columns in Table 2 not re-entered as new measurements.
+  limitations: >-
+    No reconstructible duration series or direct mass-loss series is printed.
+    Composition and run conditions accompany each isotope row. Shared YAML
+    anchors identify repeated metadata, not independent measurements.
