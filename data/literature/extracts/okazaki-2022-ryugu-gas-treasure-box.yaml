@@ -1,0 +1,314 @@
+schema_version: literature_extract.v1
+source_id: okazaki-2022-ryugu-gas-treasure-box
+source:
+  citation: 'Okazaki, R., Miura, Y. N., Takano, Y., Sawada, H., Sakamoto, K., Yada, T., Yamada, K., Kawagucci, S., Matsui, Y., Hashizume, K., and others (2022), First asteroid gas sample delivered by the Hayabusa2 mission: A treasure box from Ryugu, Science Advances 8, eabo7239.'
+  doi: 10.1126/sciadv.abo7239
+  url: https://doi.org/10.1126/sciadv.abo7239
+  year: 2022
+extraction:
+  method: Born-digital publisher PDF; transcribed from pdftotext -layout. Main article reports prose values and apparatus details; table S1 and table S2 are cited but not included in this 12-page PDF, so their unprinted cells were not reconstructed.
+  date: '2026-09-19'
+  worker: w3-okazaki-2022-ryugu-gas-treasure-box
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/okazaki-2022-ryugu-gas-treasure-box/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.He.observations.okazaki_2022_container_helium_isotope_ratio.values.ratio_3He_4He
+  value: '1.428 +/- 0.010 x 10^-4'
+  locator:
+    published_page: 3
+    figure: '2'
+    note: weighted arithmetic mean of measured container-gas 3He/4He ratios; printed uncertainty is 1 sigma in Fig. 2 discussion
+- path: species.Ryugu_sample.observations.okazaki_2022_recovered_mass_density_size.values.total_recovered_mass_g
+  value: 5.4
+  locator:
+    published_page: 5
+    section: Mechanism liberating the SW gases from Ryugu grains
+    note: total weight of Ryugu samples in the container
+species:
+  Ryugu_sample_container:
+    observations:
+    - observation_id: okazaki_2022_container_dimensions_and_sampling
+      type: method
+      locator:
+        published_page: 1
+        section: Introduction
+        note: sample-container dimensions and Hayabusa2 sampler size range are printed design/provenance facts, not furnace measurements
+      phase: Ryugu_sample_container
+      regime: sample_return_container
+      units: as printed
+      values:
+        quantity: container_dimensions_and_collectable_sample_size
+        method_class: method_only
+        container_material: aluminum alloy
+        container_diameter_mm: 120
+        container_height_mm: 130
+        collectable_sample_size_as_printed: millimeters to centimeters in diameter
+        sample_catcher_chambers: A and C
+    - observation_id: okazaki_2022_container_pressure_and_extraction_geometry
+      type: method
+      locator:
+        published_page: 6
+        section: Gas sampling and on-site measurement at the QLF in WPA
+        note: inner volume, vacuum-line volume, collection fraction, bottle volume, aliquot volume, and timing are printed in Materials and Methods
+      phase: Ryugu_sample_container
+      regime: GAEA_gas_extraction
+      units: as printed
+      values:
+        quantity: gas_sampling_geometry_and_timing
+        method_class: method_only
+        extraction_time_after_atmospheric_entry_hr: 30
+        container_inner_volume_cm3: '~200'
+        vacuum_line_volume_cm3: 79
+        gas_bottles: NT1-NT4
+        gas_bottle_volume_cm3_each: 750
+        fraction_to_NT1_NT4_pct: '~80'
+        QMS_split_volume_cm3: 16
+        QMS_split_fraction_pct: '~4'
+        cold_traps: CR1 and CR2 at liquid-nitrogen temperature
+    - observation_id: okazaki_2022_container_pressure_direct
+      type: rate_series
+      locator:
+        published_page: 3
+        section: Results
+        note: Pirani-gauge measurement 30 hours after atmospheric entry
+      phase: Ryugu_sample_container
+      regime: sealed_container_after_return
+      units: Pa
+      values:
+        quantity: container_gas_pressure
+        method_class: measured_direct
+        pressure_Pa: 68
+        instrument: Pirani gauge
+        measurement_time_after_atmospheric_entry_hr: 30
+    - observation_id: okazaki_2022_container_pressure_increase_and_leak
+      type: rate_series
+      locator:
+        published_page: 4
+        section: Discussion, Timing and contribution of the terrestrial atmosphere leakage
+        note: pressure increase and inferred continuing leak rate are both printed; no reconciliation with the separate 1.9-2.3 Pa/hour range attempted
+      phase: Ryugu_sample_container
+      regime: post_collection_container_leak
+      units: as printed
+      values:
+        quantity: pressure_change_and_leak_rate
+        method_class: measured_direct
+        pressure_increase_Pa: 4.8
+        elapsed_hr: 2.5
+        inferred_leak_rate_Pa_per_hr: 1.9
+        alternative_leak_rate_range_Pa_per_hr: 1.9 to 2.3
+    - observation_id: okazaki_2022_container_seal_force
+      type: method
+      locator:
+        published_page: 2
+        section: Introduction
+        note: metal sealing-system design force
+      phase: Ryugu_sample_container
+      regime: metal_seal
+      units: N
+      values:
+        quantity: seal_force
+        method_class: quoted_literature
+        force_N: '~2700'
+        seal_materials: softer aluminum alloy lid pressed onto harder Al alloy container edge
+    - observation_id: okazaki_2022_recovered_mass_density_size
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+        note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values; cited size distribution and density are retained as quoted literature
+      phase: Ryugu_grains
+      regime: recovered_sample_characterisation
+      units: as printed
+      values:
+        quantity: recovered_sample_mass_density_and_size_distribution
+        method_class: quoted_literature
+        total_recovered_mass_g: 5.4
+        bulk_density_g_cm3: 1.8
+        particle_size_mode_mm: 1.3
+        particle_size_range_mm: '~0.5 to 8'
+    - observation_id: okazaki_2022_maximum_temperature_history
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+        note: temperature values used to assess thermal release; the TD-site maximum is attributed to cited prior work, while the container monitor value is reported as an observed upper bound
+      phase: Ryugu_grains
+      regime: return_thermal_history
+      units: degree_C
+      values:
+        quantity: maximum_temperature_history
+        method_class: quoted_literature
+        touchdown_site_max_temperature_C: '~70'
+        container_monitor_max_temperature_C: '<=65'
+  He:
+    observations:
+    - observation_id: okazaki_2022_container_helium_isotope_ratio
+      type: rate_series
+      locator:
+        published_page: 3
+        figure: '2'
+        note: weighted arithmetic mean of measured container-gas 3He/4He ratios
+      phase: container_gas
+      regime: multi_laboratory_noble_gas_mass_spectrometry
+      units: ratio
+      uncertainty:
+        ratio_3He_4He: '+/- 0.010 x 10^-4 (1 sigma)'
+      values:
+        quantity: isotope_ratio
+        method_class: measured_direct
+        ratio_3He_4He: '1.428 x 10^-4'
+        comparison_atmospheric_ratio: '1.34 x 10^-6'
+    - observation_id: okazaki_2022_solar_wind_helium_abundance
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Origin of the He and Ne stored in the sample container
+        note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
+      phase: Ryugu_grains
+      regime: solar_wind_component_after_mixing_correction
+      units: cm3 STP
+      values:
+        quantity: released_gas_abundance
+        method_class: measured_reduced
+        model: weighted_two_component_mixing_subtraction of terrestrial atmosphere and solar wind
+        SW_4He_abundance_cm3_STP: '8 x 10^-6'
+  Ne:
+    observations:
+    - observation_id: okazaki_2022_container_ne_isotope_ratios
+      type: rate_series
+      locator:
+        published_page: 3
+        figure: '2'
+        note: weighted mean container-gas neon isotope ratios
+      phase: container_gas
+      regime: multi_laboratory_noble_gas_mass_spectrometry
+      units: ratio
+      uncertainty:
+        ratio_20Ne_22Ne: '+/- 0.0055'
+        ratio_21Ne_22Ne: '+/- 0.00015'
+      values:
+        quantity: isotope_ratios
+        method_class: measured_direct
+        ratio_20Ne_22Ne: 10.3427
+        ratio_21Ne_22Ne: 0.02980
+        ratio_20Ne_22Ne_atmospheric_comparison: 9.8
+        ratio_21Ne_22Ne_atmospheric_comparison: 0.0285
+    - observation_id: okazaki_2022_solar_wind_neon_abundance
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Origin of the He and Ne stored in the sample container
+        note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
+      phase: Ryugu_grains
+      regime: solar_wind_component_after_mixing_correction
+      units: cm3 STP
+      values:
+        quantity: released_gas_abundance
+        method_class: measured_reduced
+        model: weighted_two_component_mixing_subtraction of terrestrial atmosphere and solar wind
+        SW_20Ne_abundance_cm3_STP: '6 x 10^-7'
+  Ar:
+    observations:
+    - observation_id: okazaki_2022_argon_isotope_ratio_range
+      type: rate_series
+      locator:
+        published_page: 4
+        figure: '3'
+        note: range stated for container-gas 40Ar/36Ar measurements
+      phase: container_gas
+      regime: multi_laboratory_noble_gas_mass_spectrometry
+      units: ratio
+      values:
+        quantity: isotope_ratio
+        method_class: measured_direct
+        ratio_40Ar_36Ar_range: 268.4 to 284.7
+  N:
+    observations:
+    - observation_id: okazaki_2022_nitrogen_delta15_range
+      type: rate_series
+      locator:
+        published_page: 4
+        figure: '3'
+        note: range stated for container-gas nitrogen isotope composition
+      phase: container_gas
+      regime: multi_laboratory_noble_gas_mass_spectrometry
+      units: per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        delta_15N_range_per_mil: -16 to -13
+  CH4:
+    observations:
+    - observation_id: okazaki_2022_methane_detection_limit
+      type: rate_series
+      locator:
+        published_page: 7
+        section: Analysis procedures of the volatile compositions in the sample gas pipettes, At JAMSTEC
+        note: methane and ethane were not detected; the detection limit and abundance bound are printed
+      phase: Ryugu_grains
+      regime: purge_and_trap_gas_chromatography_isotope_ratio_mass_spectrometry
+      units: as printed
+      values:
+        quantity: detection_limit_and_abundance_bound
+        method_class: measured_direct
+        detection_limit_pmol: 6
+        abundance_upper_bound_nmol_per_g: 90
+        measured_status: not detected
+        bound_basis: barometric calculation from sample size and vacuum-line volume
+  Ryugu_SW_layer:
+    observations:
+    - observation_id: okazaki_2022_fragmentation_assumptions_and_model_output
+      type: rate_series
+      locator:
+        published_page: 8
+        section: Materials and Methods, Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+        table: 'S2'
+        note: numerical assumptions and outputs are author geometric/abundance calculations; table S2 is cited but not present in the supplied PDF, so only values printed in the prose are recorded
+      phase: Ryugu_grains
+      regime: isotropic_fragmentation_model
+      units: as printed
+      values:
+        quantity: solar_wind_layer_fragmentation_model
+        method_class: model_derived
+        model: isotropic cube-fragmentation surface-area calculation using assumed homogeneous 50-nm solar-wind layer
+        original_cube_side_cm: 1
+        original_cube_count: 3
+        terminal_cube_side_cm: 0.13
+        assumed_density_g_cm3: 1.8
+        implanted_layer_thickness_nm: 50
+        cumulative_fresh_surface_area_cm2: '3 x 10^-3'
+      derived_from: author geometric calculation from assumed cube dimensions, density, and implanted-layer thickness
+      derivation:
+        premise: three 1-cm cubes, density 1.8 g cm^-3, homogeneous 50-nm solar-wind layer, and fragmentation to 0.13-cm cubes
+        algebra: isotropic cube-fragmentation surface-area bookkeeping as described in Materials and Methods
+        unit_check: printed cm, g cm^-3, and nm inputs with printed cm2 output
+    - observation_id: okazaki_2022_surface_pulverization_model
+      type: rate_series
+      locator:
+        published_page: 8
+        section: Materials and Methods, Expected fraction of pulverized surface area
+        note: author estimate from measured SW-4He abundance and assumed grain population; printed quantities retained as assumptions/model outputs
+      phase: Ryugu_grains
+      regime: surface_pulverization_model
+      units: as printed
+      values:
+        quantity: pulverized_surface_area_estimate
+        method_class: model_derived
+        model: surface-area and solar-wind helium mass-balance estimate
+        grain_count: 1000
+        grain_side_cm: 0.13
+        assumed_total_mass_g: '~5.4'
+        assumed_bulk_4He_concentration_cm3_STP_per_g: '4 x 10^-3'
+        derived_SW_4He_density_atoms_cm3: '8 x 10^20'
+        derived_surface_SW_4He_density_atoms_cm2: '9 x 10^13'
+        required_fresh_surface_area_cm2: '2 x 10^-3'
+        pulverized_surface_fraction_pct: 2
+        alternative_fragment_count: 2000
+        alternative_fragment_area_um2: '10 by 10'
+        alternative_fragment_thickness_nm: '<50'
+      derived_from: author estimate constrained by measured blank-corrected SW-4He abundance and assumed grain population
+      derivation:
+        premise: 1000 grains of 0.13-cm side, 5.4-g total mass, 4 x 10^-3 cm3 STP g^-1 bulk SW-4He, and a 50-nm implanted layer
+        algebra: convert assumed bulk concentration to atom density, then solve fresh pulverized area from the measured released SW-4He
+        unit_check: printed cm3 STP, g, atoms cm^-3, atoms cm^-2, cm2, and percent units retained
