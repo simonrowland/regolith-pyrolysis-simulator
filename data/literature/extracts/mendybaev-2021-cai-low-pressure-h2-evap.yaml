@@ -1,0 +1,274 @@
+schema_version: literature_extract.v1
+source_id: mendybaev-2021-cai-low-pressure-h2-evap
+source:
+  citation: 'Mendybaev, R. A., Kamibayashi, M., Teng, F.-Z., Savage, P. S., Georg, R. B., Richter, F. M. & Tachibana, S. (2021), "Experiments quantifying elemental and isotopic fractionations during evaporation of CAI-like melts in low-pressure hydrogen and in vacuum: Constraints on thermal processing of CAI in the protoplanetary disk".'
+  year: 2021
+extraction:
+  method: pdftotext -layout with visual verification of Tables 1-2 and Figures 2, 6, 8
+  date: '2026-09-19'
+  worker: extract-mendybaev-2021
+  source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  note: 'The supplied manuscript PDF clips the right-hand continuation of Tables 1-2. Only readable cells are transcribed; clipped residue oxide compositions, final weights, and clipped rate columns are absent.'
+review_status: draft
+system_conditions:
+  material: CAI4B2 synthetic CAI-like CMAS melt
+  starting_composition_wt_pct:
+    MgO: 16
+    SiO2: 36
+    Al2O3: 27
+    CaO: 21
+  starting_composition_locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_page: 5
+    paragraph: 'Starting materials; CAI4B2 composition'
+  temperature_C: 1600
+  temperature_locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_page: 7
+    paragraph: 'experiments conducted at 1600°C'
+  sample_form: molten CAI4B2 droplets on 1.5- or 2.5-mm diameter Ir-wire loops
+  container: Alfa Aesar Ir wire, 99.8%; no crucible during evaporation
+  sample_form_locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_page: 5
+    paragraph: 'samples loaded onto iridium wire loops'
+  area_method: 'surface area calculated from measured sample geometry, Ir thermal expansion, and density-composition-temperature relationships; initial areas printed in Table 1'
+  area_locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_page: 7
+    table: '1'
+  temperature_measurement:
+    vacuum: 'two factory-calibrated Type G thermocouples within ~10 mm of the sample and a PYRO Micro optical pyrometer ~5 mm below it'
+    hydrogen: 'molybdenum-sheathed Type C thermocouple 22.5 mm above the sample'
+  temperature_calibration:
+    hydrogen: 'calibrated against melting Fe 1535°C, Ni 1455°C, and Rh-C eutectic 1657°C at the sample location'
+  temperature_control: 'vacuum Eurotherm controller within ±1°C; H2 heating rate ~20°C/min and 5 min hold for complete melting'
+  temperature_locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    published_pages: '7-8'
+    paragraph: 'Experimental protocols'
+  arms:
+    h2_2e-4_bar:
+      gas: H2
+      pressure_as_printed: '~2×10−4 bar'
+      pumping: 'turbo pump evacuation to 10−9–10−10 bar at room temperature; H2 introduced after the furnace was below 5×10−9 bar and flow-controlled to constant pressure'
+      furnace: 'Hokkaido University low-pressure high-temperature hydrogen furnace; stainless-steel vacuum furnace with tungsten mesh heater, 25 mm diameter × 100 mm'
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 8
+        paragraph: '3.1.2 Low-pressure H2 experiments'
+    h2_2e-5_bar:
+      gas: H2
+      pressure_as_printed: '~2×10−5 bar'
+      pumping: 'same H2-furnace evacuation and flow-control protocol as the 2×10−4 bar arm'
+      furnace: 'same Hokkaido University low-pressure hydrogen furnace'
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 8
+        paragraph: '3.1.2 Low-pressure H2 experiments'
+    vacuum:
+      gas: vacuum
+      pressure_as_printed: '~10−7 bar during the run'
+      pumping: 'turbomolecular pump; chamber pumped to ~10−7 bar before heating and vented after cooling'
+      furnace: 'University of Chicago high-temperature high-vacuum Hashimoto furnace with tungsten mesh heater and heat shield'
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 7
+        paragraph: '3.1.1 Vacuum evaporation experiments'
+species:
+  Mg:
+    observations:
+    - observation_id: mendybaev_2021_mg_evaporation_rates_by_arm
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 11
+        paragraph: 'average evaporation rates JMg'
+      T_C: 1600
+      phase: CAI4B2_melt
+      regime: free_evaporation_by_overhead_gas_arm
+      units: mol cm−2 s−1
+      values:
+        quantity: JMg
+        method_class: measured_direct_from_residue_compositions
+        arms:
+        - arm: vacuum
+          pressure_as_printed: '~10−7 bar'
+          duration: '3–3300 min across Table 1 runs'
+          value_as_printed: '(3.6±0.4)×10−9'
+        - arm: H2
+          pressure_as_printed: '~2×10−5 bar'
+          duration: '10–120 min across Table 1 runs'
+          value_as_printed: '(5.6±0.3)×10−8'
+        - arm: H2
+          pressure_as_printed: '~2×10−4 bar'
+          duration: '3–60 min across Table 1 runs'
+          value_as_printed: '(1.6±0.4)×10−7'
+        relative_rate_as_printed: 'JMg/JSi~1 in all experiments'
+    - observation_id: mendybaev_2021_mg_alpha_by_arm
+      type: alpha
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 15
+        figure: '6'
+        paragraph: 'kinetic isotopic fractionation factor α25,24'
+      T_C: 1600
+      phase: CAI4B2_melt
+      regime: Rayleigh_distillation
+      units: dimensionless
+      values:
+        quantity: alpha_25Mg_24Mg
+        method_class: measured_direct_regression
+        all_CAIB2_data_as_printed: '0.9877±0.0004'
+        vacuum_CAIB2_as_printed: '0.98786±0.00032'
+        H2_2e-4_bar_CAIB2_as_printed: '0.98745±0.00026'
+        uncertainty_convention: '±2σ'
+        note: 'Figure 6 regression excludes B2-3; data normalized to the least evaporated sample to remove furnace-ramp fractionation.'
+  Si:
+    observations:
+    - observation_id: mendybaev_2021_si_evaporation_rates_by_arm
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 11
+        paragraph: 'average evaporation rates JSi'
+      T_C: 1600
+      phase: CAI4B2_melt
+      regime: free_evaporation_by_overhead_gas_arm
+      units: mol cm−2 s−1
+      values:
+        quantity: JSi
+        method_class: measured_direct_from_residue_compositions
+        arms:
+        - arm: vacuum
+          pressure_as_printed: '~10−7 bar'
+          duration: '3–3300 min across Table 1 runs'
+          value_as_printed: '(4.0±0.5)×10−9'
+        - arm: H2
+          pressure_as_printed: '~2×10−5 bar'
+          duration: '10–120 min across Table 1 runs'
+          value_as_printed: '(6.7±0.9)×10−8'
+        - arm: H2
+          pressure_as_printed: '~2×10−4 bar'
+          duration: '3–60 min across Table 1 runs'
+          value_as_printed: '(1.9±0.5)×10−7'
+        relative_rate_as_printed: 'JMg/JSi~1 in all experiments'
+    - observation_id: mendybaev_2021_si_alpha_by_arm
+      type: alpha
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 16
+        figure: '8'
+        paragraph: 'kinetic isotopic fractionation factor α29,28'
+      T_C: 1600
+      phase: CAI4B2_melt
+      regime: Rayleigh_distillation
+      units: dimensionless
+      values:
+        quantity: alpha_29Si_28Si
+        method_class: measured_direct_regression
+        vacuum_and_H2_as_printed: '0.9910±0.0005'
+        uncertainty_convention: 'analytical uncertainties less than symbol size; quoted regression uncertainty as printed'
+    - observation_id: mendybaev_2021_isotope_table2_readable_rows
+      type: residue_isotope_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 29
+        table: '2'
+      T_C: 1600
+      phase: CAI4B2_evaporation_residue
+      regime: vacuum_or_H2_as_sample_group
+      units: 'fraction dimensionless; δ values ‰; 2 std ‰'
+      values:
+        quantity: readable_table2_fraction_evaporated_and_Mg_isotopes
+        method_class: measured_direct
+        note: 'Table 2 contains no readable gas-arm column in the supplied PDF; sample group is retained separately from the arm conditions in Table 1. Si isotope columns and clipped right-hand columns are absent from the supplied PDF.'
+        rows:
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, fraction_Mg: 0.031, fraction_Si: 0.020, delta25Mg_permil: -0.97, Mg_2std_permil: 0.05, delta26Mg_permil: -1.90}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, fraction_Mg: 0.112, fraction_Si: 0.104, delta25Mg_permil: 0.04, Mg_2std_permil: 0.05, delta26Mg_permil: 0.06}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, fraction_Mg: 0.292, fraction_Si: 0.221, delta25Mg_permil: 2.76, Mg_2std_permil: 0.05, delta26Mg_permil: 5.42}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, fraction_Mg: 0.869, fraction_Si: 0.601, delta25Mg_permil: 19.70, Mg_2std_permil: 0.05, delta26Mg_permil: 38.89}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, fraction_Mg: 0.518, fraction_Si: 0.35, delta25Mg_permil: 7.18, Mg_2std_permil: 0.05, delta26Mg_permil: 14.09}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, fraction_Mg: 0.747, fraction_Si: 0.486, delta25Mg_permil: 15.12, Mg_2std_permil: 0.05, delta26Mg_permil: 29.81}
+        - {sample: CAI4B2-26, arm: H2_2e-4_bar, fraction_Mg: 0.449, fraction_Si: 0.337}
+        - {sample: CAI4B2-28, arm: H2_2e-4_bar, fraction_Mg: 0.624, fraction_Si: 0.432}
+        - {sample: CAI4B2-30, arm: H2_2e-4_bar, fraction_Mg: 1.000, fraction_Si: 0.974}
+        - {sample: CAI4B2-31, arm: H2_2e-4_bar, fraction_Mg: 0.250, fraction_Si: 0.148}
+        - {sample: CAI4B2-29, arm: H2_2e-4_bar, fraction_Mg: 0.533, fraction_Si: 0.406}
+        - {sample: CAI4B2-13, arm: H2_2e-4_bar, fraction_Mg: 0.341, fraction_Si: 0.251}
+        - {sample: CAI4B2-1, arm: vacuum, fraction_Mg: 0.000, fraction_Si: 0.000, delta25Mg_permil: -1.66, Mg_2std_permil: 0.05, delta26Mg_permil: -3.21}
+        - {sample: CAI4B2-25, arm: vacuum, fraction_Mg: 0.105, fraction_Si: 0.063, delta25Mg_permil: 0.87, Mg_2std_permil: 0.06, delta26Mg_permil: 1.64}
+        - {sample: CAI4B2-22, arm: vacuum, fraction_Mg: 0.26, fraction_Si: 0.150, delta25Mg_permil: 2.51, Mg_2std_permil: 0.06, delta26Mg_permil: 4.89}
+        - {sample: CAI4B2-21, arm: vacuum, fraction_Mg: 0.642, fraction_Si: 0.414, delta25Mg_permil: 10.90, Mg_2std_permil: 0.06, delta26Mg_permil: 21.42}
+        - {sample: CAI4B2-23, arm: vacuum, fraction_Mg: 0.832, fraction_Si: 0.555, delta25Mg_permil: 20.90, Mg_2std_permil: 0.06, delta26Mg_permil: 41.51}
+  total:
+    observations:
+    - observation_id: mendybaev_2021_weight_loss_rates_by_arm
+      type: rate_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 11
+        figure: '2'
+        paragraph: 'surface-area-normalized total weight loss'
+      T_C: 1600
+      phase: CAI4B2_melt
+      regime: overhead_gas_arm
+      units: g cm−2 min−1
+      values:
+        quantity: surface_area_normalized_total_weight_loss_rate
+        method_class: measured_direct_from_figure_slope
+        figure_only: true
+        arms:
+        - {arm: vacuum, pressure_as_printed: '~10−7 bar', rate_as_printed: '(2.4±0.1)×10−5'}
+        - {arm: H2_2e-5_bar, pressure_as_printed: '~2×10−5 bar', rate_as_printed: '(4.5±0.2)×10−4'}
+        - {arm: H2_2e-4_bar, pressure_as_printed: '~2×10−4 bar', rate_as_printed: '(1.1±0.1)×10−3'}
+    - observation_id: mendybaev_2021_table1_sample_geometry_readable_columns
+      type: experiment_series
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        published_page: 28
+        table: '1'
+      phase: CAI4B2_melt
+      regime: overhead_gas_arm
+      units: 'diameter mm; duration min; initial weight g; initial surface area cm2'
+      values:
+        quantity: readable_table1_experimental_conditions
+        method_class: measured_direct
+        rows:
+        - {sample: CAI4B2-2, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 3, initial_mass_g: 0.01694, initial_area_cm2: 0.177}
+        - {sample: CAI4B2-16, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 10, initial_mass_g: 0.03692, initial_area_cm2: 0.278}
+        - {sample: CAI4B2-12, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 20, initial_mass_g: 0.03363, initial_area_cm2: 0.262}
+        - {sample: CAI4B2-3, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 30, initial_mass_g: 0.01758, initial_area_cm2: 0.180}
+        - {sample: CAI4B2-14, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 35, initial_mass_g: 0.03960, initial_area_cm2: 0.291}
+        - {sample: CAI4B2-10, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 45, initial_mass_g: 0.03568, initial_area_cm2: 0.272}
+        - {sample: CAI4B2-4, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 60, initial_mass_g: 0.01915, initial_area_cm2: 0.183}
+        - {sample: CAI4B2-26, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 10, initial_mass_g: 0.00725, initial_area_cm2: 0.095}
+        - {sample: CAI4B2-28, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 20, initial_mass_g: 0.00783, initial_area_cm2: 0.100}
+        - {sample: CAI4B2-30, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 30, initial_mass_g: 0.00613, initial_area_cm2: 0.088}
+        - {sample: CAI4B2-31, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 30, initial_mass_g: 0.00825, initial_area_cm2: 0.103}
+        - {sample: CAI4B2-29, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 40, initial_mass_g: 0.00536, initial_area_cm2: 0.082}
+        - {sample: CAI4B2-32, arm: H2_2e-4_bar, diameter_mm: 1.5, duration_min: 120, initial_mass_g: 0.00849, initial_area_cm2: 0.105}
+        - {sample: CAI4B2-13, arm: H2_2e-4_bar, diameter_mm: 2.5, duration_min: 60, initial_mass_g: 0.04731, initial_area_cm2: 0.327}
+        - {sample: CAI4B2-1, arm: vacuum, diameter_mm: 2.5, duration_min: 5, initial_mass_g: 0.02388, initial_area_cm2: 0.211}
+        - {sample: CAI4B2-25, arm: vacuum, diameter_mm: 2.5, duration_min: 300, initial_mass_g: 0.01966, initial_area_cm2: 0.190}
+        - {sample: CAI4B2-22, arm: vacuum, diameter_mm: 2.5, duration_min: 600, initial_mass_g: 0.02300, initial_area_cm2: 0.210}
+        - {sample: CAI4B2-21, arm: vacuum, diameter_mm: 2.5, duration_min: 1200, initial_mass_g: 0.01817, initial_area_cm2: 0.183}
+        - {sample: CAI4B2-23, arm: vacuum, diameter_mm: 2.5, duration_min: 1700, initial_mass_g: 0.02542, initial_area_cm2: 0.221}
+        - {sample: CAI4B2-20, arm: vacuum, diameter_mm: 2.5, duration_min: 1800, initial_mass_g: 0.01792, initial_area_cm2: 0.182}
+        - {sample: CAI4B2-24, arm: vacuum, diameter_mm: 2.5, duration_min: 2100, initial_mass_g: 0.03076, initial_area_cm2: 0.247}
+        - {sample: CAI4B2-18, arm: vacuum, diameter_mm: 2.5, duration_min: 2400, initial_mass_g: 0.02003, initial_area_cm2: 0.192}
+        - {sample: CAI4B2-19, arm: vacuum, diameter_mm: 2.5, duration_min: 3300, initial_mass_g: 0.02826, initial_area_cm2: 0.235}
+null_hypothesis_and_gaps:
+  duplicate_check: 'No Mendybaev 2021 title, DOI, or author match found in data/literature/extracts or data/literature/INDEX.yaml; Mendybaev 2017 is a separate sibling source.'
+  model_measurement_check: 'The fitted activation energies in Fig. 3 and modeled timescales in Fig. 9 are not entered as measurements. Printed rate values and isotope regressions are retained as measured/regression evidence with their class tags.'
+  absent_parameters:
+  - final sample weights
+  - per-run residue oxide compositions; the supplied PDF clips the Table 1 continuation containing those columns
+  - per-run evaporation rates from the clipped Table 1 columns
+  - exact H2 pressure beyond the printed approximate values
+  - vacuum pressure stability beyond the printed ~10−7 bar
+  - sample area for the 2×10−5 bar H2 rate arm as a distinct Table 1 series
+  - container material beyond the Ir-wire loop; no separate evaporation crucible is stated
+  vocabulary_names_needed:
+  - initial_area_cm2 (source-faithful; vocabulary has no initial-area-cm2 alias)
+  - arm-specific gas pressure and pumping descriptors (no existing vocabulary field)
