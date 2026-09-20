@@ -1,0 +1,230 @@
+schema_version: literature_extract.v1
+source_id: ammin-76-904
+source:
+  citation: >-
+    Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric
+    measurement of heat capacity during incongruent melting of diopside",
+    American Mineralogist 76, 904-912.
+  doi: null
+  year: 1991
+extraction:
+  method: pdftotext_layout_manual_transcription
+  date: '2026-09-20'
+  worker: codex-extract-ingest
+  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+review_status: draft
+species:
+  CaMgSi2O6:
+    observations:
+      - observation_id: ammin_76_904_table1_diopside_composition
+        type: composition
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 905
+          pdf_page: 2
+          table: '1'
+        phase: crystalline_diopside_and_diopside_glass
+        regime: electron_microprobe_and_wet_chemical_analysis
+        units: wt_pct_and_formula_atoms
+        values:
+          method_class: measured_direct
+          composition_wt_pct:
+            crystal:
+              SiO2: {value: 55.75, uncertainty: 0.64}
+              MgO: {value: 18.15, uncertainty: 0.32}
+              CaO: {value: 25.78, uncertainty: 0.51}
+              total: 99.67
+            glass_electron_microprobe:
+              SiO2: {value: 55.50, uncertainty: 0.58}
+              MgO: {value: 18.25, uncertainty: 0.30}
+              CaO: {value: 26.11, uncertainty: 0.41}
+              total: 99.86
+            glass_wet_chemical:
+              SiO2: 55.72
+              MgO: 18.43
+              CaO: 25.75
+              total: 99.90
+            ideal:
+              SiO2: 55.49
+              MgO: 18.61
+              CaO: 25.90
+              total: 100.00
+          formula_atoms:
+            crystal: {Si: 2.01, Mg: 0.98, Ca: 0.99, O: 6.00}
+            glass_electron_microprobe: {Si: 2.00, Mg: 0.98, Ca: 1.01, O: 6.00}
+            glass_wet_chemical: {Si: 2.01, Mg: 0.99, Ca: 0.99, O: 6.00}
+            ideal: {Si: 2.00, Mg: 1.00, Ca: 1.00, O: 6.00}
+          uncertainty_note: Electron-microprobe standard deviations are in parentheses; wet-chemical standard deviation is ±1%.
+        apparatus:
+          analysis: JEOL 8600 electron microprobe at Rutgers University
+          phase_checks: optical microscopy, backscattered-electron imaging at approximately 1 micrometre resolution, and XRD
+          phase_check_result: single crystalline phase; no forsterite or wollastonite peaks within the XRD detection limit of approximately 2%
+        missing: [sample_mass_for_composition_analysis, analysis_pressure, analysis_atmosphere]
+
+      - observation_id: ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 908
+          pdf_page: 5
+          table: '2'
+        T_range_K: [1403, 1762]
+        phase: crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside
+        regime: step_scan_calorimetry
+        units: as_published
+        values:
+          method_class: measured_direct
+          computed_comparator:
+            method_class: model_derived
+            generator: Stebbins_et_al_1983_crystalline_heat_capacity_and_heat_content_equations
+            columns: [Cp_calculated_J_per_mol_K, Cp_difference_pct, H_minus_H298_calculated_kJ_per_mol, H_difference_pct]
+            note: Table 2 calculated columns are retained as a separate comparator; only the measured columns are validation evidence.
+          columns: [T_K, Cp_measured_J_per_mol_K, Cp_calculated_J_per_mol_K, Cp_difference_pct, H_minus_H298_measured_kJ_per_mol, H_minus_H298_calculated_kJ_per_mol, H_difference_pct]
+          series:
+            - [1403, 265.34, 259.54, 2.23, 258.93, 258.93, 0.00]
+            - [1433, 245.88, 259.85, -5.38, 266.60, 266.70, -0.04]
+            - [1464, 246.77, 260.14, -5.14, 274.23, 274.74, -0.18]
+            - [1496, 267.27, 260.43, 2.63, 283.46, 283.06, -0.14]
+            - [1527, 283.92, 260.69, 8.91, 291.00, 291.12, -0.04]
+            - [1537, 271.23, 260.77, 4.05, 293.78, 293.72, 0.02]
+            - [1558, 280.05, 260.94, 7.32, 299.56, 299.19, 0.12]
+            - [1570, 253.31, 261.03, -2.96, 302.76, 302.32, 0.15]
+            - [1589, 276.80, 261.17, 5.98, 307.80, 307.27, 0.17]
+            - [1596, 279.99, 261.22, 7.19, 309.75, 309.10, 0.21]
+            - [1606, 324.61, 261.25, 24.25, 310.67, 309.71, 0.31]
+            - [1610, 397.88, 261.33, 52.25, 314.70, 312.75, 0.62]
+            - [1620, 522.80, 261.40, 100.0, 319.30, 315.36, 1.25]
+            - [1627, 658.11, 261.44, 151.73, 323.44, 317.19, 1.97]
+            - [1639, 839.13, 261.53, 220.85, 332.42, 320.33, 3.77]
+            - [1649, 1535.56, 261.60, 486.99, 344.89, 323.08, 6.75]
+            - [1659, 9622.81, 261.66, 3577.60, 400.68, 325.69, 23.02]
+            - [1663, 13261.71, 261.70, 4967.52, 463.61, 327.13, 41.72]
+            - [1673, 273.34, 334.00, -18.16, 469.20, 467.63, 0.34]
+            - [1679, 263.97, 334.00, -20.97, 470.95, 469.81, 0.24]
+            - [1689, 342.47, 334.00, 2.53, 473.98, 473.15, 0.17]
+            - [1699, 363.23, 334.00, 8.75, 477.51, 476.49, 0.21]
+            - [1703, 281.94, 334.00, -15.59, 478.64, 477.66, 0.21]
+            - [1709, 341.72, 334.00, 2.31, 480.66, 479.83, 0.17]
+            - [1719, 395.29, 334.00, 18.35, 484.35, 483.17, 0.24]
+            - [1731, 283.25, 334.00, -15.15, 488.42, 487.21, 0.25]
+            - [1762, 283.40, 334.00, -15.15, 497.21, 497.53, -0.06]
+            - [1641, 306.80, 334.00, -8.14, 459.45, 458.87, 0.13]
+            - [1610, 321.03, 334.00, -3.88, 449.72, 448.51, 0.27]
+          row_labels: c=crystal; l=liquid; c-l=crystal+liquid; scl=supercooled liquid
+        apparatus:
+          calorimeter: Setaram HT1500 operated in step-scanning mode
+          detector: upper thermopile around alumina sample crucible with Pt inner crucible; lower thermopile around alumina reference crucible
+          sample_container: snugly fitting Pt crucible with Pt-foil lid
+          reference_container: alumina crucible half-filled with dried corundum powder
+          sample_mass_g: 1.30602
+          reference_mass_g: 0.94967
+          separate_crucibles: approximately 2 g each and within 0.05 g of one another
+          furnace: graphite furnace; detector centered in approximately 10 cm isothermal zone
+          temperature_uniformity_K: less_than_2
+          thermocouple: Pt-60-percent-Rh/Pt-30-percent-Rh next to sample crucible
+          temperature_calibration: thermocouple calibration checked by melting Au at 1337 K
+          data_acquisition: Keithley 181 nanovoltmeter with National Instruments IEEE-488 interface
+          scanning_outside_melting: ten alternating heating and cooling steps at 1 K/min for 5 min, each followed by 20 min isothermal interval
+          scanning_inside_melting: ten continuous heating steps at 1 K/min for 5 min, each followed by 20 min isothermal interval
+          temperature_equilibration: sample reached within 0.5 K of final temperature in 1-2 min after heating; detector typically required about 20 min
+        missing: [sample_exposed_area, chamber_pressure, vacuum_level, pumping, gas_identity_and_pressure, fo2_control, crucible_geometry, run_duration_total]
+
+      - observation_id: ammin_76_904_fusion_and_melting_transition
+        type: phase_transition
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 904
+          pdf_page: 1
+          section: Abstract
+        phase: crystalline_diopside_to_liquid_diopside
+        regime: step_scan_calorimetry
+        units: K_and_kJ_per_mol
+        values:
+          method_class: measured_direct
+          incongruent_melting_onset_K: 1606
+          melting_interval_K: [1606, 1665]
+          previously_reported_melting_point_K: 1665
+          first_20_percent_melting_interval_K: 44
+          remaining_80_percent_melting_interval_K: 15
+          enthalpy_of_fusion_kJ_per_mol: 137.7
+          enthalpy_of_fusion_uncertainty_kJ_per_mol: 2.4
+          heat_capacity_scatter_pct: {crystalline: 5, liquid: 12}
+          integrated_heat_content_agreement_pct: 0.3
+        apparatus:
+          method: direct scanning measurement of heat capacity using the Setaram HT1500
+        note: Abstract reports melting begins approximately 59 K below the previously reported 1665 K melting point; Table 2 resolves the measured transition region.
+
+      - observation_id: ammin_76_904_crystallization_repeated_runs
+        type: crystallization_temperature_series
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 910
+          pdf_page: 7
+          figure: '6'
+          section: Observations on incongruent melting and preliminary crystallization study
+        phase: diopside_liquid_to_clinopyroxene_solid_solution_and_wollastonite
+        regime: scanning_calorimetry_constant_cooling
+        units: K_and_K_per_h
+        values:
+          method_class: measured_direct
+          initial_temperature_K: 1691
+          cooling_rate_K_per_h: 10
+          crystallization_peak_temperature_K: [1576, 1534, 1566]
+          repeated_conditions: three runs at identical conditions
+          earlier_30_K_per_h_run_initial_temperature_K: 1715
+          earlier_30_K_per_h_run_peak_temperature_K: 1545
+          no_forsterite_heat_effect_observed: true
+        apparatus:
+          calorimeter: Setaram HT1500
+          sample_form: crystalline diopside in capsule
+        missing: [capsule_material, capsule_dimensions, sample_mass_for_crystallization_runs]
+
+      - observation_id: ammin_76_904_author_regression_liquid_heat_capacity
+        type: fitted_heat_capacity
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          equation: '6'
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: liquid_diopside
+        regime: regression_of_integrated_enthalpy_data
+        units: J_per_mol_K
+        values:
+          method_class: model_derived
+          generator: linear_regression_on_this_study_integrated_enthalpy_data
+          equation: H_T_minus_H_298_crystal = A + bT
+          liquid_heat_capacity_J_per_mol_K: 312
+          liquid_heat_capacity_uncertainty_J_per_mol_K: 10
+          combined_datasets_liquid_heat_capacity_J_per_mol_K: 334
+          combined_datasets_uncertainty_J_per_mol_K: 7
+          more_accurate_combined_uncertainty_J_per_mol_K: 20
+        note: The 312 +/- 10 J/mol K fit is author-derived, not a direct measurement; 334 +/- 7 J/mol K combines this study with Stebbins et al. (1983) and Richet & Bottinga (1984).
+
+      - observation_id: ammin_76_904_quoted_comparator_enthalpy_values
+        type: quoted_comparator
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: diopside
+        regime: cited_literature_comparison
+        units: as_published
+        values:
+          method_class: quoted_attributed
+          cited_values:
+            - {source: Stebbins et al. (1983), quantity: enthalpy_of_fusion, value_kJ_per_mol: 138.1}
+            - {source: Richet and Bottinga (1984), quantity: enthalpy_of_fusion, value_kJ_per_mol: 137.7}
+            - {source: Ferrier (1968), quantity: enthalpy_of_fusion, value_kJ_per_mol: 128}
+            - {source: Richet and Bottinga (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 334}
+            - {source: Stebbins et al. (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 353}
+            - {source: Adamkovicova et al. (1980), quantity: wollastonite_enthalpy_of_fusion, value_kJ_per_mol: 57.3, temperature_K: 1821}
+        note: Values are quoted or attributed by Lange et al.; they are not measurements made in this source.
+
+metadata:
+  scope_verdict: in_scope_direct_step_scan_calorimetry_on_silicate_diopside
+  source_type: primary_experimental_paper
+  measured_content: heat_capacity_enthalpy_composition_melting_and_crystallization
+  not_found: vacuum_pressure_pumping_gas_identity_fO2_exposed_area_orifice_geometry_run_duration_total
+  absent_policy: absent_not_zero_and_no_values_computed_from_printed_dimensions
