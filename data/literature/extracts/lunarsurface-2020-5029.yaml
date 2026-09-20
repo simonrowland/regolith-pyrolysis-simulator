@@ -1,0 +1,109 @@
+schema_version: literature_extract.v1
+source_id: lunarsurface-2020-5029
+source:
+  citation: Dominguez, Gerardo, Jeffrey Gillis-Davis, Lauren Tafla, Ryan Ogliore (2020), Cavity Ringdown Spectroscopy for the Complete Isotopic Characterization of Lunar Surface Volatiles, Lunar Surface Science Workshop 2020, LPI Contribution No. 2241, abstract 5029.
+  year: 2020
+extraction:
+  method: Born-digital two-page LPI workshop abstract PDF from regolith-corpus raw/lunarsurface-2020-5029/lunarsurface-2020-5029.pdf. Transcribed with pdftotext -layout and checked against 150 dpi page renders. Plotted isotope coordinates and H2-16O signal were retained as figure-only and not digitised.
+  date: '2026-09-19'
+  worker: extract-lunarsurface-2020-5029
+  provenance_path: regolith-corpus/raw/lunarsurface-2020-5029/lunarsurface-2020-5029.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: H2O
+  observable: rate_series
+  observation_id: lunarsurface_2020_crd_extraction_conditions
+  field: sample_water_amount_umol_as_printed
+  value: '~52'
+  locator:
+    pdf_page_index: 1
+    section: Introduction
+    note: small (~52 µmol) water samples
+- species: H2O
+  observable: rate_series
+  observation_id: lunarsurface_2020_crd_isotope_figures
+  field: figures_not_digitised
+  value: true
+  locator:
+    pdf_page_index: 2
+    figure: '4-5'
+    note: plotted isotope results retained as figure-only; no coordinate values inferred
+species:
+  H2O:
+    observations:
+    - observation_id: lunarsurface_2020_crd_extraction_conditions
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+      phase: liquid_water_samples_from_Zag_meteorite
+      condensed_form:
+        state: liquid
+        polymorph_name: water
+        metastable: false
+        basis: explicit_author
+        note: liquid H2O samples; sample source is Zag meteorite halite-filled inclusions, not lunar regolith.
+      standard_state: Cavity-ringdown isotopic analysis of extracted H2O
+      regime: vacuum_crusher_cryogenic_concentration_crd
+      units: as printed (µmol, µL, K, C, inch, N2 purity)
+      values:
+        quantity: crd_water_extraction_and_analysis_conditions
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        sample_water_amount_umol_as_printed: '~52'
+        sample_water_amount_note: small (~52 µmol) water samples; no mass conversion performed
+        extracted_vapor_volume_uL_as_printed: '~1'
+        sample_count_as_printed: five different samples
+        sample_source: water from halite-filled inclusions in Zag meteorite
+        extraction_device: solenoid driven vacuum sample crusher
+        extraction_container: crushing device vacuum sealed
+        vacuum_line_treatment: vacuum line and crushing-device volume pumped down overnight to minimize analytical contribution of terrestrial water
+        cryogenic_concentration_temperature_K_as_printed: '~77'
+        cryogenic_trap: U-trap close to the entrance of the CRD
+        transfer_gas: UHP N2
+        crd_instrument: Picarro L2120-i cavity-ringdown spectrometer
+        liquid_injection_mode: 1 µL liquid H2O, including saltwater, injected through a septum into a thermally controlled vaporization unit
+        vaporization_unit_temperature_C_as_printed: 70
+        carrier_gas_for_injection: N2
+        standards_and_calibration: standards of known composition used to calibrate the instrument
+        isotopologues_recorded: H2O isotopologues; initial results focus on hydrogen and oxygen isotopes
+        chamber:
+          value: 12-inch diameter UHV chamber
+          locator: {pdf_page_index: 1, section: ICE Apparatus}
+        pump:
+          value: magnetically levitated turbo pump
+          locator: {pdf_page_index: 1, section: ICE Apparatus}
+        vacuum_line:
+          value: stainless steel vacuum line with gas-introduction ports, septum, and two U-shaped cold-trap sections
+          locator: {pdf_page_index: 1, section: ICE Apparatus}
+        gas:
+          value: ultra-high-purity N2 used as carrier gas for isotopic determinations
+          locator: {pdf_page_index: 1, section: ICE Apparatus}
+    - observation_id: lunarsurface_2020_crd_isotope_figures
+      type: rate_series
+      locator:
+        pdf_page_index: 2
+        figure: '4-5'
+        section: Example Results
+      phase: H2O_extracted_from_Zag_meteorite
+      standard_state: preliminary multi-oxygen and D/H isotope composition as plotted
+      regime: cavity_ringdown_spectroscopy
+      units: as plotted (δ17O, δ18O, δ2H)
+      uncertainty:
+        as_printed: statistical uncertainties shown in Figures 4-5
+        limitation: do not yet include systematic shifts introduced by the analysis method
+        future_work: controlled experiments to determine the systematic shift induced by incomplete sample recovery and analysis using the ICE apparatus vacuum line and rock crushing device
+      values:
+        quantity: extracted_water_isotopic_composition
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only_not_digitised
+        figures_not_digitised: true
+        figure_4: preliminary multi-oxygen isotopic composition of water found in Zag using CRD
+        figure_5: preliminary D/H measurements of H2O extracted from Zag using CRD
+        figure_3: H2-16O signal associated with a recent Zag water extraction experiment; five samples shown
+        plotted_species: H2O isotopologues
+        numerical_coordinates: not_printed; no axis digitisation performed
+        analysis_method: concentration-weighted time averaging of water pulses
+        reference_attribution: complete isotopic composition in Figure 4 reported in references [2, 4]; preliminary results replicated in Figures 5 and 6
