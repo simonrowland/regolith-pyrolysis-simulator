@@ -68,10 +68,56 @@ fidelity_samples:
     pdf_page_index: 2
     section: '2.3'
     note: P_P4O10_sat = 700 atm at 1643 K from JANAF extrapolated past 1500 K
+benches:
+- id: ohara-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometer}
+    locator: {published_page: 1338, section: '2.1'}
+  cell_material_and_liner:
+    state: {tag: value, value: Alumina Knudsen cell with electrolytic-iron inner crucible}
+    locator: {published_page: 1338, section: '2.1'}
+  detector:
+    state: {tag: value, value: Mass spectrometer}
+    locator: {published_page: 1338, section: '2.1'}
+  other_facts:
+  - name: internal_standard
+    unit: '-'
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 'Fe(g) in equilibrium with solid iron'}}
+      locator: {published_page: 1338, section: '2.1'}
+experiments:
+- experiment_id: feto-p2o5-additive-series
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator: {published_page: 1338, section: '2.1', note: 'Measurements of FetO-P2O5 melts with targeted CaO, MgO, MnO, or SiO2 additions; individual charge compositions remain in Table 2 observations'}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1339, table: '2', note: 'Multiple published row compositions; no single series composition'}
+    pretreatment:
+      state: {tag: value, value: Pre-melted in vacuum}
+      locator: {published_page: 1338, section: '2.1'}
+    characterization:
+      state: {tag: value, value: Chemical analysis after measurement}
+      locator: {published_page: 1338, section: '2.1'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 1338, section: '2.1', note: 'This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: in_cited_source}
+        locator: {published_page: 1338, section: '2.1', note: 'No channel length printed in this paper'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1643.15'}
+      locator: {published_page: 1338, section: '2.1', note: 'Printed 1370 C; unit conversion only'}
 species:
   P2O5:
     observations:
     - observation_id: ohara_1987_kems_geometry_and_calibration
+      experiment: feto-p2o5-additive-series
       type: gibbs_table
       locator:
         published_page: 1338
@@ -123,20 +169,8 @@ species:
       uncertainty:
         note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to
           Kambayashi 1985; orifice diameter not restated here.
-      equipment: &id001
-        cell_material:
-          value: Alumina Knudsen cell with electrolytic-iron inner crucible; Fe(g) in equilibrium with
-            solid iron as internal standard. Apparatus and method as Kambayashi, Awaka and Kato, Tetsu-to-Hagane
-            71 (1985) 1911 (ref 6). Target additive 5 mol% CaO, MgO, MnO or SiO2; measurement at 1370
-            C after ion currents were stable. P in the iron crucible always < 1 wt%, so a_Fe = 1 independent
-            of slag composition.
-          locator:
-            published_page: 1338
-            pdf_page_index: 2
-            section: '2.1'
-            note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g)
-              internal standard, 1370 C'
     - observation_id: ohara_1987_table1_ion_current_ratios_1643k
+      experiment: feto-p2o5-additive-series
       type: rate_series
       locator:
         table: '1'
@@ -427,8 +461,8 @@ species:
             row
       uncertainty:
         note: no per-cell +/- on Table 1 ion ratios
-      equipment: *id001
     - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         table: '2'
@@ -730,6 +764,7 @@ species:
         note: no per-cell +/- on Table 2. Absolute a scale set by JANAF-extrapolated P_P4O10_sat = 700
           atm at 1643 K.
     - observation_id: ohara_1987_interaction_parameters_1643k
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1337
@@ -802,6 +837,7 @@ species:
       uncertainty:
         note: quoted formula; no numeric +/- printed here
     - observation_id: ohara_1987_fig1_a_p2o5_figure_only
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         figure: '1'
@@ -836,6 +872,7 @@ species:
       uncertainty:
         note: figure-only; scatter attributed to premelt composition variation; not digitised
     - observation_id: ohara_1987_fig2_ln_gamma_vs_Ni_figure_only
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         figure: '2'
@@ -864,6 +901,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: ohara_1987_fig3_Lp_figure_only
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         figure: '3'
@@ -888,6 +926,7 @@ species:
   CaO:
     observations:
     - observation_id: ohara_1987_cao_epsilon_p2o5
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1337
@@ -911,6 +950,7 @@ species:
   MgO:
     observations:
     - observation_id: ohara_1987_mgo_epsilon_p2o5
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1337
@@ -934,6 +974,7 @@ species:
   MnO:
     observations:
     - observation_id: ohara_1987_mno_epsilon_p2o5
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1337
@@ -957,6 +998,7 @@ species:
   SiO2:
     observations:
     - observation_id: ohara_1987_sio2_epsilon_p2o5
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1337
@@ -981,6 +1023,7 @@ species:
   PO:
     observations:
     - observation_id: ohara_1987_table1_partial_pressures_1643k
+      experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
         table: '1'
@@ -1313,6 +1356,7 @@ species:
   PO2:
     observations:
     - observation_id: ohara_1987_po2_table1_partial_pressure
+      experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
         table: '1'
@@ -1423,6 +1467,7 @@ species:
   P2:
     observations:
     - observation_id: ohara_1987_p2_table1_partial_pressure
+      experiment: feto-p2o5-additive-series
       type: psat_series
       locator:
         table: '1'
@@ -1558,6 +1603,7 @@ species:
   FeO:
     observations:
     - observation_id: ohara_1987_feto_t_and_pO2_gate
+      experiment: feto-p2o5-additive-series
       type: activity_coefficient
       locator:
         published_page: 1341

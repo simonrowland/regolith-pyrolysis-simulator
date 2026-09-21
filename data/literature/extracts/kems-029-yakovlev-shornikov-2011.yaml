@@ -56,10 +56,78 @@ fidelity_samples:
     published_page: 2
     pdf_page_index: 2
     paragraph: the Na2O contents up to ~70 wt. %
+benches:
+- id: yakovlev-ms1301-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: MS-1301 mass spectrometer with Knudsen effusion cell}
+    locator: {published_page: 1, section: 'opening methods paragraphs'}
+  cell_material_and_liner:
+    state: {tag: value, value: Tungsten effusion cell with rhenium boat}
+    locator: {published_page: 1, section: 'opening methods paragraphs'}
+  heating_method:
+    state: {tag: value, value: Electron beam}
+    locator: {published_page: 1, section: 'opening methods paragraphs'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Optical pyrometer through the pyrometric hole of the cell}
+      locator: {published_page: 1, section: 'opening methods paragraphs'}
+  temperature_calibration:
+    uncertainty:
+      state: {tag: value, value: {kind: point, point: '1'}}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Printed accuracy +/-1 C'}
+experiments:
+- experiment_id: meteorite-and-cai-series
+  bench_id: yakovlev-ms1301-kems
+  method: knudsen_effusion
+  locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Murchison, Krymka, Saratov chondrules, and CAI types A/B are distinct samples; no single composition is assigned'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000015'}}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Printed 15 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Several meteorite and CAI materials; no single series composition'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1, section: 'opening methods paragraphs'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1, section: 'opening methods paragraphs'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'No single run setpoint; source prints a series start and upper extent'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise heating, about 50 C steps}
+      locator: {published_page: 1, section: 'opening methods paragraphs'}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '18000', approximate: true}}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 5 hr from about 900 C to complete evaporation; unit conversion only'}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1173.15', approximate: true}}
+        locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 900 C starting temperature; unit conversion only'}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '900', approximate: true}}
+        locator: {published_page: 1, section: 'opening methods paragraphs', note: 'About 15 min exposure per temperature step; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1, section: 'opening methods paragraphs', note: 'Instrument detection and upper limits are not a single run pressure'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 1, section: 'opening methods paragraphs'}
+    regime:
+      regime_class: {tag: value, value: molecular}
 species:
   Na:
     observations:
     - observation_id: yakovlev_shornikov_2011_kems_method_geometry
+      experiment: meteorite-and-cai-series
       type: rate_series
       locator:
         published_page: 1
@@ -137,16 +205,8 @@ species:
         temperature_accuracy_C: 1.0
         as_printed: The accuracy of temperature measurement was ±1 C
         note: No numeric uncertainty printed for gold calibration or ion currents.
-      equipment:
-        cell_material:
-          value: tungsten effusion cell; 15 mg sample in a rhenium boat on the cell bottom
-          locator:
-            published_page: 1
-            pdf_page_index: 1
-            note: Vestnik NZ6104 3-page PDF, page 1
-            paragraph: Evaporation was conducted in a tungsten effusion cell. In order to minimize the
-              interaction of tungsten with melt, a 15 mg sample was loaded into a rhenium boat
     - observation_id: yakovlev_shornikov_2011_complementary_vapor_wt_pct
+      experiment: meteorite-and-cai-series
       type: rate_series
       locator:
         published_page: 2
@@ -197,6 +257,7 @@ species:
       uncertainty:
         note: Ranges and ~ values as printed; no further numeric uncertainty.
     - observation_id: yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
+      experiment: meteorite-and-cai-series
       type: psat_series
       locator:
         figure: '1'
@@ -254,6 +315,7 @@ species:
   SiO:
     observations:
     - observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+      experiment: meteorite-and-cai-series
       type: psat_series
       locator:
         published_page: 2
@@ -295,6 +357,7 @@ species:
       uncertainty:
         note: Order-of-magnitude ~10^-6 bar as printed; not a single tabulated point.
     - observation_id: yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
+      experiment: meteorite-and-cai-series
       type: psat_series
       locator:
         figure: '2'
@@ -345,6 +408,7 @@ species:
   O2:
     observations:
     - observation_id: yakovlev_shornikov_2011_Po2_table_bar_calculated
+      experiment: meteorite-and-cai-series
       type: psat_series
       class_tag: model
       locator:

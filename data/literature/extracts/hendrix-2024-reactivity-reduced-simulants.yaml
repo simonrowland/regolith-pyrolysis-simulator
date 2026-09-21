@@ -22,10 +22,117 @@ fidelity_samples:
     published_page: 2489
     table: '1'
     note: Table 1 JSC-1A SiO2 bulk composition, wt. %.
+benches:
+- id: horizontal-tube-reduction-furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: Horizontal-tube hydrogen-reduction furnace}
+    locator: &reduction_locator {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', figure: '1'}
+  cell_material_and_liner:
+    state: {tag: value, value: Silica boat in a horizontal silica glass tube; one-hole rubber stoppers at both ends}
+    locator: *reduction_locator
+  heating_method:
+    state: {tag: value, value: Furnace voltage controlled by a Variac voltage regulator}
+    locator: *reduction_locator
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Monitoring Type K thermocouple}
+      locator: *reduction_locator
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Monitoring Type K thermocouple is named; calibration or uncertainty is not printed}
+experiments:
+- &h2_reduction
+  experiment_id: jsc-1a-h2-reduction
+  bench_id: horizontal-tube-reduction-furnace
+  method: {tag: unknown, reason: not_published}
+  locator: *reduction_locator
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: &reduction_mass_locator {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Printed three grams of milled material; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: JSC-1A lunar simulant}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+    form:
+      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      locator: *reduction_locator
+    pretreatment:
+      state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}
+      locator: *reduction_locator
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1223.15'}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Target temperature 950 C; unit conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: H2 flow is described but no pressure is printed}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Pure H2 is stated; no flow or partial pressure is printed}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: The vacuum-pump-oil flask is at the vent for flow checking and air-ingress prevention, not a pump or base-pressure measurement}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: H2 flush before heating; furnace turned off after roasting; tube immediately removed and cooled by pressurized air then wet towels}
+      locator: *reduction_locator
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: No total run duration printed; only a 15-min target-temperature hold is specified}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1223.15'}}
+        locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Target temperature 950 C; unit conversion only}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '900'}}
+        locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants', note: Reaction continued 15 min at target temperature; unit conversion only}
+- <<: *h2_reduction
+  experiment_id: lms-1-h2-reduction
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: *reduction_mass_locator
+    printed_composition:
+      state: {tag: value, value: LMS-1 lunar simulant}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+    form:
+      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      locator: *reduction_locator
+    pretreatment:
+      state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}
+      locator: *reduction_locator
+- <<: *h2_reduction
+  experiment_id: lhs-1-h2-reduction
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: *reduction_mass_locator
+    printed_composition:
+      state: {tag: value, value: LHS-1 lunar simulant}
+      locator: {published_page: 2491, pdf_page_index: 6, section: 'Methods - Milling and Reduction of Lunar Simulants'}
+    form:
+      state: {tag: value, value: Milled powder, sieved using a 63-μm mesh sieve}
+      locator: *reduction_locator
+    pretreatment:
+      state: {tag: value, value: '10 g sieved simulant milled for 2 h at 350 rpm in four 30-min intervals with approximately 5 min rests; seven 20-mm agate balls in a 125-mL agate mortar'}
+      locator: *reduction_locator
 species:
   JSC-1A:
     observations:
     - observation_id: hendrix_2024_table1_jsc1a_composition_and_mineralogy
+      experiment: jsc-1a-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 4
@@ -76,6 +183,7 @@ species:
       - what: OH* generation measurements in DI water, SLF, and ALF
         reason: biological-reactivity assay, not a silicate/oxide vaporization or thermal-process measurement
     - observation_id: hendrix_2024_jsc1a_reduction_apparatus_and_conditions
+      experiment: jsc-1a-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 6
@@ -127,6 +235,7 @@ species:
       - what: furnace calibration
         reason: Type K monitoring thermocouple is named, but calibration is not printed
     - observation_id: hendrix_2024_table4_jsc1a_grain_size_and_bet_area
+      experiment: jsc-1a-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 15
@@ -155,6 +264,7 @@ species:
       - what: raw particle-size and surface-area values from Tables S4-S6
         reason: supporting tables were listed but are not present in the supplied 19-page article PDF
     - observation_id: hendrix_2024_reduced_jsc1a_alpha_fe_and_bleb_characterization
+      experiment: jsc-1a-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 8
@@ -183,6 +293,7 @@ species:
   LMS-1:
     observations:
     - observation_id: hendrix_2024_table1_lms1_composition_and_mineralogy
+      experiment: lms-1-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 4
@@ -217,6 +328,7 @@ species:
           ilmenite: 4.3
         source_note: Table 1 footnote a attributes LMS-1 data to the CLASS Exolith Lab.
     - observation_id: hendrix_2024_table4_lms1_grain_size_and_bet_area
+      experiment: lms-1-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 15
@@ -244,6 +356,7 @@ species:
   LHS-1:
     observations:
     - observation_id: hendrix_2024_table1_lhs1_composition_and_mineralogy
+      experiment: lhs-1-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 4
@@ -277,6 +390,7 @@ species:
           ilmenite: 0.4
         source_note: Table 1 footnote a attributes LHS-1 data to the CLASS Exolith Lab.
     - observation_id: hendrix_2024_table4_lhs1_grain_size_and_bet_area
+      experiment: lhs-1-h2-reduction
       type: rate_series
       locator:
         pdf_page_index: 15

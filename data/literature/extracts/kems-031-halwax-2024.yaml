@@ -12,10 +12,122 @@ extraction:
   worker: DEEP-kems-031-halwax-2024
   provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-031-halwax-2024/kems-031-halwax-2024/
 review_status: draft
+benches:
+- id: julich-ir-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Finnigan MAT 271 90 degree magnetic-sector Knudsen effusion mass spectrometer}
+    locator: {page: 825, section: 'III. Experimental'}
+  cell_material_and_liner:
+    state: {tag: value, value: Iridium Knudsen cell in a molybdenum container with tantalum radiation shields}
+    locator: {page: 825, section: 'III. Experimental'}
+  heating_method:
+    state: {tag: value, value: Radiation then electron bombardment from a hot tungsten wire}
+    locator: {page: 825, section: 'III. Experimental'}
+  detector:
+    state: {tag: value, value: Continuous dynode multiplier linked to an ion counter}
+    locator: {page: 825, section: 'III. Experimental'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Impac IGA 12 optical pyrometer; type K thermocouple for adjustment}
+      locator: {page: 825, section: 'III. Experimental'}
+  pumping_type:
+    state: {tag: value, value: Turbomolecular pump}
+    locator: {page: 825, section: 'III. Experimental'}
+  ionization:
+    energy_eV:
+      state: {tag: value, value: {kind: point, point: '70'}}
+      locator: {page: 826, section: 'III. Experimental'}
+experiments:
+- experiment_id: cao-series
+  bench_id: julich-ir-kems
+  method: knudsen_effusion
+  locator: {page: 825, section: 'III. Experimental', note: 'Pure CaO series; separate first and second measurement rows remain observations'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00004951', interval_high: '0.00005393'}}
+      locator: {page: 825, table: 'I', note: 'Initial CaO masses 49.51 and 53.93 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: Pure CaO (99.998 pct)}
+      locator: {page: 825, section: 'III. Experimental'}
+    form:
+      state: {tag: value, value: Powder}
+      locator: {page: 825, section: 'III. Experimental'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 825, section: 'III. Experimental', note: 'Printed 0.3 mm lid-orifice diameter; unit conversion only'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 825, section: 'III. Experimental'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 825, section: 'III. Experimental', note: 'The polythermal range is retained in thermal_schedule; no single series setpoint'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1825', interval_high: '2125', approximate: true}}
+        locator: {page: 825, section: 'III. Experimental'}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '250'}}
+        locator: {page: 825, section: 'III. Experimental', note: 'Each temperature held 250 s; unit conversion only'}
+- experiment_id: mgo-series
+  bench_id: julich-ir-kems
+  method: knudsen_effusion
+  locator: {page: 825, section: 'III. Experimental', note: 'Pure MgO series; separate first and second measurement rows remain observations'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00005158', interval_high: '0.00005367'}}
+      locator: {page: 825, table: 'I', note: 'Initial MgO masses 51.58 and 53.67 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: Pure MgO (99.999 pct)}
+      locator: {page: 825, section: 'III. Experimental'}
+    form:
+      state: {tag: value, value: Powder}
+      locator: {page: 825, section: 'III. Experimental'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 825, section: 'III. Experimental', note: 'Printed 0.3 mm lid-orifice diameter; unit conversion only'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 825, section: 'III. Experimental'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 825, section: 'III. Experimental', note: 'The polythermal range is retained in thermal_schedule; no single series setpoint'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1675', interval_high: '2075', approximate: true}}
+        locator: {page: 825, section: 'III. Experimental'}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '250'}}
+        locator: {page: 825, section: 'III. Experimental', note: 'Each temperature held 250 s; unit conversion only'}
+- experiment_id: nickel-calibration-series
+  bench_id: julich-ir-kems
+  method: knudsen_effusion
+  locator: {page: 826, section: 'A. Calibration'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Pure nickel standard}
+      locator: {page: 826, section: 'A. Calibration'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 825, section: 'III. Experimental', note: 'No calibration-run-specific assignment stated'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 825, section: 'III. Experimental'}
 species:
   MgO:
     observations:
     - observation_id: halwax_2024_mgo_kems_geometry_psat_package
+      experiment: mgo-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
@@ -45,35 +157,8 @@ species:
           Sample free-surface area not stated (powder load ~50 mg).
       uncertainty:
         note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          diameter_m: 0.0003
-          orifice_shape: lid_orifice
-          inferred: true
-          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-            line_range: '222'
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater wire
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: iridium cell; molybdenum container; tantalum radiation shields
-            line_range: '222'
-        chamber_pressure:
-          value: 1.0e-05
-          units: mbar
-          converted_value_Pa: 0.001
-          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
-          note: heating started after chamber pressure decreased below 10^-5 mbar
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: pressure decreased below 10^-5 mbar
-            line_range: '230'
     - observation_id: halwax_2024_mgo_third_law_formation_enthalpy
+      experiment: mgo-series
       type: gibbs_table
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
@@ -111,6 +196,7 @@ species:
         delta_f_H_kJ_mol: 10.0
         basis: author_reported
     - observation_id: halwax_2024_geometry_not_alpha_b1
+      experiment: mgo-series
       type: psat_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
@@ -139,19 +225,8 @@ species:
         - clausing_factor
         - sample_surface_area
         - P_eq_for_alpha_inversion
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: orifice diameter from prior extract
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: Ir cell
     - observation_id: halwax_2024_table_i_mgo_sample_masses
+      experiment: mgo-series
       supersedes: halwax_2024_mgo_kems_geometry_psat_package
       type: rate_series
       class: measured
@@ -199,35 +274,8 @@ species:
         gas_species_quote: 'For MgO, 24Mg+, 16O+, and 16O2+ were detected as the main ions.'
       uncertainty:
         note: no printed uncertainty on Table I mass cells
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          diameter_m: 0.0003
-          orifice_shape: lid_orifice
-          inferred: true
-          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater wire
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
-        chamber_pressure:
-          value: 1.0e-05
-          units: mbar
-          converted_value_Pa: 0.001
-          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
-          note: heating started after chamber pressure decreased below 10^-5 mbar (threshold, not a point measurement)
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: As soon as the pressure decreased below 10-5 mbar, heating could be started.
     - observation_id: halwax_2024_table_iv_mgo_1st_measurement
+      experiment: mgo-series
       type: gibbs_table
       class: derived
       locator:
@@ -259,6 +307,7 @@ species:
         locator: {page: 830, table: IV}
         basis: author_reported
     - observation_id: halwax_2024_table_iv_mgo_2nd_measurement
+      experiment: mgo-series
       type: gibbs_table
       class: derived
       locator:
@@ -290,6 +339,7 @@ species:
         locator: {page: 830, table: IV}
         basis: author_reported
     - observation_id: halwax_2024_table_iv_mgo_mean
+      experiment: mgo-series
       supersedes: halwax_2024_mgo_third_law_formation_enthalpy
       type: gibbs_table
       class: derived
@@ -450,27 +500,10 @@ species:
         temperature_systematic_K: 5.0
         quote: a systematic error of ± 5 K is estimated
         locator: {page: 825, paragraph: experimental}
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          diameter_m: 0.0003
-          inferred: true
-          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields; W heater
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
-
   CaO:
     observations:
     - observation_id: halwax_2024_cao_kems_geometry_package
+      experiment: cao-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
@@ -495,24 +528,8 @@ species:
         - orifice_channel_length
         - sample_surface_area
         missing_note: Same Ir cell geometry as MgO; orifice d only — no Clausing invented.
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          diameter_m: 0.0003
-          inferred: true
-          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-            line_range: '222'
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields
-          locator:
-            source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-            paragraph: iridium cell; molybdenum container; tantalum radiation shields
-            line_range: '222'
     - observation_id: halwax_2024_cao_third_law_formation_enthalpy
+      experiment: cao-series
       type: gibbs_table
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
@@ -550,6 +567,7 @@ species:
         delta_f_H_kJ_mol: 3.5
         basis: author_reported
     - observation_id: halwax_2024_table_i_cao_sample_masses
+      experiment: cao-series
       supersedes: halwax_2024_cao_kems_geometry_package
       type: rate_series
       class: measured
@@ -596,33 +614,6 @@ species:
         gas_species_quote: 'For CaO, these mass scans detected 40Ca+, 16O+, and 16O2+ as the main ions.'
       uncertainty:
         note: no printed uncertainty on Table I mass cells
-      equipment:
-        orifice_area:
-          value: 7.068583e-08
-          units: m2
-          diameter_m: 0.0003
-          inferred: true
-          inference: area = π (d/2)^2 from stated lid orifice diameter 0.3 mm (same cell)
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: The orifice in the lid of the cell had a diameter of 0.3 mm
-        cell_material:
-          value: Ir Knudsen cell in Mo container; Ta radiation shields
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used.
-        chamber_pressure:
-          value: 1.0e-05
-          units: mbar
-          converted_value_Pa: 0.001
-          conversion: 1.0e-5 mbar * 100 Pa/mbar = 1.0e-3 Pa
-          note: heating started after chamber pressure decreased below 10^-5 mbar (threshold, not a point measurement)
-          locator:
-            page: 825
-            paragraph: experimental
-            quote: As soon as the pressure decreased below 10-5 mbar, heating could be started.
     - observation_id: halwax_2024_table_iii_ionization_cross_sections
       type: gibbs_table
       class: derived
@@ -662,6 +653,7 @@ species:
       uncertainty:
         note: no printed uncertainty on Table III cells
     - observation_id: halwax_2024_table_iv_cao_1st_measurement
+      experiment: cao-series
       type: gibbs_table
       class: derived
       locator:
@@ -693,6 +685,7 @@ species:
         locator: {page: 830, table: IV}
         basis: author_reported
     - observation_id: halwax_2024_table_iv_cao_2nd_measurement
+      experiment: cao-series
       type: gibbs_table
       class: derived
       locator:
@@ -724,6 +717,7 @@ species:
         locator: {page: 830, table: IV}
         basis: author_reported
     - observation_id: halwax_2024_table_iv_cao_mean
+      experiment: cao-series
       supersedes: halwax_2024_cao_third_law_formation_enthalpy
       type: gibbs_table
       class: derived
@@ -895,6 +889,7 @@ species:
   Ni:
     observations:
     - observation_id: halwax_2024_table_ii_ni_sublimation_this_study
+      experiment: nickel-calibration-series
       type: gibbs_table
       class: derived
       locator:
@@ -966,13 +961,6 @@ species:
         note: FactSageTM has no printed ±
 
 fidelity_samples:
-- path: species.MgO.observations[halwax_2024_mgo_kems_geometry_psat_package].equipment.orifice_area.value
-  value: 7.068583e-08
-  note: inferred orifice area from 0.3 mm lid diameter
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-    paragraph: The orifice in the lid of the cell had a diameter of 0.3 mm
-    line_range: '222'
 - species: MgO
   observable: rate_series
   observation_id: halwax_2024_mgo_kems_geometry_psat_package

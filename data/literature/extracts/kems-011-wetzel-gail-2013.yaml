@@ -17,6 +17,70 @@ deepening:
   corpus_tables: tables/kems-011-wetzel-gail-2013/
   parent_policy: Original observation objects and original fidelity samples retained verbatim. Superseding evidence below governs interpretation, but battery may still enumerate historical rows.
   identity_note: The inventory also lists wetzel-gail-2013-sio-arrhenius for this DOI. Alias resolution remains owner/controller-gated under this dispatch's no-alias scope.
+benches:
+- id: wetzel-uhv-film-apparatus
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: UHV physical-vapour-deposition thin-film infrared spectroscopy}
+    locator: &setup_locator {page: 2, section: '2.1', note: In-situ spectra of condensed SiO films produced by evaporation under UHV}
+  cell_material_and_liner:
+    state: {tag: value, value: Tantalum Knudsen cell}
+    locator: &evaporation_locator {page: 2, section: '2.1', note: Commercial SiO evaporated from a tantalum Knudsen cell}
+  heating_method:
+    state: {tag: value, value: Electron bombardment}
+    locator: *evaporation_locator
+  detector:
+    state: {tag: value, value: Bruker IFS66v/S Fourier-transform IR spectrometer with DTGS detector for MIR; Bruker Vertex80v with special FIR-DTGS detector for ex-situ FIR}
+    locator: {page: 2, section: '2.1', note: The source describes separate MIR in-situ and FIR ex-situ detector configurations}
+experiments:
+- experiment_id: sio-film-measurement-series
+  bench_id: wetzel-uhv-film-apparatus
+  method: knudsen_effusion
+  locator: {page: 2, section: '2.1', note: Source describes a measurement series, not one physical film or one thermal configuration}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Commercial SiO (Mateck), 99.9% pure, -325 mesh, CAS no. 10097-28-6'}
+      locator: *evaporation_locator
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2.1', note: Knudsen cell named, but no orifice diameter printed}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2.1', note: Knudsen cell named, but no orifice channel length printed}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 4, section: '2.4', note: Table 2 summarises 40-873 K from distinct condensation and annealing experiments; no one series setpoint applies}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.0000001'}}
+      locator: {page: 2, section: '2.1', note: Background pressure during evaporation did not exceed 1 x 10^-9 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 2, section: '2.1', note: UHV evaporation; no sweep gas stated}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.00000001'}}
+        locator: {page: 2, section: '2.1', note: UHV base pressure <10^-10 mbar; unit conversion only}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Gradually increased-temperature annealing for the above-350 K data; lower-temperature data are from condensation experiments}
+      locator: {page: 4, section: '2.4'}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, section: '2.4', note: Gradually increased temperatures are not individually printed here}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '6000'}}
+        locator: {page: 4, section: '2.4', note: Printed 100 min per anneal; unit conversion only}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 4, section: '2.4', note: Multiple gradually increased-temperature anneals; no total series duration printed}
 metadata:
   apparatus:
     observation_id: wetzel_gail_2013_sio_apparatus_quoted_metadata
@@ -44,6 +108,7 @@ species:
   SiO:
     observations:
     - observation_id: wetzel_gail_2013_sio_growth_alpha_arrhenius
+      experiment: sio-film-measurement-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
@@ -96,6 +161,7 @@ species:
             paragraph: background pressure measured during evaporation
             line_range: 51-53
     - observation_id: wetzel_gail_2013_sio_ta_knudsen_geometry_partial
+      experiment: sio-film-measurement-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
@@ -120,6 +186,7 @@ species:
             paragraph: tantalum Knudsen cell heated by electron bombardment
             line_range: '53'
     - observation_id: wetzel_gail_2013_sio_growth_class_b1
+      experiment: sio-film-measurement-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
@@ -163,6 +230,7 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: UHV
     - observation_id: wetzel_gail_2013_sio_alpha_fit_quoted
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_sio_growth_alpha_arrhenius
       type: alpha
       class: model
@@ -201,6 +269,7 @@ species:
             quote: in the temperature range 1175 K to 1410 K.
       note: Authors give this approximation to their own measurements (Wetzel et al. 2012b, Gail et al., in prep.). The parent temperature range is not a printed validity interval for Eq. (8); omitted here. No new fit or measured datum.
     - observation_id: wetzel_gail_2013_sio_alpha_extrapolation_quoted
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_sio_growth_class_b1
       type: alpha
       class: model
@@ -221,6 +290,7 @@ species:
         qualifier: approximate
       note: Replaces the parent measured_direct interpretation and unrelated Fig. 4a locator. Eq. (8) extrapolation is used for dust growth; no direct condensation coefficient was measured here.
     - observation_id: wetzel_gail_2013_table1_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -287,6 +357,7 @@ species:
             table: '1'
             row: eps_inf
     - observation_id: wetzel_gail_2013_table1_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table1_quoted_model
       type: gibbs_table
       class: model
@@ -355,6 +426,7 @@ species:
             table: '1'
             row: eps_inf
     - observation_id: wetzel_gail_2013_table2_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -768,6 +840,7 @@ species:
             table: '2'
             row: 873 / 3b
     - observation_id: wetzel_gail_2013_table2_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table2_quoted_model
       type: gibbs_table
       class: model
@@ -1183,6 +1256,7 @@ species:
             table: '2'
             row: 873 / 3b
     - observation_id: wetzel_gail_2013_table3_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -1276,6 +1350,7 @@ species:
             table: '3'
             row: '4'
     - observation_id: wetzel_gail_2013_table3_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table3_quoted_model
       type: gibbs_table
       class: model
@@ -1491,6 +1566,7 @@ species:
             4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078'
           note: moved from an unapplied corrections entry on the superseded parent (b-483 restoration); values verbatim
     - observation_id: wetzel_gail_2013_table4_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -1552,6 +1628,7 @@ species:
             table: '4'
             row: Pyroxene
     - observation_id: wetzel_gail_2013_table4_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table4_quoted_model
       type: gibbs_table
       class: model
@@ -1615,6 +1692,7 @@ species:
             table: '4'
             row: Pyroxene
     - observation_id: wetzel_gail_2013_table5_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -1709,6 +1787,7 @@ species:
             table: '5'
             row: R_c
     - observation_id: wetzel_gail_2013_table5_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table5_quoted_model
       type: gibbs_table
       class: model
@@ -1805,6 +1884,7 @@ species:
             table: '5'
             row: R_c
     - observation_id: wetzel_gail_2013_table6_quoted_model
+      experiment: sio-film-measurement-series
       type: rate_series
       class: model
       locator:
@@ -1912,6 +1992,7 @@ species:
             table: '6'
             row: Shell
     - observation_id: wetzel_gail_2013_table6_quoted_model_gibbs
+      experiment: sio-film-measurement-series
       supersedes: wetzel_gail_2013_table6_quoted_model
       type: gibbs_table
       class: model

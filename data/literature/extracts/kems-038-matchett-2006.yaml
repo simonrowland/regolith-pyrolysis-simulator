@@ -19,10 +19,45 @@ fidelity_samples:
       page: 27
       table: '3'
       note: Test 11 MLS-1a mass loss 10.1%
+benches:
+- id: goddard-fresnel-vacuum-pyrolysis
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Fresnel-lens vacuum solar-pyrolysis apparatus}
+    locator: {page: 25, section: 'V. Technique'}
+  heating_method:
+    state: {tag: value, value: Focused solar radiation through a Fresnel lens}
+    locator: {page: 25, section: 'V. Technique'}
+experiments:
+- experiment_id: fresnel-test-report-series
+  bench_id: goddard-fresnel-vacuum-pyrolysis
+  method: solar_furnace
+  locator: {page: 47, section: 'Appendix B', note: 'Table 3 and individual test reports summarize distinct runs; configuration and charge differ by test'}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 27, table: '3', note: 'Zn, ilmenite, enstatite, alumina and MLS-1a are distinct test samples; no single series charge'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 25, section: 'V. Technique'}
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 25, section: 'V. Technique'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 27, table: '3', note: 'Per-test maxima and bounds differ; no single series setpoint'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 27, table: '3', note: 'Per-test durations differ; no universal duration'}
 species:
   Fe:
     observations:
     - observation_id: matchett_2006_table3_fresnel_pyrolysis_log
+      experiment: fresnel-test-report-series
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-038-matchett-2006/tables.md
@@ -143,13 +178,6 @@ species:
         note: Blanks, ~900, >800, and pressure ranges 1-4 / 1-7 stay as printed. MLS-1a is the simulant row.
       uncertainty:
         note: none printed; several T and P are bounds or ranges
-      equipment:
-        chamber_pressure:
-          value: per-test Testing Pressure (Torr) as printed
-          units: Torr
-          locator:
-            page: 27
-            table: '3'
     - observation_id: matchett_2006_table2_compiled_dissociation
       type: gibbs_table
       locator:

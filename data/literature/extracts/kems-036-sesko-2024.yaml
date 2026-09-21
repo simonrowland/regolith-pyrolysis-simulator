@@ -39,6 +39,89 @@ fidelity_samples:
     locator:
       page: 221
       paragraph: experimental_results_deposit_edx
+benches:
+- id: solar-vacuum-pyrolysis-furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: Solar-vacuum pyrolysis furnace}
+    locator: &setup_locator {page: 18, section: '3.1 Solar-pyrolysis experimental setup', note: The thesis states that the setup was designed, built, tested, and first used for experiments as part of this work}
+  cell_material_and_liner:
+    state: {tag: value, value: Alumina ceramic crucible}
+    locator: {page: 35, section: '3.3.2 Elemental analysis of selected samples', note: The crucible used for the exposure-12 condensate is pure alumina ceramic}
+  heating_method:
+    state: {tag: value, value: Heliostat mirror and horizontally positioned Fresnel lens focusing sunlight through a quartz window}
+    locator: *setup_locator
+  pumping_type:
+    state: {tag: value, value: Turbomolecular pump(s)}
+    locator: {page: 19, section: '3.1.1 Vacuum system', note: Setup versions use one directly connected turbopump or two turbopumps; the changing arrangement is retained on the experiment}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Optris IR camera for peak surface temperature; two Type-K thermocouples for bake-out monitoring}
+      locator: {page: 22, section: '3.1.3 Sensors and measurement', note: Thermocouples were not useful during solar exposures; the IR camera supplied the effective exposure temperature measurement}
+  temperature_calibration:
+    uncertainty:
+      state: {tag: value, value: {kind: point, point: '14.5'}}
+      locator: {page: 23, section: '3.1.3 Sensors and measurement', note: Average IR-camera error through the quartz window was 14.5 C over 1000-1450 C; temperature difference has the same magnitude in K}
+  detector:
+    state: {tag: value, value: Residual gas analyser (RGA)}
+    locator: {page: 19, section: '3.1.1 Vacuum system', note: RGA was protected from pressure spikes; no gas-composition result was obtained}
+experiments:
+- experiment_id: solar-exposure-12
+  bench_id: solar-vacuum-pyrolysis-furnace
+  method: solar_furnace_pyrolysis
+  locator: &exposure_12_locator {page: 27, table: '3.3', note: Exposure 12 used setup version 3 (two pumps); the condensate later analysed was found after exposure 12}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 27, table: '3.3', note: The printed 2.32 g is mass of the melted regolith sample, not the initial charge mass}
+    printed_composition:
+      state: {tag: value, value: EAC-1A lunar regolith simulant}
+      locator: {page: 18, section: '3.1 Solar-pyrolysis experimental setup', note: The experimental demonstration uses EAC-1A; Table 1 separately prints its cited bulk composition}
+    form:
+      state: {tag: value, value: Bulk regolith simulant in a crucible}
+      locator: {page: 25, section: '3.2 Experiment procedure', note: Multiple solar exposures could use fresh regions of one bulk regolith sample under vacuum}
+    characterization:
+      state: {tag: value, value: SEM/EDX reference sample from the same batch}
+      locator: {page: 30, section: '3.3.2 Elemental analysis of selected samples', note: The reference bulk EAC-1A sample came from the same batch as material used for solar exposures}
+    pretreatment:
+      state: {tag: value, value: Bake-out before exposure; version-3 heater baked sample 12 to 400 C}
+      locator: {page: 21, section: '3.1.2 Chamber and sample bake-out', note: Version 3 baked samples 8-11 to at least 300 C and sample 12 to 400 C}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 27, section: '3.3.1 Pressure and temperature measurements', note: The source reports aggregate temperature behavior but does not print one numerical temperature or interval for exposure 12 in Table 3.3}
+  apparatus:
+    configuration:
+      state: {tag: value, value: 'Version 3: Two pumps; analysis section disconnected during pumping, with a second turbopump connected through V2'}
+      locator: {page: 20, section: '3.1.1 Vacuum system'}
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 18, section: '3.1 Solar-pyrolysis experimental setup', note: Solar heating of an open regolith surface in a crucible; no effusion orifice applies}
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 18, section: '3.1 Solar-pyrolysis experimental setup', note: Solar heating of an open regolith surface in a crucible; no effusion-orifice channel applies}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00008', interval_high: '1'}}
+      locator: {page: 27, table: '3.3', note: Exposure-12 chamber pressure 8 x 10^-7 to 10^-2 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 25, section: '3.2 Experiment procedure', note: Evacuated vacuum chamber; no sweep gas is stated}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.000006'}}
+        locator: {page: 27, table: '3.3', note: Exposure-12 initial chamber pressure 6 x 10^-8 mbar; unit conversion only}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Solar exposure began by manually removing a lens shade and ended by manually replacing it}
+      locator: {page: 25, section: '3.2 Experiment procedure'}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '11520'}}
+      locator: {page: 27, table: '3.3', note: Exposure-12 duration 03:12:00; unit conversion only}
 species:
   Na:
     observations:
@@ -116,6 +199,7 @@ species:
       uncertainty:
         note: as printed; 24999 total 99.99 and 70051 total 100.01 are printed
     - observation_id: sesko_2024_crucible_deposit_edx
+      experiment: solar-exposure-12
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
@@ -266,6 +350,7 @@ species:
   K:
     observations:
     - observation_id: sesko_2024_deposit_K_edx_range
+      experiment: solar-exposure-12
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
@@ -288,6 +373,7 @@ species:
   Fe:
     observations:
     - observation_id: sesko_2024_deposit_Fe_edx_qualitative
+      experiment: solar-exposure-12
       type: rate_series
       locator:
         source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
@@ -332,6 +418,7 @@ species:
   Si:
     observations:
     - observation_id: sesko_2024_deposit_Si_edx_range
+      experiment: solar-exposure-12
       type: rate_series
       locator:
         source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
