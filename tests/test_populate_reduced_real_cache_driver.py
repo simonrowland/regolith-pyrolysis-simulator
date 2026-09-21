@@ -1060,11 +1060,16 @@ def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):
 def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
     session = _FakeSession(source="builtin_authoritative")
     advance_started = False
+    advance_completed = False
 
     def slow_advance():
-        nonlocal advance_started
+        nonlocal advance_started, advance_completed
         advance_started = True
-        time.sleep(1.0)
+        # Natural completion sits 5 s out against a 0.02 s cap: a 250x margin
+        # so gate-load scheduling delay (measured 0.74 s on the 2026-09-21
+        # full-suite gate) cannot let the sleep finish before SIGALRM lands.
+        time.sleep(5.0)
+        advance_completed = True
         return _FakeStep()
 
     session.advance = slow_advance
@@ -1076,7 +1081,6 @@ def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
         lambda timings: contextlib.nullcontext(),
     )
 
-    started = time.perf_counter()
     with pytest.raises(driver.WallCapExceeded, match="exceeded its wall cap"):
         driver._run_case(
             feedstock="lunar_mare_low_ti",
@@ -1093,7 +1097,12 @@ def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
         )
 
     assert advance_started is True
-    assert time.perf_counter() - started < 0.5
+    # Invariant (b-548): the cap fired DURING the advance and unwound through
+    # it. This keys on causality, not a wall-clock budget the test cannot
+    # control on a loaded box: a cap that never fires, or fires only after
+    # the advance ran to natural completion, flips advance_completed and goes
+    # red at any load level.
+    assert advance_completed is False
 
 
 def test_wall_deadline_restores_handler_when_timer_arming_fails(monkeypatch):

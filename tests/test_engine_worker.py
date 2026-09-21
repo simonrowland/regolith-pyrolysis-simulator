@@ -57,7 +57,16 @@ def _test_worker(*, timeout_s=1.0):
         name='test engine',
         bootstrap=_bootstrap_test_worker,
         handler=_handle_test_request,
-        startup_timeout_s=2.0,
+        # Hang bound, not a latency assert: a spawn-context cold start on a
+        # contended gate box legitimately exceeds 2 s (b-548, 2026-09-21:
+        # 10/10 failures under 90 CPU burners, all 'initialization exceeded
+        # hard timeout of 2s' from a HEALTHY worker that was merely slow to
+        # exec). The start() rendezvous still fails a worker that never acks
+        # 'ready' — that coverage lives in the SilentReadyWorker tests below,
+        # which pin the initialization timeout with their own budgets. This
+        # bound only decides when "never acks" is declared, so it uses the
+        # module rendezvous figure like every other hang guard here.
+        startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
         call_timeout_s=timeout_s,
     )
 
