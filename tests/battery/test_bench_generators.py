@@ -241,6 +241,35 @@ def test_rps_requires_operator_choices_and_labels_them():
     assert next(item for item in readiness if item.consumer == "rps") == result.readiness
 
 
+def test_unsupplied_operator_inputs_are_not_evidence_gaps():
+    experiment, bench, observation, model = complete_rps()
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    refusal = vacuum_pyrolysis_preset(inputs)
+    assert refusal.readiness.status is ReadinessStatus.GAP
+    assert refusal.payload is None
+    operator_gaps = [gap for gap in refusal.readiness.gaps if gap.waypoint.startswith("operator.")]
+    assert {gap.waypoint for gap in operator_gaps} == {
+        "operator.surfaces", "operator.feedstock_id", "operator.furnace_ceiling_C"}
+    assert all(gap.reason is GapReason.CONSUMER_INPUT_NOT_SUPPLIED for gap in operator_gaps)
+    assert not any(gap.reason is GapReason.MISSING_EVIDENCE for gap in operator_gaps)
+    rps = next(item for item in consumer_readiness(experiment, bench, observation)
+               if item.consumer == "rps")
+    assert {gap.waypoint: gap.reason for gap in rps.gaps if gap.waypoint.startswith("operator.")} == {
+        gap.waypoint: gap.reason for gap in operator_gaps}
+    result = vacuum_pyrolysis_preset(inputs, modelling_inputs=model)
+    assert result.readiness.status is ReadinessStatus.READY
+    assert not any(gap.waypoint.startswith("operator.") for gap in result.readiness.gaps)
+
+
+def test_modelling_inputs_never_touch_kems_or_engine_point_readiness():
+    experiment, bench, observation, model = complete_rps()
+    without = consumer_readiness(experiment, bench, observation)
+    with_model = consumer_readiness(experiment, bench, observation, modelling_inputs=model)
+    for consumer in ("kems", "engine_point"):
+        assert [item for item in without if item.consumer == consumer] == [
+            item for item in with_model if item.consumer == consumer]
+
+
 def test_typed_calibration_routes_preserve_inference():
     from simulator.battery.records import Derivation
     experiment, bench, observation = case()

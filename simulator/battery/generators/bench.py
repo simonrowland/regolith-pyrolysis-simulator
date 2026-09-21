@@ -212,7 +212,7 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
     if missing_model:
         for name in missing_model:
             readiness = replace(readiness, status=ReadinessStatus.GAP,
-                gaps=(*readiness.gaps, ReadinessGap(name, GapReason.MISSING_EVIDENCE, (name,))))
+                gaps=(*readiness.gaps, ReadinessGap(name, GapReason.CONSUMER_INPUT_NOT_SUPPLIED, (name,))))
     if readiness.status is not ReadinessStatus.READY:
         return GeneratedInput(readiness, None, provenance)
     from simulator.lab_geometry import parse_lab_geometry, LabGeometryError

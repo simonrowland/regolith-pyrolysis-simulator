@@ -37,6 +37,7 @@ class WaypointFlag(StrEnum):
 
 class GapReason(StrEnum):
     MISSING_EVIDENCE = "missing_evidence"
+    CONSUMER_INPUT_NOT_SUPPLIED = "consumer_input_not_supplied"
     UNSUPPORTED_PRINT_FORM = "unsupported_print_form"
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
