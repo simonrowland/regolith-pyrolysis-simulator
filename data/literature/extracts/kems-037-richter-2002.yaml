@@ -11,10 +11,57 @@ extraction:
   worker: ocr-phase2b-gk
   provenance_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/
 review_status: draft
+benches:
+- id: evaporation-furnaces
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Langmuir free-evaporation furnace suite}
+    locator: {page: 525, section: '5.2 Experimental Procedure'}
+  heating_method:
+    state: {tag: value, value: Three furnaces for vacuum, hydrogen, and gas-mixing pressure regimes}
+    locator: {page: 525, section: '5.2 Experimental Procedure'}
+  detector:
+    state: {tag: value, value: JEOL JSM-5800LV SEM with Oxford Link ISIS-300 EDS}
+    locator: {page: 526, section: '5.3 Analytical Procedures'}
+experiments:
+- experiment_id: cai-evaporation-series
+  bench_id: evaporation-furnaces
+  method: langmuir_free_evaporation
+  locator: {page: 525, section: '5.1 Starting Materials', note: Type B CAI-like evaporation series; Table 1 retains per-run temperature, pressure, area and duration}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000070'}}
+      locator: {page: 525, section: '5.1 Starting Materials', note: 5-70 mg; converted to kg}
+    printed_composition:
+      state: {tag: value, value: Synthetic Type B CAI-like CaO-MgO-Al2O3-SiO2 composition}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+    form:
+      state: {tag: value, value: Quenched synthetic glass powder on platinum loops}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+    pretreatment:
+      state: {tag: value, value: Heated at 1400 C for several hours in H2/CO2 at controlled oxygen fugacity}
+      locator: {page: 525, section: '5.1 Starting Materials'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 525, table: '1', note: Vacuum, hydrogen, and gas-mixing rows have distinct pressures; no single series pressure assigned}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 525, section: '5.2 Experimental Procedure', note: Multiple pressure-regime furnaces; no common sweep gas}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 525, table: '1', note: The 1400-1800 C range spans distinct runs; per-run temperatures remain in Table 1 observations}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '900', interval_high: '18000'}}
+      locator: {page: 525, table: '1', note: 15-300 min per run; converted to s}
 species:
   Mg:
     observations:
     - observation_id: richter_2002_mg_cai_langmuir_gamma
+      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -79,6 +126,7 @@ species:
             pressure field.
           scope: vacuum_runs_only
     - observation_id: richter_2002_mg_table1_per_run_areas_b1
+      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -263,6 +311,7 @@ species:
   SiO:
     observations:
     - observation_id: richter_2002_sio_cai_langmuir_gamma
+      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
@@ -304,6 +353,7 @@ species:
             line_range: '450'
             note: Authors prose range (Table 1 Avg.area spans ~0.062–0.425; prose rounds to 0.063–0.416)
     - observation_id: richter_2002_sio_table1_per_run_areas_b1
+      experiment: cai-evaporation-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md

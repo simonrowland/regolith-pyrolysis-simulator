@@ -62,10 +62,83 @@ fidelity_samples:
     pdf_page_index: 4
     paragraph: EAC-1 oxide composition
     note: Na2O 2.95 % as printed, cited Šeško et al. 2024
+benches:
+- id: solar-reactor
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Concentrated-solar vacuum pyrolysis reactor}
+    locator: {section: '3.1 Experimental setup'}
+  cell_material_and_liner:
+    state: {tag: value, value: Water-cooled steel sample holder in glass-sphere reactor}
+    locator: {section: '3.1 Experimental setup'}
+  heating_method:
+    state: {tag: value, value: 2 m diameter parabolic solar dish with shutter-controlled concentrated radiation}
+    locator: {section: '3.1 Experimental setup'}
+  pumping_type:
+    state: {tag: value, value: Edwards NDX15 scroll pump}
+    locator: {section: '3.1 Experimental setup'}
+  detector:
+    state: {tag: value, value: Systech oxygen trace analyzer; Brooks CMC mass-flow controllers}
+    locator: {section: '3.1 Experimental setup'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Omicron IN 140/5 pyrometer, 4.8-5.2 um, emissivity 1}
+      locator: {section: '3.1 Experimental setup'}
+experiments:
+- experiment_id: solar-pyrolysis-series
+  bench_id: solar-reactor
+  method: solar_furnace_pyrolysis
+  locator: {section: '3.2 Solar pyrolysis procedure', note: EAC-1 solar-pyrolysis experiment; mass-balance and oxygen results reported in section 4.1}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.00338', approximate: true}}
+      locator: {section: '4.1 Experimental results', note: Approximately 3.38 g initial pellet mass}
+    printed_composition:
+      state: {tag: value, value: EAC-1 lunar regolith simulant}
+      locator: {section: '3.2 Solar pyrolysis procedure'}
+    form:
+      state: {tag: value, value: Hydraulically pressed pellet, 13 mm diameter and 10 mm height}
+      locator: {section: '3.2 Solar pyrolysis procedure'}
+    pretreatment:
+      state: {tag: value, value: Hydraulic press at 2.5 tons}
+      locator: {section: '3.2 Solar pyrolysis procedure'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '1300', approximate: true}}
+      locator: {section: '4.1 Experimental results', note: About 13 mbar under argon; converted to Pa}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: argon
+          flow_sccm: {tag: value, value: '300'}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {section: '4.1 Experimental results', note: Argon 99.999 percent at 0.3 NL/min; converted to 300 sccm at normal conditions}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.1'}}
+        locator: {section: '3.2 Solar pyrolysis procedure', note: Below 10^-3 mbar before heating; converted to Pa}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {section: '4.1 Experimental results', note: Around 1800 C is a punctual peak measurement, not a series-wide condition; retained in existing observation evidence}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {section: '4.1 Experimental results', note: One-hour heating period}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: unknown, reason: not_published}
+        locator: {section: '4.1 Experimental results', note: Peak temperature reported around 1800 C, but no hold temperature assigned}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '1980'}}
+        locator: {section: '4.1 Experimental results', note: 33 min at fully open shutters / 1460 W}
 species:
   O2:
     observations:
     - observation_id: robinot_2026_o2_yield_measured
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -138,6 +211,7 @@ species:
             section: '4.1'
             paragraph: maintaining an internal pressure of about 13 mbar
     - observation_id: robinot_2026_o2_prose_rate_points
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -186,6 +260,7 @@ species:
         note: These are the numeric waypoints printed in §4.1. The full O2(t) and power(t) curves remain
           figure-only in robinot_2026_o2_fig4ab_figure_only.
     - observation_id: robinot_2026_o2_fig4ab_figure_only
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         figure: '4'
@@ -214,6 +289,7 @@ species:
         note: No printed point table. Numeric waypoints from the captioning prose are stored on robinot_2026_o2_prose_rate_points.
           The 35 mg end point is stored on robinot_2026_o2_yield_measured.
     - observation_id: robinot_2026_mass_balance_text
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -253,6 +329,7 @@ species:
           (separate observation) sum captured holder+window+condenser+filter = 1.26 g and discrepancy
           0.265 g. Do not average the 1.1 / 1.26 / 1.3 g figures.
     - observation_id: robinot_2026_mass_balance_fig4c_bar_labels
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         figure: 4c
@@ -288,6 +365,7 @@ species:
           axis readings. They compete with the §4.1 prose 1.1 g captured / 0.27 g unaccounted and the
           conclusion 1.3 g vaporized; do not average.
     - observation_id: robinot_2026_o2_comparable_run_1p17
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -312,6 +390,7 @@ species:
         note: Only the 1.17 % figure is printed in the main text. The supplementary plot was not transcribed
           because it is not in the corpus PDF.
     - observation_id: robinot_2026_o2_hsc_expected_1p37_model
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 11
@@ -340,6 +419,7 @@ species:
         authors_caveat: Both results appeared to be close, however this comparison would be invalid as
           the model does not accurately reflect the experiment.
     - observation_id: robinot_2026_fig1_hsc_figure_only
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         figure: '1'
@@ -374,6 +454,7 @@ species:
         note: Printed prose numbers on p. 3 are retained. The Fig. 1 curves were not digitised. Atomic
           O was not taken into account for theoretical oxygen yield estimation.
     - observation_id: robinot_2026_fig8_80kg_astronaut_o2
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         figure: '8'
@@ -442,6 +523,7 @@ species:
         note: Feedstock composition quoted from Šeško et al. 2024. Not a measurement from this solar-pyrolysis
           run. Lunar-soil oxygen bounds are also quoted, not measured here.
     - observation_id: robinot_2026_deposit_Na_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -473,6 +555,7 @@ species:
         glass: Na not listed among predominant nonvolatiles
         note: Qualitative prose only. Absence of a number is not zero Na.
     - observation_id: robinot_2026_fig5_eds_figure_only
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         figure: '5'
@@ -520,6 +603,7 @@ species:
   K:
     observations:
     - observation_id: robinot_2026_deposit_K_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -546,6 +630,7 @@ species:
   Fe:
     observations:
     - observation_id: robinot_2026_deposit_Fe_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -587,6 +672,7 @@ species:
   Si:
     observations:
     - observation_id: robinot_2026_deposit_Si_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -615,6 +701,7 @@ species:
   Mg:
     observations:
     - observation_id: robinot_2026_deposit_Mg_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -643,6 +730,7 @@ species:
   Al:
     observations:
     - observation_id: robinot_2026_deposit_Al_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -668,6 +756,7 @@ species:
   Ca:
     observations:
     - observation_id: robinot_2026_deposit_Ca_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
@@ -692,6 +781,7 @@ species:
   Ti:
     observations:
     - observation_id: robinot_2026_deposit_Ti_qualitative
+      experiment: solar-pyrolysis-series
       type: rate_series
       locator:
         published_page: 7
