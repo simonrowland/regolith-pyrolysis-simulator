@@ -14,6 +14,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Locator,
+    Observation,
     State,
     ThermalSchedule,
     Value,
@@ -159,6 +160,29 @@ def _condition_value(experiment: Experiment, name: str) -> Value | None:
         return None
     raw = located.state.value
     return raw if isinstance(raw, Value) else Value.point_of(raw)
+
+
+def _point_condition(
+    experiment: Experiment, observation: Observation | None, key: str, name: str
+) -> Waypoint | None:
+    if observation is None:
+        return None
+    if observation.experiment_id != experiment.experiment_id:
+        raise ValueError("Observation belongs to a different experiment")
+    located = (observation.point_conditions or {}).get(key)
+    if located is None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if not isinstance(raw, (Value, Decimal, int, float, str)):
+        return None
+    try:
+        value = raw if isinstance(raw, Value) else Value.point_of(raw)
+    except (ValueError, TypeError, ArithmeticError):
+        return None
+    return Waypoint(
+        name, value, f"observation_{key}", WaypointAuthority.PRINTED,
+        (f"observation[{observation.observation_id}].point_conditions.{key}",),
+    )
 
 
 def _positive_range(value: Value) -> tuple[Decimal | None, Decimal | None]:
@@ -357,8 +381,13 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
     return _result("relevant_volume", routes, (("bench.geometry.cell_internal_dimensions",) if knudsen else ("bench.geometry.chamber_volume_m3", "bench.geometry.chamber_dimensions")))
 
 
-def pressure_boundary(experiment: Experiment, bench: Bench) -> WaypointResult:
+def pressure_boundary(
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
+) -> WaypointResult:
     routes: list[Waypoint] = []
+    point = _point_condition(experiment, observation, "total_pressure_Pa", "pressure_boundary")
+    if point is not None:
+        routes.append(point)
     printed = _value(experiment.pressure_environment.total_pressure_Pa)
     if printed is not None:
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure", WaypointAuthority.PRINTED, ("experiment.pressure_environment.total_pressure_Pa",)))
@@ -428,9 +457,14 @@ def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResul
     return result
 
 
-def thermal_path(experiment: Experiment, bench: Bench) -> WaypointResult:
+def thermal_path(
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
+) -> WaypointResult:
     del bench
     routes: list[Waypoint] = []
+    point = _point_condition(experiment, observation, "temperature_K", "thermal_path")
+    if point is not None:
+        routes.append(point)
     schedule: ThermalSchedule | None = experiment.thermal_schedule
     ramp_series: tuple[tuple[Decimal, Decimal], ...] | None = None
     hold_series: tuple[tuple[Decimal, Decimal], ...] | None = None
@@ -836,7 +870,9 @@ def _orifice_knudsen(experiment, bench, thermal, pressure):
     return kn, notice_inputs, species, gap
 
 
-def consumer_readiness(experiment: Experiment, bench: Bench) -> tuple[ConsumerReadiness, ...]:
+def consumer_readiness(
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
+) -> tuple[ConsumerReadiness, ...]:
     charges = charge_moles_by_species(experiment, bench)
     charge_gap = None if charges else ReadinessGap("charge_moles_by_species", GapReason.MISSING_EVIDENCE, ("experiment.sample.mass_kg", "experiment.sample.initial_composition"))
     thermal = thermal_path(experiment, bench)
@@ -912,7 +948,12 @@ def consumer_readiness(experiment: Experiment, bench: Bench) -> tuple[ConsumerRe
             rps_gaps.append(gap)
     if surface is None and rps_status is None:
         rps_gaps.append(ReadinessGap("surfaces", GapReason.MISSING_EVIDENCE, ("experiment.sample.surface_area_m2",)))
-    engine_gaps = common_charge + [gap for gap in (thermal_gap, _gap(pressure), _gap(oxygen)) if gap]
+    point_thermal = thermal_path(experiment, bench, observation)
+    point_pressure = pressure_boundary(experiment, bench, observation)
+    point_thermal_gap = _thermal_gap(point_thermal)
+    if point_thermal.selected is not None and point_thermal.selected.value.kind is ValueKind.POINT:
+        point_thermal_gap = None
+    engine_gaps = common_charge + [gap for gap in (point_thermal_gap, _gap(point_pressure), _gap(oxygen)) if gap]
     engine_status = None
     if len(charges) == 1:
         engine_gaps = [ReadinessGap("charge_moles_by_species", GapReason.SINGLE_SPECIES_CHARGE)]
