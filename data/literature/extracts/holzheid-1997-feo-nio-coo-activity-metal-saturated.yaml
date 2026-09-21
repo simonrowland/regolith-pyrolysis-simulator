@@ -11,6 +11,43 @@ extraction:
   date: '2026-09-20'
   worker: i1-holzheid-1997-feo-nio-coo-activity-metal-saturated
 review_status: draft
+benches:
+- id: cited-prior-equilibration-apparatus
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: Holzheid et al. (1994) and Holzheid and Palme (1996a)
+      for_parameters: [apparatus_family, cell_material_and_liner, temperature_measurement, temperature_calibration, pumping_type]
+      locator: {page: 25, section: '2.2 New experimental results', note: 'New experiments done in the same way as those described before; this paper does not print apparatus details'}
+experiments:
+- experiment_id: variable-mgo-equilibration-series
+  bench_id: cited-prior-equilibration-apparatus
+  method: quench_equilibration
+  locator: {page: 25, section: '2.2 New experimental results'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 25, section: '2.2 New experimental results'}
+    printed_composition:
+      state: {tag: value, value: {kind: categorical, categorical: 'anorthite-diopside or komatiitic-basalt silicate with variable MgO'}}
+      locator: {page: 25, table: '3'}
+    characterization:
+      state: {tag: value, value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co}
+      locator: {page: 25, section: '2.2 New experimental results'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1667', interval_high: '1677'}}
+        locator: {page: 25, table: '3', note: 'Table 3 new-run range; unit already K'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '172800', interval_high: '271080'}}
+      locator: {page: 25, table: '3', note: 'Printed 48 to 75.3 h; unit conversion only'}
+  fO2_control:
+    channel: {tag: value, value: commanded}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 25, table: '3', note: 'Values listed per run; control apparatus deferred to cited papers'}
 scope_assessment:
   document_type: primary experimental silicate-melt solubility and activity-coefficient study
   measured_direct_observations: 6
@@ -84,6 +121,7 @@ species:
   CoO:
     observations:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo
+      experiment: variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1670.0, 1677.0]
@@ -111,6 +149,7 @@ species:
       uncertainty: {concentration_uncertainty: Table 3 s.d. columns retained per row, analytical_errors_Ni_and_Co_below_10_pct: true}
       equipment: {}
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo
+      experiment: variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 26, table: '3c', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
@@ -135,6 +174,7 @@ species:
   NiO:
     observations:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo
+      experiment: variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3a', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1673.0]
@@ -164,6 +204,7 @@ species:
       uncertainty: {analytical_errors_Ni_below_10_pct: true, concentration_uncertainty: Table 3 s.d. columns retained per row}
       equipment: {}
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo
+      experiment: variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 26, table: '3d', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1675.0]
@@ -188,6 +229,7 @@ species:
   FeO:
     observations:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo
+      experiment: variable-mgo-equilibration-series
       type: activity_coefficient
       locator: {page: 25, table: '3b', section: 'Equilibration of metal and silicate melts with variable MgO-content'}
       T_range_K: [1667.0, 1677.0]

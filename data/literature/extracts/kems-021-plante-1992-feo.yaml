@@ -16,6 +16,53 @@ extraction:
   worker: orphans-close
   provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/
 review_status: draft
+benches:
+- id: tungsten-iridium-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: modulated-beam Knudsen effusion mass spectrometer}
+    locator: &plante_apparatus {page: 1277, section: '3. Experimental Procedure'}
+  cell_material_and_liner:
+    state: {tag: value, value: tungsten cell with iridium inner cup}
+    locator: *plante_apparatus
+  geometry:
+    orifice_diameter_m:
+      state: {tag: value, value: {kind: point, point: '0.0005'}}
+      locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 0.5 mm; unit conversion only'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: optical pyrometer sighted into the effusion orifice}
+      locator: *plante_apparatus
+  detector:
+    state: {tag: value, value: modulated-beam mass spectrometer with phase-sensitive detection}
+    locator: *plante_apparatus
+  ionization:
+    method:
+      state: {tag: value, value: electron impact}
+      locator: *plante_apparatus
+experiments:
+- experiment_id: feo-mgo-sio2-series
+  bench_id: tungsten-iridium-kems
+  method: knudsen_effusion
+  locator: {page: 1277, section: '3. Experimental Procedure'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000280', interval_high: '0.000350'}}
+      locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 280 to 350 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: powdered FeO-MgO-SiO2 ternary oxide mixtures}
+      locator: *plante_apparatus
+    form:
+      state: {tag: value, value: powdered}
+      locator: *plante_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '850', interval_high: '980'}}
+        locator: {page: 1277, section: '3. Experimental Procedure', note: 'Highest-FeO sample instead printed 790 to 910 K; unassigned individual compositions remain in observations'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '3600', interval_high: '7200'}}
+      locator: {page: 1277, section: '3. Experimental Procedure', note: 'Printed 60 to 120 min for homogenization before ion-intensity measurement; unit conversion only'}
 fidelity_samples:
   - species: FeO
     observable: activity_coefficient
@@ -39,6 +86,7 @@ species:
   FeO:
     observations:
     - observation_id: plante_1992_table2_feo_activity_coefficient_1973k
+      experiment: feo-mgo-sio2-series
       type: activity_coefficient
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
@@ -224,6 +272,7 @@ species:
   Fe:
     observations:
     - observation_id: plante_1992_table1_ion_intensity_ratios_1973k
+      experiment: feo-mgo-sio2-series
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md

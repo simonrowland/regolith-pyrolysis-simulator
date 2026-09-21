@@ -13,10 +13,85 @@ extraction:
   worker: langmuir-ingest-gr-t544
   provenance_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/
 review_status: draft
+benches:
+- id: vif-ii-vacuum-induction
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: VIF-II high-frequency vacuum induction furnace}
+    locator: &homma_apparatus {page: 516, section: 'II. Experimental method'}
+  cell_material_and_liner:
+    state: {tag: value, value: commercial alumina crucible CP-2}
+    locator: *homma_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.038'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed inner diameter 38 mm; unit conversion only'}
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.100'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed height 100 mm; unit conversion only'}
+  heating_method:
+    state: {tag: value, value: high-frequency induction}
+    locator: *homma_apparatus
+  pumping_type:
+    state: {tag: value, value: oil rotary pump and oil diffusion pump}
+    locator: *homma_apparatus
+  other_facts:
+  - name: oil_rotary_pump_speed
+    unit: L/h
+    value:
+      state: {tag: value, value: {kind: point, point: '450'}}
+      locator: *homma_apparatus
+  - name: oil_diffusion_pump_speed
+    unit: L/s
+    value:
+      state: {tag: value, value: {kind: point, point: '200'}}
+      locator: *homma_apparatus
+  - name: crucible_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '49'}}
+      locator: *homma_apparatus
+experiments:
+- experiment_id: alloy-vacuum-evaporation-series
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: {kind: categorical, categorical: 'Fe-Mn, Fe-C-Mn, Fe-Cu, or Fe-Sn master alloy'}}
+      locator: *homma_apparatus
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
 species:
   Mn:
     observations:
     - observation_id: homma_1966_mn_specific_evaporation_constant
+      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
@@ -624,6 +699,7 @@ species:
   Cu:
     observations:
     - observation_id: homma_1966_cu_specific_evaporation_constant
+      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
@@ -1218,6 +1294,7 @@ species:
   Sn:
     observations:
     - observation_id: homma_1966_sn_specific_evaporation_constant
+      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md

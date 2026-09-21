@@ -14,10 +14,81 @@ extraction:
   worker: tp3-sossi-remine
   provenance_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/
 review_status: draft
+benches:
+- id: gero-open-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: GERO vertical alumina tube gas-mixing furnace}
+    locator: &sossi_apparatus {page: 4, section: '2.1 Experimental Methods'}
+  heating_method:
+    state: {tag: value, value: vertical alumina tube furnace at set temperature}
+    locator: *sossi_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Type B thermocouple bead located less than 5 mm above sample}
+      locator: *sossi_apparatus
+  temperature_calibration:
+    uncertainty:
+      state: {tag: value, value: {kind: point, point: '1'}}
+      locator: {page: 4, section: '2.1 Experimental Methods', note: 'Controller limited fluctuations to within +/-1 C; this is stability, not independently stated calibration uncertainty'}
+  detector:
+    state: {tag: value, value: LA-ICP-MS}
+    locator: {page: 4, section: '2.2 Analytical Methods'}
+  other_facts:
+  - name: furnace_tube_dimensions
+    unit: as_printed
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '42-mm internal diameter; 70-cm long; 3-cm hotspot'}}
+      locator: *sossi_apparatus
+experiments:
+- experiment_id: open-furnace-ferrobasalt-series
+  bench_id: gero-open-furnace
+  method: langmuir_free_evaporation
+  locator: {page: 4, section: '2.1 Experimental Methods'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000025', approximate: true}}
+      locator: {page: 4, section: '2.1 Experimental Methods', note: 'Printed around 25 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: synthetic FCMAS ferrobasalt with 20 trace elements}
+      locator: {page: 1, section: Abstract}
+    form:
+      state: {tag: value, value: powder slurry loaded onto a metal wire loop}
+      locator: {page: 4, section: '2.1 Experimental Methods'}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: 'Re, Pt, or Ir wire loop; run assignment varies'}
+      locator: {page: 4, section: '2.1 Experimental Methods'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1573.15', interval_high: '1823.15'}}
+        locator: {page: 4, section: '2.1 Experimental Methods', note: 'Printed 1300 to 1550 C; unit conversion only'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '900', interval_high: '55800'}}
+      locator: {page: 4, section: '2.1 Experimental Methods', note: 'Printed 15 to 930 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: dropped into distilled water}
+      locator: *sossi_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 1, section: Abstract, note: 'Printed one-atmosphere furnace; SI definition conversion only'}
+    sweep_gas:
+      state: {tag: value, value: CO-CO2 gas mixtures}
+      locator: {page: 4, section: '2.1 Experimental Methods'}
+    regime:
+      regime_class: {tag: value, value: viscous}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'approximately IW (10^-10 bar) to air (10^-0.68 bar)'}
+      locator: {page: 4, section: '2.1 Experimental Methods'}
 species:
   Na:
     observations:
     - observation_id: sossi_2019_na_alpha_e_gamma_derived_range
+      experiment: open-furnace-ferrobasalt-series
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
