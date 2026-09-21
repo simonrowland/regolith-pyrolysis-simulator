@@ -13,7 +13,11 @@ extraction:
     noisy OCR layer and was not used as data. Ion-current ratio tables labelled measured. Activities,
     gamma fits, and partial molar heats that pass through the modified Gibbs-Duhem / Belton-Fruehan integrals
     labelled model_derived. Figs 3-12 and Photo 1 listed figure-only; no numbers off axes. Japanese body:
-    numbers and English captions/abstract transcribed from the render; untranslated running prose is unseen.'
+    numbers and English captions/abstract transcribed from the render; untranslated running prose was unseen
+    in that original pass. Bench registry repair (2026-09-21) rechecked source text sections 3.1, 3.2 and
+    4.2: one instrument, unassigned per-run orifices, qualified durations, and stability distinct from
+    calibration uncertainty. Source text also corrects 53Cr+, the ideal-orifice depletion bound, and
+    the empty-cell background ratio in the method observation.'
   date: '2026-09-13'
   worker: extract-alloys-b3
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
@@ -65,6 +69,174 @@ fidelity_samples:
     pdf_page_index: 4
     section: '3.2'
     note: cell-side vacuum 3 x 10^-7 to 1.5 x 10^-6 Torr during ion-intensity measurement
+benches:
+- id: rm6k
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometer}
+    locator: &apparatus_locator {page: 13, published_page: 3051, pdf_page_index: 2, section: '3.1'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *apparatus_locator
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina SSA-S; tantalum susceptor}
+    locator: *apparatus_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *apparatus_locator
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 13, published_page: 3051, section: '3.1', note: Body height is 12 mm; internal depth is not separately stated}
+  heating_method:
+    state: {tag: value, value: Electron bombardment; upper and lower tungsten ring filaments}
+    locator: *apparatus_locator
+  detector:
+    state: {tag: value, value: 'Hitachi RM-6K; magnetic scanning, single focusing, 90 degree analyser, radius 200 mm'}
+    locator: *apparatus_locator
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor}
+      locator: {page: 14, published_page: 3052, pdf_page_index: 3, section: '3.1'}
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16}
+      locator: {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2'}
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 14, published_page: 3052, section: '3.1', note: The printed +/-0.5 C is temperature stability, not calibration uncertainty}
+  other_facts:
+  - name: cell_body_height
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '12'}}
+      locator: *apparatus_locator
+  - name: temperature_fluctuation_magnitude_during_ion_ratio_measurements
+    unit: C
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.5'}}
+      locator: {page: 14, published_page: 3052, section: '3.1', note: 'Within +/-0.5 C: stability, not calibration uncertainty'}
+  - name: cell_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '11'}}
+      locator: *apparatus_locator
+  - name: offered_orifice_diameters_not_run_assignments
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.5 or 0.3'}}
+      locator: {page: 13, published_page: 3051, section: '3.1', note: Discrete alternatives, not an interval; no pairing with lid thickness printed}
+  - name: offered_lid_thicknesses_not_run_assignments
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '1 or 0.5'}}
+      locator: {page: 13, published_page: 3051, section: '3.1', note: Printed as lid thickness; no run-specific channel length or diameter pairing}
+  - name: aperture_comparison_at_NV_0_796
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.3 and 0.5; agreement reported'}}
+      locator: {page: 16, published_page: 3054, section: '4.2', note: Both apertures tested at N_V=0.796; no assignment to Table 2 aggregate or lid-thickness pairing}
+experiments:
+- &binary_series
+  experiment_id: fe-v-series
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {page: 15, published_page: 3053, section: '3.2', note: Reported Fe-V measurement series, not a claim of one physical charge or one configuration}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
+      locator: &loading_locator {page: 15, published_page: 3053, pdf_page_index: 4, section: '3.2', note: Printed loading range 1-3 g; individual charge masses not assigned}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3054, table: '2', note: Multiple Fe-V compositions remain in observation rows; no single series composition. Table 1 is starting-metal assays, not charge compositions}
+    form:
+      state: {tag: value, value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise}
+      locator: *loading_locator
+    characterization:
+      state: {tag: value, value: Chemical analysis after measurement; nearly matched master-alloy mixing compositions}
+      locator: {page: 15, published_page: 3053, section: '3.2'}
+    pretreatment:
+      state: {tag: value, value: Argon-arc melted Fe-V master alloys; solid and solid-liquid samples remelted twice for homogenization}
+      locator: {page: 14, published_page: 3052, section: '3.1'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: *apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: *apparatus_locator
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3054, table: '2', note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00003999671052631578947368421053', interval_high: '0.0001999835526315789473684210526'}}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: Vacuum measurement; preparation H2 is not measurement gas}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 13, published_page: 3051, note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Temperature-dependent measurements. At >=1600 C, limited to about 1 h due to thermocouple wear. Solid N_V=0.796 and 0.900 scans stepped low-high-low twice, about 4 h overall. No numerical heating rate or universal measurement hold printed.'}
+      locator: {published_page: '3053-3054', section: '3.2; 4.2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: '3053-3054', note: Conditional approximate upper limit about 1 h at >=1600 C; approximately 4 h for specified solid scans. Neither applies to every series member}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: Fe-Al addition only for liquid-state measurements, Al concentration 1 at% of V concentration; not a quantified oxygen buffer or pO2}
+- <<: *binary_series
+  experiment_id: fe-v-cr-series
+  locator: {published_page: 3057, table: '3', note: Reported Fe-V-Cr measurement series; per-run orifice and charge mass not assigned}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3057, table: '3', note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
+      locator: *loading_locator
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3057, table: '3', note: Multiple Fe-V-Cr compositions retained in observation rows; no single series composition}
+    form:
+      state: {tag: value, value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise}
+      locator: *loading_locator
+    characterization:
+      state: {tag: value, value: Chemical analysis after measurement}
+      locator: {page: 15, published_page: 3053, section: '3.2'}
+    pretreatment:
+      state: {tag: value, value: 'Cr reduced in purified H2 at 1200 C for 85 h. Fe-V-Cr alloyed in the cell at approximately 1580 C for 20-30 min until constant ion intensity; this is preparation, not a measurement hold.'}
+      locator: {page: 14, published_page: 3052, section: '3.1'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Measurements at >=1600 C limited to about 1 h due to thermocouple wear; 20-30 min at approximately 1580 C describes alloy preparation only.'}
+      locator: {published_page: '3052-3053', section: '3.1; 3.2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: Per-run duration unassigned; about 1 h is a conditional limit, not a duration for every run}
+- <<: *binary_series
+  experiment_id: fe-v-solid-scan-series
+  locator: {page: 16, published_page: 3054, section: '4.2', note: Explicitly reported scans at N_V=0.796 and 0.900; not an additional inferred charge. Table 2 aggregates several protocols and is not reassigned here}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Solid N_V=0.796 and 0.900: stepwise low-high-low scans repeated twice'}
+      locator: {page: 16, published_page: 3054, section: '4.2'}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '14400', approximate: true}}
+      locator: {page: 16, published_page: 3054, section: '4.2', note: About 4 h overall for the reported scan protocol; not a hold at each temperature. Unit conversion only}
 species:
   Fe:
     observations:
@@ -106,7 +278,7 @@ species:
         ion_accelerating_voltage_kV: 3.6 or 4.5
         detected_ions_as_printed:
         - 51V+
-        - 52Cr+
+        - 53Cr+
         - 54Fe+
         - 57Fe+
         sample_mass_g: 1-3
@@ -127,9 +299,11 @@ species:
         - sample_surface_area
         composition_after_run: chemical analysis; matched the master-alloy charge
       uncertainty:
-        note: Temperature hold +/-0.5 C. Surface-depletion calculation at N_V=0.796 gives Fe 1% depletion
-          time >1e8 s; authors treat depletion as negligible. 51V+ at N_V=0.093 was ~20% of empty-cell
-          background after the run and was corrected; at N_V=0.201 the correction was <5%.
+        note: Temperature stability within +/-0.5 C. Ideal-orifice surface-depletion calculation at
+          1600 C assuming effective evaporation area/orifice area=324 gives Fe 1% depletion time
+          >=1e5 s; authors treat depletion as negligible
+          (published p.3054, section 4.2). Empty-cell 51V+ background was about 20% of the sample
+          signal at N_V=0.093 and was corrected; at N_V=0.201 the correction was <5%.
       equipment:
         cell_material:
           value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm,
@@ -224,6 +398,7 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_fe_binary_fit
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         published_page: 3057
@@ -263,6 +438,7 @@ species:
       uncertainty:
         note: fit to the Fig. 5(b) integral of Table 2 ion ratios; no +/- on the coefficients
     - observation_id: furukawa_1975_gamma0_fe_1600c
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         published_page: 3056
@@ -291,6 +467,7 @@ species:
       uncertainty:
         note: no +/- printed on gamma0_Fe
     - observation_id: furukawa_1975_HM_fe_infinite_dilution
+      experiment: fe-v-series
       type: gibbs_table
       locator:
         published_page: 3057
@@ -322,6 +499,7 @@ species:
         as_printed: HM error about 2 kcal mol^-1 at infinite dilution; HM max -1.9 +/- 0.4 kcal mol^-1
           (N_V=0.44)
     - observation_id: furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
+      experiment: fe-v-series
       type: rate_series
       locator:
         figure: '4'
@@ -363,6 +541,7 @@ species:
       uncertainty:
         note: figure-only; tabulated 1600 C intercepts and slopes are in Table 2
     - observation_id: furukawa_1975_fig6_fe_v_activities_figure_only
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -394,6 +573,7 @@ species:
   V:
     observations:
     - observation_id: furukawa_1975_table2_fe_v_ion_current_ratios
+      experiment: fe-v-series
       type: rate_series
       locator:
         table: '2'
@@ -493,6 +673,7 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_v_fe_binary_fit
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         published_page: 3057
@@ -526,6 +707,7 @@ species:
       uncertainty:
         note: no +/- on the fitted coefficients
     - observation_id: furukawa_1975_gamma0_v_1600c
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         published_page: 3056
@@ -555,6 +737,7 @@ species:
         note: Al at 1 at% of V is estimated to shift gamma_V by at most ~3% for N_V<0.2 (using epsilon_V^Al=12
           from the literature); authors treat the Al effect as negligible.
     - observation_id: furukawa_1975_HM_v_infinite_dilution
+      experiment: fe-v-series
       type: gibbs_table
       locator:
         published_page: 3057
@@ -580,6 +763,7 @@ species:
       uncertainty:
         note: same ~2 kcal mol^-1 infinite-dilution envelope as H^M_Fe
     - observation_id: furukawa_1975_liquidus_solidus_1600c
+      experiment: fe-v-series
       type: transition_point
       locator:
         figure: '3'
@@ -677,6 +861,7 @@ species:
       uncertainty:
         note: quoted; no +/- transcribed
     - observation_id: furukawa_1975_fig7_av_comparison_figure_only
+      experiment: fe-v-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -704,6 +889,7 @@ species:
   Cr:
     observations:
     - observation_id: furukawa_1975_table3_fe_v_cr_ion_current_ratios
+      experiment: fe-v-cr-series
       type: rate_series
       locator:
         table: '3'
@@ -822,6 +1008,7 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_ternary_nv02_fits
+      experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
         published_page: 3058
@@ -862,6 +1049,7 @@ species:
       uncertainty:
         note: no +/- on the ternary coefficients
     - observation_id: furukawa_1975_gamma_ternary_nv03_fits
+      experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
         published_page: 3058
@@ -894,6 +1082,7 @@ species:
       uncertainty:
         note: no +/- on the ternary coefficients
     - observation_id: furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
+      experiment: fe-v-cr-series
       type: rate_series
       locator:
         figure: '10'
@@ -928,6 +1117,7 @@ species:
       uncertainty:
         note: figure-only; 1600 C intercepts are Table 3
     - observation_id: furukawa_1975_fig12_ternary_activities_figure_only
+      experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
         figure: '12'

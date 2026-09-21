@@ -226,13 +226,189 @@ Every **equipment-metadata field** that is present requires its **own** `locator
 Derived geometry must set `inferred: true` (or any truthy inferred flag) and
 state the derivation in `inference` or `note`.
 
+## Bench and experiment registries (worked example)
+
+A **Bench is the instrument**. Anything that changed between runs belongs on
+the **Experiment**, including orifice diameter and channel length under
+`apparatus.geometry`. An unattributable per-run value is a typed absence:
+never select an alternative, pair two independent sets, invent a midpoint, or
+fabricate an “unknown-configuration” bench. An unknown orifice does not erase
+a known `bench_id`. Observations must never inherit a configuration the source
+did not assign.
+
+Registry IDs are local to the extract. The migrator supplies `work_id` and
+qualifies IDs as `<work_id>::bench::<id>` and
+`<work_id>::experiment::<experiment_id>`. An observation's `experiment:`
+is a foreign key, not a nested experiment object. References must resolve.
+Registries can be lists (below) or mappings keyed by local ID.
+
+This copyable registry fragment follows Furukawa (1975). It describes the
+reported Fe-V series, **not one physical charge**: per-charge masses,
+compositions and configurations are unresolved. Retain published row
+compositions in observation values; do not use starting-metal assays as a
+charge. The complete source-specific example, including the Fe-V-Cr series,
+is [kems-119-furukawa-1975.yaml](kems-119-furukawa-1975.yaml).
+It also retains the explicitly described N_V=0.796/0.900 solid-scan protocol
+as a separate series record with approximate 14400 s total duration. This
+does not assert another physical charge or reassign mixed Table 2 observations.
+The instrument's temperature-stability magnitude is a bound of <=0.5 C.
+These real records exercise RANGE, NOMINAL and BOUND through migration.
+
+```yaml
+benches:
+- id: rm6k
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometer}
+    locator: {page: 13, published_page: 3051, section: '3.1'}
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina SSA-S}
+    locator: {page: 13, published_page: 3051, section: '3.1'}
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: {published_page: 3051, section: '3.1'}
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 3051, section: '3.1', note: Body height 12 mm is not a separately stated internal depth}
+  other_facts:
+  - name: offered_orifice_diameters_not_run_assignments
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.5 or 0.3'}}
+      locator: {published_page: 3051, section: '3.1', note: Discrete alternatives; not a range or pairing with lid thickness}
+experiments:
+- experiment_id: fe-v-series
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: 3053, section: '3.2', note: Series of measurements; individual configurations unassigned}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.003'}}
+      locator: {published_page: 3053, section: '3.2', note: Printed 1-3 g}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3054, table: '2', note: No single composition for this series; compositions remain in observation rows}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 3051, section: '3.1'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 3051, section: '3.1'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 3054, table: '2', note: Tabulated 1600 C intercept is not a universal run setpoint}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: '3053-3054', note: About 1 h limit only at >=1600 C; specified solid scans about 4 h overall}
+```
+
+Add `experiment: fe-v-series` beside `observation_id:` on the corresponding
+existing observation, retaining its `type`, `locator`, `values`, uncertainty
+and other required observation fields. Quoted results from other authors do
+**not** acquire this instrument. Supporting method/starting-material records
+are not measurements of a charge; retain their original evidence without
+pretending they are runs. Derived fits from this work can reference their
+underlying measurement series; their `model_derived` evidence class stays intact.
+
+The migrator defaults missing pressure evidence to unknown. When supplied,
+`pressure_environment` requires `total_pressure_Pa` and `sweep_gas` as
+Located values, and `regime.regime_class` as a State. Do not confuse cell-side
+chamber pressure with sample vapour pressure. There is no dedicated base-pressure
+field in the current record: the complete example preserves its typed absence
+at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
+
+### Located values and print forms
+
+Every fact is `{state: ..., locator: ...}`. Numeric fields use a tagged
+`Value` inside `state.value`; strings such as the detector name are direct
+`state.value` strings. Quote numeric payloads to preserve decimal spelling.
+Suffixes define SI units (`_m`, `_kg`, `_Pa`, `_K`, `_s`); retain original
+units and printed wording in the locator note. Unit conversion preserves
+interval endpoints, inequality and approximation. Never calculate physical
+geometry, rates or partial pressures into evidence.
+
+| Printed form | Value payload |
+|---|---|
+| POINT | `{kind: point, point: '9'}` |
+| RANGE | `{kind: interval, interval_low: '1', interval_high: '3'}` |
+| NOMINAL (“about 4”) | `{kind: point, point: '4', approximate: true}` |
+| BOUND (“at most about 1”) | `{kind: bound, bound_operator: '<=', bound_value: '1', approximate: true}` |
+| Discrete alternatives | `{kind: categorical, categorical: '0.5 or 0.3'}` |
+
+These payload examples illustrate syntax; their units and applicability come
+from the enclosing field and source. NOMINAL is encoded as a point **with
+`approximate: true`**, never as an exact point. BOUND operators are `<`, `<=`,
+`>`, `>=`. A range is not its midpoint. A ± stability envelope is not
+calibration uncertainty. A conditional duration must not become an unconditional
+`total_duration_s`: retain the qualification in evidence prose and mark the
+aggregate field unknown when no single value applies.
+
+Typed absence:
+```yaml
+orifice_diameter_m:
+  state: {tag: unknown, reason: not_published}
+  locator: {published_page: 3051, section: '3.1', note: Alternatives printed, run assignment absent}
+```
+Closed reasons: `not_published`, `not_numeric`, `in_cited_source`,
+`illegible`, `would_invent`, `not_applicable`. Use
+`tag: not_applicable, reason: not_applicable` for an inapplicable field;
+absence is not zero. Explanations go in `locator.note`, not new reason tokens.
+
+### Identity, field homes and refusal
+
+`identity.basis: described_in_this_work` means the instrument is described
+here; locate the description on its facts (the identity object has no locator
+field). A genuinely author-cited instrument uses:
+```yaml
+identity:
+  basis: cited_by_author
+  ref:
+    work_id: null
+    cited_as: 'Smith (1980)'
+    for_parameters: [orifice_diameter_m]
+    locator: {page: 3, section: apparatus}
+```
+This is a syntax example, not Furukawa evidence. Populate the cited work ID only
+when resolved. `inferred_from_embedded_evidence` is migrator-only; never author
+it in an extract.
+
+Stable instrument fields include `geometry`, `heating_method`, `detector`,
+`temperature_measurement`, `temperature_calibration`, `pumping_type`,
+`pumping_speed_m3_s`, `gauges`, `ionization`, and numeric/categorical
+`other_facts: [{name, unit, value: <Located Value>}]`.
+Experiment fields include `sample` (also accepted as `charge`),
+`apparatus.geometry` for per-run configuration, `pressure_environment`,
+`fO2_control`, `conditions`, and `thermal_schedule`.
+Sample fields include `mass_kg`, `printed_composition`, `initial_composition`,
+`form`, `characterization`, `surface_area_m2`, and `pretreatment`.
+Thermal schedules hold Located `method`, `total_duration_s`,
+`cooling_or_quench`, plus `ramps` (`rate_K_s`, start/end temperature),
+`setpoints_and_holds` (`temperature_K`, `hold_duration_s`) or `points`
+(`time_s`, `temperature_K`). Do not record alloy preparation as a measurement hold.
+
+For Furukawa there is ONE real instrument; diameter alternatives {0.5, 0.3} mm
+and lid thickness alternatives {1, 0.5} mm are **unpaired evidence sets**.
+Both diameters were compared at N_V=0.796, but no individual aggregate row has
+a diameter/thickness assignment. Preserve the sets on Bench as categorical
+evidence, per-run absences on Experiment. Effective escape area remains
+**BLOCKED**. Even an assigned diameter alone yields only GEOMETRIC_ONLY, not
+a transport-effective area. The current waypoint implementation reads bench
+geometry; this canary supplies no run-specific geometry to that route and
+does not widen or change waypoint code.
+
 ## Equipment / bench metadata
 
 Optional block on an observation during the compatibility window. The complete allowed
 printed-name set and each name's typed destination are defined only in
 `data/literature/lab_parameter_vocabulary.yaml`. The validator loads that file; do not
 maintain a second allowlist here or in Python. New extracts should prefer the top-level
-`benches:` / `experiments:` registries once their migrator lands, while legacy
+`benches:` / `experiments:` registries described above, while legacy
 `equipment:` continues to validate against the same vocabulary.
 
 The vocabulary covers apparatus identity and method, cell/chamber/orifice geometry,
