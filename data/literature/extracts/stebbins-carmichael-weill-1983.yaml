@@ -14,6 +14,105 @@ extraction:
   worker: codex-extract-ingest
   provenance_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
 review_status: draft
+benches:
+  - id: perkin-elmer-dsc-2
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: differential scanning calorimeter}
+      locator: &methods_locator {published_page: 717, section: 'Experimental methods'}
+    method:
+      state: {tag: value, value: differential scanning calorimetry}
+      locator: *methods_locator
+    detector:
+      state: {tag: value, value: Perkin-Elmer DSC-2}
+      locator: *methods_locator
+    temperature_calibration:
+      method:
+        state: {tag: value, value: NBS 720 sapphire standard reference material}
+        locator: {published_page: 718, section: 'Experimental methods'}
+  - id: calvet-drop-calorimeter
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: twin Calvet-type drop calorimeter}
+      locator: &drop_locator {published_page: 718, section: 'Experimental methods'}
+    method:
+      state: {tag: value, value: inverse-drop and drop-solution calorimetry}
+      locator: *drop_locator
+    cell_material_and_liner:
+      state: {tag: value, value: silica crucible; capsules for high-temperature enthalpy runs}
+      locator: *drop_locator
+    heating_method:
+      state: {tag: value, value: platinum-40% rhodium wire-wound furnace}
+      locator: {published_page: 717, section: 'Experimental methods'}
+    detector:
+      state: {tag: value, value: twin Calvet-type microcalorimeter}
+      locator: *drop_locator
+    temperature_calibration:
+      method:
+        state: {tag: value, value: NBS 720 sapphire standard and platinum-wire drops}
+        locator: *drop_locator
+    other_facts:
+      - name: calorimeter_medium_as_printed
+        unit: as_published
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: diphenyl ether}}
+          locator: {published_page: 717, section: 'Experimental methods', note: 'Air was removed by repeated freezing under vacuum.'}
+experiments:
+  - experiment_id: dsc-heat-capacity-series
+    bench_id: perkin-elmer-dsc-2
+    method: differential_scanning_calorimetry
+    locator: {published_page: 717, section: 'Experimental methods', note: 'Own direct heat-capacity measurements.'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.00003', approximate: true}}
+        locator: {published_page: 718, section: 'Experimental methods', note: 'Printed about 30 mg; unit conversion only'}
+      characterization:
+        state: {tag: value, value: petrographic microscope, X-ray diffraction, and post-run electron microprobe}
+        locator: {published_page: 718, section: 'Experimental methods'}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: '717-718', section: 'Experimental methods', note: 'No DSC thermal schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: '717-718', section: 'Experimental methods', note: 'No DSC run duration is printed.'}
+  - experiment_id: drop-calorimetry-series
+    bench_id: calvet-drop-calorimeter
+    method: drop_calorimetry
+    locator: {published_page: 718, section: 'Experimental methods', note: 'Own inverse-drop and drop-solution measurements.'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.0016', approximate: true}}
+        locator: {published_page: 718, section: 'Experimental methods', note: 'Printed about 1.6 g; unit conversion only'}
+      form:
+        state: {tag: value, value: 'glass pieces; capsule cores produced as cylinders about 3 mm diameter and 60-190 mg'}
+        locator: *drop_locator
+      pretreatment:
+        state: {tag: value, value: glasses prepared by quenching liquids in the drop calorimeter}
+        locator: *drop_locator
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 718, section: 'Experimental methods', note: 'No measurement pressure is printed.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 717, section: 'Experimental methods', note: 'Diphenyl ether is the calorimeter medium, not a published sweep-gas record.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: '981'}
+        locator: *drop_locator
+    thermal_schedule:
+      method:
+        state: {tag: value, value: inverse-drop and drop-solution calorimetry}
+        locator: *drop_locator
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 718, section: 'Experimental methods', note: 'Heat effects were observable for about 50 min; this is not a printed run duration.'}
+      cooling_or_quench:
+        state: {tag: value, value: glasses quenched from liquids in the drop calorimeter}
+        locator: *drop_locator
 species:
   CaMgSi2O6:
     observations:

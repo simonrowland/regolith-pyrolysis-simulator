@@ -9,6 +9,86 @@ extraction:
   date: '2026-09-19'
   worker: w1-nakano-hashimoto-2020-bubbles-to-chondrites-i
 review_status: draft
+benches:
+  - id: co2-laser-boiling-chamber
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: CO2-laser boiling chamber}
+      locator: &apparatus_locator {page: 3, section: Apparatus}
+    method:
+      state: {tag: value, value: cw-CO2 laser heating with inert-gas cooling}
+      locator: *apparatus_locator
+    geometry:
+      chamber_dimensions:
+        inner_diameter_m:
+          state: {tag: value, value: {kind: point, point: '0.097'}}
+          locator: {page: 3, section: Apparatus, note: 'Printed 97 mm ID; unit conversion only'}
+        height_m:
+          state: {tag: value, value: {kind: point, point: '0.310'}}
+          locator: {page: 3, section: Apparatus, note: 'Printed 310 mm H; unit conversion only'}
+    heating_method:
+      state: {tag: value, value: 'cw-CO2 laser, 10.6 um, 20-210 W'}
+      locator: *apparatus_locator
+    detector:
+      state: {tag: value, value: 'precision microbalance, video camera, and FE-SEM'}
+      locator: {page: 4, section: 'Experimental methods'}
+    temperature_measurement:
+      sensor:
+        state: {tag: value, value: IMPAC IS-12 automated pyrometer}
+        locator: *apparatus_locator
+    pumping_type:
+      state: {tag: value, value: '50 L/s turbomolecular pump and oil-free roughing pump'}
+      locator: *apparatus_locator
+    pumping_speed_m3_s:
+      state: {tag: value, value: {kind: point, point: '0.05'}}
+      locator: {page: 3, section: Apparatus, note: 'Printed 50 Liter s-1; unit conversion only'}
+    other_facts:
+      - name: measurement_gas_composition_as_printed
+        unit: as_published
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: 'Ar 0.3 bar; H2 0.01 bar; total stated 0.3 bar'}}
+          locator: {page: 3, section: Apparatus, note: 'Printed operands retained without deriving a combined pressure.'}
+experiments:
+  - experiment_id: laser-boiling-series
+    bench_id: co2-laser-boiling-chamber
+    method: laser_boiling
+    locator: {page: 3, section: 'Experimental methods; Apparatus', note: 'Own laser-heating and inert-gas-cooling experiments.'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.000015', approximate: true}}
+        locator: {page: 3, section: 'Experimental methods', note: 'Printed approximately 15 mg; unit conversion only'}
+      printed_composition:
+        state: {tag: value, value: 'Allende meteorite powder or synthetic Lsil'}
+        locator: {page: 2, table: '1'}
+      form:
+        state: {tag: value, value: cylindrical pressed and fired charge}
+        locator: {page: 3, section: 'Experimental methods'}
+      pretreatment:
+        state: {tag: value, value: 'Fired 12 h at 1100 C (Lsil) or 1000 C (Allende) in H2/CO2'}
+        locator: {page: 2, section: 'Experimental methods'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '30000'}}
+        locator: {page: 3, section: Apparatus, note: 'Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, section: Apparatus, note: 'The registry SweepGas shape cannot represent the printed two-gas mixture without selecting one species.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+      pumping:
+        base_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.00133322'}}
+          locator: {page: 3, section: Apparatus, note: 'Evacuated to printed 10^-5 Torr before filling; unit conversion only'}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: laser heating followed by chamber-wall and copper-plate quench of droplets}
+        locator: {page: 4, section: 'Experimental methods'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 6, table: '2', note: 'Run-specific heating durations remain in observation rows; no one duration applies to the series.'}
+      cooling_or_quench:
+        state: {tag: value, value: Cu plate and chamber-wall quench of droplets}
+        locator: {page: 4, section: 'Experimental methods'}
 fidelity_samples:
   - species: SiO2
     observable: rate_series
@@ -57,6 +137,7 @@ species:
           grain_size_um: '<5'
           sintering: '12 h at 1100 °C (Lsil) or 1000 °C (Allende), H2/CO2 = 1 or 1/2'
       - observation_id: nakano_2020_mass_loss_selected_runs
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 6, table: '2'}
         phase: boiling_silicate_melt
@@ -76,6 +157,7 @@ species:
             - {run: 103, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2177, heating_duration_s: 34, sample_initial_weight_g: 0.01429, mass_loss_wt_pct: 23.1}
             - {run: 109, group: A50, material: Allende, laser_power_W: 50, ambient_gas: '0.3Ar + 0.01H2 bar', Tmax_C: 2559, heating_duration_s: 417, sample_initial_weight_g: 0.01419, mass_loss_wt_pct: 53.1}
       - observation_id: nakano_2020_corrected_temperature_groups
+        experiment: laser-boiling-series
         type: transition_point
         locator: {page: 8, table: '3'}
         phase: boiling_silicate_melt
@@ -95,6 +177,7 @@ species:
             - {group: A50, emissivity: 0.9, TB_C: 2379, Tmax_C: 2778}
           caveat: 'Tmax is a lower limit because the pyrometer was not always on the hot spot.'
       - observation_id: nakano_2020_relative_volatility_table4
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 12, table: '4'}
         phase: boiling_chondritic_silicate_melt
@@ -137,6 +220,7 @@ species:
           vapor_handling: 'authors state vapor was 100% converted to solid condensates by collision with cold ambient gas; condensates recovered by vacuum suction'
           temperature_profile_example: 'run 3 reaches 2200 °C in 1 s and about 2600 °C in 14 s (Fig. 4)'
       - observation_id: nakano_2020_droplet_and_condensate_characterization
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 10, section: Characteristics of the droplets and the condensed particles, figures: '2-3'}
         phase: boiling_chondritic_silicate_melt
@@ -153,6 +237,7 @@ species:
   Na:
     observations:
       - observation_id: nakano_2020_relative_volatility_na
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 12, table: '4'}
         regime: relative_volatility_from_measured_droplet_composition_ensembles
@@ -161,6 +246,7 @@ species:
   K:
     observations:
       - observation_id: nakano_2020_relative_volatility_k
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 12, table: '4'}
         regime: relative_volatility_from_measured_droplet_composition_ensembles
@@ -169,6 +255,7 @@ species:
   Fe:
     observations:
       - observation_id: nakano_2020_relative_volatility_fe
+        experiment: laser-boiling-series
         type: rate_series
         locator: {page: 12, table: '4'}
         regime: relative_volatility_from_measured_droplet_composition_ensembles

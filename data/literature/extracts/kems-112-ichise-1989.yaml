@@ -20,6 +20,74 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+  - id: ichise-kems
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: Knudsen-cell mass spectrometer}
+      locator: &apparatus_locator {published_page: 844, section: '2.1 Apparatus'}
+    method:
+      state: {tag: value, value: Knudsen effusion mass spectrometry}
+      locator: *apparatus_locator
+    cell_material_and_liner:
+      state: {tag: value, value: sintered alumina crucible and tantalum holder}
+      locator: *apparatus_locator
+    geometry:
+      cell_internal_dimensions:
+        diameter_m:
+          state: {tag: value, value: {kind: point, point: '0.009'}}
+          locator: *apparatus_locator
+        height_m:
+          state: {tag: value, value: {kind: point, point: '0.011'}}
+          locator: *apparatus_locator
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004'}}
+        locator: *apparatus_locator
+    heating_method:
+      state: {tag: value, value: electron bombardment from two separately controlled ring filaments}
+      locator: *apparatus_locator
+    detector:
+      state: {tag: value, value: single-focusing mass spectrometer}
+      locator: *apparatus_locator
+    temperature_measurement:
+      sensor:
+        state: {tag: value, value: W/W-26%Re thermocouples at upper side and bottom centre of holder}
+        locator: *apparatus_locator
+    temperature_calibration:
+      method:
+        state: {tag: value, value: thermal analysis of pure iron and palladium at known melting points}
+        locator: *apparatus_locator
+    pumping_type:
+      state: {tag: value, value: separately pumped oil diffusion pumps}
+      locator: *apparatus_locator
+experiments:
+  - experiment_id: fe-ta-nb-kems-series
+    bench_id: ichise-kems
+    method: knudsen_effusion
+    locator: {published_page: 844, section: '2.1 Apparatus; 2.2 Sample Preparation', note: 'Own Fe-Ta and Fe-Nb alloy measurements.'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: Fe-Ta or Fe-Nb alloy with pure iron foil on sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      form:
+        state: {tag: value, value: iron foil covering the alloy sample surface}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'Vacuum measurement.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: foil ion intensity measured below melting points, then alloy and foil melted to form uniform liquid alloy}
+        locator: {published_page: 844, section: '2.1 Apparatus'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 844, section: '2.1 Apparatus', note: 'No universal run duration is printed.'}
 fidelity_samples:
 - path: species.Fe.observations[ichise_1989_table4_FeTa_1873K].values.rows[2].a_Fe
   value: 0.832
@@ -129,6 +197,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table1_FeTa_a_Fe
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '1'
@@ -317,6 +386,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table4_FeTa_1873K
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '4'
@@ -427,6 +497,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table5_FeNb_a_Fe
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '5'
@@ -532,6 +603,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table6_FeNb_1873K
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         table: '6'
@@ -671,6 +743,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_figs_ion_intensity_figure_only
+      experiment: fe-ta-nb-kems-series
       type: rate_series
       locator:
         figure: '1'
@@ -698,6 +771,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_figs_activities_figure_only
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -727,6 +801,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table2_metallography
+      experiment: fe-ta-nb-kems-series
       type: transition_point
       locator:
         table: '2'
@@ -798,6 +873,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_table3_phase_boundaries
+      experiment: fe-ta-nb-kems-series
       type: transition_point
       locator:
         table: '3'
@@ -854,6 +930,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1989_infinite_dilution_gamma
+      experiment: fe-ta-nb-kems-series
       type: activity_coefficient
       locator:
         published_page: 851
