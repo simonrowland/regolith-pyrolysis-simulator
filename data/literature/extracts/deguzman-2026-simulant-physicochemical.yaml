@@ -36,6 +36,64 @@ fidelity_samples:
   locator:
     pdf_page_index: 9
     table: '4'
+benches:
+- id: micromeritics-3flex
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Surface analyzer}
+    locator: &bet_locator {pdf_page_index: 3, section: Materials and Methods, note: Micromeritics 3Flex Surface Analyzer used for N2 adsorption-desorption}
+  detector:
+    state: {tag: value, value: Micromeritics 3Flex Surface Analyzer}
+    locator: *bet_locator
+- id: micromeritics-autochem
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Temperature-programmed reduction analyzer}
+    locator: &tpr_locator {pdf_page_index: 3, section: Materials and Methods, note: Hydrogen TPR using a Micromeritics AutoChem}
+  heating_method:
+    state: {tag: value, value: Micromeritics AutoChem}
+    locator: *tpr_locator
+  detector:
+    state: {tag: value, value: Thermal conductivity detector}
+    locator: {pdf_page_index: 6, section: '3.2.1', note: TCD signal integrated for oxygen quantity}
+experiments:
+- experiment_id: bet-surface-area-series
+  bench_id: micromeritics-3flex
+  method: nitrogen_adsorption_desorption_bet
+  locator: {pdf_page_index: 3, section: Materials and Methods, note: LHS-2 and constituent minerals measured by N2 adsorption-desorption at 77 K}
+  sample:
+    printed_composition:
+      state: {tag: value, value: LHS-2 and constituent minerals}
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+    pretreatment:
+      state: {tag: value, value: Activated for 12 h at 200 C under high vacuum}
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '77'}
+      locator: {pdf_page_index: 3, section: Materials and Methods, note: N2 adsorption-desorption at 77 K}
+- experiment_id: hydrogen-tpr-series
+  bench_id: micromeritics-autochem
+  method: hydrogen_temperature_programmed_reduction
+  locator: {pdf_page_index: 3, section: Materials and Methods, note: TPR of two simulant mixtures and their ilmenite and olivine phases}
+  sample:
+    printed_composition:
+      state: {tag: value, value: LHS-2 and LSP-2 simulant mixtures with ilmenite and olivine phases}
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+    pretreatment:
+      state: {tag: value, value: Flowing Ar for 1 h from ambient to 300 C, reached in 10 min}
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1173.15'}
+      locator: {pdf_page_index: 3, section: Materials and Methods, note: Reduced at 900 C; unit conversion only}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Pretreatment under flowing Ar from ambient to 300 C in 10 min; samples reduced at 900 C}
+      locator: {pdf_page_index: 3, section: Materials and Methods}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 3, section: Materials and Methods, note: The 1 h value is pretreatment only; no reduction duration printed}
 species:
   LHS-1:
     observations:
@@ -119,6 +177,7 @@ species:
         instrument: ThermoFisher Phenom-XL Desktop SEM with integrated EDX detector
         note: carbon and gold signals were identified as mounting-tape and sputter-coating artifacts; sample mass and beam settings are not stated
     - observation_id: deguzman_2026_table3_bet_texture
+      experiment: bet-surface-area-series
       type: rate_series
       locator: {pdf_page_index: 7, table: '3', section: Textural Properties and Gas-Solid Accessibility}
       phase: particulate_lunar_highlands_simulant_and_constituent_minerals
@@ -146,6 +205,7 @@ species:
         excluded_sample: LHS-1
         excluded_sample_reason: compositionally similar to LHS-2
     - observation_id: deguzman_2026_tpr_oxygen_yields_and_conditions
+      experiment: hydrogen-tpr-series
       type: rate_series
       locator: {pdf_page_index: 3, section: Materials and Methods}
       phase: LHS-2_and_LSP-2_simulant_mixtures_and_ilmenite_olivine_phases

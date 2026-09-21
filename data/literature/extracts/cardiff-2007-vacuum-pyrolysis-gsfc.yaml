@@ -19,6 +19,73 @@ extraction:
   provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/cardiff-2007-vacuum-pyrolysis-gsfc/
 review_status: draft
 corrections: []
+benches:
+- id: fresnel-prototype
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: 'Cardiff et al. (2005)'
+      for_parameters: [cell_material_and_liner]
+      locator: {pdf_page_index: 2, section: SOLAR CONCENTRATION, note: This paper attributes the zirconia-crucible prototype to Cardiff et al. (2005)}
+  apparatus_family:
+    state: {tag: value, value: Fresnel lens vacuum-pyrolysis prototype}
+    locator: &fresnel_locator {pdf_page_index: 2, section: SOLAR CONCENTRATION, note: Fresnel lens-based system used for most early development}
+  heating_method:
+    state: {tag: value, value: Fresnel lens solar concentration}
+    locator: *fresnel_locator
+  cell_material_and_liner:
+    state: {tag: value, value: Zirconia crucible}
+    locator: {pdf_page_index: 2, section: SOLAR CONCENTRATION, note: Attributed in this paper to Cardiff et al. (2005)}
+  detector:
+    state: {tag: value, value: MKS Residual Gas Analyzer}
+    locator: {pdf_page_index: 4, section: RESULTS, note: Used only for the last MLS-1A test}
+  pumping_type:
+    state: {tag: value, value: Turbopump downstream of leak valve}
+    locator: {pdf_page_index: 4, section: RESULTS}
+- id: psu-vacuum-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: High-temperature vacuum furnace}
+    locator: &psu_locator {pdf_page_index: 6, section: REDUCED PRESSURE TESTING, note: Proof-of-principle tests at Pennsylvania State University Sintering Lab}
+  heating_method:
+    state: {tag: value, value: High-temperature vacuum furnace}
+    locator: *psu_locator
+experiments:
+- experiment_id: fresnel-pyrolysis-series
+  bench_id: fresnel-prototype
+  method: solar_fresnel_vacuum_pyrolysis
+  locator: {pdf_page_index: 3, table: '1', note: Twelve prototype tests; conditions vary by table row and are retained in the observation}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 3, section: RESULTS, note: Approximately one net gram is stated for material vaporized by the small prototype, but not assigned per test}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 3, table: '1', note: Table includes Zn, FeTiO3, MgSiO3, Al2O3, and MLS-1A; no one series composition}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 3, table: '1', note: Per-test maximum temperatures vary; approximate and bound entries are retained in the observation}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 3, table: '1', note: Per-test approximate durations vary and remain in the observation}
+- experiment_id: psu-reduced-pressure-test
+  bench_id: psu-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: {pdf_page_index: 6, section: REDUCED PRESSURE TESTING, note: Approximately 10 g MLS-1A completely vaporized; lower-temperature tests showed no vaporization}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.010', approximate: true}}
+      locator: {pdf_page_index: 6, section: REDUCED PRESSURE TESTING, note: Approximately 10 g MLS-1A; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: MLS-1A lunar simulant}
+      locator: {pdf_page_index: 6, figure: '8'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: illegible}
+      locator: {pdf_page_index: 6, figure: '8', note: OCR text garbles the figure-caption pressure exponent; no pressure or temperature value is recorded here}
 fidelity_samples:
 - species: MLS-1A
   observable: rate_series
@@ -51,6 +118,7 @@ species:
   MLS-1A:
     observations:
     - observation_id: cardiff_2007_table1_fresnel_pyrolysis_log
+      experiment: fresnel-pyrolysis-series
       type: rate_series
       locator:
         table: '1'
@@ -279,6 +347,7 @@ species:
             table: '1'
             pdf_page_index: 3
     - observation_id: cardiff_2007_psu_10g_mls1a_vaporization
+      experiment: psu-reduced-pressure-test
       type: rate_series
       locator:
         figure: '8'
@@ -427,6 +496,7 @@ species:
   O2:
     observations:
     - observation_id: cardiff_2007_fig4_rga_test12_figure_only
+      experiment: fresnel-pyrolysis-series
       type: rate_series
       locator:
         figure: '4'

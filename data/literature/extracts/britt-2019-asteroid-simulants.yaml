@@ -11,6 +11,52 @@ extraction:
   provenance_path: raw/britt-2019-asteroid-simulants/britt-2019-asteroid-simulants.pdf
 review_status: draft
 corrections: []
+benches:
+- id: labsys-evo-thermostar
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Differential scanning calorimeter and thermal gravimeter with quadrupole mass spectrometer}
+    locator: &tga_locator {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer}
+  heating_method:
+    state: {tag: value, value: Labsys EVO differential scanning calorimeter/thermal gravimeter}
+    locator: *tga_locator
+  detector:
+    state: {tag: value, value: ThermoStar quadrupole mass spectrometer}
+    locator: *tga_locator
+experiments:
+- experiment_id: tga-ega-simulant-series
+  bench_id: labsys-evo-thermostar
+  method: thermogravimetry_evolved_gas_analysis
+  locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: CI, CM, and CR prototype simulants measured at NASA JSC ARES}
+  sample:
+    printed_composition:
+      state: {tag: value, value: CI, CM, and CR asteroid-simulant prototypes}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '3000'}}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: 30-mbar helium atmosphere; unit conversion only}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Helium
+          flow_sccm: {tag: value, value: '10'}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Helium flow 10 sccm}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_numeric}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Starts at ambient; no numerical start temperature printed}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated from ambient to 1000 C at 35 C/min under 10 sccm helium}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, note: Heating rate and ambient start are printed, but no duration is stated}
 fidelity_samples:
 - species: CI_Asteroid_Simulant
   observable: gibbs_table
@@ -115,6 +161,7 @@ species:
             Nickel metal: 0.5
         note: The table also prints future-update recipes; they are retained only as quoted recipe data, not treated as measurements of the prototype samples.
     - observation_id: britt_2019_tga_ega_thermal_program
+      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -156,6 +203,7 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed for the TG/EGA conditions or total integrated mass losses.
     - observation_id: britt_2019_tga_ega_release_patterns
+      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -223,6 +271,7 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed in Table 3.
     - observation_id: britt_2019_ci_tg_integrated_mass_loss
+      experiment: tga-ega-simulant-series
       type: rate_series
       locator:
         pdf_page_index: 11
@@ -269,6 +318,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cm_tg_integrated_mass_loss
+      experiment: tga-ega-simulant-series
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CM total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]
@@ -299,6 +349,7 @@ species:
         iron_speciation: not_measured; future Mössbauer spectroscopy stated
       uncertainty: {note: No numerical uncertainty is printed in Table 3.}
     - observation_id: britt_2019_cr_tg_integrated_mass_loss
+      experiment: tga-ega-simulant-series
       type: rate_series
       locator: {pdf_page_index: 11, section: Thermogravimetry and Evolved Gas Analysis, figure: '6a', note: Body text prints CR total integrated mass loss from 0 to 1000 °C.}
       T_range_K: [273.15, 1273.15]

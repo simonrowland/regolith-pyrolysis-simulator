@@ -19,6 +19,46 @@ extraction:
   provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/engelschion-2020-eac1a-simulant/
 review_status: draft
 corrections: []
+benches:
+- id: pegasus-dsc-404c
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Differential scanning calorimeter}
+    locator: &dsc_locator {page: 5, section: DSC, note: Measurements performed with a Pegasus DSC 404 C}
+  heating_method:
+    state: {tag: value, value: Pegasus DSC 404 C}
+    locator: *dsc_locator
+  detector:
+    state: {tag: value, value: Pegasus DSC 404 C}
+    locator: *dsc_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.005'}}
+        locator: {page: 5, section: DSC, note: 5 mm diameter crucibles; unit conversion only}
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.005'}}
+        locator: {page: 5, section: DSC, note: 5 mm high crucibles; unit conversion only}
+experiments:
+- experiment_id: dsc-simulant-series
+  bench_id: pegasus-dsc-404c
+  method: differential_scanning_calorimetry
+  locator: {page: 5, section: DSC, note: Six lunar-regolith simulants measured under argon}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Six lunar regolith simulants, including EAC-1}
+      locator: {page: 5, section: DSC}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_numeric}
+      locator: {page: 5, section: DSC, note: Starts at room temperature; no numerical start temperature printed}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated from room temperature to 1,200 C at 10 K/minute}
+      locator: {page: 5, section: DSC}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, section: DSC, note: Heating rate and endpoints are printed, but no duration is stated}
 species:
   EAC-1A:
     observations:
@@ -263,6 +303,7 @@ species:
       uncertainty:
         note: comparative plagioclase ranges and the EDX dead-time bound retained as printed.
     - observation_id: engelschion_2020_eac1_dsc
+      experiment: dsc-simulant-series
       type: thermal_transition
       locator:
         page: 5
