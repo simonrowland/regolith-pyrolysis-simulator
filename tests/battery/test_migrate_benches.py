@@ -197,7 +197,68 @@ def test_readiness_counts_unique_sources_not_experiments(tmp_path) -> None:
     readiness = report(root)
     assert readiness["source_count"] == 1
     assert len(readiness["sources"][0]["experiments"]) == 2
-    assert all(sum(counts.values()) == 1 for counts in readiness["summary"].values())
+    assert all(
+        sum(counts.values()) == 1
+        for counts in readiness["summary"]["by_consumer"].values()
+    )
+    assert all(
+        sum(counts.values()) == 1
+        for counts in readiness["summary"]["by_engine"].values()
+    )
+    expected_statuses = {"ready", "partial", "gap", "not_applicable"}
+    assert all(
+        set(counts) == expected_statuses
+        for counts in readiness["summary"]["by_consumer"].values()
+    )
+    assert all(
+        set(counts) == expected_statuses
+        for counts in readiness["summary"]["by_engine"].values()
+    )
+    for consumer in readiness["sources"][0]["consumers"]:
+        for gap in consumer["gaps"]:
+            assert gap["count"] == 2
+            assert gap["experiment_ids"] == sorted(
+                experiment["experiment_id"]
+                for experiment in readiness["sources"][0]["experiments"]
+            )
+
+
+def test_legacy_embedded_bench_reaches_waypoints_without_explicit_link(tmp_path) -> None:
+    extract = _registry_extract()
+    extract.pop("benches")
+    extract["experiments"][0]["bench_id"] = None
+    extract["experiments"][0]["sample"]["mass_kg"] = to_plain(
+        factories.located(Value.point_of("0.0001"))
+    )
+    extract["experiments"][0]["sample"]["printed_composition"] = to_plain(
+        factories.located({"SiO2": Decimal("100")})
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = Migrator(root=root).run()
+    write_outputs(result, root)
+    readiness = report(root)
+    source = readiness["sources"][0]
+    experiment = source["experiments"][0]
+    assert experiment["informational_gaps"] == [
+        {
+            "waypoint": "bench_link",
+            "reason": "implicit_legacy_bench",
+            "missing": ["experiment.bench_id"],
+        }
+    ]
+    assert source["informational_gaps"][0]["count"] == 1
+    assert all(
+        gap["waypoint"] != "bench"
+        for consumer in experiment["consumers"]
+        for gap in consumer["gaps"]
+    )
+    kems = next(
+        item for item in experiment["consumers"] if item["consumer"] == "kems"
+    )
+    assert all(
+        gap["waypoint"] not in {"charge_moles_by_species", "thermal_path"}
+        for gap in kems["gaps"]
+    )
 
 
 def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> None:

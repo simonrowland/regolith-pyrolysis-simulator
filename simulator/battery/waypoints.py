@@ -36,11 +36,13 @@ class GapReason(StrEnum):
     MISSING_EVIDENCE = "missing_evidence"
     UNSUPPORTED_PRINT_FORM = "unsupported_print_form"
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
+    OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
 
 
 class ReadinessStatus(StrEnum):
     READY = "ready"
+    PARTIAL = "partial"
     GAP = "gap"
     NOT_APPLICABLE = "not_applicable"
 
@@ -97,6 +99,7 @@ class ConsumerReadiness:
     consumer: str
     status: ReadinessStatus
     gaps: tuple[ReadinessGap, ...]
+    engine: str | None = None
 
 
 _AUTHORITY_RANK = {
@@ -107,6 +110,17 @@ _AUTHORITY_RANK = {
 _PI = Decimal("3.141592653589793238462643383279502884197")
 _R = Decimal("8.31446261815324")
 RPS_PRESSURE_FLOOR_PA = as_decimal(LAB_SCHEDULE_PRESSURE_FLOOR_MBAR) * Decimal("100")
+STANDARD_ATMOSPHERE_PA = Decimal("101325")
+ENGINE_POINT_CONSUMERS = (
+    "internal-analytical",
+    "alphamelts",
+    "thermoengine",
+    "vaporock",
+    "magemin",
+    "cached-real",
+    "imcc_sf04",
+    "imcc_sf04_ext",
+)
 
 
 def _result(name: str, routes: list[Waypoint], missing: tuple[str, ...]) -> WaypointResult:
@@ -120,6 +134,14 @@ def _value(located: Located[Value] | None) -> Value | None:
         return None
     value = located.state.value
     return value if isinstance(value, Value) else None
+
+
+def _condition_value(experiment: Experiment, name: str) -> Value | None:
+    located = experiment.conditions.get(name)
+    if located is None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    return raw if isinstance(raw, Value) else Value.point_of(raw)
 
 
 def _positive_range(value: Value) -> tuple[Decimal | None, Decimal | None]:
@@ -236,22 +258,27 @@ def charge_moles_by_species(
                 molar_mass = _molar_mass_kg_mol(species)
                 if molar_mass is None:
                     continue
-                value = _divide(
-                    _multiply(mass, Value.point_of(wt_pct / Decimal(100))) or Value.point_of(0),
-                    Value.point_of(molar_mass),
+                species_mass = _multiply(
+                    mass, Value.point_of(wt_pct / Decimal(100))
+                )
+                value = (
+                    None
+                    if species_mass is None
+                    else _divide(species_mass, Value.point_of(molar_mass))
                 )
                 if value is not None:
                     # Premise: w_i is printed wt% and m_i=m*w_i/100.
                     # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
                     # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
-                    routes.setdefault(species, []).append(
+                    routes.setdefault(species, []).insert(
+                        0,
                         Waypoint(
                             f"charge_moles_by_species.{species}",
                             value,
                             "mass_times_printed_wt_percent",
                             WaypointAuthority.DERIVED,
                             ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
-                        )
+                        ),
                     )
     results = {
         species: _result(
@@ -289,7 +316,15 @@ def _rectangular_volume(dimensions: Mapping[str, Located[Value]] | None) -> Valu
 def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
     routes: list[Waypoint] = []
     geometry = bench.geometry
-    knudsen = experiment.method.is_value and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    bench_method = (
+        str(bench.method.state.value)
+        if bench.method is not None and bench.method.state.is_value
+        else None
+    )
+    knudsen = (
+        experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ) or bench_method == MethodToken.KNUDSEN_EFFUSION.value
     if geometry is not None:
         if knudsen:
             value = _rectangular_volume(geometry.cell_internal_dimensions)
@@ -354,12 +389,19 @@ def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResul
                     geometric = total
                     inputs.append("bench.geometry.orifice_count")
                     route = "diameter_geometric_area_total"
-            flags = (WaypointFlag.GEOMETRIC_ONLY,) if clausing is None else ()
-            routes.append(Waypoint("effective_escape_area", geometric, route, WaypointAuthority.DERIVED, tuple(inputs), flags))
+            geometric_route = Waypoint(
+                "effective_escape_area",
+                geometric,
+                route,
+                WaypointAuthority.DERIVED,
+                tuple(inputs),
+                (WaypointFlag.GEOMETRIC_ONLY,),
+            )
             if clausing is not None:
                 effective = _multiply(geometric, clausing)
                 if effective is not None:
                     routes.append(Waypoint("effective_escape_area", effective, "diameter_times_clausing", WaypointAuthority.DERIVED, tuple(inputs + ["bench.geometry.clausing_factor"])))
+            routes.append(geometric_route)
     return _result("effective_escape_area", routes, ("bench.geometry.orifice_area_m2", "bench.geometry.orifice_diameter_m"))
 
 
@@ -367,6 +409,8 @@ def thermal_path(experiment: Experiment, bench: Bench) -> WaypointResult:
     del bench
     routes: list[Waypoint] = []
     schedule: ThermalSchedule | None = experiment.thermal_schedule
+    ramp_series: tuple[tuple[Decimal, Decimal], ...] | None = None
+    hold_series: tuple[tuple[Decimal, Decimal], ...] | None = None
     if schedule is not None and schedule.points:
         pairs = []
         for point in schedule.points:
@@ -430,10 +474,11 @@ def thermal_path(experiment: Experiment, bench: Bench) -> WaypointResult:
             pairs.extend(((time, start.point), (time + duration, end.point)))
             time += duration
         if pairs:
+            ramp_series = tuple(pairs)
             routes.append(
                 Waypoint(
                     "thermal_path",
-                    Value(ValueKind.SERIES, series=tuple(pairs)),
+                    Value(ValueKind.SERIES, series=ramp_series),
                     "printed_ramps",
                     WaypointAuthority.DERIVED,
                     ("experiment.thermal_schedule.ramps",),
@@ -464,7 +509,8 @@ def thermal_path(experiment: Experiment, bench: Bench) -> WaypointResult:
             # Premise: each printed setpoint is held isothermally for its duration.
             # Algebra: t_end=t_start+dt, T(t)=T_set. Units: s+s=s and K.
             # Sanity: 1500 K held 600 s yields points (0,1500),(600,1500).
-            routes.append(Waypoint("thermal_path", Value(ValueKind.SERIES, series=tuple(pairs)), "setpoints_and_holds", WaypointAuthority.DERIVED, ("experiment.thermal_schedule.setpoints_and_holds",)))
+            hold_series = tuple(pairs)
+            routes.append(Waypoint("thermal_path", Value(ValueKind.SERIES, series=hold_series), "setpoints_and_holds", WaypointAuthority.DERIVED, ("experiment.thermal_schedule.setpoints_and_holds",)))
         else:
             for setpoint in schedule.setpoints_and_holds:
                 for candidate in (
@@ -485,6 +531,29 @@ def thermal_path(experiment: Experiment, bench: Bench) -> WaypointResult:
                             )
                         )
                         break
+    if ramp_series is not None and hold_series is not None:
+        offset = ramp_series[-1][0]
+        shifted_holds = tuple(
+            (offset + time, temperature) for time, temperature in hold_series
+        )
+        if ramp_series[-1][1] == shifted_holds[0][1]:
+            shifted_holds = shifted_holds[1:]
+        # Premise: printed ramps precede the printed hold sequence.
+        # Algebra: t_hold,absolute=t_ramp,end+t_hold,relative. Units: s+s=s.
+        # Sanity: 300→1500 K at 2 K/s plus a 600 s hold ends at 1200 s.
+        routes.insert(
+            0,
+            Waypoint(
+                "thermal_path",
+                Value(ValueKind.SERIES, series=ramp_series + shifted_holds),
+                "printed_ramps_and_holds",
+                WaypointAuthority.DERIVED,
+                (
+                    "experiment.thermal_schedule.ramps",
+                    "experiment.thermal_schedule.setpoints_and_holds",
+                ),
+            ),
+        )
     temperature = experiment.conditions.get("temperature_K")
     raw_temperature = temperature.state.value if temperature is not None and temperature.state.is_value else None
     if raw_temperature is not None and not routes:
@@ -580,14 +649,45 @@ def g1(
 def g2(experiment: Experiment, bench: Bench) -> WaypointResult:
     escape = effective_escape_area(experiment, bench).selected
     surface = _value(experiment.sample.surface_area_m2)
+    alpha = _condition_value(experiment, "evaporation_alpha")
+    alpha_flags: tuple[WaypointFlag, ...] = ()
+    alpha_input = "experiment.conditions.evaporation_alpha"
+    if alpha is None:
+        alpha = Value.point_of(1)
+        alpha_flags = (WaypointFlag.ASSUMPTION,)
+        alpha_input = "alpha_assumed_unity"
     routes: list[Waypoint] = []
     if escape is not None and surface is not None:
-        value = _divide(escape.value, surface)
+        denominator = _multiply(surface, alpha)
+        value = None if denominator is None else _divide(escape.value, denominator)
         if value is not None:
-            # Premise: departure scales with escape aperture relative to evaporating surface.
-            # Algebra: G2=S_eff/A_evap. Units: m2/m2=1. Sanity: 1e-6/1e-4=0.01.
-            routes.append(Waypoint("G2", value, "escape_over_evaporating_area", WaypointAuthority.DERIVED, ("effective_escape_area", "experiment.sample.surface_area_m2"), escape.flags))
-    return _result("G2", routes, ("effective_escape_area", "experiment.sample.surface_area_m2"))
+            # Premise: molecular escape competes with alpha-scaled surface supply.
+            # Algebra: G2=S_eff/(A_evap*alpha). Units: m2/(m2*1)=1.
+            # Sanity: 1e-6/(1e-4*0.1)=0.1. Missing alpha uses a visibly
+            # flagged unity ceiling so G2 remains comparable without certifying it.
+            routes.append(
+                Waypoint(
+                    "G2",
+                    value,
+                    "escape_over_evaporating_area_and_alpha",
+                    WaypointAuthority.DERIVED,
+                    (
+                        "effective_escape_area",
+                        "experiment.sample.surface_area_m2",
+                        alpha_input,
+                    ),
+                    tuple(dict.fromkeys(escape.flags + alpha_flags)),
+                )
+            )
+    return _result(
+        "G2",
+        routes,
+        (
+            "effective_escape_area",
+            "experiment.sample.surface_area_m2",
+            "experiment.conditions.evaporation_alpha",
+        ),
+    )
 
 
 def g3(experiment: Experiment, bench: Bench) -> WaypointResult:
@@ -629,6 +729,20 @@ def _thermal_gap(result: WaypointResult) -> ReadinessGap | None:
     return None
 
 
+def _effective_escape_gap(result: WaypointResult) -> ReadinessGap | None:
+    missing = _gap(result)
+    if missing is not None:
+        return missing
+    assert result.selected is not None
+    if WaypointFlag.GEOMETRIC_ONLY in result.selected.flags:
+        return ReadinessGap(
+            "effective_escape_area",
+            GapReason.MISSING_EVIDENCE,
+            ("bench.geometry.clausing_factor", "bench.geometry.orifice_area_m2"),
+        )
+    return None
+
+
 def consumer_readiness(experiment: Experiment, bench: Bench) -> tuple[ConsumerReadiness, ...]:
     charges = charge_moles_by_species(experiment, bench)
     charge_gap = None if charges else ReadinessGap("charge_moles_by_species", GapReason.MISSING_EVIDENCE, ("experiment.sample.mass_kg", "experiment.sample.initial_composition"))
@@ -638,12 +752,32 @@ def consumer_readiness(experiment: Experiment, bench: Bench) -> tuple[ConsumerRe
     oxygen = oxygen_condition(experiment, bench)
     surface = _value(experiment.sample.surface_area_m2)
 
-    def build(consumer: str, gaps: list[ReadinessGap], status: ReadinessStatus | None = None) -> ConsumerReadiness:
-        return ConsumerReadiness(consumer, status or (ReadinessStatus.GAP if gaps else ReadinessStatus.READY), tuple(gaps))
+    def build(
+        consumer: str,
+        gaps: list[ReadinessGap],
+        status: ReadinessStatus | None = None,
+        engine: str | None = None,
+    ) -> ConsumerReadiness:
+        return ConsumerReadiness(
+            consumer,
+            status or (ReadinessStatus.GAP if gaps else ReadinessStatus.READY),
+            tuple(gaps),
+            engine,
+        )
 
     common_charge = [charge_gap] if charge_gap else []
     thermal_gap = _thermal_gap(thermal)
-    kems_gaps = common_charge + [gap for gap in (thermal_gap, _gap(escape), _gap(oxygen)) if gap]
+    kems_gaps = common_charge + [gap for gap in (thermal_gap, _effective_escape_gap(escape), _gap(oxygen)) if gap]
+    kems_status = None
+    if pressure.selected is not None:
+        pressure_low, _ = _positive_range(pressure.selected.value)
+        if pressure_low is not None and pressure_low >= STANDARD_ATMOSPHERE_PA:
+            kems_gaps = [
+                ReadinessGap(
+                    "pressure_boundary", GapReason.OUTSIDE_PRESSURE_REGIME
+                )
+            ]
+            kems_status = ReadinessStatus.NOT_APPLICABLE
     rps_gaps = common_charge + [gap for gap in (thermal_gap, _gap(pressure)) if gap]
     if thermal.selected is not None and thermal.selected.route == "temperature_points_only":
         rps_gaps.append(
@@ -654,16 +788,23 @@ def consumer_readiness(experiment: Experiment, bench: Bench) -> tuple[ConsumerRe
             )
         )
     if pressure.selected is not None and not _pressure_meets_floor(pressure.selected.value):
-        rps_gaps.append(ReadinessGap("pressure_boundary", GapReason.BELOW_PRESSURE_FLOOR))
-    if surface is None:
+        rps_gaps = [ReadinessGap("pressure_boundary", GapReason.BELOW_PRESSURE_FLOOR)]
+        rps_status = ReadinessStatus.NOT_APPLICABLE
+    else:
+        rps_status = None
+    if surface is None and rps_status is None:
         rps_gaps.append(ReadinessGap("surfaces", GapReason.MISSING_EVIDENCE, ("experiment.sample.surface_area_m2",)))
     engine_gaps = common_charge + [gap for gap in (thermal_gap, _gap(pressure), _gap(oxygen)) if gap]
     engine_status = None
     if len(charges) == 1:
         engine_gaps = [ReadinessGap("charge_moles_by_species", GapReason.SINGLE_SPECIES_CHARGE)]
         engine_status = ReadinessStatus.NOT_APPLICABLE
+    engine_results = tuple(
+        build("engine_point", engine_gaps, engine_status, engine)
+        for engine in ENGINE_POINT_CONSUMERS
+    )
     return (
-        build("kems", kems_gaps),
-        build("rps", rps_gaps),
-        build("engine_point", engine_gaps, engine_status),
+        build("kems", kems_gaps, kems_status),
+        build("rps", rps_gaps, rps_status),
+        *engine_results,
     )

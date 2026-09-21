@@ -100,6 +100,27 @@ def test_knudsen_uses_cell_volume_and_preserves_interval() -> None:
     assert result.selected.value.kind is ValueKind.INTERVAL
 
 
+def test_bench_knudsen_method_selects_cell_when_experiment_method_unknown() -> None:
+    geometry = ApparatusGeometry(
+        cell_internal_dimensions={
+            key: factories.located(Value.point_of("0.1"))
+            for key in ("length_m", "width_m", "height_m")
+        },
+        chamber_volume_m3=factories.located(Value.point_of("9")),
+    )
+    experiment = replace(
+        factories.kems_experiment(), method=factories.State.unknown("unknown")
+    )
+    bench = _bench(
+        geometry=geometry,
+        method=factories.located("knudsen_effusion"),
+    )
+    result = relevant_volume(experiment, bench)
+    assert result.selected is not None
+    assert result.selected.route == "cell_internal_dimensions"
+    assert result.selected.value.point == Decimal("0.001")
+
+
 def test_pressure_keeps_printed_and_derived_routes() -> None:
     experiment = replace(
         factories.tabulation_experiment(total_P=Decimal("2e-3")),
@@ -166,6 +187,25 @@ def test_printed_escape_area_wins_while_clausing_route_remains_visible() -> None
     assert result.routes[1].value.point == Decimal("5e-7")
 
 
+def test_clausing_corrected_diameter_route_wins_and_raw_route_stays_flagged() -> None:
+    result = effective_escape_area(
+        factories.kems_experiment(),
+        _bench(
+            geometry=ApparatusGeometry(
+                orifice_diameter_m=factories.located(Value.point_of("0.001")),
+                clausing_factor=factories.located(Value.point_of("0.5")),
+            )
+        ),
+    )
+    assert result.selected is not None
+    assert result.selected.route == "diameter_times_clausing"
+    assert result.selected.value.point == Decimal(
+        "3.926990816987241548078304229E-7"
+    )
+    geometric = next(route for route in result.routes if "geometric" in route.route)
+    assert WaypointFlag.GEOMETRIC_ONLY in geometric.flags
+
+
 def test_thermal_setpoint_route_and_uncontrolled_oxygen_flag() -> None:
     experiment = replace(
         factories.kems_experiment(),
@@ -201,7 +241,7 @@ def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
         ),
         end_temperature_K=factories.located(Value.point_of("1500")),
     )
-    experiment = factories.kems_experiment()
+    experiment = factories.kems_experiment(total_P=Decimal("0.1"))
     point = thermal_path(
         replace(
             experiment,
@@ -236,6 +276,33 @@ def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
             for gap in item.gaps
         )
         for item in readiness
+    )
+
+
+def test_thermal_ramp_and_hold_are_composed() -> None:
+    ramp = ThermalRamp(
+        rate_K_s=factories.located(Value.point_of("2")),
+        start_temperature_K=factories.located(Value.point_of("300")),
+        end_temperature_K=factories.located(Value.point_of("1500")),
+    )
+    hold = ThermalSetpoint(
+        factories.located(Value.point_of("1500")),
+        factories.located(Value.point_of("600")),
+    )
+    result = thermal_path(
+        replace(
+            factories.kems_experiment(),
+            thermal_schedule=ThermalSchedule(
+                ramps=(ramp,), setpoints_and_holds=(hold,)
+            ),
+        ),
+        _bench(),
+    )
+    assert result.selected is not None
+    assert result.selected.route == "printed_ramps_and_holds"
+    assert result.selected.value.series[-1] == (
+        Decimal("1200"),
+        Decimal("1500"),
     )
 
 
@@ -289,7 +356,7 @@ def test_rps_pressure_floor_rejects_below_and_crossing_interval() -> None:
         readiness = {
             item.consumer: item for item in consumer_readiness(experiment, bench)
         }
-        assert readiness["rps"].status is ReadinessStatus.GAP
+        assert readiness["rps"].status is ReadinessStatus.NOT_APPLICABLE
         assert any(
             gap.reason is GapReason.BELOW_PRESSURE_FLOOR
             for gap in readiness["rps"].gaps
@@ -305,6 +372,18 @@ def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
     bench = _bench(geometry=experiment.apparatus.geometry)
     readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
     assert readiness["engine_point"].status is ReadinessStatus.READY
+    engines = [item for item in consumer_readiness(experiment, bench) if item.engine]
+    assert [item.engine for item in engines] == [
+        "internal-analytical",
+        "alphamelts",
+        "thermoengine",
+        "vaporock",
+        "magemin",
+        "cached-real",
+        "imcc_sf04",
+        "imcc_sf04_ext",
+    ]
+    assert all(item.status is ReadinessStatus.READY for item in engines)
 
 
 def test_derived_groups_compute_and_preserve_nonpoint_inputs() -> None:
@@ -340,9 +419,87 @@ def test_derived_groups_compute_and_preserve_nonpoint_inputs() -> None:
     group2 = g2(experiment, bench)
     assert group2.selected is not None
     assert group2.selected.value.point == Decimal("0.01")
+    assert WaypointFlag.ASSUMPTION in group2.selected.flags
     group3 = g3(experiment, bench)
     assert group3.selected is not None
     assert group3.selected.value.point == Decimal("1e3")
+
+
+def test_g2_uses_explicit_evaporation_alpha() -> None:
+    experiment = replace(
+        factories.kems_experiment(),
+        sample=_charge(),
+        conditions={
+            **factories.kems_experiment().conditions,
+            "evaporation_alpha": factories.located(Decimal("0.1")),
+        },
+    )
+    bench = _bench(
+        geometry=ApparatusGeometry(
+            orifice_area_m2=factories.located(Value.point_of("1e-6"))
+        )
+    )
+    result = g2(experiment, bench)
+    assert result.selected is not None
+    assert result.selected.value.point == Decimal("0.1")
+    assert WaypointFlag.ASSUMPTION not in result.selected.flags
+
+
+def test_partial_printed_oxide_inventory_preserves_printed_mass_basis() -> None:
+    sample = replace(
+        _charge(single=False),
+        printed_composition=factories.located(
+            {"MgO": Decimal("40"), "SiO2": Decimal("50")}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert result["MgO"].selected is not None
+    assert result["MgO"].selected.route == "mass_times_printed_wt_percent"
+    assert result["MgO"].selected.value.point == Decimal(
+        "0.0009924573243350535926955140929"
+    )
+
+
+def test_non_numeric_mass_does_not_fabricate_zero_charge() -> None:
+    sample = Sample(
+        mass_kg=factories.Located(factories.State.unknown("not_numeric")),
+        printed_composition=factories.located({"SiO2": Decimal("100")}),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert result.absence is not None
+    assert not result
+
+
+def test_geometric_only_escape_does_not_satisfy_kems_readiness() -> None:
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("0.1")),
+        sample=_charge(single=False),
+        thermal_schedule=_schedule(),
+    )
+    bench = _bench(
+        geometry=ApparatusGeometry(
+            orifice_diameter_m=factories.located(Value.point_of("0.001"))
+        )
+    )
+    readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
+    assert readiness["kems"].status is ReadinessStatus.GAP
+    assert any(gap.waypoint == "effective_escape_area" for gap in readiness["kems"].gaps)
+
+
+def test_atmospheric_kems_is_structurally_not_applicable() -> None:
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        sample=_charge(single=False),
+        thermal_schedule=_schedule(),
+    )
+    bench = _bench(geometry=experiment.apparatus.geometry)
+    readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
+    assert readiness["kems"].status is ReadinessStatus.NOT_APPLICABLE
+    assert readiness["kems"].gaps[0].reason is GapReason.OUTSIDE_PRESSURE_REGIME
 
 
 def test_g1_requires_species_keyed_saturation_pressure_for_multicomponent_charge() -> None:
