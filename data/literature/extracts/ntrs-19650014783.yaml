@@ -9,10 +9,79 @@ extraction:
   date: '2026-09-19'
   worker: w3-ntrs-19650014783
 review_status: draft
+benches:
+- id: static-sodium-capsule
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Static capsule sodium vapor-pressure apparatus}
+    locator: &ntrs_apparatus_locator {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus'}
+  cell_material_and_liner:
+    state: {tag: value, value: 90 percent tantalum and 10 percent tungsten alloy capsule}
+    locator: *ntrs_apparatus_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0177'}}
+        locator: {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus', note: '1.77 cm inside diameter; unit conversion only'}
+  heating_method:
+    state: {tag: value, value: Tungsten resistance heater concentric around capsule}
+    locator: *ntrs_apparatus_locator
+  detector:
+    state: {tag: value, value: Pressure transducers}
+    locator: {published_page: 3, pdf_page_index: 5, section: 'Experiment - Apparatus'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Chromel-alumel for run 1; W-Re for runs 2-4; Pt-Pt-13Rh for run 5}
+      locator: {published_page: 4, pdf_page_index: 6, section: 'Temperature measurements'}
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Pt-Pt-13Rh calibrated against NBS standard; W-Re calibrated against Pt-Pt-13Rh from 845 to 1820 K and extrapolated to 2200 K}
+      locator: {published_page: 4, pdf_page_index: 6, section: 'Temperature measurements'}
+experiments:
+- experiment_id: sodium-vapor-pressure-series
+  bench_id: static-sodium-capsule
+  method: static_capsule_vapor_pressure
+  locator: {published_page: 2, pdf_page_index: 4, section: 'Experiment - Apparatus and Procedure'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Sodium}
+      locator: {published_page: 2, pdf_page_index: 4, section: Experiment}
+    form:
+      state: {tag: value, value: Liquid sodium}
+      locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
+    pretreatment:
+      state: {tag: value, value: Filtered, hot gettered with titanium, vacuum distilled, then heated above sodium melting point}
+      locator: {published_page: 3, pdf_page_index: 5, section: 'Procedure; Sodium purification'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *ntrs_apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *ntrs_apparatus_locator
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 6, pdf_page_index: 8, table: 'I', note: Vapor pressure is the measured outcome and varies point by point; it is not a single imposed pressure environment}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 3, pdf_page_index: 5, section: Procedure, note: Argon transfers sodium before measurement; it is not sweep gas}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.01333223684210526315789473684'}}
+        locator: {published_page: 3, pdf_page_index: 5, section: Procedure, note: 'Entire apparatus evacuated to 10^-4 torr before sodium transfer; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated through series of test temperatures; sufficient time allowed between changes for equilibrium}
+      locator: {published_page: 3, pdf_page_index: 5, section: Procedure}
 species:
   Na:
     observations:
     - observation_id: bowles_rosenblum_1965_na_method_and_apparatus
+      experiment: sodium-vapor-pressure-series
       type: rate_series
       locator:
         published_page: 2
@@ -87,6 +156,7 @@ species:
             pdf_page_index: 5
             section: Procedure
     - observation_id: bowles_rosenblum_1965_na_table1_static_capsule
+      experiment: sodium-vapor-pressure-series
       type: psat_series
       locator:
         published_page: 6
@@ -157,6 +227,7 @@ species:
         - {run: 5, T_K: 1455, inv_T_1_per_K: 6.87e-4, p_atm: 8.974}
         - {run: 5, T_K: 1522, inv_T_1_per_K: 6.57e-4, p_atm: 12.920}
     - observation_id: bowles_rosenblum_1965_na_fit_this_work
+      experiment: sodium-vapor-pressure-series
       type: psat_series
       locator:
         published_page: 7

@@ -18,6 +18,100 @@ extraction:
   provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: dta-dt7
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Perkin Elmer model DT-7 differential thermal analyser}
+    locator: &street_equipment {published_page: 3, pdf_page_index: 7, section: Equipment}
+  cell_material_and_liner:
+    state: {tag: value, value: 60 mm3 internal-volume high-purity alumina (Al2O3) crucible}
+    locator: *street_equipment
+- id: tga-sta409
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: NETZSCH model STA 409 thermal analyser}
+    locator: *street_equipment
+  cell_material_and_liner:
+    state: {tag: value, value: 100 mm3 internal-volume high-purity alumina crucible}
+    locator: *street_equipment
+- id: tga-ftir-2950
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: TA Instruments TGA model 2950 interfaced with Thermo Electron Nexus 470 FTIR}
+    locator: *street_equipment
+  detector:
+    state: {tag: value, value: Liquid-nitrogen-cooled mercury-cadmium-telluride detector}
+    locator: *street_equipment
+experiments:
+- experiment_id: dta-series
+  bench_id: dta-dt7
+  method: differential_thermal_analysis
+  locator: *street_equipment
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000045', interval_high: '0.000060'}}
+      locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: '45 to 60 mg depending on density; unit conversion only'}
+    form:
+      state: {tag: value, value: Simulant powder compacted by intermittent tapping}
+      locator: *street_equipment
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *street_equipment
+    sweep_gas:
+      state: {tag: value, value: {species: nitrogen, flow_sccm: {tag: value, value: '30'}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *street_equipment
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: JSC-1AF run to 1050 C then cooled and rerun to 1250 C}
+      locator: {published_page: 3, pdf_page_index: 7, section: Sample Specific Procedures}
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.1666666666666666666666666667'}}
+        locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: '10 C/min; unit conversion only'}
+- experiment_id: tga-series
+  bench_id: tga-sta409
+  method: thermogravimetric_analysis
+  locator: *street_equipment
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000100'}}
+      locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: 'Typical 100 mg; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *street_equipment
+    sweep_gas:
+      state: {tag: value, value: {species: nitrogen, flow_sccm: {tag: value, value: '30'}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *street_equipment
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.1666666666666666666666666667'}}
+        locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: '10 C/min; unit conversion only'}
+- experiment_id: tga-ftir-series
+  bench_id: tga-ftir-2950
+  method: thermogravimetric_analysis_ftir
+  locator: *street_equipment
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *street_equipment
+    sweep_gas:
+      state: {tag: value, value: {species: nitrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: '20 cm3/min sample flow and 40 cm3/min balance purge are distinct printed channels; no single flow is assigned'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.1666666666666666666666666667'}}
+        locator: {published_page: 3, pdf_page_index: 7, section: Equipment, note: '10 C/min; unit conversion only'}
 fidelity_samples:
 - species: JSC-1AF
   observable: transition_point
@@ -46,6 +140,7 @@ species:
   JSC-1AF:
     observations:
     - observation_id: street_2010_table1_dta_transitions
+      experiment: dta-series
       type: transition_point
       locator:
         published_page: 3
@@ -179,6 +274,7 @@ species:
             table: '1'
             section: Equipment / Results
     - observation_id: street_2010_jsc1af_tga_ftir_windows
+      experiment: tga-ftir-series
       type: rate_series
       locator:
         published_page: 1
@@ -204,6 +300,7 @@ species:
           to 545, 545 to 705, and 705 to 985 C ranges.
         figure_2: figure_only_not_digitised
     - observation_id: street_2010_fig1_jsc1af_dta_tga_figure_only
+      experiment: dta-series
       type: rate_series
       locator:
         published_page: 4
@@ -253,6 +350,7 @@ species:
   H2O:
     observations:
     - observation_id: street_2010_anorthosite_water_mass_loss_0p1_pct
+      experiment: tga-series
       type: rate_series
       locator:
         published_page: 1
@@ -279,6 +377,7 @@ species:
   NU-LHT-2M:
     observations:
     - observation_id: street_2010_fig3_nulht2m_dta_tga_figure_only
+      experiment: dta-series
       type: rate_series
       locator:
         published_page: 5

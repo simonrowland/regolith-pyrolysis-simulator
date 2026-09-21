@@ -21,6 +21,58 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: rm6e
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hitachi RM-6E Knudsen-cell mass spectrometer}
+    locator: &nunoue_apparatus {published_page: 869, section: '2.1 Apparatus'}
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina SSA-S Knudsen cell}
+    locator: *nunoue_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *nunoue_apparatus
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 869, section: '2.1 Apparatus', note: Printed 12 mm cell height is not separately identified as internal depth}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W-26%Re/W-5%Re thermocouples at upper and lower cell positions}
+      locator: *nunoue_apparatus
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Calibrated at pure Ni and pure Fe melting points}
+      locator: *nunoue_apparatus
+experiments:
+- experiment_id: fe-sn-series
+  bench_id: rm6e
+  method: knudsen_effusion
+  locator: {published_page: 868, section: Synopsis, note: This-work Fe-Sn measurements}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.0017', approximate: true}}
+      locator: {published_page: 869, section: '2.2 Sample', note: About 1.7 g}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: '868-869', section: 'Synopsis/2.2 Sample', note: Composition range is not a single charge composition}
+    pretreatment:
+      state: {tag: value, value: 'Fe 1500 C for 4 h and Sn 1000 C for 12 h in H2 flow; alloys arc melted'}
+      locator: {published_page: 869, section: '2.2 Sample'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003', approximate: true}}
+        locator: {published_page: 869, section: '2.1 Apparatus', note: About 0.3 mm; no effective area computed}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1473.15', interval_high: '1873.15'}}
+        locator: {published_page: 868, section: Synopsis, note: Printed 1200-1600 C, converted endpoints only}
+- experiment_id: cited-results
+  locator: {published_page: 872, figure: '1', note: Literature comparison; not this work's bench}
 fidelity_samples:
 - path: species.Sn.observations[nunoue_1987_table2_miscibility_gap].values.rows[6].T_C
   value: 1491
@@ -89,6 +141,7 @@ species:
             pdf_page_index: 2
             section: '2.1'
       observation_id: nunoue_1987_kems_geometry_and_calibration
+      experiment: fe-sn-series
       type: gibbs_table
       locator:
         published_page: 869
@@ -128,6 +181,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_table1_starting_materials
+      experiment: fe-sn-series
       type: gibbs_table
       locator:
         table: '1'
@@ -165,6 +219,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_table2_miscibility_gap
+      experiment: fe-sn-series
       type: transition_point
       locator:
         table: '2'
@@ -227,6 +282,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_table3_activities
+      experiment: fe-sn-series
       type: activity_coefficient
       locator:
         table: '3'
@@ -422,6 +478,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_consolute_author_estimate
+      experiment: fe-sn-series
       type: transition_point
       locator:
         published_page: 868
@@ -447,6 +504,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig1_literature_gap_figure_only
+      experiment: cited-results
       type: transition_point
       locator:
         figure: '1'
@@ -475,6 +533,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig2_ion_ratio_figure_only
+      experiment: fe-sn-series
       type: rate_series
       locator:
         figure: '2'
@@ -506,6 +565,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig3_ion_ratio_gap_figure_only
+      experiment: fe-sn-series
       type: rate_series
       locator:
         figure: '3'
@@ -529,6 +589,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig5_gap_this_work_figure_only
+      experiment: fe-sn-series
       type: transition_point
       locator:
         figure: '5'
@@ -556,6 +617,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig6_isothermal_ion_ratio_figure_only
+      experiment: fe-sn-series
       type: rate_series
       locator:
         figure: '6'
@@ -584,6 +646,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig7_activities_1550C_figure_only
+      experiment: fe-sn-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -608,6 +671,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: nunoue_1987_fig8_activities_1600C_figure_only
+      experiment: fe-sn-series
       type: activity_coefficient
       locator:
         figure: '8'

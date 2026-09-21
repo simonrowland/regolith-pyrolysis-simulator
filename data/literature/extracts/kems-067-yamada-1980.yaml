@@ -22,6 +22,52 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: rm6k
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: 'Yamada and Kato (1977), reference 2'
+      for_parameters: [apparatus_family, temperature_measurement]
+      locator: &yamada_apparatus {published_page: 489, section: '2.3 Experimental method', note: The modified Hitachi RM-6K and thermocouple correction defer to reference 2}
+  apparatus_family:
+    state: {tag: value, value: Modified Hitachi RM-6K Knudsen-cell mass spectrometer}
+    locator: *yamada_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W-26%Re/W-5%Re thermocouples at Knudsen-cell top and bottom}
+      locator: {published_page: 493, section: '4.2'}
+experiments:
+- experiment_id: fe-si-series
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: 488, section: Synopsis, note: This-work Fe-Si KEMS measurements at 1600 C}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.001', approximate: true}}
+      locator: {published_page: 489, section: '2.2', note: About 1 g total sample}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 488, section: Synopsis, note: N_Si spans 0.05 to 0.5; no single series charge composition}
+    form:
+      state: {tag: value, value: 'Fe-Si charge with trace Th added as Fe-Th alloy'}
+      locator: {published_page: 489, section: '2.3'}
+    pretreatment:
+      state: {tag: value, value: 'Pure Fe deoxidized in an alumina crucible under high vacuum before charging'}
+      locator: {published_page: 489, section: '2.2'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 490, section: '3.1', note: The source prints varying 0.4-0.7 mm diameters without a run assignment; no area computed}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1873.15'}}
+        locator: {published_page: 488, section: Synopsis, note: Printed 1600 C, converted only}
+- experiment_id: cited-results
+  locator: {published_page: 493, table: '2', note: Quoted investigators' values are not assigned this work's bench}
 fidelity_samples:
 - path: species.Si.observations[yamada_1980_ion_current_ratio_table1_1600C].values.points[0].I_Si_plus_count_per_s
   value: 0.61
@@ -88,6 +134,7 @@ species:
   Si:
     observations:
     - observation_id: yamada_1980_kems_geometry_and_calibration
+      experiment: fe-si-series
       type: rate_series
       locator:
         published_page: 488
@@ -214,6 +261,7 @@ species:
             note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
               was in high vacuum
     - observation_id: yamada_1980_ion_current_ratio_table1_1600C
+      experiment: fe-si-series
       type: rate_series
       locator:
         table: '1'
@@ -365,6 +413,7 @@ species:
             note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
               was in high vacuum
     - observation_id: yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         published_page: 492
@@ -464,6 +513,7 @@ species:
             note: chamber pressure / vacuum quality during the KEMS run not printed; Fe deoxidation
               was in high vacuum
     - observation_id: yamada_1980_quoted_gamma_Si_NSi_0p5
+      experiment: cited-results
       type: activity_coefficient
       locator:
         published_page: 491
@@ -508,6 +558,7 @@ species:
           ref: 17
           log10_gamma_Si: -0.36
     - observation_id: yamada_1980_quoted_table2_investigators
+      experiment: cited-results
       type: activity_coefficient
       locator:
         table: '2'
@@ -648,6 +699,7 @@ species:
           fujisawa_estimate: true
           method_as_printed: Estimation
     - observation_id: yamada_1980_p_Si_estimate_NSi_below_0p05
+      experiment: fe-si-series
       type: psat_series
       locator:
         published_page: 491
@@ -686,6 +738,7 @@ species:
           higher than usual. N_Si > 0.5: cell attacked and abundant SiO(g); experiment not
           possible.'
     - observation_id: yamada_1980_fragmentation_BeO_ThO2_ion_ratios
+      experiment: fe-si-series
       type: rate_series
       locator:
         published_page: 494
@@ -729,6 +782,7 @@ species:
         example_fragment_contribution_pct_of_ISi: 5.0
         example_log_ISi_over_IFe_error: 0.02
     - observation_id: yamada_1980_fig1_peak_figure_only
+      experiment: fe-si-series
       type: rate_series
       locator:
         figure: '1'
@@ -766,6 +820,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig3_ISiO_over_ISi_figure_only
+      experiment: fe-si-series
       type: rate_series
       locator:
         figure: '3'
@@ -803,6 +858,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
+      experiment: fe-si-series
       type: rate_series
       locator:
         figure: '4'
@@ -849,6 +905,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig5_gamma_Si_comparison_figure_only
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         figure: '5'
@@ -885,6 +942,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig6_integration_curve_figure_only
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -921,6 +979,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig7_gamma_Si_this_work_figure_only
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -957,6 +1016,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig8_activities_figure_only
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         figure: '8'
@@ -995,6 +1055,7 @@ species:
           Si. Trace Th added as Fe-Th alloy, about 0.6 at% of the total sample. Composition
           window 0.05 < N_Si < 0.5 (mole fraction).
     - observation_id: yamada_1980_fig9_ionization_efficiency_figure_only
+      experiment: fe-si-series
       type: rate_series
       locator:
         figure: '9'
@@ -1033,6 +1094,7 @@ species:
   Fe:
     observations:
     - observation_id: yamada_1980_fe_activity_fig8_figure_only
+      experiment: fe-si-series
       type: activity_coefficient
       locator:
         figure: '8'
@@ -1068,6 +1130,7 @@ species:
   SiO:
     observations:
     - observation_id: yamada_1980_cell_po2_calculated
+      experiment: fe-si-series
       type: psat_series
       locator:
         published_page: 489
@@ -1102,6 +1165,7 @@ species:
         expected_PSiO_over_PSi_BeO_about: 200.0
         expected_PSiO_over_PSi_ThO2_about: 15.0
     - observation_id: yamada_1980_fig2_Si_O_po2_figure_only
+      experiment: fe-si-series
       type: psat_series
       locator:
         figure: '2'

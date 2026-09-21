@@ -133,6 +133,48 @@ table2_policy:
   numeric_basis: Elemental abundances in ppm and printed K/Rb and K/Ba ratios; no oxide conversion, depletion calculation, or ratio recomputation.
   trace_species_status: Li, Rb, Ba, Sr and measured REEs retained as evidence regardless of engine support.
   uncertainty: No Table 2 analytical uncertainty printed; none assigned.
+benches:
+- id: mettler-vta
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Mettler recording vacuum thermal analyzer}
+    locator: *procedures
+  cell_material_and_liner:
+    state: {tag: value, value: platinum crucible}
+    locator: *procedures
+  detector:
+    state: {tag: value, value: continuously recorded sample weight, temperature, and in some experiments evolved-gas composition}
+    locator: *procedures
+experiments:
+- experiment_id: lunar-volatilization-series
+  bench_id: mettler-vta
+  method: thermal_volatilization
+  locator: *procedures
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: Sample weight was recorded but no numerical mass is printed}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *table2, note: Multiple sample types and compositions; elemental rows remain on observations}
+    form:
+      state: {tag: value, value: powdered lunar samples}
+      locator: *procedures
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}
+      locator: {<<: *procedures, note: Printed 2 x 10^-6 Torr; unit conversion only}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *procedures}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: No distinct base-pressure history printed}}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: *procedures}
+  thermal_schedule:
+    method: {state: {tag: value, value: Heated at 4 or 6 C/min to 950, 1050, 1200, or 1400 C; run assignments are not printed}, locator: *procedures}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: Most runs held 2 h; one 950/1050 C set held 1-72 h; no universal duration}}
+    cooling_or_quench: {state: {tag: value, value: normal cooling curve; 1400 C to room temperature required 4 h}, locator: *procedures}
 species:
   K:
     observations:

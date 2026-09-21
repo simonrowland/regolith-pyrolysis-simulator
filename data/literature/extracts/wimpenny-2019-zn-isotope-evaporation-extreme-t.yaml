@@ -10,10 +10,80 @@ extraction:
   worker: w3-wimpenny-2019-zn-isotope-evaporation-extreme-t
   provenance_path: docs-private/research/2026-09-19-wimpenny-2019-zn-isotope-evaporation-extreme-t/
 review_status: draft
+benches:
+- id: ipgp-laser-levitation
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Gas-mixing aerodynamic levitation laser furnace at IPGP}
+    locator: &wimpenny_laser {published_page: 5, section: '2.1 Laser melting experiments'}
+  heating_method:
+    state: {tag: value, value: CO2 laser aerodynamic levitation}
+    locator: *wimpenny_laser
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: External pyrometer}
+      locator: *wimpenny_laser
+  other_facts:
+  - name: sample_levitation_mode
+    unit: null
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: Samples freely floated on a stream of Ar gas}}
+      locator: *wimpenny_laser
+experiments:
+- experiment_id: soil-laser-heating-series
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Laser-heating series of arkosic and rhyolitic soils; the closed method vocabulary has no levitation token.}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000040', approximate: true}}
+      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed approximately 5-40 mg; unit conversion only.}
+    composition_class:
+      state: {tag: value, value: Arkosic Trinity soil and rhyolitic soil}
+      locator: *wimpenny_laser
+    form:
+      state: {tag: value, value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm}
+      locator: *wimpenny_laser
+    pretreatment:
+      state: {tag: value, value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons}
+      locator: *wimpenny_laser
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Multiple target temperatures; no single series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *wimpenny_laser
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: *wimpenny_laser
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Samples first melted above liquidus over 20-60 s, then rapidly ramped to target temperature.}
+      locator: *wimpenny_laser
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed 1-120 s is target-temperature duration after a separate 20-60 s melt stage, not total run duration.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1873.15', interval_high: '2473.15'}}
+        locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed 1600-2200 C target range; unit conversion only.}
+      hold_duration_s:
+        state: {tag: value, value: {kind: interval, interval_low: '1', interval_high: '120'}}
+        locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed target-temperature duration range.}
 species:
   Zn:
     observations:
     - observation_id: wimpenny_2019_laser_levitation_apparatus
+      experiment: soil-laser-heating-series
       type: rate_series
       class_tag: measured_direct
       locator:
@@ -60,6 +130,7 @@ species:
       uncertainty:
         trace_element_analysis: typically better than 5 percent based on BCR-2 and NIST 1640a standards
     - observation_id: wimpenny_2019_table1_experimental_zn_rows
+      experiment: soil-laser-heating-series
       type: rate_series
       class_tag: measured_direct
       locator:
@@ -155,6 +226,7 @@ species:
         - {sample: Australite 11, delta66Zn_permil: 1.94, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 9.98, Zn_2sigma_ppm: 0.86}
         - {sample: Australite 12, delta66Zn_permil: 1.49, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 11.55, Zn_2sigma_ppm: 0.29}
     - observation_id: wimpenny_2019_zn_fractionation_summary
+      experiment: soil-laser-heating-series
       type: alpha
       class_tag: measured_direct
       derived_from: wimpenny_2019_table1_experimental_zn_rows

@@ -10,6 +10,87 @@ extraction:
   worker: w1-boulliung-wood-2022-so2-solubility-silicate-melts
   provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
 review_status: draft
+benches:
+- id: gero-vertical-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Gero vertical furnace HTRV 70-250/18}
+    locator: &bw_conditions {page: 152, section: '2.2 Experimental conditions'}
+  heating_method:
+    state: {tag: value, value: Vertical resistance furnace}
+    locator: *bw_conditions
+  other_facts:
+  - name: gas_mix_control
+    unit: null
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: Tylan mass flow controllers}}
+      locator: *bw_conditions
+  - name: sample_support
+    unit: null
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 0.25 mm platinum wire loop on Pt chandelier suspended from silica rod}}
+      locator: *bw_conditions
+  detector:
+    state: {tag: value, value: Cameca SX-Five-FE EPMA and Cameca IMS 1270 E7 SIMS}
+    locator: {page: 152, section: '2.3 Analyses'}
+experiments:
+- experiment_id: sulfate-solubility-series
+  bench_id: gero-vertical-furnace
+  method: melt_equilibration_quench
+  locator: {page: 152, section: '2.2 Experimental conditions', note: Series of equilibration experiments; individual Table 2 conditions remain in observations.}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000010'}}
+      locator: {page: 152, section: '2.2 Experimental conditions', note: Printed 5-10 mg; unit conversion only.}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 151, table: '1', note: Fourteen synthetic and natural compositions; no single series composition.}
+    form:
+      state: {tag: value, value: Powder suspended on platinum wire loop with paraffin oil}
+      locator: *bw_conditions
+    pretreatment:
+      state: {tag: value, value: Oxide and carbonate powders crushed under ethanol then decarbonated overnight at 1273 K; starting compositions reground.}
+      locator: {page: 151, section: '2.1 Starting materials'}
+    characterization:
+      state: {tag: value, value: Quenched glasses analyzed by EPMA and, for low S, SIMS}
+      locator: {page: 152, section: '2.3 Analyses'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 152, table: '2', note: Multiple Table 2 setpoints; no single series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {page: 152, section: '2.2 Experimental conditions', note: Atmospheric pressure, 1 atm; unit conversion only.}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Air-SO2
+          flow_sccm: {tag: value, value: '200'}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: *bw_conditions
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: Air/SO2 ratios 0.11, 0.60, and 4.00; oxidizing fO2 above FMQ, calculated from thermodynamic data}
+      locator: *bw_conditions
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Equilibrated then quenched under the same atmosphere in the cold area at the top of the vertical furnace}
+      locator: *bw_conditions
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 152, table: '2', note: Table gives 10 h at lower temperatures, 8 h at 1723 K, and 6 h at 1773 K; no universal duration.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1473', interval_high: '1773'}}
+        locator: {page: 152, table: '2', note: Printed series span in 50 K increments.}
+    cooling_or_quench:
+      state: {tag: value, value: Quenched under the same atmosphere in the cold area at the top of the vertical furnace}
+      locator: *bw_conditions
 species:
   S:
     observations:
@@ -52,6 +133,7 @@ species:
 
 
     - observation_id: boulliung_wood_2022_run_conditions
+      experiment: sulfate-solubility-series
       type: laboratory_conditions
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
@@ -103,6 +185,7 @@ species:
                                                                                                         3.1. Compositions of products
 
     - observation_id: boulliung_wood_2022_equilibrated_glass_measurements
+      experiment: sulfate-solubility-series
       type: sulfur_solubility_and_sulfate_capacity_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
@@ -325,6 +408,7 @@ species:
 
 
     - observation_id: boulliung_wood_2022_air_so2_ratio_measurements
+      experiment: sulfate-solubility-series
       type: sulfur_solubility_and_sulfate_capacity_ratio_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf

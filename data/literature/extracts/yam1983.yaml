@@ -19,10 +19,103 @@ extraction:
   date: '2026-08-26'
   worker: t745-na2o-extracts
 review_status: draft
+benches:
+- id: beta-alumina-emf-cell
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Galvanic EMF cell using beta-alumina solid electrolyte}
+    locator: &yam_emf {page: 738, section: 'III. EMF measurement'}
+  cell_material_and_liner:
+    state: {tag: value, value: Platinum crucible, mullite tube, beta-alumina closed-end tube, alumina and zirconia-magnesia components}
+    locator: *yam_emf
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 737, section: 'II. Samples and electrolyte', note: Multiple beta-alumina tube dimensions are printed; no one internal diameter applies to all cells.}
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 737, section: 'II. Samples and electrolyte', note: Multiple beta-alumina tube dimensions are printed; no one internal height applies to all cells.}
+  heating_method:
+    state: {tag: value, value: SiC heating furnace}
+    locator: *yam_emf
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Pt/Pt-13%Rh thermocouple adjacent to heating element}
+      locator: *yam_emf
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 738, section: 'III. EMF measurement', note: Printed +/-1 K is furnace control stability, not calibration uncertainty.}
+  detector:
+    state: {tag: value, value: Yokokawa 2727 potentiometer}
+    locator: *yam_emf
+  other_facts:
+  - name: beta_alumina_tube_sizes
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '10 x 8 x 100 or 16 x 14 x 200'}}
+      locator: {page: 737, section: 'II. Samples and electrolyte', note: Printed alternatives, not a paired run configuration.}
+  - name: furnace_temperature_stability
+    unit: K
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
+      locator: {page: 738, section: 'III. EMF measurement', note: Controlled within +/-1 K.}
+experiments:
+- experiment_id: na2o-sio2-emf-series
+  bench_id: beta-alumina-emf-cell
+  method: melt_equilibration_quench
+  locator: {page: 736, section: Abstract, note: Na2O activity measurements in Na2O-SiO2 melts using beta-alumina solid electrolyte.}
+  sample:
+    printed_composition:
+      state: {tag: value, value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions}
+      locator: {page: 736, section: Abstract}
+    form:
+      state: {tag: value, value: Pulverized vitrified sample}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    pretreatment:
+      state: {tag: value, value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+    characterization:
+      state: {tag: value, value: Batch compositions used; relative composition error estimated within 2-3 percent}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 738, section: 'III. EMF measurement', note: Multiple measurement temperatures; no single series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_emf
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Pure O2 or Ar+O2; reference-cell gas includes Ar+O2+CO2
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: *yam_emf
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: EMF recorded after temperature became constant and remained within 1 mV for at least 1 h; heating and cooling reversibility repeated at least twice.}
+      locator: *yam_emf
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 738, section: 'III. EMF measurement', note: Stability criterion is a lower bound after temperature stabilization, not a universal total duration.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1173', interval_high: '1673'}}
+        locator: *yam_emf
+    cooling_or_quench:
+      state: {tag: value, value: Water-cooled copper plate used for sampling quench}
+      locator: {page: 737, section: 'II. Samples and electrolyte'}
 species:
   Na2O:
     observations:
     - observation_id: yam1983_na2o_table1_minus_log10_a_AT_B
+      experiment: na2o-sio2-emf-series
       type: activity_coefficient
       locator:
         page: 3
@@ -269,6 +362,7 @@ species:
             figure: '1'
             paragraph: 2. 試料および電解質 / 3. 起電力測定
     - observation_id: yam1983_na2o_prose_activity_range
+      experiment: na2o-sio2-emf-series
       type: activity_coefficient
       locator:
         page: 1
@@ -310,6 +404,7 @@ species:
   SiO2:
     observations:
     - observation_id: yam1983_sio2_table2_minus_log10_a_AT_B
+      experiment: na2o-sio2-emf-series
       type: activity_coefficient
       locator:
         page: 5

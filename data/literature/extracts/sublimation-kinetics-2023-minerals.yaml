@@ -26,6 +26,90 @@ extraction:
   worker: extract-sublimation-kinetics-2023
 review_status: draft
 corrections: []
+benches:
+- id: sintering-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Carbolite GERO HTRH 100-600/18 vacuum furnace}
+    locator: &sinter_locator {published_page: 2, pdf_page_index: 2, section: '2.1 Lunar Simulant Sintering'}
+  heating_method:
+    state: {tag: value, value: Six MoSi2 heating elements in vertical hanging position; E3508P10 programmer}
+    locator: *sinter_locator
+  pumping_type:
+    state: {tag: value, value: Edwards E2M1.5 Rotary Vane Vacuum Pump}
+    locator: *sinter_locator
+  gauges:
+    state: {tag: value, value: Mechanical pressure gauge}
+    locator: *sinter_locator
+- id: bet-analyser
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Micromeritics TriStar II PLUS BET analysis machine}
+    locator: &bet_locator {published_page: 3, pdf_page_index: 3, section: '2.2 Surface Area Reduction'}
+  detector:
+    state: {tag: value, value: Micromeritics TriStar II PLUS}
+    locator: *bet_locator
+experiments:
+- experiment_id: lms1-sintering-series
+  bench_id: sintering-furnace
+  method: vacuum_sintering
+  locator: *sinter_locator
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.0026'}}
+      locator: *sinter_locator
+    printed_composition:
+      state: {tag: value, value: LMS-1 lunar regolith simulant}
+      locator: *sinter_locator
+    form:
+      state: {tag: value, value: Compressed pellets}
+      locator: *sinter_locator
+    pretreatment:
+      state: {tag: value, value: Compressed in 13 mm steel die for 5 min at 80 kN; three pellets prepared for each test}
+      locator: *sinter_locator
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *sinter_locator
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *sinter_locator
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '101.325'}}
+      locator: {published_page: 2, pdf_page_index: 2, section: '2.1 Lunar Simulant Sintering', note: 'Constant pressure below 10^-3 atm; SI conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *sinter_locator
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '21600'}}
+      locator: {published_page: 2, pdf_page_index: 2, section: '2.1 Lunar Simulant Sintering', note: 'Six hours; unit conversion only'}
+    method:
+      state: {tag: value, value: Samples were heated to the reaction temperature and held for 2 h; reaction temperature varies by test}
+      locator: {published_page: 2, pdf_page_index: 2, section: '2.1 Lunar Simulant Sintering', note: 'Two-hour hold is printed, but no single series setpoint is assigned'}
+    cooling_or_quench:
+      state: {tag: value, value: Allowed to cool naturally}
+      locator: *sinter_locator
+- experiment_id: lms1-bet-analysis
+  bench_id: bet-analyser
+  method: nitrogen_bet
+  locator: *bet_locator
+  sample:
+    form:
+      state: {tag: value, value: Sintered samples fractured into quarters}
+      locator: *bet_locator
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *bet_locator
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *bet_locator
 fidelity_samples:
 - species: LMS-1
   observable: rate_series
@@ -123,6 +207,7 @@ species:
   LMS-1:
     observations:
     - observation_id: shaw_2023_lms1_sintering_apparatus
+      experiment: lms1-sintering-series
       type: rate_series
       class_tag: measured
       locator:
@@ -221,6 +306,7 @@ species:
             section: 2.2
             paragraph: Brunauer-Emmett-Teller (BET) analysis
     - observation_id: shaw_2023_lms1_bet_printed_ssa_vs_T
+      experiment: lms1-bet-analysis
       type: rate_series
       class_tag: measured
       locator:
@@ -353,6 +439,7 @@ species:
             pdf_page_index: 3
             section: 2.2
     - observation_id: shaw_2023_lms1_fig1_ssa_curve_figure_only
+      experiment: lms1-bet-analysis
       type: rate_series
       class_tag: measured
       locator:
@@ -382,6 +469,7 @@ species:
           were not digitised.
         error_bars: 5% (Hackley and Stefaniak interlaboratory survey; added to plots)
     - observation_id: shaw_2023_lms1_fig2_micrographs_and_partial_melt
+      experiment: lms1-sintering-series
       type: transition_point
       class_tag: measured
       locator:

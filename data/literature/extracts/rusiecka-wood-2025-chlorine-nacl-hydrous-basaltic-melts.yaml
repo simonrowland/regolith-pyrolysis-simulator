@@ -12,6 +12,63 @@ extraction:
   provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/
 review_status: draft
 corrections: []
+benches:
+- id: oxford-piston-cylinder
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: End-loaded half-inch piston-cylinder apparatus at the University of Oxford}
+    locator: &rusiecka_experiment_locator {published_page: 210, section: '2. Experimental procedure'}
+  heating_method:
+    state: {tag: value, value: Graphite furnace}
+    locator: *rusiecka_experiment_locator
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Alumina-sheathed C-type thermocouple at 1.0 and 1.5 GPa; S-type thermocouple at 0.5 GPa}
+      locator: *rusiecka_experiment_locator
+  detector:
+    state: {tag: value, value: CAMECA SXFive-FE electron microprobe and CAMECA IMS-7f GEO SIMS}
+    locator: {published_page: 210, section: '3. Analytical procedures'}
+experiments:
+- experiment_id: icb-series
+  bench_id: oxford-piston-cylinder
+  method: melt_equilibration_quench
+  locator: *rusiecka_experiment_locator
+  sample:
+    printed_composition:
+      state: {tag: value, value: Hydrous Icelandic Reykjanes Ridge basalt with AgI-AgCl buffer}
+      locator: {published_page: 210, table: '1'}
+    form:
+      state: {tag: value, value: Powder mixed with AgI-AgCl buffer}
+      locator: *rusiecka_experiment_locator
+    pretreatment:
+      state: {tag: value, value: Ground under ethanol for 2 h, decarbonated overnight at 400-800 C at 2 C/min, then ground under ethanol at least 2 h}
+      locator: *rusiecka_experiment_locator
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *rusiecka_experiment_locator
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: *rusiecka_experiment_locator
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 212, table: '2', note: Individual ICB rows span multiple pressure-temperature conditions; no single series setpoint is assigned here}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 212, table: '2', note: Individual ICB rows span 0.5-1.5 GPa; no single series pressure is assigned here}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *rusiecka_experiment_locator
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: value, value: Close to C-CO-CO2 buffer}
+      locator: {published_page: 210, section: '2. Experimental procedure'}
 fidelity_samples:
 - observation_id: rusiecka_wood_2025_table2_experiments
   field: experiments
@@ -97,6 +154,7 @@ species:
           H2O_wt_pct: 6.29
           H2O_uncertainty_wt_pct: 0.33
     - observation_id: rusiecka_wood_2025_table2_icb1
+      experiment: icb-series
       type: experiment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-1}
       phase: hydrous_basalt_melt
@@ -108,6 +166,7 @@ species:
         evidence_class: authors_own_experiment
         row: {sample: ICB-1, T_C: 1300, n: 43, P_GPa: 1.5, fO2_as_printed: 1.10E-08, fCl2_as_printed: 2.10E-04, SiO2_wt_pct: 51.17, SiO2_uncertainty: 0.86, TiO2_wt_pct: 1.02, TiO2_uncertainty: 0.04, Al2O3_wt_pct: 14.55, Al2O3_uncertainty: 0.38, FeO_wt_pct: 5.13, FeO_uncertainty: 0.24, MgO_wt_pct: 9.28, MgO_uncertainty: 0.30, CaO_wt_pct: 12.49, CaO_uncertainty: 0.30, Na2O_wt_pct: 1.37, Na2O_uncertainty: 0.20, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 1.0, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 1.6, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.27, final_Ag_over_Ag_plus_Pt: 0.98}
     - observation_id: rusiecka_wood_2025_table2_icb2
+      experiment: icb-series
       type: experiment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-2}
       phase: hydrous_basalt_melt
@@ -115,6 +174,7 @@ species:
       units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
       values: {quantity: experimental_conditions_and_melt_composition, method_class: measured_tabulated, evidence_class: authors_own_experiment, row: {sample: ICB-2, T_C: 1300, n: 21, P_GPa: 1.5, fO2_as_printed: 1.10E-08, fCl2_as_printed: 2.01E-04, SiO2_wt_pct: 48.4, SiO2_uncertainty: 0.76, TiO2_wt_pct: 0.96, TiO2_uncertainty: 0.04, Al2O3_wt_pct: 12.7, Al2O3_uncertainty: 0.44, FeO_wt_pct: 7.92, FeO_uncertainty: 0.30, MgO_wt_pct: 8.92, MgO_uncertainty: 0.32, CaO_wt_pct: 11.99, CaO_uncertainty: 0.30, Na2O_wt_pct: 1.24, Na2O_uncertainty: 0.18, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 1.21, H2O_uncertainty: 0.06, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.0, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.27, final_Ag_over_Ag_plus_Pt: 0.98}}
     - observation_id: rusiecka_wood_2025_table2_icb3
+      experiment: icb-series
       type: experiment
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-3}
       phase: hydrous_basalt_melt
@@ -122,6 +182,7 @@ species:
       units: T in degC; P in GPa; fO2 and fCl2 as printed; compositions and concentrations in wt%
       values: {quantity: experimental_conditions_and_melt_composition, method_class: measured_tabulated, evidence_class: authors_own_experiment, row: {sample: ICB-3, T_C: 1300, n: 32, P_GPa: 1.5, fO2_as_printed: 1.29E-08, fCl2_as_printed: 1.95E-04, SiO2_wt_pct: 46.79, SiO2_uncertainty: 0.74, TiO2_wt_pct: 0.95, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.32, Al2O3_uncertainty: 0.30, FeO_wt_pct: 7.74, FeO_uncertainty: 0.28, MgO_wt_pct: 8.65, MgO_uncertainty: 0.28, CaO_wt_pct: 11.71, CaO_uncertainty: 0.34, Na2O_wt_pct: 1.23, Na2O_uncertainty: 0.14, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 3.92, H2O_uncertainty: 0.1, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.9, CO2_uncertainty: 0.04, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.57, Cl_uncertainty: 0.16, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.98}}
     - observation_id: rusiecka_wood_2025_table2_icb4_to_icb7
+      experiment: icb-series
       type: experiment_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-4_to_ICB-7}
       phase: hydrous_basalt_melt
@@ -137,6 +198,7 @@ species:
         - {sample: ICB-6, T_C: 1200, n: 41, P_GPa: 1.0, fO2_as_printed: 3.89E-10, fCl2_as_printed: 2.27E-05, SiO2_wt_pct: 48.28, SiO2_uncertainty: 0.72, TiO2_wt_pct: 0.98, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.26, Al2O3_uncertainty: 0.32, FeO_wt_pct: 8.41, FeO_uncertainty: 0.28, MgO_wt_pct: 8.45, MgO_uncertainty: 0.22, CaO_wt_pct: 11.66, CaO_uncertainty: 0.22, Na2O_wt_pct: 1.06, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.75, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.4, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 2.85, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
         - {sample: ICB-7, T_C: 1200, n: 36, P_GPa: 1.0, fO2_as_printed: 3.83E-10, fCl2_as_printed: 2.25E-05, SiO2_wt_pct: 47.51, SiO2_uncertainty: 1.02, TiO2_wt_pct: 0.98, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.71, Al2O3_uncertainty: 0.40, FeO_wt_pct: 8.13, FeO_uncertainty: 0.34, MgO_wt_pct: 8.45, MgO_uncertainty: 0.32, CaO_wt_pct: 11.72, CaO_uncertainty: 0.28, Na2O_wt_pct: 0.99, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.87, H2O_uncertainty: 0.06, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.4, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.13, Cl_uncertainty: 0.18, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.26, final_Ag_over_Ag_plus_Pt: 0.99}
     - observation_id: rusiecka_wood_2025_table2_icb8_to_icb10
+      experiment: icb-series
       type: experiment_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf, published_page: 212, table: '2', record: ICB-8_to_ICB-10}
       phase: hydrous_basalt_melt
@@ -151,6 +213,7 @@ species:
         - {sample: ICB-9, T_C: 1200, n: 34, P_GPa: 0.5, fO2_as_printed: 5.57E-11, fCl2_as_printed: 5.15E-06, SiO2_wt_pct: 50.26, SiO2_uncertainty: 0.72, TiO2_wt_pct: 1.03, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 13.8, Al2O3_uncertainty: 0.32, FeO_wt_pct: 6.04, FeO_uncertainty: 0.40, MgO_wt_pct: 8.78, MgO_uncertainty: 0.24, CaO_wt_pct: 11.88, CaO_uncertainty: 0.32, Na2O_wt_pct: 1.2, Na2O_uncertainty: 0.16, K2O_wt_pct: 0.03, K2O_uncertainty: 0.02, H2O_wt_pct: 3.1, H2O_uncertainty: 0.4, H2O_basis: estimated_from_EPMA, CO2_wt_pct: 0.1, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.25, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.25, final_Ag_over_Ag_plus_Pt: 0.99}
         - {sample: ICB-10, T_C: 1200, n: 29, P_GPa: 0.5, fO2_as_printed: 5.50E-11, fCl2_as_printed: 5.11E-06, SiO2_wt_pct: 49.34, SiO2_uncertainty: 1.42, TiO2_wt_pct: 1.01, TiO2_uncertainty: 0.06, Al2O3_wt_pct: 12.71, Al2O3_uncertainty: 0.40, FeO_wt_pct: 6.52, FeO_uncertainty: 0.28, MgO_wt_pct: 9.34, MgO_uncertainty: 0.34, CaO_wt_pct: 11.81, CaO_uncertainty: 0.36, Na2O_wt_pct: 0.7, Na2O_uncertainty: 0.18, K2O_wt_pct: 0.02, K2O_uncertainty: 0.02, H2O_wt_pct: 3.18, H2O_uncertainty: 0.09, H2O_basis: measured_by_SIMS, CO2_wt_pct: 0.1, CO2_uncertainty: 0.02, CO2_basis: estimated_from_EPMA, Cl_wt_pct: 3.37, Cl_uncertainty: 0.08, initial_Cl_over_Cl_plus_I: 0.29, final_Cl_over_Cl_plus_I: 0.25, final_Ag_over_Ag_plus_Pt: 0.99}
     - observation_id: rusiecka_wood_2025_apparatus_and_conditions
+      experiment: icb-series
       type: apparatus
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
@@ -184,6 +247,7 @@ species:
         exposed_area: absent_not_printed
         vacuum_or_pumping: not_applicable_high_pressure_capsule_experiment
     - observation_id: rusiecka_wood_2025_model_outputs
+      experiment: icb-series
       type: model_comparison
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf

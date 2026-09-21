@@ -20,6 +20,149 @@ extraction:
   provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: setrys-tga-ms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: SETSYS Evolution thermogravimetric analyzer with integrated mass spectroscopy}
+    locator: &wilk_tga {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Icarus journal pre-proof; no printed pagination.}
+  heating_method:
+    state: {tag: value, value: SETSYS Evolution TGA}
+    locator: *wilk_tga
+  detector:
+    state: {tag: value, value: Hiden QGA quadrupole mass spectrometer for flowing-gas tests}
+    locator: *wilk_tga
+  pumping_type:
+    state: {tag: value, value: HiCube 80 Eco turbo vacuum for vacuum TGA runs}
+    locator: *wilk_tga
+- id: custom-vacuum-ms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Custom vertical tube furnace vacuum mass-spectrometry assembly}
+    locator: &wilk_vac {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Icarus journal pre-proof; no printed pagination.}
+  cell_material_and_liner:
+    state: {tag: value, value: Quartz tubes}
+    locator: *wilk_vac
+  heating_method:
+    state: {tag: value, value: Barnstead International F21100 vertical tube furnace with Watlow EZ-zone PID controller}
+    locator: *wilk_vac
+  detector:
+    state: {tag: value, value: Pfeiffer OmniStar GSD 320 gas analyzer using split-flow and a 130 C heated transfer line}
+    locator: *wilk_vac
+  pumping_type:
+    state: {tag: value, value: HiCube 80 Eco turbo pump station with liquid-nitrogen trap}
+    locator: *wilk_vac
+  gauges:
+    sample_transfer_pressure:
+      state: {tag: value, value: MKS 901P piezo-transducer/micro-Pirani combination gauge}
+      locator: *wilk_vac
+experiments:
+- experiment_id: tga-atmosphere-series
+  bench_id: setrys-tga-ms
+  method: tga
+  locator: *wilk_tga
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.001500'}}
+      locator: {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed 1500 mg specimen; unit conversion only.}
+    form:
+      state: {tag: value, value: JSC-1A powder}
+      locator: *wilk_tga
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Multiple programmed temperatures; no single series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *wilk_tga
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: He, 5%H2/Ar, and vacuum are separate arms; no one series sweep gas.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.04166666666666666666666666667'}}
+        locator: {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed 2.5 C/min; unit conversion only.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '298.15', interval_high: '1473.15'}}
+        locator: {pdf_page_index: 6, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed 25-1200 C; unit conversion only.}
+- experiment_id: vacuum-ms-series
+  bench_id: custom-vacuum-ms
+  method: evolved_gas_ms
+  locator: *wilk_vac
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.023', approximate: true}}
+      locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed approximately 23 g; unit conversion only.}
+    form:
+      state: {tag: value, value: JSC-1A powder sealed in quartz tubes}
+      locator: *wilk_vac
+    pretreatment:
+      state: {tag: value, value: Carefully evacuated through a leak valve to avoid powder-bed fluidization}
+      locator: *wilk_vac
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Program ramped to 1200 C; no single series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Sample pressure changed from base through operating and outgassing peaks; no single run pressure.}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wilk_vac
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.}
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.04166666666666666666666666667'}}
+        locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Printed 2.5 C/min; unit conversion only.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '298.15', interval_high: '1473.15'}}
+        locator: {pdf_page_index: 7, section: '2.1 Thermal Analysis and Mass Spectroscopy', note: Heated up to printed 1200 C; initial temperature not printed.}
+- experiment_id: tga-heat-treatment-series
+  bench_id: setrys-tga-ms
+  method: tga
+  locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: Icarus journal pre-proof; idealized TGA heat-treatment schedule.}
+  sample:
+    form:
+      state: {tag: value, value: JSC-1A powder}
+      locator: *wilk_tga
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: Ramp plus 750 C hold; no one constant series setpoint.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design'}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: He ramp and Ar/5%H2 hold are separate schedule stages.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state: {tag: value, value: {kind: point, point: '0.04166666666666666666666666667'}}
+        locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: Printed 2.5 C/min; unit conversion only.}
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1023.15'}}
+        locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: Printed 750 C; unit conversion only.}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '7200'}}
+        locator: {pdf_page_index: 17, section: '3.3 Heat Treatment Design', note: Printed two-hour hold; unit conversion only.}
 fidelity_samples:
 - species: JSC-1A
   observable: rate_series
@@ -52,6 +195,7 @@ species:
   JSC-1A:
     observations:
     - observation_id: wilkerson_2023_tga_apparatus_and_thermal_program
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 6
@@ -100,6 +244,7 @@ species:
             note: Icarus journal pre-proof; no printed pagination.
             section: 2.1 Thermal Analysis and Mass Spectroscopy
     - observation_id: wilkerson_2023_vacuum_ms_apparatus
+      experiment: vacuum-ms-series
       type: rate_series
       locator:
         pdf_page_index: 7
@@ -148,6 +293,7 @@ species:
             note: Icarus journal pre-proof; no printed pagination.
             section: 2.1-2.2 vacuum MS and chemical analysis
     - observation_id: wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 13
@@ -178,6 +324,7 @@ species:
         T_K_conversion: 1050 C -> 1323.15 K
         reducing_total: not_printed_as_a_number; Figure 2C curve is figure-only
     - observation_id: wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+      experiment: tga-heat-treatment-series
       type: rate_series
       locator:
         pdf_page_index: 17
@@ -209,6 +356,7 @@ species:
           section.
         figure_4_curve: figure_only_not_digitised
     - observation_id: wilkerson_2023_printed_gas_release_windows
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 12
@@ -247,6 +395,7 @@ species:
         figure_1_vacuum_as_printed: high vacuum of 1E-5 mbar
         T_range_K_omitted: windows are open/approximate as printed; T_range_K not invented
     - observation_id: wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 12
@@ -268,6 +417,7 @@ species:
           amu (CO2), 28 amu (N2, CO), 32 amu (O2), 64 amu (SO2, S2), 80 amu (SO3) vs Temperature (C)
         completeness_note: Curve coordinates were not digitised.
     - observation_id: wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 13
@@ -289,6 +439,7 @@ species:
           18 amu (H2O), 44 amu (CO2), 64 amu (SO2, S2), 34 amu (H2S)
         completeness_note: Curve coordinates were not digitised.
     - observation_id: wilkerson_2023_fig4_idealized_ht_tg_figure_only
+      experiment: tga-heat-treatment-series
       type: rate_series
       locator:
         pdf_page_index: 17
@@ -388,6 +539,7 @@ species:
   H2O:
     observations:
     - observation_id: wilkerson_2023_h2_reduction_extra_water_windows
+      experiment: tga-atmosphere-series
       type: rate_series
       locator:
         pdf_page_index: 13
@@ -411,6 +563,7 @@ species:
   C:
     observations:
     - observation_id: wilkerson_2023_table2_carbon_sulfur
+      experiment: tga-heat-treatment-series
       type: rate_series
       locator:
         pdf_page_index: 14
@@ -449,6 +602,7 @@ species:
   S:
     observations:
     - observation_id: wilkerson_2023_table2_sulfur_pointer
+      experiment: tga-heat-treatment-series
       type: rate_series
       locator:
         pdf_page_index: 14
@@ -470,6 +624,7 @@ species:
   Fe:
     observations:
     - observation_id: wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+      experiment: tga-atmosphere-series
       type: gibbs_table
       locator:
         pdf_page_index: 8

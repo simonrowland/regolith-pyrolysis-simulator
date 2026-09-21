@@ -27,6 +27,39 @@ fidelity_samples:
     locator:
       page: 71
       table: '1'
+benches:
+- id: chicago-vacuum-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family: {state: {tag: value, value: vacuum furnace}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+  heating_method: {state: {tag: value, value: vertically mounted tungsten-mesh heater with seven alternating tungsten and molybdenum shield layers}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+  temperature_measurement:
+    sensor: {state: {tag: value, value: two W100/W74Re26 thermocouples and an occasional pyrometer}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+  temperature_calibration:
+    uncertainty: {state: {tag: unknown, reason: not_published}, locator: {section: '2.2 Vacuum evaporation experiments', note: Within 5 C is agreement among measured temperatures, not calibration uncertainty}}
+experiments:
+- experiment_id: basalt-vacuum-evaporation-series
+  bench_id: chicago-vacuum-furnace
+  method: free_evaporation
+  locator: {section: '2.2 Vacuum evaporation experiments'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.00007'}}, locator: {section: '2.1 Sample preparation', note: Printed 25-70 mg; unit conversion only}}
+    printed_composition: {state: {tag: value, value: synthetic basaltic oxide and carbonate mixture}, locator: {section: '2.1 Sample preparation'}}
+    form: {state: {tag: value, value: pre-molten glass on a 2.5 mm iridium wire loop}, locator: {section: '2.1 Sample preparation'}}
+    pretreatment: {state: {tag: value, value: decarbonated and dehydrated at 950 C for 5 h; pre-melted at 1200 C for 5 min at IW+2}, locator: {section: '2.1 Sample preparation'}}
+  apparatus:
+    cell_material_and_liner: {state: {tag: value, value: iridium wire loop}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.1'}}, locator: {section: '2.2 Vacuum evaporation experiments', note: Printed 10^-6 mbar; unit conversion only}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.1', approximate: true}}, locator: {section: '2.2 Vacuum evaporation experiments', note: Printed about 10^-6 mbar; unit conversion only}}
+  conditions:
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {section: '2.2 Vacuum evaporation experiments', note: 1200 and 1400 C are distinct run setpoints; no single series setpoint}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 40 C/min ramps; 1200 C and 1400 C schedules include different setpoint holds}, locator: {section: '2.2 Vacuum evaporation experiments'}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '1', note: Per-run durations vary from zero-time to 2400 min}}
+    cooling_or_quench: {state: {tag: value, value: power cut; cooled to about 25 C before venting}, locator: {section: '2.2 Vacuum evaporation experiments'}}
 species:
   Na:
     observations:
