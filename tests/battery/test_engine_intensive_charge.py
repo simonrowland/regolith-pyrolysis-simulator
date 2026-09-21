@@ -8,8 +8,10 @@ import pytest
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import AmountBasis
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
-from simulator.battery.records import Composition, Located, Sample, State
-from simulator.battery.migrate import load_yaml, _sample_from_plain
+from simulator.battery.records import Composition, Derivation, Located, Sample, State
+from simulator.battery.migrate import (
+    load_yaml, _sample_from_plain, wt_pct_to_mole_fraction, wt_pct_to_mole_fraction_derivation,
+)
 from simulator.battery.waypoints import GapReason, ReadinessStatus, WaypointAuthority
 from tests.battery import factories as f
 from tests.battery.test_bench_generators import case, complete_kems, complete_rps
@@ -72,6 +74,82 @@ def test_printed_inventory_precedes_wt_derivation():
     selected = collect_consumer_inputs(experiment, bench, observation).waypoints["normalized_composition"].selected
     assert selected.value == {"MgO": D(".25"), "SiO2": D(".75")}
     assert selected.authority is WaypointAuthority.DERIVED
+
+
+def test_printed_mole_fraction_precedes_wt_derivation():
+    experiment, bench, observation = case()
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=Located(State.unknown("would_invent")),
+        printed_composition=f.located({"MgO": D(50), "SiO2": D(50)}),
+        initial_composition=f.located(Composition("mix", (("MgO", D(".25")),
+            ("SiO2", D(".75"))), AmountBasis.MOLE_FRACTION))))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    selected = inputs.waypoints["normalized_composition"].selected
+    assert selected.value == {"MgO": D(".25"), "SiO2": D(".75")}
+    for result in engine_point_requests(inputs):
+        assert result.payload is not None
+        assert result.payload["composition_mol"] == {"MgO": 0.25, "SiO2": 0.75}
+
+
+@pytest.mark.parametrize("extra", [{"LOI": D(20)}, {"Total": D(100)}])
+def test_printed_species_dropped_by_sibling_refuses(extra):
+    experiment, bench, observation = case()
+    wt = {"SiO2": D(50), "MgO": D(30)}
+    key = next(iter(extra))
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=Located(State.unknown("would_invent")),
+        printed_composition=f.located({**wt, **extra}),
+        initial_composition=Located(
+            State.of(wt_pct_to_mole_fraction(wt)), locator=f.loc(),
+            inference=wt_pct_to_mole_fraction_derivation(wt, f.loc()))))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert waypoint.absence.missing == (f"experiment.sample.printed_composition.{key}",)
+    for result in engine_point_requests(inputs):
+        assert result.payload is None
+        assert result.readiness.status is ReadinessStatus.GAP
+        assert any(g.waypoint == "normalized_composition"
+                   and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                   and any(key in path for path in g.missing)
+                   for g in result.readiness.gaps)
+
+
+def test_losing_single_species_charge_does_not_veto_intensive():
+    experiment, bench, observation = case()
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=Located(State.unknown("would_invent")),
+        printed_composition=f.located({"MgO": D(50), "SiO2": D(50)}),
+        initial_composition=Located(
+            State.of(Composition("mix", (("MgO", D(1)),), AmountBasis.MOL_INVENTORY)),
+            locator=f.loc(),
+            inference=Derivation("derived_inventory", ("test",), (), "mol"))))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    assert list(inputs.charges) == ["MgO"]
+    selected = inputs.waypoints["normalized_composition"].selected
+    assert set(selected.value) == {"MgO", "SiO2"}
+    for result in engine_point_requests(inputs):
+        assert result.readiness.status is ReadinessStatus.READY
+        assert result.payload is not None
+        assert not any(g.reason is GapReason.SINGLE_SPECIES_CHARGE for g in result.readiness.gaps)
+
+
+def test_unsupported_print_reports_refusal_not_single_species():
+    experiment, bench, observation = case()
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=experiment.sample.mass_kg,
+        printed_composition=f.located({"MgO": D(50), "NotAnOxide": D(50)})))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    assert list(inputs.charges) == ["MgO"]
+    assert inputs.waypoints["normalized_composition"].absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    for result in engine_point_requests(inputs):
+        assert result.payload is None
+        assert result.readiness.status is ReadinessStatus.GAP
+        assert any(g.waypoint == "normalized_composition"
+                   and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                   for g in result.readiness.gaps)
+        assert not any(g.reason is GapReason.SINGLE_SPECIES_CHARGE for g in result.readiness.gaps)
 
 
 @pytest.mark.parametrize("weights", [{"MgO": 0, "SiO2": 0}, {"unknown_species": 50, "MgO": 50}])

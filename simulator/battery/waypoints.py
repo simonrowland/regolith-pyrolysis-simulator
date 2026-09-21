@@ -381,6 +381,8 @@ def normalized_composition(
     evidence_ranks = []
     missing = []
     unsupported = False
+    printed_species: set[str] | None = None
+    printed_path = None
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
@@ -390,6 +392,9 @@ def normalized_composition(
         if located is None or not located.state.is_value:
             continue
         raw = located.state.value
+        if field == "printed_composition" and isinstance(raw, Mapping):
+            printed_species = {str(species) for species in raw}
+            printed_path = path
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
@@ -422,14 +427,26 @@ def normalized_composition(
                 ("observation_" if key in point else "") + "normalized_" + field,
                 WaypointAuthority.DERIVED, (path,)))
             # Rank source evidence before normalization makes every output DERIVED.
-            # A printed molar inventory outranks a wt%-to-moles derivation.
-            evidence_ranks.append((not bool(located.inference),
-                field == "initial_composition" and raw.amount_basis is AmountBasis.MOL_INVENTORY))
+            # Evidence directness: a printed x_i outranks a printed molar inventory,
+            # which outranks a wt%-to-moles derivation (external molar-mass table).
+            directness = 0
+            if field == "initial_composition":
+                directness = 2 if raw.amount_basis is AmountBasis.MOLE_FRACTION else 1
+            evidence_ranks.append((not bool(located.inference), directness))
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
     routes = [route for _, route in sorted(zip(evidence_ranks, routes),
                                           key=lambda pair: pair[0], reverse=True)]
     result = _result("normalized_composition", routes, tuple(missing))
+    if result.selected is not None and printed_species is not None:
+        dropped = tuple(sorted(
+            printed_species - {str(species) for species in result.selected.value}))
+        if dropped:
+            # The print names species the selected route dropped; emitting the
+            # reduced sibling would silently vanish printed sample mass.
+            return WaypointResult(result.name, None, result.routes, WaypointAbsence(
+                result.name, GapReason.UNSUPPORTED_PRINT_FORM,
+                tuple(f"{printed_path}.{species}" for species in dropped)))
     if not routes and unsupported:
         return replace(result, absence=WaypointAbsence(
             result.name, GapReason.UNSUPPORTED_PRINT_FORM, tuple(missing)))
@@ -1067,7 +1084,6 @@ def _orifice_knudsen(experiment, bench, thermal, pressure):
 def _consumer_constraints(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> tuple[ConsumerReadiness, ...]:
-    charges = charge_moles_by_species(experiment, bench, observation)
     thermal = thermal_path(experiment, bench)
     pressure = pressure_boundary(experiment, bench)
     escape = effective_escape_area(experiment, bench)
@@ -1139,8 +1155,8 @@ def _consumer_constraints(
     engine_gaps = []
     engine_status = None
     intensive = normalized_composition(experiment, bench, observation)
-    if len(charges) == 1 or (intensive.selected is not None and len(intensive.selected.value) == 1):
-        engine_gaps = [ReadinessGap("charge_moles_by_species", GapReason.SINGLE_SPECIES_CHARGE)]
+    if intensive.selected is not None and len(intensive.selected.value) == 1:
+        engine_gaps = [ReadinessGap("normalized_composition", GapReason.SINGLE_SPECIES_CHARGE)]
         engine_status = ReadinessStatus.NOT_APPLICABLE
     engine_results = tuple(
         build("engine_point", engine_gaps, engine_status, engine)
