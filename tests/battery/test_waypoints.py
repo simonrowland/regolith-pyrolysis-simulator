@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import replace
 from decimal import Decimal
 
+import pytest
+
+from simulator.battery.migrate import wt_pct_to_mole_fraction
+
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
 from simulator.battery.records import (
     ApparatusGeometry,
@@ -14,6 +18,7 @@ from simulator.battery.records import (
     ThermalSchedule,
     ThermalRamp,
     ThermalSetpoint,
+    ThermalPoint,
     Value,
 )
 from simulator.battery.waypoints import (
@@ -168,7 +173,7 @@ def test_diameter_only_escape_area_is_flagged_and_not_midpointed() -> None:
     assert "bench.geometry.orifice_count" not in result.selected.inputs
 
 
-def test_printed_escape_area_wins_while_clausing_route_remains_visible() -> None:
+def test_corrected_printed_escape_area_wins_while_raw_route_remains_visible() -> None:
     result = effective_escape_area(
         factories.kems_experiment(),
         _bench(
@@ -179,7 +184,9 @@ def test_printed_escape_area_wins_while_clausing_route_remains_visible() -> None
         ),
     )
     assert result.selected is not None
-    assert result.selected.route == "printed_area"
+    assert result.selected.route == "printed_area_times_clausing"
+    assert result.selected.value.point == Decimal("5e-7")
+    assert WaypointFlag.GEOMETRIC_ONLY in result.routes[0].flags
     assert {route.route for route in result.routes} == {
         "printed_area",
         "printed_area_times_clausing",
@@ -300,10 +307,60 @@ def test_thermal_ramp_and_hold_are_composed() -> None:
     )
     assert result.selected is not None
     assert result.selected.route == "printed_ramps_and_holds"
-    assert result.selected.value.series[-1] == (
-        Decimal("1200"),
-        Decimal("1500"),
+    assert result.selected.value.series == (
+        (Decimal("0"), Decimal("300")),
+        (Decimal("600"), Decimal("1500")),
+        (Decimal("1200"), Decimal("1500")),
     )
+
+
+@pytest.mark.parametrize("unusable_points", [False, True])
+@pytest.mark.parametrize("ambiguous", [False, True])
+def test_incomplete_or_unordered_ramp_hold_schedule_cannot_earn_readiness(ambiguous, unusable_points) -> None:
+    ramp = ThermalRamp(
+        factories.located(Value.point_of("2")),
+        factories.located(Value.point_of("300")),
+        factories.located(Value.point_of("1500")),
+    )
+    hold = ThermalSetpoint(
+        factories.located(Value.point_of("1500")),
+        factories.located(Value(ValueKind.INTERVAL, interval_low=Decimal("500"), interval_high=Decimal("600"))),
+    )
+    ramps, holds = (ramp,), (hold,)
+    if ambiguous:
+        ramps = (
+            replace(ramp, end_temperature_K=factories.located(Value.point_of("1000"))),
+            replace(ramp, start_temperature_K=factories.located(Value.point_of("1000"))),
+        )
+        holds = (
+            ThermalSetpoint(factories.located(Value.point_of("1000")), factories.located(Value.point_of("100"))),
+            replace(hold, hold_duration_s=factories.located(Value.point_of("200"))),
+        )
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("0.1")),
+        sample=_charge(single=False),
+        thermal_schedule=ThermalSchedule(ramps=ramps, setpoints_and_holds=holds,
+            points=(ThermalPoint(factories.Located(factories.State.unknown("not_published")),
+                                factories.Located(factories.State.unknown("not_published"))),) if unusable_points else None),
+    )
+    bench = _bench(geometry=experiment.apparatus.geometry)
+    result = thermal_path(experiment, bench)
+    assert result.selected is None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert result.routes  # Evidence remains inspectable, never selected as a complete path.
+    for item in consumer_readiness(experiment, bench):
+        assert item.status is ReadinessStatus.GAP
+        assert any(gap.waypoint == "thermal_path" for gap in item.gaps)
+
+
+def test_raw_printed_area_cannot_satisfy_effective_requirement() -> None:
+    experiment = replace(factories.kems_experiment(), sample=_charge(single=False), thermal_schedule=_schedule())
+    bench = _bench(geometry=ApparatusGeometry(orifice_area_m2=factories.located(Value.point_of("1e-6"))))
+    area = effective_escape_area(experiment, bench)
+    assert WaypointFlag.GEOMETRIC_ONLY in area.selected.flags
+    kems = consumer_readiness(experiment, bench)[0]
+    assert kems.status is ReadinessStatus.GAP
+    assert any(gap.waypoint == "effective_escape_area" for gap in kems.gaps)
 
 
 def test_readiness_pressure_floor_and_single_species_routing() -> None:
@@ -331,21 +388,22 @@ def test_rps_refuses_temperature_point_without_piecewise_schedule() -> None:
     assert any(gap.waypoint == "thermal_path" for gap in readiness["rps"].gaps)
 
 
-def test_rps_pressure_floor_rejects_below_and_crossing_interval() -> None:
+@pytest.mark.parametrize("pressure,status", [
+    (Value.point_of("0.099"), ReadinessStatus.NOT_APPLICABLE),
+    (Value(ValueKind.INTERVAL, interval_low=Decimal("0.01"), interval_high=Decimal("0.09")), ReadinessStatus.NOT_APPLICABLE),
+    (Value(ValueKind.INTERVAL, interval_low=Decimal("0.09"), interval_high=Decimal("0.11")), ReadinessStatus.GAP),
+    (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("0.1")), ReadinessStatus.NOT_APPLICABLE),
+    (Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal("0.1")), ReadinessStatus.GAP),
+    (Value(ValueKind.BOUND, bound_operator=">", bound_value=Decimal("0.09")), ReadinessStatus.GAP),
+])
+def test_rps_pressure_floor_rejects_only_wholly_excluded_values(pressure, status) -> None:
     base = replace(
         factories.kems_experiment(),
         sample=_charge(single=False),
         thermal_schedule=_schedule(),
     )
     bench = _bench(geometry=base.apparatus.geometry)
-    for pressure in (
-        Value.point_of("0.099"),
-        Value(
-            ValueKind.INTERVAL,
-            interval_low=Decimal("0.09"),
-            interval_high=Decimal("0.11"),
-        ),
-    ):
+    for pressure in (pressure,):
         experiment = replace(
             base,
             pressure_environment=replace(
@@ -356,7 +414,7 @@ def test_rps_pressure_floor_rejects_below_and_crossing_interval() -> None:
         readiness = {
             item.consumer: item for item in consumer_readiness(experiment, bench)
         }
-        assert readiness["rps"].status is ReadinessStatus.NOT_APPLICABLE
+        assert readiness["rps"].status is status
         assert any(
             gap.reason is GapReason.BELOW_PRESSURE_FLOOR
             for gap in readiness["rps"].gaps
@@ -418,11 +476,11 @@ def test_derived_groups_compute_and_preserve_nonpoint_inputs() -> None:
     assert group1["Mg2SiO4"].selected.value.kind is ValueKind.INTERVAL
     group2 = g2(experiment, bench)
     assert group2.selected is not None
-    assert group2.selected.value.point == Decimal("0.01")
+    assert group2.selected.value.point == Decimal("0.005")
     assert WaypointFlag.ASSUMPTION in group2.selected.flags
     group3 = g3(experiment, bench)
     assert group3.selected is not None
-    assert group3.selected.value.point == Decimal("1e3")
+    assert group3.selected.value.point == Decimal("2e3")
 
 
 def test_g2_uses_explicit_evaporation_alpha() -> None:
@@ -445,26 +503,37 @@ def test_g2_uses_explicit_evaporation_alpha() -> None:
     assert WaypointFlag.ASSUMPTION not in result.selected.flags
 
 
-def test_partial_printed_oxide_inventory_preserves_printed_mass_basis() -> None:
+@pytest.mark.parametrize("silica,expected_mass", [("50", "0.0009"), ("60", "0.001")])
+def test_partial_printed_oxide_inventory_preserves_printed_mass_basis(silica, expected_mass) -> None:
+    printed = {"MgO": Decimal("40"), "SiO2": Decimal(silica)}
     sample = replace(
         _charge(single=False),
-        printed_composition=factories.located(
-            {"MgO": Decimal("40"), "SiO2": Decimal("50")}
-        ),
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=factories.located(wt_pct_to_mole_fraction(printed)),
+        printed_composition=factories.located(printed),
     )
     result = charge_moles_by_species(
         replace(factories.kems_experiment(), sample=sample), _bench()
     )
-    assert result["MgO"].selected is not None
-    assert result["MgO"].selected.route == "mass_times_printed_wt_percent"
-    assert result["MgO"].selected.value.point == Decimal(
-        "0.0009924573243350535926955140929"
-    )
+    for species in printed:
+        assert result[species].selected.route == "mass_times_printed_wt_percent"
+        assert {route.route for route in result[species].routes} == {
+            "mass_times_printed_wt_percent", "mass_times_mole_fraction",
+        }
+    # CIAAW atomic masses: MgO=40.304 g/mol, SiO2=60.083 g/mol.
+    recovered = (result["MgO"].selected.value.point * Decimal("0.040304")
+                 + result["SiO2"].selected.value.point * Decimal("0.060083"))
+    assert float(recovered) == pytest.approx(float(expected_mass), rel=1e-12)
 
 
-def test_non_numeric_mass_does_not_fabricate_zero_charge() -> None:
+@pytest.mark.parametrize("mass", [
+    factories.Located(factories.State.unknown("not_numeric")),
+    factories.located(Value(ValueKind.UNAVAILABLE, unavailable_reason="not_numeric")),
+    factories.located(Value(ValueKind.CATEGORICAL, categorical="not measured")),
+])
+def test_non_numeric_mass_does_not_fabricate_zero_charge(mass) -> None:
     sample = Sample(
-        mass_kg=factories.Located(factories.State.unknown("not_numeric")),
+        mass_kg=mass,
         printed_composition=factories.located({"SiO2": Decimal("100")}),
     )
     result = charge_moles_by_species(
@@ -490,16 +559,95 @@ def test_geometric_only_escape_does_not_satisfy_kems_readiness() -> None:
     assert any(gap.waypoint == "effective_escape_area" for gap in readiness["kems"].gaps)
 
 
-def test_atmospheric_kems_is_structurally_not_applicable() -> None:
+def _knudsen_case(pressure, method=MethodToken.KNUDSEN_EFFUSION):
     experiment = replace(
-        factories.kems_experiment(total_P=Decimal("101325")),
+        factories.kems_experiment(),
         sample=_charge(single=False),
         thermal_schedule=_schedule(),
+        method=factories.State.of(method) if method else factories.State.unknown("not_published"),
     )
-    bench = _bench(geometry=experiment.apparatus.geometry)
-    readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
-    assert readiness["kems"].status is ReadinessStatus.NOT_APPLICABLE
-    assert readiness["kems"].gaps[0].reason is GapReason.OUTSIDE_PRESSURE_REGIME
+    experiment = replace(experiment, pressure_environment=replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=factories.located(pressure, page=7),
+        sweep_gas=factories.located(replace(experiment.pressure_environment.sweep_gas.state.value, species="Ar")),
+    ))
+    bench = _bench(geometry=ApparatusGeometry(
+        orifice_diameter_m=factories.located(Value.point_of("0.0005"), page=9),
+        clausing_factor=factories.located(Value.point_of("0.5")),
+    ))
+    return experiment, bench
+
+
+def test_atmospheric_knudsen_method_gets_notice_without_refusal() -> None:
+    experiment, bench = _knudsen_case(Value.point_of("101325"))
+    result = consumer_readiness(experiment, bench)[0]
+    assert result.status is ReadinessStatus.READY
+    assert result.notices
+    notice, = result.notices
+    assert notice.threshold == Decimal("10")
+    assert float(notice.knudsen_number.point) == pytest.approx(74.30919441729452 / 101325, rel=1e-12)
+    assert notice.inputs["d_orifice"].value.point == Decimal("0.0005")
+    assert notice.inputs["d_orifice"].locators == (factories.loc(page=9),)
+    assert notice.inputs["P"].locators == (factories.loc(page=7),)
+    assert notice.inputs["T"].value.point == Decimal("1500")
+    assert notice.inputs["T"].locators == (factories.loc(),)
+
+
+def test_knudsen_notice_detects_failing_actual_ramp_segment() -> None:
+    experiment, bench = _knudsen_case(Value.point_of("5"))
+    experiment = replace(experiment, thermal_schedule=ThermalSchedule(ramps=(ThermalRamp(
+        factories.located(Value.point_of("2")), factories.located(Value.point_of("300")),
+        factories.located(Value.point_of("1500")),
+    ),)))
+    result = consumer_readiness(experiment, bench)[0]
+    assert result.status is ReadinessStatus.READY
+    assert result.notices
+    notice, = result.notices
+    assert float(notice.knudsen_number.interval_low) == pytest.approx(2.97236777669)
+    assert float(notice.knudsen_number.interval_high) == pytest.approx(14.8618388835)
+
+
+@pytest.mark.parametrize("pressure,status", [
+    (Value.point_of("5"), ReadinessStatus.READY),
+    (Value.point_of("20"), ReadinessStatus.NOT_APPLICABLE),
+    (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("5")), ReadinessStatus.READY),
+    (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("20")), ReadinessStatus.GAP),
+    (Value(ValueKind.BOUND, bound_operator=">", bound_value=Decimal("20")), ReadinessStatus.NOT_APPLICABLE),
+])
+def test_unknown_method_knudsen_predicate_and_directional_pressure_bounds(pressure, status) -> None:
+    experiment, bench = _knudsen_case(pressure, method=None)
+    result = consumer_readiness(experiment, bench)[0]
+    assert result.status is status
+
+
+def test_explicit_non_effusion_method_is_not_applicable_even_at_low_pressure() -> None:
+    experiment, bench = _knudsen_case(Value.point_of("1e-6"), MethodToken.TRANSPIRATION)
+    result = consumer_readiness(experiment, bench)[0]
+    assert result.status is ReadinessStatus.NOT_APPLICABLE
+    assert result.gaps[0].waypoint == "method"
+    assert result.gaps[0].missing == ("transpiration",)
+
+
+@pytest.mark.parametrize("missing", ["diameter", "gas", "pressure", "thermal"])
+def test_unknown_method_uncomputable_knudsen_names_missing_input(missing) -> None:
+    experiment, bench = _knudsen_case(Value.point_of("1"), method=None)
+    if missing == "diameter":
+        bench = replace(bench, geometry=replace(bench.geometry, orifice_diameter_m=None))
+    elif missing == "gas":
+        experiment = replace(experiment, pressure_environment=replace(experiment.pressure_environment,
+            sweep_gas=factories.Located(factories.State.unknown("not_published"))))
+    elif missing == "pressure":
+        experiment = replace(experiment, pressure_environment=replace(experiment.pressure_environment,
+            total_pressure_Pa=factories.Located(factories.State.unknown("not_published"))))
+    else:
+        experiment = replace(experiment, thermal_schedule=None,
+            conditions={"temperature_K": factories.Located(factories.State.unknown("not_published"))})
+    result = consumer_readiness(experiment, bench)[0]
+    assert result.status is ReadinessStatus.GAP
+    gap = next(gap for gap in result.gaps if gap.waypoint == "knudsen_number_orifice")
+    assert gap.reason is GapReason.MISSING_EVIDENCE
+    assert gap.missing
+    assert not result.notices
 
 
 def test_g1_requires_species_keyed_saturation_pressure_for_multicomponent_charge() -> None:

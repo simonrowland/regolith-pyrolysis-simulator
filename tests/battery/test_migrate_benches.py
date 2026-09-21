@@ -4,6 +4,8 @@ import copy
 import hashlib
 from dataclasses import replace
 from decimal import Decimal
+import pytest
+import yaml
 
 from simulator.battery.enums import BenchIdentityBasis, RefusalReason, ValueKind
 from scripts.bench_readiness import report
@@ -26,6 +28,7 @@ from simulator.battery.records import (
 )
 from tests.battery import factories
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tests.battery.test_waypoints import _charge, _schedule, _knudsen_case
 
 
 def _registry_extract() -> dict:
@@ -223,6 +226,72 @@ def test_readiness_counts_unique_sources_not_experiments(tmp_path) -> None:
             )
 
 
+def test_mixed_source_retains_ready_experiment_and_ranks_unique_blockers(tmp_path) -> None:
+    extract = _registry_extract()
+    ready = replace(factories.kems_experiment(experiment_id="ready", total_P=Decimal("0.1")),
+                    bench_id="bench-one", sample=_charge(single=False), thermal_schedule=_schedule())
+    extract["benches"][0]["geometry"]["clausing_factor"] = to_plain(factories.located(Value.point_of("0.5")))
+    extract["experiments"] = [to_plain(ready)] + [
+        to_plain(replace(ready, experiment_id=f"gap-{i:02}", sample=replace(ready.sample, mass_kg=None)))
+        for i in range(49)
+    ]
+    extract["species"]["Na"]["observations"][0]["experiment"] = "ready"
+    root = _write_min_tree(tmp_path, extract)
+    write_outputs(Migrator(root=root).run(), root)
+    result = report(root)
+    source = result["sources"][0]
+    from simulator.battery.waypoints import ENGINE_POINT_CONSUMERS
+    assert set(result["summary"]["by_engine"]) == set(ENGINE_POINT_CONSUMERS)
+    assert set(result["summary"]["by_consumer"]) == {"kems", "rps", "engine_point"}
+    for row in source["consumers"] + source["engines"]:
+        assert row["status"] == "partial"
+        charge = next(gap for gap in row["gaps"] if gap["waypoint"] == "charge_moles_by_species")
+        assert charge["count"] == 49
+        assert len(set(charge["experiment_ids"])) == 49
+    for counts in list(result["summary"]["by_consumer"].values()) + list(result["summary"]["by_engine"].values()):
+        assert counts == {"ready": 0, "partial": 1, "gap": 0, "not_applicable": 0}
+    ready_row = next(row for row in source["experiments"] if row["experiment_id"].endswith("ready"))
+    assert all(row["status"] == "ready" for row in ready_row["consumers"] + ready_row["engines"])
+    assert result["summary"]["top_blocking_waypoints"]
+    assert result["summary"]["top_blocking_waypoints"][0] == {
+        "waypoint": "charge_moles_by_species", "reason": "missing_evidence",
+        "source_count": 1, "experiment_count": 49,
+    }
+
+
+def test_blockers_rank_source_count_before_experiment_count(tmp_path, monkeypatch) -> None:
+    import scripts.bench_readiness as module
+    experiment, bench = _knudsen_case(Value.point_of("1"))
+    work_a = replace(factories.work("a"), source_ids=("a",))
+    work_b = replace(factories.work("b"), source_ids=("b",))
+    experiment = replace(experiment, bench_id=bench.id)
+    experiments = {
+        f"a-{i}": replace(experiment, experiment_id=f"a-{i}", work_id="a",
+            sample=replace(experiment.sample, mass_kg=None,
+                           surface_area_m2=None if i == 0 else experiment.sample.surface_area_m2))
+        for i in range(9)
+    }
+    experiments["b"] = replace(experiment, experiment_id="b", work_id="b",
+        sample=replace(experiment.sample, surface_area_m2=None))
+    monkeypatch.setattr(module, "load_migrated_store", lambda root: ({"a": work_a, "b": work_b}, experiments, {}))
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+    blockers = module.report(tmp_path)["summary"]["top_blocking_waypoints"]
+    assert [(row["waypoint"], row["source_count"], row["experiment_count"]) for row in blockers] == [
+        ("surfaces", 2, 2), ("charge_moles_by_species", 1, 9),
+    ]
+
+
+def test_duplicate_gap_is_counted_once_per_experiment() -> None:
+    from scripts.bench_readiness import _deduplicated_gaps
+    from simulator.battery.waypoints import ConsumerReadiness, ReadinessGap, ReadinessStatus, GapReason
+    gap = ReadinessGap("charge", GapReason.MISSING_EVIDENCE, ("mass",))
+    item = ConsumerReadiness("kems", ReadinessStatus.GAP, (gap, gap))
+    assert _deduplicated_gaps([("a", item), ("b", item)]) == [{
+        "waypoint": "charge", "reason": "missing_evidence", "missing": ["mass"],
+        "count": 2, "experiment_ids": ["a", "b"],
+    }]
+
+
 def test_legacy_embedded_bench_reaches_waypoints_without_explicit_link(tmp_path) -> None:
     extract = _registry_extract()
     extract.pop("benches")
@@ -246,6 +315,9 @@ def test_legacy_embedded_bench_reaches_waypoints_without_explicit_link(tmp_path)
             "missing": ["experiment.bench_id"],
         }
     ]
+    assert experiment["bench_identity"] is not None
+    assert experiment["bench_identity"]["basis"] == "inferred_from_embedded_evidence"
+    assert "experiment.apparatus" in experiment["bench_identity"]["reason"]
     assert source["informational_gaps"][0]["count"] == 1
     assert all(
         gap["waypoint"] != "bench"
@@ -259,6 +331,85 @@ def test_legacy_embedded_bench_reaches_waypoints_without_explicit_link(tmp_path)
         gap["waypoint"] not in {"charge_moles_by_species", "thermal_path"}
         for gap in kems["gaps"]
     )
+
+
+def test_implicit_bench_external_apparatus_locator_never_claims_own_work() -> None:
+    from scripts.bench_readiness import _implicit_bench
+    experiment = factories.kems_experiment(work_id="paper-A")
+    external = Locator(source_path="paper-B.pdf", page=7, note="Apparatus described in Smith (1980)")
+    experiment = replace(experiment, apparatus=replace(experiment.apparatus, geometry=replace(
+        experiment.apparatus.geometry, orifice_area_m2=Located(State.of(Value.point_of("1e-6")), locator=external))))
+    bench = _implicit_bench(experiment)
+    assert bench.identity.basis is BenchIdentityBasis.CITED_BY_AUTHOR
+    assert bench.identity.ref.cited_as == "paper-B.pdf"
+    assert bench.identity.ref.locator == external
+    assert bench.geometry.orifice_area_m2.locator == external
+
+
+def test_implicit_bench_cited_pumping_locator_is_not_inferred() -> None:
+    from scripts.bench_readiness import _implicit_bench
+    experiment = factories.kems_experiment()
+    external = Locator(source_path="paper-B.pdf", page=7)
+    experiment = replace(experiment, pressure_environment=replace(experiment.pressure_environment,
+        pumping={"pumping_speed_m3_s": Located(State.of(Value.point_of("0.01")), locator=external)}))
+    bench = _implicit_bench(experiment)
+    assert bench.identity.basis is BenchIdentityBasis.CITED_BY_AUTHOR
+    assert bench.identity.ref.locator == external
+
+
+def test_extract_cannot_declare_inferred_identity(tmp_path) -> None:
+    extract = _registry_extract()
+    extract["benches"][0]["identity"] = {
+        "basis": "inferred_from_embedded_evidence", "reason": "experiment.apparatus",
+    }
+    with pytest.raises(ValueError, match="migration-only"):
+        Migrator(root=_write_min_tree(tmp_path, extract)).run()
+
+
+@pytest.mark.parametrize("ledger", [False, True])
+def test_explicit_or_ledger_apparatus_reference_wins_over_inferred_identity(tmp_path, ledger, monkeypatch) -> None:
+    from scripts.bench_readiness import _apparatus_references, _implicit_bench
+    extract = _registry_extract()
+    if not ledger:
+        extract["apparatus_reference"] = {"cited_as": "Smith (1980)", "locator": {"page": 3}}
+    root = _write_min_tree(tmp_path, extract)
+    work = replace(factories.work(), source_ids=("fixture-source",))
+    if ledger:
+        corpus = tmp_path / "corpus"
+        (corpus / "ledger").mkdir(parents=True)
+        (corpus / "ledger/apparatus-reference-leads.yaml").write_text(yaml.safe_dump({"leads": [{
+            "citing": "fixture-source", "lead_as_given": "Smith (1980)",
+            "for_parameters": ["orifice diameter"], "reference_list_locator": "page 3",
+        }]}))
+        work = replace(work, source_files=replace(work.source_files, corpus_repo=str(corpus)))
+    refs = _apparatus_references(root, {work.work_id: work})
+    bench = _implicit_bench(factories.kems_experiment(), work, refs["fixture-source"])
+    assert bench.identity.basis is BenchIdentityBasis.CITED_BY_AUTHOR
+    assert bench.identity.ref.cited_as == "Smith (1980)"
+
+
+def test_ambiguous_cited_apparatuses_do_not_select_a_bench() -> None:
+    from scripts.bench_readiness import _implicit_bench
+    refs = [BenchReference(None, cited, (), Locator(page=1)) for cited in ("Smith (1980)", "Jones (1981)")]
+    assert _implicit_bench(factories.kems_experiment(), references=refs) is None
+
+
+def test_readiness_json_carries_knudsen_notice_and_inputs(tmp_path) -> None:
+    experiment, bench = _knudsen_case(Value.point_of("101325"))
+    extract = _registry_extract()
+    extract["experiments"] = [to_plain(replace(experiment, experiment_id="run-one", bench_id="bench-one"))]
+    extract["benches"] = [to_plain(replace(bench, id="bench-one"))]
+    root = _write_min_tree(tmp_path, extract)
+    write_outputs(Migrator(root=root).run(), root)
+    row = report(root)["sources"][0]["experiments"][0]["consumers"][0]
+    assert row["status"] == "ready"
+    assert row["notices"]
+    notice, = row["notices"]
+    assert notice["kind"] == "knudsen_regime_inconsistency"
+    assert Decimal(notice["threshold"]) == 10
+    assert Decimal(notice["knudsen_number"]["point"]) < 10
+    assert set(notice["inputs"]) == {"d_orifice", "T", "P"}
+    assert notice["inputs"]["P"]["locators"][0]["page"] == 7
 
 
 def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> None:

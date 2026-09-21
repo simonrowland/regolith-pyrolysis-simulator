@@ -749,10 +749,16 @@ class BenchReference:
 class BenchIdentity:
     basis: BenchIdentityBasis
     ref: BenchReference | None = None
+    reason: str | None = None
 
     def __post_init__(self) -> None:
         basis = BenchIdentityBasis(self.basis)
         object.__setattr__(self, "basis", basis)
+        if basis is BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE:
+            if not self.reason or not self.reason.strip():
+                raise ValueError("inferred bench identity requires an embedded-evidence reason")
+        elif self.reason is not None:
+            raise ValueError("only inferred bench identity carries an inference reason")
         if basis is BenchIdentityBasis.CITED_BY_AUTHOR:
             if self.ref is None:
                 raise ValueError("cited_by_author BenchIdentity requires ref.cited_as")
@@ -763,7 +769,7 @@ class BenchIdentity:
             if not self.ref.cited_as.strip():
                 raise ValueError("cited_by_author BenchIdentity requires ref.cited_as")
         elif self.ref is not None:
-            raise ValueError("described_in_this_work BenchIdentity cannot carry ref")
+            raise ValueError("only cited_by_author BenchIdentity can carry ref")
 
 
 @dataclass(frozen=True)

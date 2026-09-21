@@ -143,6 +143,7 @@ class BenchAbsenceReason(StrEnum):
 class BenchIdentityBasis(StrEnum):
     DESCRIBED_IN_THIS_WORK = "described_in_this_work"
     CITED_BY_AUTHOR = "cited_by_author"
+    INFERRED_FROM_EMBEDDED_EVIDENCE = "inferred_from_embedded_evidence"
 
 
 class NoticeKind(StrEnum):

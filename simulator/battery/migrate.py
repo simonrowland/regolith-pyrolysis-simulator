@@ -1154,7 +1154,7 @@ def bench_from_plain(payload: object) -> Bench:
     return Bench(
         id=str(payload.get("id") or ""),
         work_id=str(payload.get("work_id") or ""),
-        identity=BenchIdentity(basis=basis, ref=ref),
+        identity=BenchIdentity(basis=basis, ref=ref, reason=raw_identity.get("reason")),
         apparatus_family=located_text("apparatus_family"),
         method=located_text("method"),
         cell_material_and_liner=located_text("cell_material_and_liner"),
@@ -5841,6 +5841,8 @@ class Migrator:
         for raw in raw_benches:
             if not isinstance(raw, Mapping):
                 raise TypeError("extract benches entries must be mappings")
+            if (raw.get("identity") or {}).get("basis") == BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE.value:
+                raise ValueError("extract cannot declare migration-only inferred_from_embedded_evidence")
             local_id = raw.get("id") or raw.get("bench_id")
             bench_id = self._registry_id(work.work_id, "bench", local_id)
             payload = dict(raw)

@@ -200,9 +200,12 @@ def test_bench_identity_requires_citation_text() -> None:
     assert {item.value for item in BenchIdentityBasis} == {
         "described_in_this_work",
         "cited_by_author",
+        "inferred_from_embedded_evidence",
     }
     with pytest.raises(ValueError, match="cited_as"):
         BenchIdentity(BenchIdentityBasis.CITED_BY_AUTHOR)
+    with pytest.raises(ValueError, match="reason"):
+        BenchIdentity(BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE)
     with pytest.raises(ValueError, match="cited_as"):
         BenchIdentity(
             BenchIdentityBasis.CITED_BY_AUTHOR,

@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""Print per-source Bench consumer readiness as deterministic JSON."""
+"""Print per-source Bench consumer readiness as deterministic JSON.
+
+PARTIAL means heterogeneous per-experiment statuses, not partial completeness.
+Per-experiment rows remain available so callers can select a usable experiment.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from dataclasses import fields, is_dataclass
+from collections.abc import Mapping
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,6 +21,9 @@ if str(ROOT) not in sys.path:
 from simulator.battery.migrate import (  # noqa: E402
     load_migrated_benches,
     load_migrated_store,
+    load_yaml,
+    discover_extracts,
+    locator_from_mapping,
     to_plain,
 )
 from simulator.battery.enums import BenchIdentityBasis  # noqa: E402
@@ -22,7 +31,9 @@ from simulator.battery.records import (  # noqa: E402
     ApparatusGeometry,
     Bench,
     BenchIdentity,
+    BenchReference,
     Located,
+    Locator,
     State,
 )
 from simulator.battery.waypoints import (  # noqa: E402
@@ -35,8 +46,11 @@ from simulator.battery.waypoints import (  # noqa: E402
 )
 
 
-def _missing_bench_readiness() -> tuple[ConsumerReadiness, ...]:
-    gap = ReadinessGap("bench", GapReason.MISSING_EVIDENCE, ("experiment.bench_id",))
+def _missing_bench_readiness(*, implicit=False) -> tuple[ConsumerReadiness, ...]:
+    gap = ReadinessGap(
+        "bench_identity" if implicit else "bench", GapReason.MISSING_EVIDENCE,
+        ("bench.identity.ref: multiple cited apparatuses",) if implicit else ("experiment.bench_id",),
+    )
     return (
         ConsumerReadiness("kems", ReadinessStatus.GAP, (gap,)),
         ConsumerReadiness("rps", ReadinessStatus.GAP, (gap,)),
@@ -49,7 +63,57 @@ def _missing_bench_readiness() -> tuple[ConsumerReadiness, ...]:
     )
 
 
-def _implicit_bench(experiment) -> Bench:
+def _located_evidence(value):
+    if isinstance(value, Located):
+        yield value
+    elif is_dataclass(value):
+        for field in fields(value):
+            yield from _located_evidence(getattr(value, field.name))
+    elif isinstance(value, Mapping):
+        for item in value.values():
+            yield from _located_evidence(item)
+
+
+def _apparatus_references(root, works):
+    references = {}
+    for path in discover_extracts(root / "data/literature/extracts"):
+        doc = load_yaml(path)
+        source = str(doc.get("source_id") or path.stem)
+        pending = [doc]
+        while pending:
+            value = pending.pop()
+            if isinstance(value, Mapping):
+                for key, item in value.items():
+                    if key in {"apparatus_reference", "cited_apparatus_reference", "apparatus_ref"} and item:
+                        raw = item if isinstance(item, Mapping) else {"cited_as": str(item)}
+                        cited = raw.get("cited_as") or raw.get("reference")
+                        if cited:
+                            ref = BenchReference(raw.get("work_id"), str(cited),
+                                tuple(raw.get("for_parameters") or ()),
+                                locator_from_mapping(raw.get("locator")) or Locator(source_path=str(path), record=str(key)))
+                            references.setdefault(source, []).append(ref)
+                    else:
+                        pending.append(item)
+            elif isinstance(value, (list, tuple)):
+                pending.extend(value)
+    for corpus in {work.source_files.corpus_repo for work in works.values()}:
+        corpus_path = Path(corpus).expanduser()
+        if not corpus_path.is_absolute():
+            corpus_path = Path.home() / "Repos" / corpus_path
+        ledger = corpus_path / "ledger/apparatus-reference-leads.yaml"
+        if not ledger.exists():
+            continue
+        for lead in (load_yaml(ledger).get("leads") or ()):
+            cited = lead.get("lead_as_given")
+            if cited:
+                ref = BenchReference(None, str(cited), tuple(lead.get("for_parameters") or ()),
+                    Locator(source_path=str(ledger), record=str(lead.get("citing")),
+                            note=str(lead.get("reference_list_locator") or "apparatus reference lead")))
+                references.setdefault(str(lead.get("citing")), []).append(ref)
+    return references
+
+
+def _implicit_bench(experiment, work=None, references=()) -> Bench | None:
     apparatus = experiment.apparatus
     pumping = experiment.pressure_environment.pumping or {}
     pumping_speed = pumping.get("pumping_speed_m3_s")
@@ -88,10 +152,32 @@ def _implicit_bench(experiment) -> Bench:
                 kwargs[name] = kept
         if kwargs:
             geometry = ApparatusGeometry(**kwargs)
+    refs = list(references)
+    own_paths = {experiment.locator.source_path} if experiment.locator else set()
+    if work is not None:
+        own_paths.update(file.path for file in work.source_files.files)
+    for evidence in (*_located_evidence(apparatus), *_located_evidence(pumping)):
+        locator = evidence.locator
+        if locator and locator.source_path and locator.source_path not in own_paths:
+            if not any(ref.locator == locator for ref in refs):
+                refs.append(BenchReference(None, locator.source_path, ("apparatus",), locator))
+    unique = {ref.cited_as: ref for ref in refs}
+    if len(unique) > 1:
+        return None  # One identity cannot select among multiple cited apparatuses.
+    blocks = ["experiment.method"]
+    if pumping_speed is not None:
+        blocks.append("experiment.pressure_environment.pumping")
+    if apparatus is not None:
+        blocks.append("experiment.apparatus")
+    identity = (
+        BenchIdentity(BenchIdentityBasis.CITED_BY_AUTHOR, next(iter(unique.values())))
+        if unique else BenchIdentity(BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+                                    reason="Provenance unverified; embedded blocks: " + ", ".join(blocks))
+    )
     return Bench(
         id=f"{experiment.experiment_id}::bench::implicit",
         work_id=experiment.work_id or "unknown",
-        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        identity=identity,
         method=method,
         geometry=geometry,
         pumping_speed_m3_s=pumping_speed,
@@ -166,6 +252,7 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
 def report(root: Path) -> dict[str, object]:
     works, experiments, _ = load_migrated_store(root)
     benches = load_migrated_benches(root)
+    references = _apparatus_references(root, works)
     by_source: dict[str, list[dict[str, object]]] = {}
     source_readiness: dict[
         str, list[tuple[str, tuple[ConsumerReadiness, ...]]]
@@ -177,9 +264,10 @@ def report(root: Path) -> dict[str, object]:
         bench = benches.get(experiment.bench_id or "")
         implicit = experiment.bench_id is None
         if implicit:
-            bench = _implicit_bench(experiment)
+            refs = [ref for source_id in source_ids for ref in references.get(source_id, ())]
+            bench = _implicit_bench(experiment, work, refs)
         readiness = (
-            _missing_bench_readiness()
+            _missing_bench_readiness(implicit=implicit)
             if bench is None
             else consumer_readiness(experiment, bench)
         )
@@ -192,6 +280,7 @@ def report(root: Path) -> dict[str, object]:
                     "work_id": experiment.work_id,
                     "experiment_id": experiment.experiment_id,
                     "bench_id": experiment.bench_id,
+                    "bench_identity": to_plain(bench.identity) if bench is not None else None,
                     "consumers": to_plain(consumers),
                     "engines": to_plain(engines),
                     "informational_gaps": (
