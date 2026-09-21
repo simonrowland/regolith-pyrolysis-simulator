@@ -829,3 +829,176 @@ def test_each_unreachable_scalar_waypoint_has_typed_absence() -> None:
         assert result.selected is None
         assert result.absence is not None
         assert result.absence.reason is GapReason.MISSING_EVIDENCE
+
+
+def test_multi_cited_bench_identity_gap_is_unattributable_by_construction() -> None:
+    from scripts.bench_readiness import _missing_bench_readiness
+
+    readiness = _missing_bench_readiness(implicit=True)
+    for consumer in readiness:
+        assert consumer.status is ReadinessStatus.GAP
+        (gap,) = consumer.gaps
+        assert gap.waypoint == "bench_identity"
+        assert gap.reason is GapReason.UNATTRIBUTABLE_BY_CONSTRUCTION
+        assert gap.missing == ("bench.identity.ref: multiple cited apparatuses",)
+
+
+def test_missing_linked_bench_keeps_missing_evidence_reason() -> None:
+    from scripts.bench_readiness import _missing_bench_readiness
+
+    readiness = _missing_bench_readiness(implicit=False)
+    for consumer in readiness:
+        (gap,) = consumer.gaps
+        assert gap.waypoint == "bench"
+        assert gap.reason is GapReason.MISSING_EVIDENCE
+
+
+def _lead_corpus(tmp_path, leads) -> "object":
+    import yaml
+
+    corpus = tmp_path / "corpus"
+    (corpus / "ledger").mkdir(parents=True)
+    (corpus / "ledger" / "apparatus-reference-leads.yaml").write_text(
+        yaml.safe_dump({"leads": leads})
+    )
+    work = factories.work()
+    return replace(
+        work,
+        source_ids=("fixture-source",),
+        source_files=replace(work.source_files, corpus_repo=str(corpus)),
+    )
+
+
+def _report_with_work(tmp_path, monkeypatch, work, experiment) -> "object":
+    import scripts.bench_readiness as module
+
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {experiment.experiment_id: experiment},
+            {},
+        ),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {})
+    return module.report(tmp_path)
+
+
+def test_verdict_no_lead_is_not_an_apparatus_reference(tmp_path, monkeypatch) -> None:
+    work = _lead_corpus(
+        tmp_path,
+        [
+            {
+                "citing": "fixture-source",
+                "lead_as_given": "Ross (1948); Bonamici et al. (2017)",
+                "for_parameters": ["arkosic soil characterization"],
+                "identity_verdict": "no",
+            }
+        ],
+    )
+    experiment = factories.kems_experiment(work_id=work.work_id)
+    result = _report_with_work(tmp_path, monkeypatch, work, experiment)
+    (source,) = result["sources"]
+    (row,) = source["experiments"]
+    assert row["bench_identity"]["basis"] == "inferred_from_embedded_evidence"
+    assert all(
+        gap["waypoint"] != "bench_identity"
+        for consumer in row["consumers"] + row["engines"]
+        for gap in consumer["gaps"]
+    )
+    assert result["summary"]["bench_identity_verdicts"] == {
+        "unattributable_by_construction": {"source_count": 0, "experiment_count": 0},
+        "reference_not_yet_resolved": {"source_count": 0, "experiment_count": 0},
+    }
+
+
+def test_unobtained_single_cited_apparatus_is_pending_acquisition(tmp_path, monkeypatch) -> None:
+    work = _lead_corpus(
+        tmp_path,
+        [
+            {
+                "citing": "fixture-source",
+                "lead_as_given": "Smith (1980)",
+                "for_parameters": ["orifice diameter"],
+            }
+        ],
+    )
+    experiment = factories.kems_experiment(work_id=work.work_id)
+    result = _report_with_work(tmp_path, monkeypatch, work, experiment)
+    (source,) = result["sources"]
+    (row,) = source["experiments"]
+    assert row["bench_identity"]["basis"] == "cited_by_author"
+    assert {
+        "waypoint": "bench_identity",
+        "reason": "reference_not_yet_resolved",
+        "missing": ["bench.identity.ref: Smith (1980)"],
+    } in row["informational_gaps"]
+    assert {
+        "waypoint": "bench_identity",
+        "reason": "reference_not_yet_resolved",
+        "missing": ["bench.identity.ref: Smith (1980)"],
+        "count": 1,
+        "experiment_ids": [experiment.experiment_id],
+    } in source["informational_gaps"]
+    assert result["summary"]["bench_identity_verdicts"]["reference_not_yet_resolved"] == {
+        "source_count": 1,
+        "experiment_count": 1,
+    }
+    assert result["summary"]["bench_identity_verdicts"][
+        "unattributable_by_construction"
+    ] == {"source_count": 0, "experiment_count": 0}
+
+
+def test_obtained_single_cited_apparatus_is_not_pending(tmp_path, monkeypatch) -> None:
+    work = _lead_corpus(
+        tmp_path,
+        [
+            {
+                "citing": "fixture-source",
+                "lead_as_given": "Smith (1980)",
+                "for_parameters": ["orifice diameter"],
+                "resolution": "obtained",
+                "obtained_path": "/corpus/raw/smith-1980/smith-1980.pdf",
+            }
+        ],
+    )
+    experiment = factories.kems_experiment(work_id=work.work_id)
+    result = _report_with_work(tmp_path, monkeypatch, work, experiment)
+    (source,) = result["sources"]
+    (row,) = source["experiments"]
+    assert row["bench_identity"]["basis"] == "cited_by_author"
+    assert all(
+        gap["reason"] != "reference_not_yet_resolved"
+        for gap in row["informational_gaps"] + source["informational_gaps"]
+    )
+    assert result["summary"]["bench_identity_verdicts"][
+        "reference_not_yet_resolved"
+    ] == {"source_count": 0, "experiment_count": 0}
+
+
+def test_multi_cited_source_counts_as_unattributable_not_pending(tmp_path, monkeypatch) -> None:
+    work = _lead_corpus(
+        tmp_path,
+        [
+            {
+                "citing": "fixture-source",
+                "lead_as_given": "Smith (1980)",
+                "for_parameters": ["detailed apparatus construction"],
+            },
+            {
+                "citing": "fixture-source",
+                "lead_as_given": "Jones (1981)",
+                "for_parameters": ["detailed apparatus construction"],
+            },
+        ],
+    )
+    experiment = factories.kems_experiment(work_id=work.work_id)
+    result = _report_with_work(tmp_path, monkeypatch, work, experiment)
+    (source,) = result["sources"]
+    (row,) = source["experiments"]
+    assert row["bench_identity"] is None
+    assert result["summary"]["bench_identity_verdicts"] == {
+        "unattributable_by_construction": {"source_count": 1, "experiment_count": 1},
+        "reference_not_yet_resolved": {"source_count": 0, "experiment_count": 0},
+    }

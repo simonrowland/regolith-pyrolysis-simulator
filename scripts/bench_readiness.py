@@ -48,8 +48,12 @@ from simulator.battery.waypoints import (  # noqa: E402
 
 
 def _missing_bench_readiness(*, implicit=False) -> tuple[ConsumerReadiness, ...]:
+    # Multiple cited apparatuses is a permanent typed absence: the no-select
+    # ruling forbids choosing one, so no acquisition can ever close it. It is
+    # not a fetch work item (that class is reference_not_yet_resolved below).
+    reason = GapReason.UNATTRIBUTABLE_BY_CONSTRUCTION if implicit else GapReason.MISSING_EVIDENCE
     gap = ReadinessGap(
-        "bench_identity" if implicit else "bench", GapReason.MISSING_EVIDENCE,
+        "bench_identity" if implicit else "bench", reason,
         ("bench.identity.ref: multiple cited apparatuses",) if implicit else ("experiment.bench_id",),
     )
     return (
@@ -75,6 +79,28 @@ def _located_evidence(value):
             yield from _located_evidence(item)
 
 
+def _corpus_apparatus_leads(works) -> dict[str, list[tuple[Mapping, str]]]:
+    leads: dict[str, list[tuple[Mapping, str]]] = {}
+    for corpus in {work.source_files.corpus_repo for work in works.values()}:
+        corpus_path = Path(corpus).expanduser()
+        if not corpus_path.is_absolute():
+            corpus_path = Path.home() / "Repos" / corpus_path
+        ledger = corpus_path / "ledger/apparatus-reference-leads.yaml"
+        if not ledger.exists():
+            continue
+        for lead in (load_yaml(ledger).get("leads") or ()):
+            leads.setdefault(str(lead.get("citing")), []).append((lead, str(ledger)))
+    return leads
+
+
+def _lead_reference_obtained(lead: Mapping) -> bool:
+    return bool(
+        lead.get("resolution") == "obtained"
+        or lead.get("obtained_path")
+        or lead.get("already_held")
+    )
+
+
 def _apparatus_references(root, works):
     references = {}
     for path in discover_extracts(root / "data/literature/extracts"):
@@ -97,20 +123,18 @@ def _apparatus_references(root, works):
                         pending.append(item)
             elif isinstance(value, (list, tuple)):
                 pending.extend(value)
-    for corpus in {work.source_files.corpus_repo for work in works.values()}:
-        corpus_path = Path(corpus).expanduser()
-        if not corpus_path.is_absolute():
-            corpus_path = Path.home() / "Repos" / corpus_path
-        ledger = corpus_path / "ledger/apparatus-reference-leads.yaml"
-        if not ledger.exists():
-            continue
-        for lead in (load_yaml(ledger).get("leads") or ()):
+    for source, leads in _corpus_apparatus_leads(works).items():
+        for lead, ledger in leads:
+            if str(lead.get("identity_verdict") or "").strip().lower() == "no":
+                # Acquisition-verified non-apparatus citation (e.g. sample
+                # provenance); it must not occupy an apparatus-reference slot.
+                continue
             cited = lead.get("lead_as_given")
             if cited:
                 ref = BenchReference(None, str(cited), tuple(lead.get("for_parameters") or ()),
                     Locator(source_path=str(ledger), record=str(lead.get("citing")),
                             note=str(lead.get("reference_list_locator") or "apparatus reference lead")))
-                references.setdefault(str(lead.get("citing")), []).append(ref)
+                references.setdefault(source, []).append(ref)
     return references
 
 
@@ -258,11 +282,18 @@ def report(root: Path) -> dict[str, object]:
             by_experiment[observation.experiment_id].append(observation)
     benches = load_migrated_benches(root)
     references = _apparatus_references(root, works)
+    lead_obtained = {
+        (source, str(lead.get("lead_as_given"))): _lead_reference_obtained(lead)
+        for source, leads in _corpus_apparatus_leads(works).items()
+        for lead, _ in leads
+    }
     by_source: dict[str, list[dict[str, object]]] = {}
     source_readiness: dict[
         str, list[tuple[str, tuple[ConsumerReadiness, ...]]]
     ] = {}
     source_information: dict[str, set[str]] = {}
+    source_pending: dict[str, dict[str, set[str]]] = {}
+    experiment_pending: dict[str, str] = {}
     for experiment in sorted(experiments.values(), key=lambda item: item.experiment_id):
         work = works.get(experiment.work_id or "")
         source_ids = work.source_ids if work is not None else (experiment.work_id or "unknown",)
@@ -271,6 +302,24 @@ def report(root: Path) -> dict[str, object]:
         if implicit:
             refs = [ref for source_id in source_ids for ref in references.get(source_id, ())]
             bench = _implicit_bench(experiment, work, refs)
+        identity = bench.identity if bench is not None else None
+        if identity is not None and identity.basis is BenchIdentityBasis.CITED_BY_AUTHOR:
+            ref = identity.ref
+            ledger_backed = ref.locator is not None and str(
+                ref.locator.source_path or ""
+            ).endswith("apparatus-reference-leads.yaml")
+            obtained = any(
+                lead_obtained.get((source_id, ref.cited_as), False)
+                for source_id in source_ids
+            )
+            if ledger_backed and not obtained:
+                # Single cited apparatus whose reference the corpus acquisition
+                # ledger has not obtained: actionable, an acquisition work item.
+                experiment_pending[experiment.experiment_id] = ref.cited_as
+                for source_id in source_ids:
+                    source_pending.setdefault(source_id, {}).setdefault(
+                        ref.cited_as, set()
+                    ).add(experiment.experiment_id)
         readiness = (
             _missing_bench_readiness(implicit=implicit)
             if bench is None
@@ -315,6 +364,19 @@ def report(root: Path) -> dict[str, object]:
                         ]
                         if implicit
                         else []
+                    )
+                    + (
+                        [
+                            {
+                                "waypoint": "bench_identity",
+                                "reason": "reference_not_yet_resolved",
+                                "missing": [
+                                    f"bench.identity.ref: {experiment_pending[experiment.experiment_id]}"
+                                ],
+                            }
+                        ]
+                        if experiment.experiment_id in experiment_pending
+                        else []
                     ),
                 }
             )
@@ -353,24 +415,34 @@ def report(root: Path) -> dict[str, object]:
             for engine in ENGINE_POINT_CONSUMERS
         ]
         info_ids = sorted(source_information.get(source_id, set()))
+        informational_gaps: list[dict[str, object]] = []
+        if info_ids:
+            informational_gaps.append(
+                {
+                    "waypoint": "bench_link",
+                    "reason": "implicit_legacy_bench",
+                    "missing": ["experiment.bench_id"],
+                    "count": len(info_ids),
+                    "experiment_ids": info_ids,
+                }
+            )
+        for cited_as in sorted(source_pending.get(source_id, {})):
+            pending_ids = sorted(source_pending[source_id][cited_as])
+            informational_gaps.append(
+                {
+                    "waypoint": "bench_identity",
+                    "reason": "reference_not_yet_resolved",
+                    "missing": [f"bench.identity.ref: {cited_as}"],
+                    "count": len(pending_ids),
+                    "experiment_ids": pending_ids,
+                }
+            )
         rows.append(
             {
                 "source_id": source_id,
                 "consumers": consumer_rows,
                 "engines": engine_rows,
-                "informational_gaps": (
-                    [
-                        {
-                            "waypoint": "bench_link",
-                            "reason": "implicit_legacy_bench",
-                            "missing": ["experiment.bench_id"],
-                            "count": len(info_ids),
-                            "experiment_ids": info_ids,
-                        }
-                    ]
-                    if info_ids
-                    else []
-                ),
+                "informational_gaps": informational_gaps,
                 "experiments": by_source[source_id],
             }
         )
@@ -413,6 +485,15 @@ def report(root: Path) -> dict[str, object]:
             ),
         )[:10]
     ]
+    def _blocker_counts(key: tuple[str, str]) -> dict[str, int]:
+        entry = blockers.get(key)
+        if entry is None:
+            return {"source_count": 0, "experiment_count": 0}
+        return {
+            "source_count": len(entry["sources"]),
+            "experiment_count": len(entry["experiments"]),
+        }
+
     return {
         "schema_version": "bench_readiness.v2",
         "sources": rows,
@@ -420,6 +501,25 @@ def report(root: Path) -> dict[str, object]:
             "by_consumer": by_consumer,
             "by_engine": by_engine,
             "top_blocking_waypoints": top_blockers,
+            # The two bench_identity verdicts, counted separately so a caller can
+            # tell how much of the gap acquisition could ever close: permanent
+            # multi-apparatus absences vs single cited references not yet fetched.
+            "bench_identity_verdicts": {
+                "unattributable_by_construction": _blocker_counts(
+                    ("bench_identity", GapReason.UNATTRIBUTABLE_BY_CONSTRUCTION.value)
+                ),
+                "reference_not_yet_resolved": {
+                    "source_count": len(source_pending),
+                    "experiment_count": len(
+                        {
+                            experiment_id
+                            for per_source in source_pending.values()
+                            for experiment_ids in per_source.values()
+                            for experiment_id in experiment_ids
+                        }
+                    ),
+                },
+            },
         },
         "source_count": len(rows),
     }

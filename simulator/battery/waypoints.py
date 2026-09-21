@@ -42,6 +42,9 @@ class GapReason(StrEnum):
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
+    # Permanent typed absence: several apparatuses are cited and the no-select
+    # ruling forbids picking one, so no acquisition can ever close this gap.
+    UNATTRIBUTABLE_BY_CONSTRUCTION = "unattributable_by_construction"
 
 
 class ReadinessStatus(StrEnum):
