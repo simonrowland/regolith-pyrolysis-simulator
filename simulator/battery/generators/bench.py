@@ -43,11 +43,13 @@ def _requirements(inputs, consumer, engine=None):
             waypoint = inputs.waypoints[name]
             absent = waypoint.selected is None
             missing = waypoint.absence.missing if waypoint.absence else ()
-            if not absent and consumer == "engine_point":
+            if not absent and consumer == "engine_point" and name != "normalized_composition":
                 if not isinstance(waypoint.selected.value, Value) or waypoint.selected.value.kind is not ValueKind.POINT:
                     gaps.append(ReadinessGap(name, GapReason.UNSUPPORTED_PRINT_FORM, (name,)))
         if absent:
-            gaps.append(ReadinessGap(name, GapReason.MISSING_EVIDENCE, missing))
+            reason = (waypoint.absence.reason if name == "normalized_composition" and waypoint.absence
+                      else GapReason.MISSING_EVIDENCE)
+            gaps.append(ReadinessGap(name, reason, missing))
     return replace(constraints, status=ReadinessStatus.GAP if gaps else ReadinessStatus.READY,
                    gaps=tuple(dict.fromkeys(gaps)))
 
@@ -85,11 +87,10 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
             continue
         try:
             composition = {}
-            for species, waypoint in inputs.charges.items():
-                value = waypoint.selected.value
-                if value.kind is not ValueKind.POINT or value.point < 0:
-                    raise UnsupportedValue("charge_moles_by_species." + species)
-                composition[species] = float(value.point)
+            for species, value in inputs.waypoints["normalized_composition"].selected.value.items():
+                if not value.is_finite() or value < 0:
+                    raise UnsupportedValue("normalized_composition." + species)
+                composition[species] = float(value)
             temperature = _point(inputs, "temperature_K")
             pressure = _point(inputs, "pressure_boundary")
             oxygen = _point(inputs, "oxygen_condition")
@@ -105,7 +106,8 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
                 "pressure_bar": {"authority": "derived", "waypoint": "pressure_boundary", "formula": "Pa / 100000"},
                 "fO2_log": {"waypoint": "oxygen_condition"},
-                "composition_mol": {"waypoint": "charge_moles_by_species"},
+                "composition_mol": {"waypoint": "normalized_composition", "authority": "derived",
+                                    "formula": "x_i * 1 mol reference charge"},
             }}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))

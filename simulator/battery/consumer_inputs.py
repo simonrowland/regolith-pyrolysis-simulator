@@ -9,12 +9,12 @@ from simulator.battery.enums import ValueKind
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
     ConsumerReadiness, _result, charge_moles_by_species, thermal_path,
-    pressure_boundary, oxygen_condition, effective_escape_area,
+    pressure_boundary, oxygen_condition, effective_escape_area, normalized_composition,
 )
 
 
 REQUIREMENTS = {
-    "engine_point": ("charge_moles_by_species", "temperature_K", "pressure_boundary", "oxygen_condition"),
+    "engine_point": ("normalized_composition", "temperature_K", "pressure_boundary", "oxygen_condition"),
     "kems": ("charge_moles_by_species", "mass_kg", "post_mass_kg", "purity_fraction",
              "orifice_diameter_m", "orifice_area_m2", "clausing_factor", "effective_escape_area",
              "cell_material", "temperature_program", "temperature_uncertainty_K", "repeat_count",
@@ -90,6 +90,7 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
         else:
             temperature = _result("temperature_K", [], ("observation.point_conditions.temperature_K",))
     waypoints = {
+        "normalized_composition": normalized_composition(experiment, bench, observation),
         "thermal_path": thermal_path(experiment, bench),
         "temperature_K": temperature,
         "pressure_boundary": pressure_boundary(experiment, bench, observation),

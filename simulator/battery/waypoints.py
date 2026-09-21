@@ -369,6 +369,73 @@ def charge_moles_by_species(
     return SpeciesWaypoints(results, absence)
 
 
+def normalized_composition(
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
+) -> WaypointResult:
+    """Intensive composition for fixed-T/P/fO2 points; never an absolute charge."""
+    del bench
+    if observation is not None and observation.experiment_id != experiment.experiment_id:
+        raise ValueError("Observation belongs to a different experiment")
+    point = (observation.point_conditions or {}) if observation else {}
+    routes = []
+    evidence_ranks = []
+    missing = []
+    unsupported = False
+    for field, key in (("printed_composition", "printed_composition"),
+                       ("initial_composition", "composition")):
+        located = point.get(key) if key in point else getattr(experiment.sample, field)
+        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
+                if key in point else f"experiment.sample.{field}")
+        missing.append(path)
+        if located is None or not located.state.is_value:
+            continue
+        raw = located.state.value
+        try:
+            if field == "printed_composition":
+                if not isinstance(raw, Mapping):
+                    raise ValueError("unsupported composition")
+                amounts = {}
+                for species, weight in raw.items():
+                    molar_mass = _molar_mass_kg_mol(species)
+                    if molar_mass is None:
+                        raise ValueError("unknown molar mass")
+                    amounts[species] = as_decimal(weight) / molar_mass
+                # Premise: printed w_i are wt%, M_i are species molar masses.
+                # Algebra: n_i=m*w_i/(100*M_i); x_i=(w_i/M_i)/sum_j(w_j/M_j).
+                # Units: w_i dimensionless, M_i kg/mol; (mol/kg)/(mol/kg)=1.
+                # Unknown common mass m cancels; no run mass is inferred.
+                # Sanity: pure Mg2SiO4 (M=0.140693 kg/mol) gives x=1;
+                # weights proportional to molar masses give equal mole fractions.
+            elif raw.amount_basis in (AmountBasis.MOL_INVENTORY, AmountBasis.MOLE_FRACTION):
+                amounts = raw.as_map()
+            else:
+                raise ValueError("unsupported composition basis")
+            if not amounts or any(not n.is_finite() or n < 0 for n in amounts.values()):
+                raise ValueError("invalid composition")
+            total = sum(amounts.values())
+            if total <= 0:
+                raise ValueError("empty charge")
+            # n_i/sum(n_j) is dimensionless and invariant under n -> k*n, k>0.
+            # A one-mole reference charge preserves ratios at specified T/P/fO2.
+            routes.append(Waypoint("normalized_composition",
+                {species: n / total for species, n in amounts.items()},
+                ("observation_" if key in point else "") + "normalized_" + field,
+                WaypointAuthority.DERIVED, (path,)))
+            # Rank source evidence before normalization makes every output DERIVED.
+            # A printed molar inventory outranks a wt%-to-moles derivation.
+            evidence_ranks.append((not bool(located.inference),
+                field == "initial_composition" and raw.amount_basis is AmountBasis.MOL_INVENTORY))
+        except (ValueError, TypeError, ArithmeticError):
+            unsupported = True
+    routes = [route for _, route in sorted(zip(evidence_ranks, routes),
+                                          key=lambda pair: pair[0], reverse=True)]
+    result = _result("normalized_composition", routes, tuple(missing))
+    if not routes and unsupported:
+        return replace(result, absence=WaypointAbsence(
+            result.name, GapReason.UNSUPPORTED_PRINT_FORM, tuple(missing)))
+    return result
+
+
 def _rectangular_volume(dimensions: Mapping[str, Located[Value]] | None) -> Value | None:
     if not dimensions:
         return None
@@ -1071,7 +1138,8 @@ def _consumer_constraints(
             rps_gaps.append(gap)
     engine_gaps = []
     engine_status = None
-    if len(charges) == 1:
+    intensive = normalized_composition(experiment, bench, observation)
+    if len(charges) == 1 or (intensive.selected is not None and len(intensive.selected.value) == 1):
         engine_gaps = [ReadinessGap("charge_moles_by_species", GapReason.SINGLE_SPECIES_CHARGE)]
         engine_status = ReadinessStatus.NOT_APPLICABLE
     engine_results = tuple(
