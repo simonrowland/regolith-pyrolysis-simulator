@@ -64,6 +64,7 @@ from simulator.battery.enums import (
     Quantity,
     Rail,
     ReferenceStateConvention,
+    RefusalReason,
     RegimeClass,
     StateTag,
     UncertaintyKind,
@@ -86,6 +87,10 @@ from simulator.battery.records import (
     Annotations,
     Apparatus,
     ApparatusGeometry,
+    Bench,
+    BenchFact,
+    BenchIdentity,
+    BenchReference,
     Composition,
     Derivation,
     Evidence,
@@ -114,7 +119,12 @@ from simulator.battery.records import (
     Work,
     as_decimal,
 )
-from simulator.battery.validate import ValidationReport, validate_corpus
+from simulator.battery.enums import BenchIdentityBasis
+from simulator.battery.validate import (
+    ValidationIssue,
+    ValidationReport,
+    validate_corpus,
+)
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 
 # ---------------------------------------------------------------------------
@@ -1088,6 +1098,85 @@ def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
     return ApparatusGeometry(**kwargs) if kwargs else None
 
 
+def bench_from_plain(payload: object) -> Bench:
+    """Load a Bench from the same deterministic plain form emitted by ``to_plain``."""
+
+    if not isinstance(payload, Mapping):
+        raise TypeError("bench must be a mapping")
+    raw_identity = payload.get("identity")
+    if not isinstance(raw_identity, Mapping):
+        raise TypeError("bench identity must be a mapping")
+    if raw_identity.get("basis") is None:
+        raise ValueError("bench identity requires basis")
+    basis = BenchIdentityBasis(str(raw_identity["basis"]))
+    raw_ref = raw_identity.get("ref")
+    ref = None
+    if raw_ref is not None:
+        if not isinstance(raw_ref, Mapping):
+            raise TypeError("bench identity ref must be a mapping")
+        ref_locator = _locator_from_plain(raw_ref.get("locator"))
+        if ref_locator is None:
+            raise ValueError("bench identity ref requires locator")
+        ref = BenchReference(
+            work_id=None
+            if raw_ref.get("work_id") is None
+            else str(raw_ref["work_id"]),
+            cited_as=str(raw_ref.get("cited_as") or ""),
+            for_parameters=tuple(
+                str(item) for item in (raw_ref.get("for_parameters") or ())
+            ),
+            locator=ref_locator,
+        )
+
+    def located_text(name: str) -> Located[str] | None:
+        raw = payload.get(name)
+        return None if raw is None else _located_from_plain(raw, str)
+
+    def value_or_text(raw: object) -> object:
+        if isinstance(raw, Mapping) and raw.get("kind") is not None:
+            return _value_or_point_from_plain(raw)
+        return _any_from_plain(raw)
+
+    other_facts = []
+    for raw in payload.get("other_facts") or ():
+        if not isinstance(raw, Mapping):
+            raise TypeError("bench other_facts entries must be mappings")
+        other_facts.append(
+            BenchFact(
+                name=str(raw.get("name") or ""),
+                value=_located_from_plain(
+                    raw.get("value"), _value_or_point_from_plain
+                ),
+                unit=None if raw.get("unit") is None else str(raw["unit"]),
+            )
+        )
+    pumping_speed = payload.get("pumping_speed_m3_s")
+    return Bench(
+        id=str(payload.get("id") or ""),
+        work_id=str(payload.get("work_id") or ""),
+        identity=BenchIdentity(basis=basis, ref=ref),
+        apparatus_family=located_text("apparatus_family"),
+        method=located_text("method"),
+        cell_material_and_liner=located_text("cell_material_and_liner"),
+        geometry=_geometry_from_plain(payload.get("geometry")),
+        pumping_type=located_text("pumping_type"),
+        pumping_speed_m3_s=None
+        if pumping_speed is None
+        else _located_from_plain(pumping_speed, _value_or_point_from_plain),
+        gauges=_located_mapping_from_plain(payload.get("gauges"), str),
+        detector=located_text("detector"),
+        ionization=_located_mapping_from_plain(payload.get("ionization"), value_or_text),
+        temperature_measurement=_located_mapping_from_plain(
+            payload.get("temperature_measurement"), str
+        ),
+        temperature_calibration=_located_mapping_from_plain(
+            payload.get("temperature_calibration"), str
+        ),
+        heating_method=located_text("heating_method"),
+        other_facts=tuple(other_facts),
+    )
+
+
 def _any_from_plain(value: object) -> object:
     if isinstance(value, Mapping):
         return dict(value)
@@ -1367,6 +1456,23 @@ def load_migrated_store(
     return works, experiments, observations
 
 
+def load_migrated_benches(root: Path | None = None) -> dict[str, Bench]:
+    """Deserialize Bench records without changing ``load_migrated_store``'s API."""
+
+    root = root or REPO_ROOT
+    benches: dict[str, Bench] = {}
+    for path in sorted((root / "data" / "literature" / "works").glob("*.yaml")):
+        if path.name == "ALIASES.yaml":
+            continue
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping):
+            continue
+        for raw_bench in doc.get("benches") or ():
+            bench = bench_from_plain(raw_bench)
+            benches[bench.id] = bench
+    return benches
+
+
 _YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
@@ -1436,9 +1542,13 @@ class MeasuredCounts:
 @dataclass
 class MigrationResult:
     works: dict[str, Work] = field(default_factory=dict)
+    benches: dict[str, Bench] = field(default_factory=dict)
     experiments: dict[str, Experiment] = field(default_factory=dict)
     observations: dict[str, Observation] = field(default_factory=dict)
     experiments_by_work: dict[str, list[str]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
+    benches_by_work: dict[str, list[str]] = field(
         default_factory=lambda: defaultdict(list)
     )
     observations_by_source: dict[str, list[str]] = field(
@@ -1452,6 +1562,7 @@ class MigrationResult:
     evidence_fallthrough: dict[str, int] = field(default_factory=dict)
     unrecognised_polymorphs: dict[str, int] = field(default_factory=dict)
     validation: ValidationReport | None = None
+    registry_issues: list[ValidationIssue] = field(default_factory=list)
 
     def add_queue(
         self,
@@ -4780,8 +4891,18 @@ def _merge_geometry(
             "orifice_to_sample_area_ratio",
             "exposed_area_m2",
             "chamber_length_m",
+            "chamber_volume_m3",
+            "orifice_channel_length_m",
+            "orifice_count",
+            "orifice_shape",
         )
     }
+    kwargs["cell_internal_dimensions"] = _merge_located_mapping(
+        old.cell_internal_dimensions, new.cell_internal_dimensions
+    )
+    kwargs["chamber_dimensions"] = _merge_located_mapping(
+        old.chamber_dimensions, new.chamber_dimensions
+    )
     if not any(v is not None for v in kwargs.values()):
         return None
     return ApparatusGeometry(**kwargs)
@@ -4875,6 +4996,18 @@ def _merge_experiment_lab_params(
         ),
         form=_prefer_located(existing.sample.form, sample.form),
         container=_prefer_located(existing.sample.container, sample.container),
+        composition_class=_prefer_located(
+            existing.sample.composition_class, sample.composition_class
+        ),
+        characterization=_prefer_located(
+            existing.sample.characterization, sample.characterization
+        ),
+        surface_area_m2=_prefer_located(
+            existing.sample.surface_area_m2, sample.surface_area_m2
+        ),
+        pretreatment=_prefer_located(
+            existing.sample.pretreatment, sample.pretreatment
+        ),
     )
     return replace(
         existing,
@@ -5683,6 +5816,141 @@ class Migrator:
         for path in discover_extracts(directory or self.extracts_dir):
             self._migrate_extract(path)
 
+    @staticmethod
+    def _registry_id(work_id: str, kind: str, raw: object) -> str:
+        token = str(raw or "").strip()
+        if not token:
+            raise ValueError(f"{kind} registry entry requires an id")
+        if "::" in token:
+            return token
+        return f"{work_id}::{kind}::{token}"
+
+    def _lift_extract_registries(
+        self,
+        doc: Mapping[str, Any],
+        *,
+        work: Work,
+        source_key: str,
+    ) -> dict[str, str]:
+        bench_refs: dict[str, str] = {}
+        raw_benches = doc.get("benches") or ()
+        if isinstance(raw_benches, Mapping):
+            raw_benches = [dict(value, id=key) for key, value in raw_benches.items()]
+        if not isinstance(raw_benches, (list, tuple)):
+            raise TypeError("extract benches registry must be a list or mapping")
+        for raw in raw_benches:
+            if not isinstance(raw, Mapping):
+                raise TypeError("extract benches entries must be mappings")
+            local_id = raw.get("id") or raw.get("bench_id")
+            bench_id = self._registry_id(work.work_id, "bench", local_id)
+            payload = dict(raw)
+            payload["id"] = bench_id
+            payload["work_id"] = work.work_id
+            bench = bench_from_plain(payload)
+            existing_bench = self.result.benches.get(bench.id)
+            if existing_bench is not None:
+                if existing_bench != bench:
+                    self.result.registry_issues.append(
+                        ValidationIssue(
+                            path=f"bench[{bench.id}]",
+                            reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                            detail=f"duplicate bench id {bench.id!r} has conflicting payloads",
+                        )
+                    )
+                continue
+            self.result.benches[bench.id] = bench
+            if bench.id not in self.result.benches_by_work[work.work_id]:
+                self.result.benches_by_work[work.work_id].append(bench.id)
+            bench_refs[str(local_id)] = bench.id
+            bench_refs[bench.id] = bench.id
+
+        experiment_refs: dict[str, str] = {}
+        raw_experiments = doc.get("experiments") or ()
+        if isinstance(raw_experiments, Mapping):
+            raw_experiments = [
+                dict(value, experiment_id=key)
+                for key, value in raw_experiments.items()
+            ]
+        if not isinstance(raw_experiments, (list, tuple)):
+            raise TypeError("extract experiments registry must be a list or mapping")
+        for raw in raw_experiments:
+            if not isinstance(raw, Mapping):
+                raise TypeError("extract experiments entries must be mappings")
+            local_id = raw.get("experiment_id") or raw.get("id")
+            experiment_id = self._registry_id(
+                work.work_id, "experiment", local_id
+            )
+            raw_bench_id = raw.get("bench_id") or raw.get("bench")
+            bench_id = None
+            if raw_bench_id is not None:
+                bench_id = bench_refs.get(
+                    str(raw_bench_id),
+                    self._registry_id(work.work_id, "bench", raw_bench_id),
+                )
+            locator = locator_from_mapping(
+                raw.get("locator"), fallback=f"{source_key}:experiments:{local_id}"
+            )
+            method_raw = raw.get("method")
+            if isinstance(method_raw, Mapping) and "tag" in method_raw:
+                method = method_raw
+            elif method_raw is None:
+                method = to_plain(State.unknown("experiment method not published"))
+            else:
+                method = to_plain(map_method(method_raw))
+            pressure = raw.get("pressure_environment")
+            if pressure is None:
+                pressure = to_plain(
+                    pressure_from_equipment(
+                        None, vocabulary=self._vocab, locator=locator
+                    )
+                )
+            conditions = raw.get("conditions")
+            if not conditions:
+                conditions = {
+                    "temperature_K": to_plain(
+                        Located(State.unknown("experiment temperature not published"))
+                    )
+                }
+            payload = dict(raw)
+            payload.update(
+                {
+                    "experiment_id": experiment_id,
+                    "kind": ExperimentKind.LITERATURE.value,
+                    "method": method,
+                    "sample": raw.get("sample") or raw.get("charge") or {},
+                    "conditions": conditions,
+                    "pressure_environment": pressure,
+                    "work_id": work.work_id,
+                    "bench_id": bench_id,
+                    "locator": to_plain(locator),
+                }
+            )
+            experiment = experiment_from_plain(payload)
+            existing_experiment = self.result.experiments.get(
+                experiment.experiment_id
+            )
+            if existing_experiment is not None:
+                if existing_experiment != experiment:
+                    self.result.registry_issues.append(
+                        ValidationIssue(
+                            path=f"experiment[{experiment.experiment_id}]",
+                            reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                            detail=(
+                                f"duplicate experiment id {experiment.experiment_id!r} "
+                                "has conflicting payloads"
+                            ),
+                        )
+                    )
+                continue
+            self.result.experiments[experiment.experiment_id] = experiment
+            if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
+                self.result.experiments_by_work[work.work_id].append(
+                    experiment.experiment_id
+                )
+            experiment_refs[str(local_id)] = experiment.experiment_id
+            experiment_refs[experiment.experiment_id] = experiment.experiment_id
+        return experiment_refs
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -5714,12 +5982,24 @@ class Migrator:
             source_id=source_id,
             index_row=index_row,
         )
+        experiment_refs = self._lift_extract_registries(
+            doc, work=work, source_key=rel
+        )
         extraction = doc.get("extraction") if isinstance(doc.get("extraction"), Mapping) else {}
         rows = list(iter_extract_observations(doc))
         count.rows_in += len(rows)
         self.result.measured.citations += 1
         local_ids = {str(obs.get("observation_id")) for _, obs in rows if obs.get("observation_id")}
         for formula, obs in rows:
+            raw_experiment = obs.get("experiment")
+            declared_experiment_id = None
+            if raw_experiment is not None:
+                declared_experiment_id = experiment_refs.get(
+                    str(raw_experiment),
+                    self._registry_id(
+                        work.work_id, "experiment", raw_experiment
+                    ),
+                )
             self._migrate_extract_observation(
                 formula=formula,
                 obs=obs,
@@ -5728,6 +6008,7 @@ class Migrator:
                 source_key=rel,
                 extraction=extraction or {},
                 local_ids=local_ids,
+                declared_experiment_id=declared_experiment_id,
             )
 
     def _migrate_extract_observation(
@@ -5740,6 +6021,7 @@ class Migrator:
         source_key: str,
         extraction: Mapping[str, Any],
         local_ids: set[str],
+        declared_experiment_id: str | None = None,
     ) -> None:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or f"{source_id}:missing")
@@ -5780,6 +6062,7 @@ class Migrator:
                     source_key=source_key,
                     extraction=extraction,
                     local_ids=local_ids,
+                    declared_experiment_id=declared_experiment_id,
                 )
             return
         locator = locator_from_mapping(
@@ -6053,7 +6336,7 @@ class Migrator:
             cid = values.get("composition_id") or values.get("composition_name")
             if cid not in (None, ""):
                 distinguisher = str(cid)
-        experiment_id = self._experiment_id(
+        experiment_id = declared_experiment_id or self._experiment_id(
             work.work_id, locator, source_id, distinguisher=distinguisher
         )
         rail_raw = obs.get("rail") or values.get("rail")
@@ -6072,16 +6355,20 @@ class Migrator:
         point_conditions = None
         if t_known is not None:
             point_conditions = {"temperature_K": located_value(t_known, locator)}
-        self._ensure_experiment(
-            work_id=work.work_id,
-            experiment_id=experiment_id,
-            locator=locator,
-            method=method,
-            equipment=obs.get("equipment"),
-            values=values if isinstance(values, Mapping) else None,
-            observation_id=obs_id,
-            source=source_key,
-        )
+        if declared_experiment_id is None or (
+            declared_experiment_id in self.result.experiments
+            and bool(obs.get("equipment"))
+        ):
+            self._ensure_experiment(
+                work_id=work.work_id,
+                experiment_id=experiment_id,
+                locator=locator,
+                method=method,
+                equipment=obs.get("equipment"),
+                values=values if isinstance(values, Mapping) else None,
+                observation_id=obs_id,
+                source=source_key,
+            )
         read_from = choose_read_from(work, locator)
         unmatched = unmatched_read_from_reason(locator, read_from)
         if unmatched:
@@ -7875,11 +8162,15 @@ class Migrator:
                 self.result.measured.doi_works += 1
             else:
                 self.result.measured.no_doi_works += 1
-        self.result.validation = validate_corpus(
+        validation = validate_corpus(
             self.result.works,
             self.result.experiments,
             self.result.observations,
             residuals=None,
+            benches=self.result.benches,
+        )
+        self.result.validation = ValidationReport(
+            validation.issues + tuple(self.result.registry_issues)
         )
 
     def run(self) -> MigrationResult:
@@ -7924,6 +8215,13 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
                 if eid in experiments_by_id
             ],
         }
+        bench_ids = result.benches_by_work.get(work_id, [])
+        if bench_ids:
+            payload["benches"] = [
+                to_plain(result.benches[bench_id])
+                for bench_id in sorted(set(bench_ids))
+                if bench_id in result.benches
+            ]
         dump_yaml(payload, works_dir / work_filename(work_id))
 
     live_work_files = {work_filename(wid) for wid in live_work_ids}

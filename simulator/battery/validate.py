@@ -68,6 +68,7 @@ from simulator.battery.identity import (
     validate_quantity_profile,
 )
 from simulator.battery.records import (
+    Bench,
     Experiment,
     Located,
     Notice,
@@ -613,6 +614,7 @@ def validate_experiment(
     works: Mapping[str, Work],
     experiments: Mapping[str, Experiment],
     path: str = "experiment",
+    benches: Mapping[str, Bench] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     if experiment.kind is ExperimentKind.LITERATURE:
@@ -649,6 +651,18 @@ def validate_experiment(
                     f"simulated_experiment_id {experiment.simulated_experiment_id!r} does not resolve",
                 )
             )
+    if (
+        benches is not None
+        and experiment.bench_id is not None
+        and experiment.bench_id not in benches
+    ):
+        issues.append(
+            _issue(
+                f"{path}.bench_id",
+                RefusalReason.REFERENTIAL_INTEGRITY,
+                f"bench_id {experiment.bench_id!r} does not resolve",
+            )
+        )
     sweep = experiment.pressure_environment.sweep_gas.state
     if sweep.is_value and sweep.value is not None and sweep.value.species == "none":
         if sweep.value.flow_sccm.is_value or sweep.value.partial_pressure_Pa.is_value:
@@ -1369,11 +1383,13 @@ def validate_corpus(
     experiments: Sequence[Experiment] | Mapping[str, Experiment],
     observations: Sequence[Observation] | Mapping[str, Observation],
     residuals: Sequence[Residual] | Mapping[str, Residual] | None = None,
+    benches: Sequence[Bench] | Mapping[str, Bench] | None = None,
 ) -> ValidationReport:
     issues: list[ValidationIssue] = []
     work_map = _index_unique(works, "work_id", "work", issues)
     exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
     obs_map = _index_unique(observations, "observation_id", "observation", issues)
+    bench_map = None if benches is None else _index_unique(benches, "id", "bench", issues)
     res_items: Iterable[Residual]
     if residuals is None:
         res_items = ()
@@ -1395,9 +1411,26 @@ def validate_corpus(
 
     for work in work_map.values():
         issues.extend(validate_work(work, f"work[{work.work_id}]"))
+    if bench_map is not None:
+        for bench in bench_map.values():
+            if bench.work_id not in work_map:
+                issues.append(
+                    _issue(
+                        f"bench[{bench.id}].work_id",
+                        RefusalReason.REFERENTIAL_INTEGRITY,
+                        f"work_id {bench.work_id!r} does not resolve",
+                    )
+                )
+            _walk_located(bench, f"bench[{bench.id}]", issues, empirical=True)
     for experiment in exp_map.values():
         issues.extend(
-            validate_experiment(experiment, work_map, exp_map, f"experiment[{experiment.experiment_id}]")
+            validate_experiment(
+                experiment,
+                work_map,
+                exp_map,
+                f"experiment[{experiment.experiment_id}]",
+                bench_map,
+            )
         )
     for observation in obs_map.values():
         issues.extend(
