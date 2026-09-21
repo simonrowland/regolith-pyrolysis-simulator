@@ -650,6 +650,23 @@ def test_non_numeric_mass_does_not_fabricate_zero_charge(mass) -> None:
     assert not result
 
 
+def test_categorical_printed_composition_routes_no_wt_percent() -> None:
+    """A Value-payload-shaped printed_composition ({kind: categorical, ...}) is
+    not a wt% map: no leaf parses as Decimal, so no charge route and no crash.
+    """
+    sample = Sample(
+        mass_kg=factories.located(Value.point_of("0.001")),
+        printed_composition=factories.located(
+            {"kind": "categorical", "categorical": "Fe-Mn, Fe-C-Mn, Fe-Cu, or Fe-Sn master alloy"}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert result.absence is not None
+    assert not result
+
+
 def test_geometric_only_escape_does_not_satisfy_kems_readiness() -> None:
     experiment = replace(
         factories.kems_experiment(total_P=Decimal("0.1")),

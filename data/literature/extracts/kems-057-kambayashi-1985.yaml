@@ -1225,6 +1225,8 @@ species:
         method_class: measured
         admission_status: figure_only
         semantics: bound_not_point_ordering
+        T_K: 1573.0
+        T_K_conversion: authors use T_C + 273
         T_C_as_printed: 1300
         dashed_curve: Gibbs-Duhem calculated values from I(PbO+)/I(Pd+)
         authors_text: PO+/Pd+ and PO2+/Pd+ points agree with the Gibbs-Duhem dashed curve from PbO+
@@ -1307,6 +1309,8 @@ species:
         quantity: ion_current_ratio
         method_class: measured
         gas_species: PbO(g)
+        T_K: 1573.0
+        T_K_conversion: authors use T_C + 273
         T_C_as_printed: 1300
         internal_standard: Pd+
         rows:
@@ -2118,6 +2122,8 @@ species:
         method_class: model_derived
         model_or_data_source: eq. (9') slope of Fig. 8; compared with JANAF 395 kJ
         delta_H_sub_kJ: 429
+        T_K: 1643.0
+        T_K_conversion: authors use T_C + 273
         T_C_as_printed: 1370
         janaf_comparison_kJ: 395
         authors_text: 429 kJ agrees with JANAF 395 kJ once long-run sensitivity drift is allowed for;

@@ -105,6 +105,8 @@ species:
       values:
         quantity: mercury_concentration_in_quenched_melt_vs_time
         method_class: measured_direct
+        T_K: 1573.15
+        T_K_conversion: 1300 C + 273.15 = 1573.15 K
         temperature_C: 1300
         initial_concentration_ppm: ~93
         after_5_min_ppm: ~2.3
@@ -130,6 +132,8 @@ species:
           relation: ideal_gas_law_equation_1
           inputs: [boulliung_2025_hg_retention_1300c, boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: Pa
+        T_K: 1573.15
+        T_K_conversion: 1300 C + 273.15 = 1573.15 K
         temperature_C: 1300
         melt_hg_concentration_ppm: ~0.1
         p_Hg_Pa: ~150
@@ -157,6 +161,8 @@ species:
           relation: ideal_gas_law_equation_1
           inputs: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
           output_unit: Pa
+        T_K: 1673.15
+        T_K_conversion: 1400 C + 273.15 = 1673.15 K
         temperature_C: 1400
         melt_hg_concentration_ppb: ~40
         p_Hg_Pa: about 150

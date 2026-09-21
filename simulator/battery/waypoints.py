@@ -321,7 +321,17 @@ def charge_moles_by_species(
     if mass is not None and printed is not None and printed.state.is_value:
         raw = printed.state.value
         if isinstance(raw, Mapping):
-            numeric = {str(k): as_decimal(v) for k, v in raw.items() if not isinstance(v, Mapping)}
+            numeric = {}
+            for key, item in raw.items():
+                if isinstance(item, Mapping):
+                    continue
+                try:
+                    numeric[str(key)] = as_decimal(item)
+                except (ValueError, TypeError, ArithmeticError):
+                    # A printed composition may be a categorical Value payload
+                    # (e.g. {kind: categorical, categorical: 'Fe-Mn or Fe-Sn'});
+                    # non-numeric leaves carry no wt% and route nothing.
+                    continue
             for species, wt_pct in numeric.items():
                 molar_mass = _molar_mass_kg_mol(species)
                 if molar_mass is None:
