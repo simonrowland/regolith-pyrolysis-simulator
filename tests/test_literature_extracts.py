@@ -113,6 +113,18 @@ def tmp_extracts(tmp_path: Path):
                     "activity_coefficient": ["fixture-source"],
                     "rate_series": ["fixture-source"],
                     "transition_point": ["fixture-source", "other-source"],
+                    # d-032 (2026-09-21): physics types admitted from the
+                    # invented-type cleanup; fixture tracks the closed set.
+                    "partial_pressure": ["fixture-source"],
+                    "mass_loss": ["fixture-source"],
+                    "heat_capacity_and_heat_content_series": ["fixture-source"],
+                    "interaction_parameter": ["fixture-source"],
+                    "concentration_series": ["fixture-source"],
+                    "volatility_series": ["fixture-source"],
+                    "phase_transition": ["fixture-source"],
+                    "gas_speciation": ["fixture-source"],
+                    "sulfur_solubility_and_sulfate_capacity_series": ["fixture-source"],
+                    "composition_series": ["fixture-source"],
                 },
             }
         ),
@@ -318,6 +330,88 @@ def test_refuses_missing_fidelity_samples():
     # pre_policy_ids=None → samples required (non-allowlisted fixture)
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
     assert any("fidelity_samples" in e for e in errs)
+
+
+# ---------------------------------------------------------------------------
+# d-032: context sibling container + admitted physics types (owner ruling)
+# ---------------------------------------------------------------------------
+
+
+def _context_row(**overrides):
+    row = {
+        "observation_id": "fe_bench_note",
+        "type": "apparatus",
+        "locator": {"page": 3, "section": "experimental"},
+        "units": "as printed",
+        "values": {"quantity": "apparatus_note", "method_class": "method_only", "furnace": "muffle"},
+    }
+    row.update(overrides)
+    return row
+
+
+def test_context_container_rows_validate():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["context"] = [_context_row()]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert errs == []
+
+
+def test_context_row_requires_locator_and_values():
+    doc = _minimal_extract()
+    bad = _context_row()
+    del bad["locator"]
+    doc["species"]["Fe"]["context"] = [bad]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("locator is required" in e for e in errs)
+
+
+def test_refuses_scored_type_parked_in_context():
+    """Null-hypothesis (d-032 boundary): context must not shadow the scored container."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["context"] = [_context_row(type="alpha")]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("must live under observations" in e for e in errs)
+
+
+def test_context_and_observations_share_id_namespace():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["context"] = [_context_row(observation_id="fe_alpha_1")]
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("duplicate observation_id" in e for e in errs)
+
+
+@pytest.mark.parametrize(
+    "new_type",
+    [
+        "partial_pressure",
+        "mass_loss",
+        "heat_capacity_and_heat_content_series",
+        "interaction_parameter",
+        "concentration_series",
+        "volatility_series",
+        "phase_transition",
+        "gas_speciation",
+        "sulfur_solubility_and_sulfate_capacity_series",
+        "composition_series",
+    ],
+)
+def test_d032_admitted_physics_types_accepted(new_type):
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["type"] = new_type
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert not any("type must be one of" in e for e in errs)
+
+
+@pytest.mark.parametrize(
+    "d_type", ["model_derived", "model_comparison", "quoted_comparator"]
+)
+def test_d032_boundary_class_types_still_refused(d_type):
+    """The engine-reference vs validation-evidence boundary is an OPEN owner
+    question: these stay refused until ruled."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["type"] = d_type
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("type must be one of" in e for e in errs)
 
 
 def test_pre_policy_allowlist_exempts_missing_samples():

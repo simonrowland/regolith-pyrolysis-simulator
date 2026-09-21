@@ -1590,6 +1590,11 @@ class MigrationResult:
     observations_by_source: dict[str, list[str]] = field(
         default_factory=lambda: defaultdict(list)
     )
+    # d-032: extract ``context`` rows carried verbatim per work. They are
+    # experiment context, never Observation records (that is the ruling).
+    context_by_work: dict[str, list[dict[str, Any]]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
     queue: list[QueueEntry] = field(default_factory=list)
     source_counts: dict[str, SourceCount] = field(default_factory=dict)
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
@@ -5989,6 +5994,39 @@ class Migrator:
             experiment_refs[experiment.experiment_id] = experiment.experiment_id
         return experiment_refs
 
+    def _lift_extract_context(
+        self,
+        doc: Mapping[str, Any],
+        *,
+        work: Work,
+        source_id: str,
+    ) -> None:
+        species = doc.get("species")
+        if not isinstance(species, Mapping):
+            return
+        for formula, body in species.items():
+            if not isinstance(body, Mapping):
+                continue
+            rows = body.get("context")
+            if rows is None:
+                continue
+            if not isinstance(rows, (list, tuple)):
+                raise TypeError("extract context container must be a list")
+            for row in rows:
+                if not isinstance(row, Mapping):
+                    raise TypeError("extract context entries must be mappings")
+                raw_id = str(row.get("observation_id") or "").strip()
+                if not raw_id:
+                    raise ValueError(
+                        "extract context entry requires an observation_id"
+                    )
+                record = dict(row)
+                record["context_id"] = f"{source_id}::context::{raw_id}"
+                record["work_id"] = work.work_id
+                record["source_id"] = source_id
+                record["species"] = str(formula)
+                self.result.context_by_work[work.work_id].append(record)
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -6023,6 +6061,7 @@ class Migrator:
         experiment_refs = self._lift_extract_registries(
             doc, work=work, source_key=rel
         )
+        self._lift_extract_context(doc, work=work, source_id=source_id)
         extraction = doc.get("extraction") if isinstance(doc.get("extraction"), Mapping) else {}
         rows = list(iter_extract_observations(doc))
         count.rows_in += len(rows)
@@ -8259,6 +8298,12 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
                 to_plain(result.benches[bench_id])
                 for bench_id in sorted(set(bench_ids))
                 if bench_id in result.benches
+            ]
+        context_rows = result.context_by_work.get(work_id, [])
+        if context_rows:
+            payload["context"] = [
+                to_plain(row)
+                for row in sorted(context_rows, key=lambda r: str(r.get("context_id")))
             ]
         dump_yaml(payload, works_dir / work_filename(work_id))
 

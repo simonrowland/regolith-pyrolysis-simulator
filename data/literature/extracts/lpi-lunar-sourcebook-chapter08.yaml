@@ -15,7 +15,8 @@ extraction:
 review_status: draft
 species:
   lunar_major_elements:
-    observations:
+    observations: []
+    context:
     - observation_id: lpi_1991_major_element_atom_abundances
       type: composition_summary
       locator:
@@ -75,7 +76,8 @@ species:
         sample_dimension_cm: "0.2-0.4"
         note: "Context for samples allocated for analysis; not a reported mass for one named specimen."
   rare_earth_elements:
-    observations:
+    observations: []
+    context:
     - observation_id: lpi_1991_ree_chondrite_standard_table8_1
       type: reference_composition_table
       locator:
@@ -127,7 +129,8 @@ species:
         Yb: 35.8
         Lu: 5.48
   compiled_analytical_methods:
-    observations:
+    observations: []
+    context:
     - observation_id: lpi_1991_incompatible_trace_element_methods
       type: analytical_method_summary
       locator:
@@ -184,7 +187,8 @@ species:
         alternative_units: [microgram_per_gram, nanogram_per_gram]
         note: "Literature atomic abundances were converted to equivalent gas volume at stated STP; this is a reporting convention, not a new measurement."
   appendix_tables:
-    observations:
+    observations: []
+    context:
     - observation_id: lpi_1991_appendix_statistical_table_coverage
       type: compilation_scope
       locator:

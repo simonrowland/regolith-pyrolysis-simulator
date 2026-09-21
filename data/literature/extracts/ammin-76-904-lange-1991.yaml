@@ -16,51 +16,6 @@ review_status: draft
 species:
   CaMgSi2O6:
     observations:
-      - observation_id: ammin_76_904_table1_diopside_composition
-        type: composition
-        locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
-          published_page: 905
-          pdf_page: 2
-          table: '1'
-        phase: crystalline_diopside_and_diopside_glass
-        regime: electron_microprobe_and_wet_chemical_analysis
-        units: wt_pct_and_formula_atoms
-        values:
-          method_class: measured_direct
-          composition_wt_pct:
-            crystal:
-              SiO2: {value: 55.75, uncertainty: 0.64}
-              MgO: {value: 18.15, uncertainty: 0.32}
-              CaO: {value: 25.78, uncertainty: 0.51}
-              total: 99.67
-            glass_electron_microprobe:
-              SiO2: {value: 55.50, uncertainty: 0.58}
-              MgO: {value: 18.25, uncertainty: 0.30}
-              CaO: {value: 26.11, uncertainty: 0.41}
-              total: 99.86
-            glass_wet_chemical:
-              SiO2: 55.72
-              MgO: 18.43
-              CaO: 25.75
-              total: 99.90
-            ideal:
-              SiO2: 55.49
-              MgO: 18.61
-              CaO: 25.90
-              total: 100.00
-          formula_atoms:
-            crystal: {Si: 2.01, Mg: 0.98, Ca: 0.99, O: 6.00}
-            glass_electron_microprobe: {Si: 2.00, Mg: 0.98, Ca: 1.01, O: 6.00}
-            glass_wet_chemical: {Si: 2.01, Mg: 0.99, Ca: 0.99, O: 6.00}
-            ideal: {Si: 2.00, Mg: 1.00, Ca: 1.00, O: 6.00}
-          uncertainty_note: Electron-microprobe standard deviations are in parentheses; wet-chemical standard deviation is ±1%.
-        apparatus:
-          analysis: JEOL 8600 electron microprobe at Rutgers University
-          phase_checks: optical microscopy, backscattered-electron imaging at approximately 1 micrometre resolution, and XRD
-          phase_check_result: single crystalline phase; no forsterite or wollastonite peaks within the XRD detection limit of approximately 2%
-        missing: [sample_mass_for_composition_analysis, analysis_pressure, analysis_atmosphere]
-
       - observation_id: ammin_76_904_table2_step_scan_heat_capacity_enthalpy
         type: heat_capacity_and_heat_content_series
         locator:
@@ -128,7 +83,6 @@ species:
           scanning_inside_melting: ten continuous heating steps at 1 K/min for 5 min, each followed by 20 min isothermal interval
           temperature_equilibration: sample reached within 0.5 K of final temperature in 1-2 min after heating; detector typically required about 20 min
         missing: [sample_exposed_area, chamber_pressure, vacuum_level, pumping, gas_identity_and_pressure, fo2_control, crucible_geometry, run_duration_total]
-
       - observation_id: ammin_76_904_fusion_and_melting_transition
         type: phase_transition
         locator:
@@ -153,9 +107,8 @@ species:
         apparatus:
           method: direct scanning measurement of heat capacity using the Setaram HT1500
         note: Abstract reports melting begins approximately 59 K below the previously reported 1665 K melting point; Table 2 resolves the measured transition region.
-
       - observation_id: ammin_76_904_crystallization_repeated_runs
-        type: crystallization_temperature_series
+        type: phase_transition
         locator:
           source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 910
@@ -178,9 +131,8 @@ species:
           calorimeter: Setaram HT1500
           sample_form: crystalline diopside in capsule
         missing: [capsule_material, capsule_dimensions, sample_mass_for_crystallization_runs]
-
       - observation_id: ammin_76_904_author_regression_liquid_heat_capacity
-        type: fitted_heat_capacity
+        type: heat_capacity_and_heat_content_series
         locator:
           source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 909
@@ -200,7 +152,6 @@ species:
           combined_datasets_uncertainty_J_per_mol_K: 7
           more_accurate_combined_uncertainty_J_per_mol_K: 20
         note: The 312 +/- 10 J/mol K fit is author-derived, not a direct measurement; 334 +/- 7 J/mol K combines this study with Stebbins et al. (1983) and Richet & Bottinga (1984).
-
       - observation_id: ammin_76_904_quoted_comparator_enthalpy_values
         type: quoted_comparator
         locator:
@@ -221,7 +172,51 @@ species:
             - {source: Stebbins et al. (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 353}
             - {source: Adamkovicova et al. (1980), quantity: wollastonite_enthalpy_of_fusion, value_kJ_per_mol: 57.3, temperature_K: 1821}
         note: Values are quoted or attributed by Lange et al.; they are not measurements made in this source.
-
+    context:
+      - observation_id: ammin_76_904_table1_diopside_composition
+        type: composition
+        locator:
+          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 905
+          pdf_page: 2
+          table: '1'
+        phase: crystalline_diopside_and_diopside_glass
+        regime: electron_microprobe_and_wet_chemical_analysis
+        units: wt_pct_and_formula_atoms
+        values:
+          method_class: measured_direct
+          composition_wt_pct:
+            crystal:
+              SiO2: {value: 55.75, uncertainty: 0.64}
+              MgO: {value: 18.15, uncertainty: 0.32}
+              CaO: {value: 25.78, uncertainty: 0.51}
+              total: 99.67
+            glass_electron_microprobe:
+              SiO2: {value: 55.50, uncertainty: 0.58}
+              MgO: {value: 18.25, uncertainty: 0.30}
+              CaO: {value: 26.11, uncertainty: 0.41}
+              total: 99.86
+            glass_wet_chemical:
+              SiO2: 55.72
+              MgO: 18.43
+              CaO: 25.75
+              total: 99.90
+            ideal:
+              SiO2: 55.49
+              MgO: 18.61
+              CaO: 25.90
+              total: 100.00
+          formula_atoms:
+            crystal: {Si: 2.01, Mg: 0.98, Ca: 0.99, O: 6.00}
+            glass_electron_microprobe: {Si: 2.00, Mg: 0.98, Ca: 1.01, O: 6.00}
+            glass_wet_chemical: {Si: 2.01, Mg: 0.99, Ca: 0.99, O: 6.00}
+            ideal: {Si: 2.00, Mg: 1.00, Ca: 1.00, O: 6.00}
+          uncertainty_note: Electron-microprobe standard deviations are in parentheses; wet-chemical standard deviation is ±1%.
+        apparatus:
+          analysis: JEOL 8600 electron microprobe at Rutgers University
+          phase_checks: optical microscopy, backscattered-electron imaging at approximately 1 micrometre resolution, and XRD
+          phase_check_result: single crystalline phase; no forsterite or wollastonite peaks within the XRD detection limit of approximately 2%
+        missing: [sample_mass_for_composition_analysis, analysis_pressure, analysis_atmosphere]
 metadata:
   scope_verdict: in_scope_direct_step_scan_calorimetry_on_silicate_diopside
   source_type: primary_experimental_paper

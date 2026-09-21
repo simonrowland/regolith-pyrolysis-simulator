@@ -4373,3 +4373,62 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_not_robinot_duplicates(
         oid.startswith("robinot_2026_deposit_measurements:")
         for oid in result.observations
     )
+
+
+def test_d032_context_rows_carried_not_observed(tmp_path: Path) -> None:
+    """d-032 ruling: extract ``context`` rows reach the work record verbatim
+    and never become Observation records in the v2.1 store."""
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    context_row = {
+        "observation_id": "na_bench_note",
+        "type": "apparatus",
+        "locator": {"page": 3, "section": "experimental"},
+        "phase": "gas",
+        "regime": "knudsen_effusion",
+        "units": "as printed",
+        "values": {
+            "quantity": "apparatus_note",
+            "method_class": "method_only",
+            "furnace": "muffle",
+            "sample_mass_g": 90,
+        },
+    }
+    extract["species"]["Na"]["context"] = [context_row]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    qualified = "fixture-source::context::na_bench_note"
+    assert qualified not in result.observations
+    assert not any(
+        oid.endswith("::na_bench_note") for oid in result.observations
+    )
+    work_id = next(iter(result.context_by_work))
+    carried = result.context_by_work[work_id]
+    assert len(carried) == 1
+    record = carried[0]
+    assert record["context_id"] == qualified
+    assert record["work_id"] == work_id
+    assert record["source_id"] == "fixture-source"
+    assert record["species"] == "Na"
+    assert record["type"] == "apparatus"
+    assert record["values"]["sample_mass_g"] == 90
+    assert record["locator"]["page"] == 3
+    # The scored row still migrates exactly as before (series explodes to points).
+    assert any(
+        oid.startswith("fixture-source::na_psat") for oid in result.observations
+    )
+    # Works payload carries the container; the store holds no observation for it.
+    works_docs = [
+        d
+        for d in (
+            yaml.safe_load(p.read_text(encoding="utf-8"))
+            for p in (root / "data" / "literature" / "works").glob("*.yaml")
+        )
+        if isinstance(d, dict)
+    ]
+    context_entries = [
+        row for doc in works_docs for row in (doc.get("context") or [])
+    ]
+    assert [row["context_id"] for row in context_entries] == [qualified]
+    works, experiments, observations = load_migrated_store(root)
+    assert qualified not in observations
+    assert not any(oid.endswith("::na_bench_note") for oid in observations)

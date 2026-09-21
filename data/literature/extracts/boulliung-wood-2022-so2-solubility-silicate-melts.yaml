@@ -130,60 +130,6 @@ species:
                 Data fromTaracsák et al. (2021).
            b
                 Data fromAdam (1990).
-
-
-    - observation_id: boulliung_wood_2022_run_conditions
-      experiment: sulfate-solubility-series
-      type: laboratory_conditions
-      locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
-        page: 152
-        table: '2'
-        section: 2.2 Experimental conditions
-        note: Every value below is transcribed from the printed Table 2 cell under its column header.
-      units: K, cm3 min^-1, cm s^-1, atm, h, dimensionless ratios and log10 fugacity relative to the stated standard
-      values:
-        quantity: atmosphere_controlled_sulfate_equilibration_runs
-        method_class: measured_condition_or_author_calculated_condition
-        apparatus:
-          furnace: Gero vertical furnace HTRV 70-250/18
-          support: platinum wire loop, 0.25 mm diameter
-          charges: up to 7 experimental charges hung on a Pt chandelier suspended from a silica rod
-          sample_mass_range_mg: 5-10
-          gas_flow_cm3_min: 200
-          gas_linear_velocity_cm_s: 0.2
-          gas_pretreatment_min: 10
-          equilibration_time_range_h: 6-10
-          pressure: 1 atm
-          atmosphere: Air-SO2
-          fO2_control: FMQ-buffered/oxidizing; tabulated log(fO2) values are calculated from NIST/JANAF thermochemical tables
-          temperature_measurement: not stated
-          temperature_calibration: not stated
-          exposed_area: not stated
-          crucible: not used; sample suspended on Pt loop
-          vacuum_level: not applicable
-          pumping: not stated
-        table_transcription: |
-          Table 2
-          Run conditions and gas mixtures for the different S equilibration experiments of this study at P = 1 atm. The conditions to study the temperature effect on sulfur solubility were
-          with a Air/SO2 ratio of 0.60. The fO2 and fS2 parameters were determined using NIST and JANAF thermochemical tables.
-
-            Temperature (K)                   Air                 SO2                   Air/SO2               log(fO2)                     DFMQ                log(fS2)               t (h)
-            1473                              37.5                62.5                  0.6                    1.10                        7.2                  16.22                 10
-            1523                              37.5                62.5                  0.6                    1.10                        6.6                  15.38                 10
-            1573                              37.5                62.5                  0.6                    1.10                        6.1                  14.6                  10
-            1573                              10                  90                    0.11                   1.68                        5.5                  13.13                 10
-            1573                              80                  20                    4                      0.77                        6.5                  15.87                 10
-            1623                              37.5                62.5                  0.6                    1.10                        5.6                  13.86                 10
-            1673                              37.5                62.5                  0.6                    1.10                        5.2                  13.16                 10
-            1723                              37.5                62.5                  0.6                    1.10                        4.7                  12.51                 8
-            1773                              37.5                62.5                  0.6                    1.10                        4.3                  11.89                 6
-
-
-                                                                                                        3. Results
-
-                                                                                                        3.1. Compositions of products
-
     - observation_id: boulliung_wood_2022_equilibrated_glass_measurements
       experiment: sulfate-solubility-series
       type: sulfur_solubility_and_sulfate_capacity_series
@@ -403,13 +349,9 @@ species:
 
                                                                                              155
            J. Boulliung and B.J. Wood                                                                                                  Geochimica et Cosmochimica Acta 336 (2022) 150–164
-
-
-
-
     - observation_id: boulliung_wood_2022_air_so2_ratio_measurements
       experiment: sulfate-solubility-series
-      type: sulfur_solubility_and_sulfate_capacity_ratio_series
+      type: sulfur_solubility_and_sulfate_capacity_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
         page: 158
@@ -499,6 +441,58 @@ species:
           sample_mount: epoxy
           EPMA_coating: carbon
           SIMS_coating: gold
+    context:
+    - observation_id: boulliung_wood_2022_run_conditions
+      experiment: sulfate-solubility-series
+      type: laboratory_conditions
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+        page: 152
+        table: '2'
+        section: 2.2 Experimental conditions
+        note: Every value below is transcribed from the printed Table 2 cell under its column header.
+      units: K, cm3 min^-1, cm s^-1, atm, h, dimensionless ratios and log10 fugacity relative to the stated standard
+      values:
+        quantity: atmosphere_controlled_sulfate_equilibration_runs
+        method_class: measured_condition_or_author_calculated_condition
+        apparatus:
+          furnace: Gero vertical furnace HTRV 70-250/18
+          support: platinum wire loop, 0.25 mm diameter
+          charges: up to 7 experimental charges hung on a Pt chandelier suspended from a silica rod
+          sample_mass_range_mg: 5-10
+          gas_flow_cm3_min: 200
+          gas_linear_velocity_cm_s: 0.2
+          gas_pretreatment_min: 10
+          equilibration_time_range_h: 6-10
+          pressure: 1 atm
+          atmosphere: Air-SO2
+          fO2_control: FMQ-buffered/oxidizing; tabulated log(fO2) values are calculated from NIST/JANAF thermochemical tables
+          temperature_measurement: not stated
+          temperature_calibration: not stated
+          exposed_area: not stated
+          crucible: not used; sample suspended on Pt loop
+          vacuum_level: not applicable
+          pumping: not stated
+        table_transcription: |
+          Table 2
+          Run conditions and gas mixtures for the different S equilibration experiments of this study at P = 1 atm. The conditions to study the temperature effect on sulfur solubility were
+          with a Air/SO2 ratio of 0.60. The fO2 and fS2 parameters were determined using NIST and JANAF thermochemical tables.
+
+            Temperature (K)                   Air                 SO2                   Air/SO2               log(fO2)                     DFMQ                log(fS2)               t (h)
+            1473                              37.5                62.5                  0.6                    1.10                        7.2                  16.22                 10
+            1523                              37.5                62.5                  0.6                    1.10                        6.6                  15.38                 10
+            1573                              37.5                62.5                  0.6                    1.10                        6.1                  14.6                  10
+            1573                              10                  90                    0.11                   1.68                        5.5                  13.13                 10
+            1573                              80                  20                    4                      0.77                        6.5                  15.87                 10
+            1623                              37.5                62.5                  0.6                    1.10                        5.6                  13.86                 10
+            1673                              37.5                62.5                  0.6                    1.10                        5.2                  13.16                 10
+            1723                              37.5                62.5                  0.6                    1.10                        4.7                  12.51                 8
+            1773                              37.5                62.5                  0.6                    1.10                        4.3                  11.89                 6
+
+
+                                                                                                        3. Results
+
+                                                                                                        3.1. Compositions of products
 deepening:
   classification: original measured atmosphere-controlled silicate-melt experiments; Table 3/4 sulfate capacity is calculated from measured sulfur and fugacity inputs, not a direct instrument output
   measured_scope: sulfur concentration, sulfate capacity inputs/outputs, major oxide compositions, gas/temperature/time conditions

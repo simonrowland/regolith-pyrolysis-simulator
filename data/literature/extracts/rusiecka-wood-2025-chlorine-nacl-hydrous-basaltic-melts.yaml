@@ -153,6 +153,35 @@ species:
           K2O_uncertainty_wt_pct: 0.02
           H2O_wt_pct: 6.29
           H2O_uncertainty_wt_pct: 0.33
+    - observation_id: rusiecka_wood_2025_model_outputs
+      experiment: icb-series
+      type: model_comparison
+      locator:
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+        published_page: 213
+        section: Results
+        equation: '8'
+      phase: hydrous_basalt_melt
+      regime: high_pressure_hydrous_basalt_experiment
+      units: log CCl dimensionless; T in K; P in GPa; X terms are single-cation oxide mole fractions
+      values:
+        quantity: chloride_capacity_model
+        method_class: model_derived
+        evidence_class: author_stepwise_linear_regression
+        generator: author stepwise linear regression fitted to 70 results (60 anhydrous from Thomas and Wood 2021, 2023 plus 10 hydrous experiments here); SPSS; F-test alpha=0.05
+        equation_8: logCCl = 1.492 + (4331XCa - 3508XSi + 2440XFe - 3921XK - 741P)/T
+        R2: 0.963
+        standard_error_68_percent: 0.083
+        water_treatment: HO0.5 treated as ideal diluent; no significant fitted HO0.5 term at alpha=0.05
+        equation_16: log(aNaCl) = log(Cl-) + 0.23 + (-4331XCa + 3508XSi + 5694XFe + 7484XMg + 4726XNa + 3921XK - 3160)/T
+        equation_16_generator: author model combining chloride capacities with Na2SiO3 and SiO2 partial molar free energies from Rhyolite-MELTS 1.2.0 for MATLAB; NIST-JANAF for gas and liquid NaCl standard-state free energies; Marcus NaCl volume data
+        melT_outputs: calculated NaCl activities for experimental melts; individual values not printed in main-paper table
+        figure_only_outputs: Figures 1-9 include plotted comparisons and calculated activities/salinities; coordinates not digitized
+        fO2_generator: author calculation using Jakobsson and Oskarsson 1994 at 1.0 and 1.5 GPa; Modified Redlich-Kwong equation of state after Holloway 1977 at 0.5 GPa; NIST-JANAF 1-bar free energies; H2O correction from Moore et al. 1998
+        fCl2_generator: Thomas and Wood 2021 chlorine-fugacity control equation from AgI/AgCl buffer
+        uncertainty:
+          standard_error_68_percent: 0.083
+    context:
     - observation_id: rusiecka_wood_2025_table2_icb1
       experiment: icb-series
       type: experiment
@@ -246,34 +275,6 @@ species:
         sample_mass: absent_not_printed
         exposed_area: absent_not_printed
         vacuum_or_pumping: not_applicable_high_pressure_capsule_experiment
-    - observation_id: rusiecka_wood_2025_model_outputs
-      experiment: icb-series
-      type: model_comparison
-      locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-        published_page: 213
-        section: Results
-        equation: '8'
-      phase: hydrous_basalt_melt
-      regime: high_pressure_hydrous_basalt_experiment
-      units: log CCl dimensionless; T in K; P in GPa; X terms are single-cation oxide mole fractions
-      values:
-        quantity: chloride_capacity_model
-        method_class: model_derived
-        evidence_class: author_stepwise_linear_regression
-        generator: author stepwise linear regression fitted to 70 results (60 anhydrous from Thomas and Wood 2021, 2023 plus 10 hydrous experiments here); SPSS; F-test alpha=0.05
-        equation_8: logCCl = 1.492 + (4331XCa - 3508XSi + 2440XFe - 3921XK - 741P)/T
-        R2: 0.963
-        standard_error_68_percent: 0.083
-        water_treatment: HO0.5 treated as ideal diluent; no significant fitted HO0.5 term at alpha=0.05
-        equation_16: log(aNaCl) = log(Cl-) + 0.23 + (-4331XCa + 3508XSi + 5694XFe + 7484XMg + 4726XNa + 3921XK - 3160)/T
-        equation_16_generator: author model combining chloride capacities with Na2SiO3 and SiO2 partial molar free energies from Rhyolite-MELTS 1.2.0 for MATLAB; NIST-JANAF for gas and liquid NaCl standard-state free energies; Marcus NaCl volume data
-        melT_outputs: calculated NaCl activities for experimental melts; individual values not printed in main-paper table
-        figure_only_outputs: Figures 1-9 include plotted comparisons and calculated activities/salinities; coordinates not digitized
-        fO2_generator: author calculation using Jakobsson and Oskarsson 1994 at 1.0 and 1.5 GPa; Modified Redlich-Kwong equation of state after Holloway 1977 at 0.5 GPa; NIST-JANAF 1-bar free energies; H2O correction from Moore et al. 1998
-        fCl2_generator: Thomas and Wood 2021 chlorine-fugacity control equation from AgI/AgCl buffer
-        uncertainty:
-          standard_error_68_percent: 0.083
 deepening:
   date: '2026-09-19'
   worker: w3-rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts

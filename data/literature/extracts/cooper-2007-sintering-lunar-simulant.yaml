@@ -53,21 +53,8 @@ species:
         standard_deviation_um: 105.2
         distribution_type: well-graded / poorly-sorted
       uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
-    - observation_id: cooper_2007_jsc1a_glass_fraction
-      type: condensate_composition
-      locator: {pdf_page_index: 1, section: 'What Is Sintering, and Why Is It a Concern?'}
-      phase: glass
-      regime: simulant_characterisation
-      units: wt% as printed
-      values:
-        quantity: printed_composition
-        method_class: quoted_unattributed
-        glass_fraction_wt_pct: approximately 49
-        material: JSC-1A
-        note: The paper gives this composition without a source citation at the statement.
-      uncertainty: {note: approximate qualifier retained; no numerical uncertainty printed}
     - observation_id: cooper_2007_jsc1a_sintering_1100c_quoted
-      type: transition_temperature
+      type: transition_point
       locator: {pdf_page_index: 2, section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: glass
       regime: sintering
@@ -83,7 +70,7 @@ species:
       uncertainty: {note: no numerical uncertainty printed}
       equipment: {note: apparatus details of the cited experiment are not stated in this source}
     - observation_id: cooper_2007_jsc1a_sintering_1050c_three_hours
-      type: transition_temperature
+      type: transition_point
       locator: {pdf_page_index: 2, section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: glass
       regime: sintering
@@ -98,6 +85,20 @@ species:
         outcome: lightly-sintered material disaggregable with gentle pressure
       uncertainty: {note: no numerical uncertainty printed}
       equipment: {note: apparatus details of the cited experiment are not stated in this source}
+    context:
+    - observation_id: cooper_2007_jsc1a_glass_fraction
+      type: condensate_composition
+      locator: {pdf_page_index: 1, section: 'What Is Sintering, and Why Is It a Concern?'}
+      phase: glass
+      regime: simulant_characterisation
+      units: wt% as printed
+      values:
+        quantity: printed_composition
+        method_class: quoted_unattributed
+        glass_fraction_wt_pct: approximately 49
+        material: JSC-1A
+        note: The paper gives this composition without a source citation at the statement.
+      uncertainty: {note: approximate qualifier retained; no numerical uncertainty printed}
   JSC-1AF:
     observations:
     - observation_id: cooper_2007_jsc1af_grain_size_statistics
@@ -116,7 +117,7 @@ species:
       uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
       equipment: {instrument: Microtrac S3500 laser diffraction instrument, note: measurement courtesy of Microtrac Incorporated}
     - observation_id: cooper_2007_jsc1af_figure1_sintering_threshold
-      type: transition_temperature
+      type: transition_point
       locator: {pdf_page_index: 2, figure: '1', section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: synthetic_apollo14_composition_glass
       regime: sintering
@@ -134,7 +135,8 @@ species:
         note: Caption assumptions and prose values are printed; the graphical solution itself was not digitised.
       uncertainty: {note: no numerical uncertainty printed}
   Lunar_soil:
-    observations:
+    observations: []
+    context:
     - observation_id: cooper_2007_lunar_soil_agglutinate_fraction
       type: condensate_composition
       locator: {pdf_page_index: 8, section: Nomenclature}
@@ -151,7 +153,7 @@ species:
   Apollo_14_glass:
     observations:
     - observation_id: cooper_2007_apollo14_glass_sintering_minutes_800c
-      type: transition_temperature
+      type: transition_point
       locator: {pdf_page_index: 1, figure: '1', section: 'What Is Sintering, and Why Is It a Concern?'}
       phase: synthetic_apollo14_composition_glass
       regime: sintering
@@ -167,6 +169,23 @@ species:
       uncertainty: {note: no numerical uncertainty printed}
   Fluidized_bed:
     observations:
+    - observation_id: cooper_2007_fluidization_fraction_1000c_model
+      type: mass_loss_fraction_vs_T
+      locator: {pdf_page_index: 5, figure: '5', section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization}
+      phase: particulate_simulant
+      regime: fluidization_model
+      units: percent, degree C, and litres per minute as printed
+      values:
+        quantity: fluidizing_fraction
+        method_class: model_derived
+        generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
+        material: JSC-1A
+        hydrogen_temperature_C: 1000
+        fluidizing_fraction_pct: approximately 70
+        flow_rate_axis: 0.01 to 100 L/min as plotted
+        note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.
+      uncertainty: {note: approximate qualifier retained; no model uncertainty printed}
+    context:
     - observation_id: cooper_2007_humid_air_channelization_sequence
       type: mass_loss_fraction_vs_T
       locator: {pdf_page_index: 3, figure: '2', section: 'How Can Sintering Be Prevented?'}
@@ -213,22 +232,6 @@ species:
       equipment:
         chamber_material: inconel
         temperature_measurement: thermocouples
-    - observation_id: cooper_2007_fluidization_fraction_1000c_model
-      type: mass_loss_fraction_vs_T
-      locator: {pdf_page_index: 5, figure: '5', section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization}
-      phase: particulate_simulant
-      regime: fluidization_model
-      units: percent, degree C, and litres per minute as printed
-      values:
-        quantity: fluidizing_fraction
-        method_class: model_derived
-        generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
-        material: JSC-1A
-        hydrogen_temperature_C: 1000
-        fluidizing_fraction_pct: approximately 70
-        flow_rate_axis: 0.01 to 100 L/min as plotted
-        note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.
-      uncertainty: {note: approximate qualifier retained; no model uncertainty printed}
     - observation_id: cooper_2007_partial_gravity_fluidized_bed_figure_only
       type: transition_temperature
       locator: {pdf_page_index: 6, figure: '6', section: Discussion}

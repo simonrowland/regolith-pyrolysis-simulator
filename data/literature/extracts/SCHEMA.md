@@ -184,6 +184,16 @@ Exactly one of:
 | `alpha` | Evaporation / condensation coefficient (HKL α), including `alpha_form` Arrhenius |
 | `rate_series` | Weight-loss, ion-current, or flux time series (for HKL inversion) |
 | `transition_point` | Melting / boiling / triple / congruent-transition fixed points |
+| `partial_pressure` | Pressure attributable to one species (equilibrium partial pressure, author-calculated pressure with declared lineage, or a pure-component vapour-pressure point/tabulation). Point vs series lives in the payload |
+| `mass_loss` | Mass-loss (fraction) series or point vs temperature/time |
+| `heat_capacity_and_heat_content_series` | Calorimetric Cp / heat-content series, including an author-published single-point fit of the same quantity |
+| `interaction_parameter` | Solution-model interaction parameters (Wagner ε/r, etc.) as published |
+| `concentration_series` | Measured condensed-phase abundance series (elemental concentrations, concentration pairs, residue isotope ratios) |
+| `volatility_series` | Measured relative-volatility / retention series across elements |
+| `phase_transition` | Calorimetrically resolved transition temperatures/intervals and scan-condition series (DSC/DTA peaks, crystallization-on-cooling). Distinct from `transition_point`: those are thermodynamic fixed points, these are method-conditioned measurements |
+| `gas_speciation` | Vapour/atmosphere/condensate composition: which gas-bearing species, how much, as published |
+| `sulfur_solubility_and_sulfate_capacity_series` | Measured sulfur solubility / sulfate capacity series, including ratio-conditioned variants |
+| `composition_series` | Measured composition series across runs/samples (per-sample rows as payload) |
 
 **Verbatim only.** Extracts store published numbers (and arithmetic that merely
 converts units with the conversion shown). No Antoine/refit coefficients invented
@@ -192,6 +202,57 @@ by the migrator, no averaging across sources, no model-derived fill-in.
 Partial shapes are in scope (t-507 scope ruling): single-species P_sat series,
 derived γ without raw ion time series, single-species rate series, relative/
 uncalibrated series with bound-not-point semantics.
+
+## The `context` container (d-032 owner ruling, 2026-09-21)
+
+Different consumers get different containers. `observations` is the container
+the scoring machinery iterates; rows that **describe the experiment** —
+apparatus, method, sample characterization, run conditions, compilation scope,
+worked examples — are not measurements the rail could score, so they live in a
+**sibling container** `context` inside the same species block, the way
+`lab_parameters` sits alongside `equipment`. Nothing scored reads `context`.
+
+```yaml
+species:
+  Ryugu_sample_container:
+    observations:
+    - observation_id: okazaki_2022_container_pressure_direct
+      type: rate_series                    # scored physics stays here
+      locator: {published_page: 3, section: Results}
+      units: Pa
+      values: { quantity: container_gas_pressure, method_class: measured_direct, pressure_Pa: 68 }
+    context:                               # unscored experiment context moves here
+    - observation_id: okazaki_2022_container_dimensions_and_sampling
+      type: method                          # free context-kind label, NOT an observation type
+      locator: {published_page: 1, section: Introduction}
+      units: as printed
+      values:
+        quantity: container_dimensions_and_collectable_sample_size
+        method_class: method_only
+        container_material: aluminum alloy
+        container_diameter_mm: 120
+```
+
+Rules:
+
+- Same row contract as observations: `observation_id` (unique within the file,
+  shared namespace with `observations`), `locator`, non-empty `values`,
+  `units` when values are present. Move is verbatim — values, locators,
+  uncertainty, equipment blocks, and `experiment:` FKs are preserved as-is.
+- `type` is required but is a **context-kind label** (e.g. `apparatus`,
+  `method`, `characterization`, `composition`, `experiment_series`,
+  `laboratory_conditions`, `thermodynamic_example`). The closed observation
+  enum does not apply — **except** that a scored observation `type` parked in
+  `context` is refused. Context is not a shadow container for scored rows.
+- Context rows are **carried through migration** into the work record's
+  `context:` list (keyed `<source_id>::context::<observation_id>`). They never
+  become Observation records in the v2.1 store.
+- If real printed evidence fits neither `observations` nor `context`, do not
+  invent a type: record an amendment request (owner directive 2026-09-21) and
+  leave the row as it is until ruled. `model_derived`, `model_comparison`,
+  and `quoted_comparator` rows are an OPEN owner question (engine-reference
+  vs validation-evidence boundary); they stay typed as they are and keep
+  failing validation until ruled.
 
 ### Values payload
 

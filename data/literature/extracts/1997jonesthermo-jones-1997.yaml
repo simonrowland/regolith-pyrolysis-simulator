@@ -22,7 +22,8 @@ scope_assessment:
   note: Printed calculated examples and compiled/model statements are retained with their evidence class; no laboratory metadata is attached.
 species:
   Fe:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_fe_heating_enthalpy_example
       type: thermodynamic_example
       locator:
@@ -72,7 +73,8 @@ species:
       uncertainty:
         reported_status: not_reported
   CO2:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_graphite_oxygen_energy_balance
       type: thermodynamic_example
       locator:
@@ -105,7 +107,8 @@ species:
       uncertainty:
         reported_status: not_reported
   ZnS:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_zns_roasting_energy_balance
       type: thermodynamic_example
       locator:
@@ -129,7 +132,8 @@ species:
       uncertainty:
         reported_status: not_reported
   propane:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_propane_adiabatic_flame_temperature
       type: thermodynamic_example
       locator:
@@ -148,7 +152,8 @@ species:
       uncertainty:
         reported_status: not_reported
   CO_H2O_H2_CO2:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_water_gas_shift_equilibrium
       type: equilibrium_example
       locator:
@@ -185,7 +190,8 @@ species:
       uncertainty:
         reported_status: not_reported
   C_CO2_CO:
-    observations:
+    observations: []
+    context:
     - observation_id: jones_1997_boudouard_equilibrium
       type: equilibrium_example
       locator:
@@ -210,7 +216,7 @@ species:
   Mn:
     observations:
     - observation_id: jones_1997_mn_vapour_pressure_tabulation
-      type: vapor_pressure
+      type: partial_pressure
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
         published_page: 18

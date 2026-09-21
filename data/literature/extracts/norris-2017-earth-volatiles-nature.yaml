@@ -97,6 +97,48 @@ experiments:
 species:
   basaltic_silicate_melt:
     observations:
+    - observation_id: norris_2017_volatile_loss_conditions
+      experiment: volatile-loss-series
+      type: rate_series
+      locator:
+        pdf_page_index: 3
+        section: Experimental vaporisation experiments
+        note: Main text conditions; detailed assembly and timing are in Methods on PDF pages 11-14.
+      phase: stirred_basaltic_silicate_melt
+      regime: one_atmosphere_CO_CO2_controlled_vaporisation
+      units: as printed (C, log fO2, minutes)
+      values:
+        quantity: volatile_loss_experiment_conditions
+        method_class: measured_direct
+        evidence_class: measured_direct
+        authors_own_experiment: true
+        T_C: 1300
+        temperature_C: 1300
+        temperature_control: fixed-temperature experiment; calibration or thermometer type not stated
+        log_fO2_range: -7 to -13
+        fO2_units: atm
+        fO2_control: constant CO/CO2 mixture apportioned from Deines et al. tables
+        fO2_verification: solid zirconia potentiometric oxygen sensor before and after each experiment
+        total_pressure_atm: 1
+        total_pressure_as_printed: one atmosphere
+        carrier_gas: CO/CO2
+        gas_flow_rate: not stated
+        run_duration_comparison_min: 60
+        time_series_duration_range: 10-180 minutes
+        time_series_fO2_log: -7
+        other_60_minute_fO2_logs:
+        - -9
+        - -11
+        - -13
+        melting_temperature_C: around 1250
+        heat_up_time_min: 1-2
+        stirrer_insertion_depth_mm: approximately 8
+        stirring_rate_RPM: 30
+        stirrer_drive: DC motor via PWM controller at 20% output power
+        quench: free-fall through a trapdoor into a water bath
+      uncertainty:
+        fO2_verification: before and after each experiment; no numeric sensor uncertainty stated
+    context:
     - observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
       experiment: volatile-loss-series
       type: apparatus
@@ -166,47 +208,6 @@ species:
         pellet_diameter_mm: 12
         pellet_press: 10 ton press
       uncertainty: {}
-    - observation_id: norris_2017_volatile_loss_conditions
-      experiment: volatile-loss-series
-      type: rate_series
-      locator:
-        pdf_page_index: 3
-        section: Experimental vaporisation experiments
-        note: Main text conditions; detailed assembly and timing are in Methods on PDF pages 11-14.
-      phase: stirred_basaltic_silicate_melt
-      regime: one_atmosphere_CO_CO2_controlled_vaporisation
-      units: as printed (C, log fO2, minutes)
-      values:
-        quantity: volatile_loss_experiment_conditions
-        method_class: measured_direct
-        evidence_class: measured_direct
-        authors_own_experiment: true
-        T_C: 1300
-        temperature_C: 1300
-        temperature_control: fixed-temperature experiment; calibration or thermometer type not stated
-        log_fO2_range: -7 to -13
-        fO2_units: atm
-        fO2_control: constant CO/CO2 mixture apportioned from Deines et al. tables
-        fO2_verification: solid zirconia potentiometric oxygen sensor before and after each experiment
-        total_pressure_atm: 1
-        total_pressure_as_printed: one atmosphere
-        carrier_gas: CO/CO2
-        gas_flow_rate: not stated
-        run_duration_comparison_min: 60
-        time_series_duration_range: 10-180 minutes
-        time_series_fO2_log: -7
-        other_60_minute_fO2_logs:
-        - -9
-        - -11
-        - -13
-        melting_temperature_C: around 1250
-        heat_up_time_min: 1-2
-        stirrer_insertion_depth_mm: approximately 8
-        stirring_rate_RPM: 30
-        stirrer_drive: DC motor via PWM controller at 20% output power
-        quench: free-fall through a trapdoor into a water bath
-      uncertainty:
-        fO2_verification: before and after each experiment; no numeric sensor uncertainty stated
     - observation_id: norris_2017_analytical_measurement_performance
       experiment: volatile-loss-series
       type: apparatus

@@ -74,3 +74,32 @@ source_priority:
     - nist-webbook
     - nasa-cea-thermo
     - crc-handbook
+  # 2026-09-21 (d-032 owner ruling): families for the physics observation types
+  # admitted from the invented-type cleanup. Each lists the sources currently
+  # carrying that type, ordered compilation → primary measurement →
+  # secondary/derived per the family policy above.
+  partial_pressure:
+    - boulliung-2025-mercury-volatile-metals-magmatic
+    - 1997jonesthermo
+  mass_loss:
+    - engelschion-2020-eac1a-simulant
+  heat_capacity_and_heat_content_series:
+    - ammin-76-904
+  interaction_parameter:
+    - itoh-hino-banya-1997-mg-deoxidation
+  concentration_series:
+    - boulliung-2025-mercury-volatile-metals-magmatic
+    - itoh-hino-banya-1997-mg-deoxidation
+    - mendybaev-2021-cai-low-pressure-h2-evap
+  volatility_series:
+    - boulliung-2025-mercury-volatile-metals-magmatic
+  phase_transition:
+    - ammin-76-904
+    - engelschion-2020-eac1a-simulant
+  gas_speciation:
+    - boulliung-2025-mercury-volatile-metals-magmatic
+  sulfur_solubility_and_sulfate_capacity_series:
+    - boulliung-wood-2022-so2-solubility-silicate-melts
+  composition_series:
+    - boulliung-wood-2022-so2-solubility-silicate-melts
+    - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts

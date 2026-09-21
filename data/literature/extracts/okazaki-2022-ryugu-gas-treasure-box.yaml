@@ -28,6 +28,68 @@ fidelity_samples:
 species:
   Ryugu_sample_container:
     observations:
+    - observation_id: okazaki_2022_container_pressure_direct
+      type: rate_series
+      locator:
+        published_page: 3
+        section: Results
+        note: Pirani-gauge measurement 30 hours after atmospheric entry
+      phase: Ryugu_sample_container
+      regime: sealed_container_after_return
+      units: Pa
+      values:
+        quantity: container_gas_pressure
+        method_class: measured_direct
+        pressure_Pa: 68
+        instrument: Pirani gauge
+        measurement_time_after_atmospheric_entry_hr: 30
+    - observation_id: okazaki_2022_container_pressure_increase_and_leak
+      type: rate_series
+      locator:
+        published_page: 4
+        section: Discussion, Timing and contribution of the terrestrial atmosphere leakage
+        note: pressure increase and inferred continuing leak rate are both printed; no reconciliation with the separate 1.9-2.3 Pa/hour range attempted
+      phase: Ryugu_sample_container
+      regime: post_collection_container_leak
+      units: as printed
+      values:
+        quantity: pressure_change_and_leak_rate
+        method_class: measured_direct
+        pressure_increase_Pa: 4.8
+        elapsed_hr: 2.5
+        inferred_leak_rate_Pa_per_hr: 1.9
+        alternative_leak_rate_range_Pa_per_hr: 1.9 to 2.3
+    - observation_id: okazaki_2022_recovered_mass_density_size
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+        note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values; cited size distribution and density are retained as quoted literature
+      phase: Ryugu_grains
+      regime: recovered_sample_characterisation
+      units: as printed
+      values:
+        quantity: recovered_sample_mass_density_and_size_distribution
+        method_class: quoted_literature
+        total_recovered_mass_g: 5.4
+        bulk_density_g_cm3: 1.8
+        particle_size_mode_mm: 1.3
+        particle_size_range_mm: '~0.5 to 8'
+    - observation_id: okazaki_2022_maximum_temperature_history
+      type: rate_series
+      locator:
+        published_page: 5
+        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+        note: temperature values used to assess thermal release; the TD-site maximum is attributed to cited prior work, while the container monitor value is reported as an observed upper bound
+      phase: Ryugu_grains
+      regime: return_thermal_history
+      units: degree_C
+      values:
+        quantity: maximum_temperature_history
+        method_class: quoted_literature
+        touchdown_site_max_temperature_C: '~70'
+        container_monitor_max_temperature_C: '<=65'
+    context:
     - observation_id: okazaki_2022_container_dimensions_and_sampling
       type: method
       locator:
@@ -66,37 +128,6 @@ species:
         QMS_split_volume_cm3: 16
         QMS_split_fraction_pct: '~4'
         cold_traps: CR1 and CR2 at liquid-nitrogen temperature
-    - observation_id: okazaki_2022_container_pressure_direct
-      type: rate_series
-      locator:
-        published_page: 3
-        section: Results
-        note: Pirani-gauge measurement 30 hours after atmospheric entry
-      phase: Ryugu_sample_container
-      regime: sealed_container_after_return
-      units: Pa
-      values:
-        quantity: container_gas_pressure
-        method_class: measured_direct
-        pressure_Pa: 68
-        instrument: Pirani gauge
-        measurement_time_after_atmospheric_entry_hr: 30
-    - observation_id: okazaki_2022_container_pressure_increase_and_leak
-      type: rate_series
-      locator:
-        published_page: 4
-        section: Discussion, Timing and contribution of the terrestrial atmosphere leakage
-        note: pressure increase and inferred continuing leak rate are both printed; no reconciliation with the separate 1.9-2.3 Pa/hour range attempted
-      phase: Ryugu_sample_container
-      regime: post_collection_container_leak
-      units: as printed
-      values:
-        quantity: pressure_change_and_leak_rate
-        method_class: measured_direct
-        pressure_increase_Pa: 4.8
-        elapsed_hr: 2.5
-        inferred_leak_rate_Pa_per_hr: 1.9
-        alternative_leak_rate_range_Pa_per_hr: 1.9 to 2.3
     - observation_id: okazaki_2022_container_seal_force
       type: method
       locator:
@@ -111,36 +142,6 @@ species:
         method_class: quoted_literature
         force_N: '~2700'
         seal_materials: softer aluminum alloy lid pressed onto harder Al alloy container edge
-    - observation_id: okazaki_2022_recovered_mass_density_size
-      type: rate_series
-      locator:
-        published_page: 5
-        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-        note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values; cited size distribution and density are retained as quoted literature
-      phase: Ryugu_grains
-      regime: recovered_sample_characterisation
-      units: as printed
-      values:
-        quantity: recovered_sample_mass_density_and_size_distribution
-        method_class: quoted_literature
-        total_recovered_mass_g: 5.4
-        bulk_density_g_cm3: 1.8
-        particle_size_mode_mm: 1.3
-        particle_size_range_mm: '~0.5 to 8'
-    - observation_id: okazaki_2022_maximum_temperature_history
-      type: rate_series
-      locator:
-        published_page: 5
-        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-        note: temperature values used to assess thermal release; the TD-site maximum is attributed to cited prior work, while the container monitor value is reported as an observed upper bound
-      phase: Ryugu_grains
-      regime: return_thermal_history
-      units: degree_C
-      values:
-        quantity: maximum_temperature_history
-        method_class: quoted_literature
-        touchdown_site_max_temperature_C: '~70'
-        container_monitor_max_temperature_C: '<=65'
   He:
     observations:
     - observation_id: okazaki_2022_container_helium_isotope_ratio

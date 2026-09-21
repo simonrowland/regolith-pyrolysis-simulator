@@ -232,7 +232,7 @@ species:
         vacuum_and_H2_as_printed: '0.9910±0.0005'
         uncertainty_convention: 'analytical uncertainties less than symbol size; quoted regression uncertainty as printed'
     - observation_id: mendybaev_2021_isotope_table2_readable_rows
-      type: residue_isotope_series
+      type: concentration_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 29
@@ -284,6 +284,7 @@ species:
         - {arm: vacuum, pressure_as_printed: '~10−7 bar', rate_as_printed: '(2.4±0.1)×10−5'}
         - {arm: H2_2e-5_bar, pressure_as_printed: '~2×10−5 bar', rate_as_printed: '(4.5±0.2)×10−4'}
         - {arm: H2_2e-4_bar, pressure_as_printed: '~2×10−4 bar', rate_as_printed: '(1.1±0.1)×10−3'}
+    context:
     - observation_id: mendybaev_2021_table1_sample_geometry_readable_columns
       type: experiment_series
       locator:

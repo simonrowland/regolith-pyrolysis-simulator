@@ -19,6 +19,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 * fidelity sample structure: path-based *or* structured line-item form
   (species, observable, T/index, value, locator)
 * no silent acceptance of unknown top-level observation types
+* sibling ``context`` container rows (unscored experiment context, d-032):
+  observation-shaped contract, but a scored observation ``type`` parked
+  there is refused
 * absolute machine-local provenance_path refused
 
 Usage::
@@ -54,6 +57,14 @@ FIDELITY_GRADUATION_LEDGER_SCHEMA = (
 )
 LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vocabulary.yaml"
 
+# Scored physics series. The first six are read by the rail/scoring machinery;
+# the d-032 additions (owner ruling 2026-09-21) are physics quantities the rail
+# could score, admitted from the invented-type cleanup with near-spellings
+# collapsed (see SCHEMA.md "Observation types"). The set stays CLOSED:
+# model_derived / model_comparison / quoted_comparator remain refused while
+# the engine-reference vs validation-evidence boundary is an open owner
+# question, and unscored experiment context lives in the sibling ``context``
+# container instead of inventing type names here.
 OBSERVATION_TYPES = frozenset(
     {
         "psat_series",
@@ -62,6 +73,16 @@ OBSERVATION_TYPES = frozenset(
         "alpha",
         "rate_series",
         "transition_point",
+        "partial_pressure",
+        "mass_loss",
+        "heat_capacity_and_heat_content_series",
+        "interaction_parameter",
+        "concentration_series",
+        "volatility_series",
+        "phase_transition",
+        "gas_speciation",
+        "sulfur_solubility_and_sulfate_capacity_series",
+        "composition_series",
     }
 )
 
@@ -1092,6 +1113,101 @@ def _check_observation(
     _check_equipment(obs.get("equipment"), path, errors)
 
 
+def _check_context_row(
+    row: Any,
+    path: str,
+    errors: list[str],
+    seen_ids: set[str],
+) -> None:
+    """One row of the sibling ``context`` container (d-032 ruling).
+
+    Context rows describe the experiment (apparatus, method, sample,
+    conditions, compilation scope); nothing scored reads them. They keep the
+    observation-shaped payload contract (id, locator, non-empty values) but
+    their ``type`` is a free context-kind label — except that a SCORED
+    observation type parked here is refused, because context must never
+    become a shadow container for the container the scoring machinery reads.
+    """
+    if not isinstance(row, Mapping):
+        errors.append(f"{path}: context row must be a mapping")
+        return
+    oid = row.get("observation_id")
+    if not oid or not isinstance(oid, str):
+        errors.append(f"{path}: observation_id is required (non-empty string)")
+    else:
+        if oid in seen_ids:
+            errors.append(f"{path}: duplicate observation_id '{oid}' within extract")
+        seen_ids.add(oid)
+        path = f"{path}[{oid}]"
+
+    rtype = row.get("type")
+    if not isinstance(rtype, str) or not rtype.strip():
+        errors.append(f"{path}: type is required on every context row (non-empty string)")
+    elif rtype in OBSERVATION_TYPES:
+        errors.append(
+            f"{path}: scored observation type {rtype!r} must live under "
+            f"observations, not the context container"
+        )
+
+    locator = row.get("locator")
+    if locator is None:
+        errors.append(f"{path}: locator is required on every context row")
+    elif not _locator_ok(locator):
+        errors.append(
+            f"{path}: locator must be a mapping with at least one of "
+            f"{sorted(LOCATOR_KEYS)}"
+        )
+
+    # Same anti-parking rule as observations.
+    for eqf in EQUIPMENT_FIELDS:
+        if eqf in row:
+            errors.append(
+                f"{path}: equipment field {eqf!r} must live under the row's equipment "
+                f"(misplaced top-level key refused)"
+            )
+
+    if "values" not in row or row["values"] is None:
+        errors.append(
+            f"{path}: values is required (empty/null-only payloads refused)"
+        )
+    else:
+        if not isinstance(row["values"], (Mapping, list)):
+            errors.append(f"{path}: values must be a mapping or list when present")
+        elif not _has_payload_leaf(row["values"]):
+            errors.append(
+                f"{path}: values is empty or null-only (refuse empty evidence payloads)"
+            )
+        if not row.get("units"):
+            errors.append(f"{path}: units required when values are present")
+
+    unc = row.get("uncertainty")
+    if unc is not None:
+        if isinstance(unc, Mapping) and not _has_payload_leaf(unc):
+            if any(v is None for v in unc.values()) and not _has_payload_leaf(
+                {k: v for k, v in unc.items() if v is not None}
+            ):
+                errors.append(
+                    f"{path}: uncertainty mapping is null-only "
+                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
+                )
+        elif isinstance(unc, str) and not unc.strip():
+            errors.append(f"{path}: uncertainty string must be non-empty when present")
+
+    tr = row.get("T_range_K")
+    if tr is not None:
+        if not (isinstance(tr, (list, tuple)) and len(tr) == 2):
+            errors.append(f"{path}: T_range_K must be [T_min, T_max]")
+        else:
+            try:
+                t0, t1 = float(tr[0]), float(tr[1])
+                if t0 > t1:
+                    errors.append(f"{path}: T_range_K min > max")
+            except (TypeError, ValueError):
+                errors.append(f"{path}: T_range_K bounds must be numeric")
+
+    _check_equipment(row.get("equipment"), path, errors)
+
+
 def _observation_count(doc: Mapping[str, Any]) -> int:
     species = doc.get("species") or {}
     n_obs = 0
@@ -1399,6 +1515,13 @@ def validate_extract_document(
                 continue
             for i, obs in enumerate(obs_list):
                 _check_observation(obs, f"{spath}.observations[{i}]", errors, seen)
+            ctx_list = block.get("context")
+            if ctx_list is not None:
+                if not isinstance(ctx_list, list):
+                    errors.append(f"{spath}: context must be a list")
+                else:
+                    for i, row in enumerate(ctx_list):
+                        _check_context_row(row, f"{spath}.context[{i}]", errors, seen)
 
     _check_sweep_gases(doc, label, errors)
 
