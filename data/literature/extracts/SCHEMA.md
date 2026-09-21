@@ -247,6 +247,14 @@ Rules:
 - Context rows are **carried through migration** into the work record's
   `context:` list (keyed `<source_id>::context::<observation_id>`). They never
   become Observation records in the v2.1 store.
+- A context row that names an `experiment:` and holds equipment evidence (an
+  `equipment` block or `values.apparatus`) is that experiment's equipment
+  record **by reference** (d-036 owner ruling): migration sets
+  `equipment_context_id` on the Experiment to the row's `context_id`, and
+  consumers resolve it against the work record's `context:` list. Equipment
+  values are never copied onto the experiment; a reference that names no
+  stored context row is a typed `referential_integrity` refusal naming the
+  missing id.
 - If real printed evidence fits neither `observations` nor `context`, do not
   invent a type: record an amendment request (owner directive 2026-09-21) and
   leave the row as it is until ruled. `model_derived`, `model_comparison`,

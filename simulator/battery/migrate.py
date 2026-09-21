@@ -1413,6 +1413,9 @@ def experiment_from_plain(payload: object) -> Experiment:
         apparatus=_apparatus_from_plain(payload.get("apparatus")),
         fO2_control=fo2_control,
         bench_id=None if payload.get("bench_id") is None else str(payload["bench_id"]),
+        equipment_context_id=None
+        if payload.get("equipment_context_id") is None
+        else str(payload["equipment_context_id"]),
         thermal_schedule=_thermal_schedule_from_plain(payload.get("thermal_schedule")),
     )
 
@@ -1507,6 +1510,52 @@ def load_migrated_benches(root: Path | None = None) -> dict[str, Bench]:
             bench = bench_from_plain(raw_bench)
             benches[bench.id] = bench
     return benches
+
+
+class UnresolvedEquipmentContextError(ValueError):
+    """Experiment.equipment_context_id names a context row the store does not carry."""
+
+
+def load_migrated_context(root: Path | None = None) -> dict[str, dict[str, Any]]:
+    """Deserialize the work records' ``context`` rows, keyed by ``context_id``.
+
+    Context rows are verbatim extract payloads (d-032), not typed records.
+    """
+
+    root = root or REPO_ROOT
+    context: dict[str, dict[str, Any]] = {}
+    for path in sorted((root / "data" / "literature" / "works").glob("*.yaml")):
+        if path.name == "ALIASES.yaml":
+            continue
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping):
+            continue
+        for row in doc.get("context") or ():
+            if isinstance(row, Mapping) and row.get("context_id"):
+                context[str(row["context_id"])] = dict(row)
+    return context
+
+
+def resolve_equipment_context(
+    experiment: Experiment,
+    context: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any] | None:
+    """Resolve ``Experiment.equipment_context_id`` to its context row.
+
+    ``None`` when the experiment carries no reference (absence is not an
+    error). A reference that names no stored row is a dangling FK: typed
+    refusal naming the missing id, never a silent skip.
+    """
+
+    ref = experiment.equipment_context_id
+    if ref is None:
+        return None
+    row = context.get(ref)
+    if row is None:
+        raise UnresolvedEquipmentContextError(
+            f"equipment_context_id {ref!r} does not resolve"
+        )
+    return row
 
 
 _YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
@@ -6015,6 +6064,7 @@ class Migrator:
         *,
         work: Work,
         source_id: str,
+        experiment_refs: Mapping[str, str],
     ) -> None:
         species = doc.get("species")
         if not isinstance(species, Mapping):
@@ -6041,6 +6091,61 @@ class Migrator:
                 record["source_id"] = source_id
                 record["species"] = str(formula)
                 self.result.context_by_work[work.work_id].append(record)
+                self._link_equipment_context(work, record, experiment_refs)
+
+    def _link_equipment_context(
+        self,
+        work: Work,
+        record: Mapping[str, Any],
+        experiment_refs: Mapping[str, str],
+    ) -> None:
+        """d-036 ruling: a context row that names an ``experiment:`` and holds
+        equipment evidence (an ``equipment`` block or ``values.apparatus``) is
+        the experiment's equipment record BY REFERENCE. The experiment carries
+        the FK; the row's content is never copied onto it."""
+        raw_experiment = record.get("experiment")
+        if raw_experiment is None:
+            return
+        values = record.get("values")
+        holds_equipment = isinstance(record.get("equipment"), Mapping) or (
+            isinstance(values, Mapping) and values.get("apparatus") is not None
+        )
+        if not holds_equipment:
+            return
+        experiment_id = experiment_refs.get(
+            str(raw_experiment),
+            self._registry_id(work.work_id, "experiment", raw_experiment),
+        )
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is None:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"context[{record['context_id']}].experiment",
+                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                    detail=(
+                        f"equipment context row names experiment {experiment_id!r} "
+                        "which is not declared; no equipment_context_id written"
+                    ),
+                )
+            )
+            return
+        existing = experiment.equipment_context_id
+        if existing is not None:
+            if existing != record["context_id"]:
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"experiment[{experiment_id}].equipment_context_id",
+                        reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                        detail=(
+                            f"experiment {experiment_id!r} has two equipment context "
+                            f"rows {existing!r} and {record['context_id']!r}; keeping {existing!r}"
+                        ),
+                    )
+                )
+            return
+        self.result.experiments[experiment_id] = replace(
+            experiment, equipment_context_id=record["context_id"]
+        )
 
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
@@ -6076,7 +6181,9 @@ class Migrator:
         experiment_refs = self._lift_extract_registries(
             doc, work=work, source_key=rel
         )
-        self._lift_extract_context(doc, work=work, source_id=source_id)
+        self._lift_extract_context(
+            doc, work=work, source_id=source_id, experiment_refs=experiment_refs
+        )
         extraction = doc.get("extraction") if isinstance(doc.get("extraction"), Mapping) else {}
         rows = list(iter_extract_observations(doc))
         count.rows_in += len(rows)
@@ -8273,6 +8380,11 @@ class Migrator:
             self.result.observations,
             residuals=None,
             benches=self.result.benches,
+            context_rows={
+                str(row["context_id"]): row
+                for rows in self.result.context_by_work.values()
+                for row in rows
+            },
         )
         self.result.validation = ValidationReport(
             validation.issues + tuple(self.result.registry_issues)

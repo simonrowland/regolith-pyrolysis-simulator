@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import unicodedata
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,7 @@ from simulator.battery.enums import (
     Polymorph,
     Quantity,
     Rail,
+    RefusalReason,
     StateTag,
     ValueKind,
 )
@@ -33,6 +35,7 @@ from simulator.battery.migrate import (
     DuplicateObservationIdError,
     Migrator,
     UnknownRailSpellingError,
+    UnresolvedEquipmentContextError,
     canonicalize_doi,
     canonicalize_rail,
     citation_hash,
@@ -43,13 +46,16 @@ from simulator.battery.migrate import (
     convert_temperature_to_k,
     iter_observation_store_paths,
     lineage_parents_from_source,
+    load_migrated_context,
     map_phase,
     map_quantity,
     compilation_quantity_from_record,
     load_migrated_store,
     migrate,
     pressure_from_equipment,
+    resolve_equipment_context,
     select_declared_source,
+    to_plain,
     work_id_for,
     write_outputs,
 )
@@ -4525,3 +4531,204 @@ def test_d032_context_rows_carried_not_observed(tmp_path: Path) -> None:
     works, experiments, observations = load_migrated_store(root)
     assert qualified not in observations
     assert not any(oid.endswith("::na_bench_note") for oid in observations)
+
+
+def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
+    """d-036 ruling: boulliung's declared experiment reaches
+    ``boulliung_2025_ssas_apparatus_and_run_conditions`` BY REFERENCE.
+    Equipment values are read through the FK and never copied onto the
+    experiment record."""
+    extract = yaml.safe_load(
+        (
+            REPO_ROOT
+            / "data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    experiment_id = "10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series"
+    context_id = (
+        "boulliung-2025-mercury-volatile-metals-magmatic"
+        "::context::boulliung_2025_ssas_apparatus_and_run_conditions"
+    )
+    experiment = result.experiments[experiment_id]
+    assert experiment.equipment_context_id == context_id
+
+    # The reference resolves against the work record's context rows, and the
+    # equipment values are readable through it.
+    context = load_migrated_context(root)
+    row = resolve_equipment_context(experiment, context)
+    assert row is not None
+    assert row["context_id"] == context_id
+    assert row["type"] == "laboratory_conditions"
+    assert row["equipment"]["cell_material"] == "silica tube"
+    assert row["equipment"]["crucible_material"] == "alumina"
+    assert row["equipment"]["sample_container"]["value"] == "alumina crucible"
+    assert row["equipment"]["ampoule_volume_m3"]["value"] == "4.4 x 10^-6"
+    assert row["values"]["apparatus"]["furnace"] == "muffle furnace"
+
+    # No duplication: the experiment record carries none of the row's
+    # equipment keys or values; they exist in exactly one place.
+    assert experiment.apparatus is not None
+    assert experiment.apparatus.cell_material_and_liner is None
+    experiment_text = yaml.safe_dump(to_plain(experiment))
+    for key in (
+        "cell_material",
+        "crucible_material",
+        "sample_container",
+        "ampoule_volume_m3",
+        "chamber_length_cm",
+        "thermocouple",
+        "silica tube",
+    ):
+        assert key not in experiment_text
+    work_file = root / "data/literature/works/10.1016_j.chemgeo.2025.123018.yaml"
+    work_text = work_file.read_text(encoding="utf-8")
+    assert work_text.count("ampoule_volume_m3") == 1
+    work_doc = yaml.safe_load(work_text)
+    assert [row["context_id"] for row in work_doc["context"]] == [
+        "boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ag_trace_doping_and_comparator",
+        "boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_hg_oxidation_state_and_fugacity",
+        "boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions",
+        "boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping",
+    ]
+
+    # The FK round-trips through the persisted store.
+    _, experiments, _ = load_migrated_store(root)
+    assert experiments[experiment_id].equipment_context_id == context_id
+    assert experiments[experiment_id].apparatus.cell_material_and_liner is None
+
+
+def test_d036_migrator_links_equipment_context_rows(tmp_path: Path) -> None:
+    """Fixture-level link rules: an equipment-bearing context row that names a
+    declared experiment sets the FK; a context row without equipment evidence
+    does not; a second equipment row for the same experiment is a typed
+    registry issue, never a silent overwrite."""
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["experiments"] = [
+        {
+            "experiment_id": "fixture-series",
+            "method": "knudsen_effusion",
+            "locator": {"page": 2, "section": "experimental"},
+        }
+    ]
+    extract["species"]["Na"]["context"] = [
+        {
+            "observation_id": "apparatus_row",
+            "experiment": "fixture-series",
+            "type": "laboratory_conditions",
+            "locator": {"page": 3, "section": "experimental"},
+            "units": "as printed",
+            "equipment": {"cell_material": "alumina"},
+            "values": {"quantity": "apparatus_note", "method_class": "method_only"},
+        },
+        {
+            "observation_id": "characterization_row",
+            "experiment": "fixture-series",
+            "type": "characterization",
+            "locator": {"page": 3, "section": "experimental"},
+            "units": "as printed",
+            "values": {"quantity": "sample_note", "method_class": "method_only"},
+        },
+        {
+            "observation_id": "second_apparatus_row",
+            "experiment": "fixture-series",
+            "type": "apparatus",
+            "locator": {"page": 4, "section": "experimental"},
+            "units": "as printed",
+            "equipment": {"cell_material": "platinum"},
+            "values": {"quantity": "apparatus_note", "method_class": "method_only"},
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    experiment_id = next(
+        eid for eid in result.experiments if eid.endswith("::experiment::fixture-series")
+    )
+    experiment = result.experiments[experiment_id]
+    assert experiment.equipment_context_id == "fixture-source::context::apparatus_row"
+    # The row without equipment evidence is context, not an equipment record.
+    assert experiment.equipment_context_id != "fixture-source::context::characterization_row"
+    # The second equipment row is a typed conflict, not a silent overwrite.
+    conflicts = [
+        issue
+        for issue in result.registry_issues
+        if issue.path.endswith(".equipment_context_id")
+    ]
+    assert len(conflicts) == 1
+    assert conflicts[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert "second_apparatus_row" in conflicts[0].detail
+    assert "apparatus_row" in conflicts[0].detail
+    row = resolve_equipment_context(experiment, load_migrated_context(root))
+    assert row["equipment"]["cell_material"] == "alumina"
+
+
+def test_d036_equipment_context_row_naming_undeclared_experiment_refuses(
+    tmp_path: Path,
+) -> None:
+    """A context row whose ``experiment:`` names no declared experiment is a
+    typed registry refusal naming the missing id — never a manufactured
+    pointer."""
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["context"] = [
+        {
+            "observation_id": "apparatus_row",
+            "experiment": "ghost-series",
+            "type": "laboratory_conditions",
+            "locator": {"page": 3, "section": "experimental"},
+            "units": "as printed",
+            "equipment": {"cell_material": "alumina"},
+            "values": {"quantity": "apparatus_note", "method_class": "method_only"},
+        }
+    ]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    assert not any(
+        experiment.equipment_context_id is not None
+        for experiment in result.experiments.values()
+    )
+    issues = [
+        issue
+        for issue in result.registry_issues
+        if issue.path == "context[fixture-source::context::apparatus_row].experiment"
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert "ghost-series" in issues[0].detail
+
+
+def test_d036_dangling_equipment_context_fk_refuses_typed(tmp_path: Path) -> None:
+    """A stored equipment_context_id that names no context row is a typed
+    refusal naming the missing id — at resolution and at validation."""
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True)
+    works, experiments, observations = load_migrated_store(root)
+    experiment = next(iter(experiments.values()))
+    assert experiment.equipment_context_id is None
+    # Absence is not an error: no reference resolves to None.
+    assert resolve_equipment_context(experiment, {}) is None
+
+    dangling = "fixture-source::context::absent_equipment_row"
+    ghost = replace(experiment, equipment_context_id=dangling)
+    with pytest.raises(UnresolvedEquipmentContextError, match=re.escape(dangling)):
+        resolve_equipment_context(ghost, {})
+    report = validate_corpus(
+        works, [ghost], observations, residuals=None, context_rows={}
+    )
+    issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith(".equipment_context_id")
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert dangling in issues[0].detail
+    # A store carrying the row resolves clean.
+    row = {"context_id": dangling, "equipment": {"cell_material": "alumina"}}
+    assert resolve_equipment_context(ghost, {dangling: row}) is row
+    report = validate_corpus(
+        works, [ghost], observations, residuals=None, context_rows={dangling: row}
+    )
+    assert not any(
+        issue.path.endswith(".equipment_context_id") for issue in report.issues
+    )

@@ -678,6 +678,7 @@ def validate_experiment(
     experiments: Mapping[str, Experiment],
     path: str = "experiment",
     benches: Mapping[str, Bench] | None = None,
+    context_rows: Mapping[str, Any] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     if experiment.kind is ExperimentKind.LITERATURE:
@@ -724,6 +725,18 @@ def validate_experiment(
                 f"{path}.bench_id",
                 RefusalReason.REFERENTIAL_INTEGRITY,
                 f"bench_id {experiment.bench_id!r} does not resolve",
+            )
+        )
+    if (
+        context_rows is not None
+        and experiment.equipment_context_id is not None
+        and experiment.equipment_context_id not in context_rows
+    ):
+        issues.append(
+            _issue(
+                f"{path}.equipment_context_id",
+                RefusalReason.REFERENTIAL_INTEGRITY,
+                f"equipment_context_id {experiment.equipment_context_id!r} does not resolve",
             )
         )
     sweep = experiment.pressure_environment.sweep_gas.state
@@ -1440,12 +1453,22 @@ def validate_corpus(
     observations: Sequence[Observation] | Mapping[str, Observation],
     residuals: Sequence[Residual] | Mapping[str, Residual] | None = None,
     benches: Sequence[Bench] | Mapping[str, Bench] | None = None,
+    context_rows: Sequence[Mapping[str, Any]] | Mapping[str, Mapping[str, Any]] | None = None,
 ) -> ValidationReport:
     issues: list[ValidationIssue] = []
     work_map = _index_unique(works, "work_id", "work", issues)
     exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
     obs_map = _index_unique(observations, "observation_id", "observation", issues)
     bench_map = None if benches is None else _index_unique(benches, "id", "bench", issues)
+    context_map: dict[str, Mapping[str, Any]] | None = None
+    if context_rows is not None:
+        # Context rows are verbatim extract payloads (mappings), not typed
+        # records; key by their context_id the way benches key by id.
+        context_map = (
+            dict(context_rows)
+            if isinstance(context_rows, Mapping)
+            else {str(row.get("context_id")): row for row in context_rows}
+        )
     res_items: Iterable[Residual]
     if residuals is None:
         res_items = ()
@@ -1486,6 +1509,7 @@ def validate_corpus(
                 exp_map,
                 f"experiment[{experiment.experiment_id}]",
                 bench_map,
+                context_map,
             )
         )
     for observation in obs_map.values():

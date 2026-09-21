@@ -958,6 +958,11 @@ class Experiment:
     apparatus: Apparatus | None = None
     fO2_control: FO2Control | None = None
     bench_id: str | None = None
+    # FK to the work record's context row holding this experiment's equipment
+    # evidence (``<source_id>::context::<observation_id>``). Same convention as
+    # bench_id: the record carries the reference; consumers resolve it against
+    # the store's context rows. Values are never copied onto the experiment.
+    equipment_context_id: str | None = None
     thermal_schedule: ThermalSchedule | None = None
 
     def __post_init__(self) -> None:
