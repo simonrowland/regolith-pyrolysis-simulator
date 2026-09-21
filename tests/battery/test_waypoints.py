@@ -15,6 +15,8 @@ from simulator.battery.records import (
     BenchIdentity,
     Composition,
     Sample,
+    SweepGas,
+    SweepGasComponent,
     ThermalSchedule,
     ThermalRamp,
     ThermalSetpoint,
@@ -228,6 +230,112 @@ def test_thermal_setpoint_route_and_uncontrolled_oxygen_flag() -> None:
     oxygen = oxygen_condition(experiment, _bench())
     assert oxygen.selected is None
     assert "fO2_log" in oxygen.absence.missing
+
+
+def _sweep_gas_experiment(gas: SweepGas):
+    experiment = factories.kems_experiment()
+    return replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, sweep_gas=factories.located(gas)
+        ),
+    )
+
+
+def _o2_ar_mixture(o2_partial_pressure=None) -> SweepGas:
+    unknown = factories.State.unknown("not_published")
+    return SweepGas(
+        species=None,
+        flow_sccm=unknown,
+        partial_pressure_Pa=unknown,
+        components=(
+            SweepGasComponent(
+                species="O2",
+                mole_fraction=factories.State.of(Decimal("0.2")),
+                flow_sccm=unknown,
+                partial_pressure_Pa=(
+                    factories.State.of(Decimal("20000"))
+                    if o2_partial_pressure is None
+                    else o2_partial_pressure
+                ),
+            ),
+            SweepGasComponent(
+                species="Ar",
+                mole_fraction=factories.State.of(Decimal("0.8")),
+                flow_sccm=unknown,
+                partial_pressure_Pa=factories.State.of(Decimal("80000")),
+            ),
+        ),
+    )
+
+
+def test_oxygen_condition_uses_mixture_component_printed_partial_pressure() -> None:
+    result = oxygen_condition(_sweep_gas_experiment(_o2_ar_mixture()), _bench())
+    assert result.selected is not None
+    assert result.selected.route == "oxygen_sweep_component_partial_pressure"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    assert float(result.selected.value.point) == pytest.approx(-0.6989700043360188, rel=1e-12)
+    single = SweepGas(
+        species="O2",
+        flow_sccm=factories.State.unknown("not_published"),
+        partial_pressure_Pa=factories.State.of(Decimal("20000")),
+    )
+    single_result = oxygen_condition(_sweep_gas_experiment(single), _bench())
+    assert single_result.selected is not None
+    assert result.selected.value == single_result.selected.value
+
+
+def test_oxygen_condition_mixture_typed_absence_component_pressure_stays_refusal() -> None:
+    mixture = _o2_ar_mixture(o2_partial_pressure=factories.State.unknown("not_published"))
+    result = oxygen_condition(_sweep_gas_experiment(mixture), _bench())
+    assert result.selected is None
+    assert result.absence is not None
+    # No route may be invented from the printed mole fraction alone.
+    assert not any("sweep" in route.route for route in result.routes)
+
+
+def test_oxygen_condition_mixture_without_o2_component_stays_refusal() -> None:
+    unknown = factories.State.unknown("not_published")
+    mixture = SweepGas(
+        species=None,
+        flow_sccm=unknown,
+        partial_pressure_Pa=unknown,
+        components=(
+            SweepGasComponent(
+                species="CO",
+                mole_fraction=factories.State.of(Decimal("0.25")),
+                flow_sccm=unknown,
+                partial_pressure_Pa=factories.State.of(Decimal("25000")),
+            ),
+            SweepGasComponent(
+                species="Ar",
+                mole_fraction=factories.State.of(Decimal("0.75")),
+                flow_sccm=unknown,
+                partial_pressure_Pa=factories.State.of(Decimal("75000")),
+            ),
+        ),
+    )
+    result = oxygen_condition(_sweep_gas_experiment(mixture), _bench())
+    assert result.selected is None
+    assert not any("sweep" in route.route for route in result.routes)
+
+
+def test_oxygen_condition_never_selects_among_alternatives() -> None:
+    unknown = factories.State.unknown("not_published")
+    single = SweepGas(
+        species="O2",
+        flow_sccm=unknown,
+        partial_pressure_Pa=factories.State.of(Decimal("20000")),
+    )
+    gas = SweepGas(
+        species=None,
+        flow_sccm=unknown,
+        partial_pressure_Pa=unknown,
+        alternatives=(single, _o2_ar_mixture()),
+    )
+    result = oxygen_condition(_sweep_gas_experiment(gas), _bench())
+    assert result.selected is None
+    assert not any("sweep" in route.route for route in result.routes)
 
 
 def test_thermal_ramp_route_and_nonpoint_propagation() -> None:

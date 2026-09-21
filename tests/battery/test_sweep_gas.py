@@ -174,3 +174,45 @@ def test_file_accepts_exact_serialized_field_lists() -> None:
     assert isinstance(gas.components[0], SweepGasComponent)
     for payload in (plain, to_plain(gas)):
         assert validate_extract_document(_extract_with_gas(copy.deepcopy(payload))) == []
+
+
+def _single_species() -> dict:
+    return {
+        "species": "N2",
+        "flow_sccm": UNKNOWN.copy(),
+        "partial_pressure_Pa": UNKNOWN.copy(),
+    }
+
+
+def test_empty_optional_collections_are_absent() -> None:
+    base = _single_species()
+    reference = _sweep_gas_from_plain(base)
+    assert isinstance(reference, SweepGas)
+    for key in ("components", "alternatives"):
+        gas = _sweep_gas_from_plain({**base, key: []})
+        assert isinstance(gas, SweepGas)
+        assert gas == reference
+        assert validate_sweep_gas(gas, "gas") == []
+        assert to_plain(gas) == base
+    both = _sweep_gas_from_plain({**base, "components": [], "alternatives": []})
+    assert both == reference
+    assert to_plain(both) == base
+
+
+def test_single_species_with_empty_collections_migrates_byte_identically(tmp_path) -> None:
+    payloads = {
+        "plain": _single_species(),
+        "components": {**_single_species(), "components": []},
+        "alternatives": {**_single_species(), "alternatives": []},
+        "both": {**_single_species(), "components": [], "alternatives": []},
+    }
+    serialized = []
+    for label, payload in payloads.items():
+        result = Migrator(root=_write_min_tree(tmp_path / label, _extract_with_gas(payload))).run()
+        assert result.validation.ok, result.validation.hard_issues
+        experiment = next(iter(result.experiments.values()))
+        serialized.append(
+            json.dumps(to_plain(experiment), sort_keys=True, separators=(",", ":")).encode()
+        )
+        assert experiment_from_plain(to_plain(experiment)) == experiment
+    assert len(set(serialized)) == 1

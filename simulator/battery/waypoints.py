@@ -711,6 +711,19 @@ def oxygen_condition(
         if value is not None:
             routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_partial_pressure",
                 WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
+    if (sweep.state.is_value and sweep.state.value.alternatives is None
+            and sweep.state.value.components is not None):
+        # A mixture's printed O2 component partial pressure is the same evidence as a
+        # single-species O2 record. Typed-absence component pressures stay refusals —
+        # never inferred from mole fraction. alternatives are ambiguous by construction
+        # (the paper printed "A or B"), so they are never selected from.
+        printed_o2 = [c for c in sweep.state.value.components
+                      if c.species == "O2" and c.partial_pressure_Pa.is_value]
+        if len(printed_o2) == 1:
+            value = _log_pressure(Value.point_of(printed_o2[0].partial_pressure_Pa.value))
+            if value is not None:
+                routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_component_partial_pressure",
+                    WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
     gas = (observation.point_conditions or {}).get("gas_composition") if observation else None
     if gas is not None and gas.state.is_value:
         from simulator.battery.records import Composition

@@ -1227,24 +1227,28 @@ def _sweep_gas_from_plain(payload: object) -> object:
         if payload.get("components") is not None:
             if not isinstance(payload["components"], (list, tuple)):
                 return payload
-            components = []
-            for component in payload["components"]:
-                if not isinstance(component, Mapping) or set(component) != {
-                    item.name for item in fields(SweepGasComponent)
-                }:
-                    return payload
-                components.append(SweepGasComponent(
-                    species=component["species"],
-                    mole_fraction=_state_from_plain(component["mole_fraction"], as_decimal),
-                    flow_sccm=_state_from_plain(component["flow_sccm"], as_decimal),
-                    partial_pressure_Pa=_state_from_plain(component["partial_pressure_Pa"], as_decimal),
-                ))
-            components = tuple(components)
+            # An empty optional collection is ABSENT, not a populated empty tuple.
+            if payload["components"]:
+                components = []
+                for component in payload["components"]:
+                    if not isinstance(component, Mapping) or set(component) != {
+                        item.name for item in fields(SweepGasComponent)
+                    }:
+                        return payload
+                    components.append(SweepGasComponent(
+                        species=component["species"],
+                        mole_fraction=_state_from_plain(component["mole_fraction"], as_decimal),
+                        flow_sccm=_state_from_plain(component["flow_sccm"], as_decimal),
+                        partial_pressure_Pa=_state_from_plain(component["partial_pressure_Pa"], as_decimal),
+                    ))
+                components = tuple(components)
         alternatives = None
         if payload.get("alternatives") is not None:
             if not isinstance(payload["alternatives"], (list, tuple)):
                 return payload
-            alternatives = tuple(_sweep_gas_from_plain(v) for v in payload["alternatives"])
+            # An empty optional collection is ABSENT, not a populated empty tuple.
+            if payload["alternatives"]:
+                alternatives = tuple(_sweep_gas_from_plain(v) for v in payload["alternatives"])
         return SweepGas(
             species=payload.get("species"),
             flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
