@@ -79,7 +79,8 @@ experiments:
       state: {tag: value, value: {kind: point, point: '101325'}}
       locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Printed total pressure 1 atm; SI unit conversion only'}
     sweep_gas:
-      state: {tag: value, value: air or CO-CO2 mixture}
+      state: {tag: unknown, reason: not_published}
+      note: 'Printed as air or CO-CO2 mixture; the SweepGas shape carries one species field and cannot represent a mixture or an alternative, so the printed text is retained rather than a single species chosen.'
       locator: *sossi_experimental
     regime:
       regime_class: {tag: unknown, reason: not_published}

@@ -50,13 +50,13 @@ experiments:
     temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 8, note: 1600 C; unit conversion only}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '20', approximate: true}}, locator: {published_page: 8, note: ~2x10^-4 bar H2; unit conversion only}}
-    sweep_gas: {state: {tag: value, value: Hydrogen}, locator: *mendy_h2_apparatus}
+    sweep_gas: {state: {tag: value, value: {species: hydrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: *mendy_h2_apparatus}
     regime: {regime_class: {tag: unknown, reason: not_published}}
 - <<: *mendy_h2_series
   experiment_id: cai4b2-h2-2e-5-bar-series
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '2', approximate: true}}, locator: {published_page: 8, note: ~2x10^-5 bar H2; unit conversion only}}
-    sweep_gas: {state: {tag: value, value: Hydrogen}, locator: *mendy_h2_apparatus}
+    sweep_gas: {state: {tag: value, value: {species: hydrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: *mendy_h2_apparatus}
     regime: {regime_class: {tag: unknown, reason: not_published}}
 - experiment_id: cai4b2-vacuum-series
   bench_id: chicago-high-vacuum-furnace

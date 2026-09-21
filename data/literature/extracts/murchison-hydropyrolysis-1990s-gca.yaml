@@ -54,7 +54,7 @@ experiments:
       state: {tag: value, value: {kind: point, point: '15000000'}}
       locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: 15 MPa hydrogen; unit conversion only}
     sweep_gas:
-      state: {tag: value, value: Hydrogen}
+      state: {tag: value, value: {species: hydrogen, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
       locator: *hydro_apparatus
     regime: {regime_class: {tag: unknown, reason: not_published}}
 corrections: []

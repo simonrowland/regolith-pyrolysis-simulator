@@ -75,8 +75,8 @@ experiments:
       state: {tag: value, value: {kind: point, point: '101325'}}
       locator: {page: 1, section: Abstract, note: 'Printed one-atmosphere furnace; SI definition conversion only'}
     sweep_gas:
-      state: {tag: value, value: CO-CO2 gas mixtures}
-      locator: {page: 4, section: '2.1 Experimental Methods'}
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 4, section: '2.1 Experimental Methods', note: 'Printed as CO-CO2 gas mixtures; the SweepGas shape carries one species field and cannot represent a two-gas mixture, so the printed text is retained here rather than reduced to a single species.'}
     regime:
       regime_class: {tag: value, value: viscous}
   fO2_control:

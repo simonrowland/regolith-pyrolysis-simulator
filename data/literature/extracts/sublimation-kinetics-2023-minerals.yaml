@@ -39,8 +39,9 @@ benches:
     state: {tag: value, value: Edwards E2M1.5 Rotary Vane Vacuum Pump}
     locator: *sinter_locator
   gauges:
-    state: {tag: value, value: Mechanical pressure gauge}
-    locator: *sinter_locator
+    chamber_pressure_gauge:
+      state: {tag: value, value: Mechanical pressure gauge}
+      locator: *sinter_locator
 - id: bet-analyser
   identity: {basis: described_in_this_work}
   apparatus_family:

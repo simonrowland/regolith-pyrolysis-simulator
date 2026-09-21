@@ -72,7 +72,7 @@ experiments:
     temperature_K: {state: {tag: unknown, reason: not_published}, locator: {published_page: 574, table: '1', note: Three isothermal setpoints, not one series temperature}}
   pressure_environment:
     total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '110000', approximate: true}}, locator: {published_page: 574, note: 1.1 +/- 0.1 bar helium; unit conversion only}}
-    sweep_gas: {state: {tag: value, value: Helium}, locator: *degassing_apparatus}
+    sweep_gas: {state: {tag: value, value: {species: helium, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: *degassing_apparatus}
     regime: {regime_class: {tag: unknown, reason: not_published}}
 - <<: *murchison_degassing_base
   experiment_id: murchison-stepwise-series
