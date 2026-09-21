@@ -113,13 +113,26 @@ def test_buffer_derivation_and_domain():
 
 def test_printed_gas_composition_derives_oxygen():
     experiment, bench, observation = case(oxygen=False, pressure="100000")
-    experiment = replace(experiment, fO2_control=FO2Control(State.unknown("channel"),
-        oxygen_partial_pressure_Pa=f.located(Value.point_of(1))))
     observation = replace(observation, point_conditions={**observation.point_conditions,
         "gas_composition": f.located(Composition("gas", (("O2", Decimal(".2")), ("Ar", Decimal(".8"))), AmountBasis.MOLE_FRACTION))})
     result = oxygen_condition(experiment, bench, observation).selected
     assert result.authority is WaypointAuthority.DERIVED
     assert float(result.value.point) == pytest.approx(math.log10(.2))
+
+
+def test_printed_control_pressure_outranks_gas_composition_derivation():
+    """A printed fO2-control pO2 is direct evidence; the observation
+    gas_composition x_O2 * P_total derivation must not shadow it."""
+    experiment, bench, observation = case(oxygen=False, pressure="100000")
+    experiment = replace(experiment, fO2_control=FO2Control(State.unknown("channel"),
+        oxygen_partial_pressure_Pa=f.located(Value.point_of(1))))
+    observation = replace(observation, point_conditions={**observation.point_conditions,
+        "gas_composition": f.located(Composition("gas", (("O2", Decimal(".2")), ("Ar", Decimal(".8"))), AmountBasis.MOLE_FRACTION))})
+    result = oxygen_condition(experiment, bench, observation)
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    assert result.selected.route == "oxygen_partial_pressure_to_log_fO2"
+    assert result.selected.value.point == -5
+    assert "observation_gas_composition" in {route.route for route in result.routes}
 
 
 def test_point_oxygen_pressure_derives_log_units():
@@ -191,6 +204,23 @@ def test_kems_payload_passes_real_validator():
     validate_kems_case(result.payload)
     assert result.payload["samples"][0]["initial_mass_mg"] == 100
     assert result.payload["provider_inputs"]["pO2_bar"] == 1e-9
+
+
+def test_kems_refuses_reduced_charge_when_print_names_dropped_species():
+    """A printed composition naming a species no charge route can cover (no
+    molar mass) must refuse the reduced charge, mirroring the engine_point
+    dropped-species refusal; the reduced set is never scored as complete."""
+    experiment, bench, observation = complete_kems()
+    experiment = replace(experiment, sample=replace(experiment.sample,
+        printed_composition=f.located({"MgO": Decimal("97"), "Unobtainium2O": Decimal("3")})))
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    assert list(inputs.charges) == ["MgO"]
+    assert inputs.charges.dropped == ("Unobtainium2O",)
+    result = kems_case(inputs)
+    assert result.payload is None
+    assert result.readiness.status is ReadinessStatus.GAP
+    assert any(gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+               and "Unobtainium2O" in gap.waypoint for gap in result.readiness.gaps)
 
 
 @pytest.mark.parametrize("name", REQUIREMENTS["kems"])

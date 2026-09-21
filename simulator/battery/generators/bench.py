@@ -139,6 +139,12 @@ def kems_case(inputs: ConsumerInputs) -> GeneratedInput:
         return GeneratedInput(readiness, None, provenance)
     from simulator.diagnostic_helpers.kems import validate_kems_case, KEMSSchemaError
     try:
+        if inputs.charges.dropped:
+            # The print names species no charge route covers; scoring the
+            # reduced set would silently vanish printed sample mass, exactly
+            # the refusal engine_point enforces on the intensive side.
+            raise UnsupportedValue(
+                "charge_moles_by_species.dropped:" + ",".join(inputs.charges.dropped))
         if len(inputs.charges) != 1:
             raise UnsupportedValue("single_oxide_formula")
         escape = inputs.waypoints["effective_escape_area"].selected

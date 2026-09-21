@@ -8,7 +8,7 @@ from simulator.battery.records import Located, Value
 from simulator.battery.enums import ValueKind
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
-    ConsumerReadiness, _result, charge_moles_by_species, thermal_path,
+    ConsumerReadiness, _AUTHORITY_RANK, _result, charge_moles_by_species, thermal_path,
     pressure_boundary, oxygen_condition, effective_escape_area, normalized_composition,
 )
 
@@ -74,10 +74,13 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
                 value = Value(ValueKind.CATEGORICAL, categorical=value)
             routes.append(Waypoint(name, value, path,
                 WaypointAuthority.DERIVED if located.inference else WaypointAuthority.PRINTED, (path,)))
-        result = _result(name, routes, tuple(path for path, _ in ((prefix + "." + name, None), *candidates)))
-        if routes and routes[0].route.startswith("observation["):
-            return WaypointResult(name, routes[0], tuple(routes))
-        return result
+        # The observation point condition specializes the run scope, so it
+        # stays first; remaining candidates rank by authority, ties keep the
+        # caller's candidate order.
+        head = routes[:1] if routes and routes[0].route.startswith("observation[") else []
+        tail = routes[len(head):]
+        tail = sorted(tail, key=lambda route: _AUTHORITY_RANK[route.authority], reverse=True)
+        return _result(name, head + tail, tuple(path for path, _ in ((prefix + "." + name, None), *candidates)))
 
     thermal = thermal_path(experiment, bench, observation)
     temperature = thermal

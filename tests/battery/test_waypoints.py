@@ -7,13 +7,16 @@ import pytest
 
 from simulator.battery.migrate import wt_pct_to_mole_fraction
 
-from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
+from simulator.battery.enums import AmountBasis, BenchIdentityBasis, FO2Channel, MethodToken, ValueKind
 from simulator.battery.records import (
     ApparatusGeometry,
     Bench,
     BenchFact,
     BenchIdentity,
     Composition,
+    Derivation,
+    FO2Control,
+    Located,
     Sample,
     SweepGas,
     SweepGasComponent,
@@ -34,6 +37,7 @@ from simulator.battery.waypoints import (
     g1,
     g2,
     g3,
+    normalized_composition,
     oxygen_condition,
     pressure_boundary,
     relevant_volume,
@@ -153,6 +157,28 @@ def test_pressure_keeps_printed_and_derived_routes() -> None:
         "printed_run_pressure",
         "steady_gas_load_over_pump_speed",
     }
+
+
+def test_inferred_run_pressure_never_carries_printed_authority() -> None:
+    """A unit-converted or otherwise inferred run pressure is a derivation;
+    it still wins its scope but must not be stamped printed."""
+    experiment = factories.tabulation_experiment(total_P=Decimal("2e-3"))
+    located_pressure = experiment.pressure_environment.total_pressure_Pa
+    inferred = Located(
+        located_pressure.state,
+        located_pressure.locator,
+        Derivation("unit_conversion", ("printed_mTorr",), (), "Pa"),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=inferred
+        ),
+    )
+    result = pressure_boundary(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "printed_run_pressure"
+    assert result.selected.authority is WaypointAuthority.DERIVED
 
 
 def test_diameter_only_escape_area_is_flagged_and_not_midpointed() -> None:
@@ -336,6 +362,69 @@ def test_oxygen_condition_never_selects_among_alternatives() -> None:
     result = oxygen_condition(_sweep_gas_experiment(gas), _bench())
     assert result.selected is None
     assert not any("sweep" in route.route for route in result.routes)
+
+
+def test_sweep_species_route_refuses_when_alternatives_present() -> None:
+    """A species="O2" record that also sets alternatives is invalid (validation
+    rejects it); the waypoint must refuse it too, never score the partial."""
+    unknown = factories.State.unknown("not_published")
+    gas = SweepGas(
+        species="O2",
+        flow_sccm=unknown,
+        partial_pressure_Pa=factories.State.of(Decimal("20000")),
+        alternatives=(
+            SweepGas(species="Ar", flow_sccm=unknown, partial_pressure_Pa=unknown),
+            SweepGas(species="N2", flow_sccm=unknown, partial_pressure_Pa=unknown),
+        ),
+    )
+    result = oxygen_condition(_sweep_gas_experiment(gas), _bench())
+    assert result.selected is None
+    assert not any("sweep" in route.route for route in result.routes)
+
+
+def test_printed_mixture_component_outranks_observation_gas_derivation() -> None:
+    """A printed mixture-component pO2 is direct evidence; an observation
+    gas_composition x_O2 * P_total derivation must not shadow it."""
+    experiment = _sweep_gas_experiment(_o2_ar_mixture())
+    gas = Composition("mix", (("O2", Decimal("0.21")), ("N2", Decimal("0.79"))), AmountBasis.MOLE_FRACTION)
+    observation = replace(
+        factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
+        point_conditions={"gas_composition": factories.located(gas)},
+    )
+    result = oxygen_condition(experiment, _bench(), observation)
+    assert result.selected is not None
+    assert result.selected.route == "oxygen_sweep_component_partial_pressure"
+    assert float(result.selected.value.point) == pytest.approx(-0.6989700043360188, rel=1e-12)
+    assert "observation_gas_composition" in {route.route for route in result.routes}
+
+
+def test_printed_sweep_partial_pressure_outranks_buffer_derivation() -> None:
+    """A printed sweep pO2 outranks the buffer relation, which needs a
+    published table plus thermal and pressure waypoints."""
+    experiment = replace(
+        factories.kems_experiment(),
+        conditions={"temperature_K": factories.located(Decimal("1200"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("IW"),
+        ),
+    )
+    single = SweepGas(
+        species="O2",
+        flow_sccm=factories.State.unknown("not_published"),
+        partial_pressure_Pa=factories.State.of(Decimal("20000")),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, sweep_gas=factories.located(single)
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "oxygen_sweep_partial_pressure"
+    assert float(result.selected.value.point) == pytest.approx(-0.6989700043360188, rel=1e-12)
+    assert "buffer_relation" in {route.route for route in result.routes}
 
 
 def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
@@ -665,6 +754,85 @@ def test_categorical_printed_composition_routes_no_wt_percent() -> None:
     )
     assert result.absence is not None
     assert not result
+
+
+def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
+    """An inferred point composition must never outrank a printed wt%: the
+    observation scope bit is not evidence authority."""
+    printed = {"MgO": Decimal("40.304"), "SiO2": Decimal("60.083")}
+    sample = Sample(
+        mass_kg=Located(factories.State.unknown("intensive point only")),
+        printed_composition=factories.located(printed),
+    )
+    experiment = replace(factories.kems_experiment(), sample=sample)
+    inferred = Located(
+        factories.State.of(
+            Composition(
+                "mix",
+                (("MgO", Decimal("0.1")), ("SiO2", Decimal("0.9"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        factories.loc(),
+        Derivation("estimated_point", ("assumed",), (), "mol_fraction"),
+    )
+    observation = replace(
+        factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
+        point_conditions={"composition": inferred},
+    )
+    result = normalized_composition(experiment, _bench(), observation)
+    assert result.selected is not None
+    assert result.selected.route == "normalized_printed_composition"
+    # CIAAW molar masses: 40.304/40.304 and 60.083/60.083 give equal moles.
+    assert result.selected.value == {"MgO": Decimal("0.5"), "SiO2": Decimal("0.5")}
+    # The inferred route stays visible as evidence; it is just never selected.
+    assert "observation_normalized_initial_composition" in {
+        route.route for route in result.routes
+    }
+
+
+def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:
+    """A molar inventory carrying an inference marker is a derivation: it must
+    not acquire printed authority, and a printed wt% derivation outranks it."""
+    sample = Sample(
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=Located(
+            factories.State.of(
+                Composition(
+                    "mix",
+                    (("MgO", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+                    AmountBasis.MOL_INVENTORY,
+                )
+            ),
+            factories.loc(),
+            Derivation("derived_inventory", ("wt_pct",), (), "mol"),
+        ),
+        printed_composition=factories.located({"MgO": Decimal("40"), "SiO2": Decimal("60")}),
+    )
+    result = charge_moles_by_species(replace(factories.kems_experiment(), sample=sample), _bench())
+    selected = result["MgO"].selected
+    assert selected is not None
+    assert selected.route == "mass_times_printed_wt_percent"
+    assert selected.authority is WaypointAuthority.DERIVED
+    inventory = next(
+        route for route in result["MgO"].routes if route.route == "printed_molar_inventory"
+    )
+    assert inventory.authority is WaypointAuthority.DERIVED
+    # A genuinely printed inventory keeps printed authority and wins outright.
+    printed_sample = replace(
+        sample,
+        initial_composition=Located(
+            factories.State.of(sample.initial_composition.state.value), factories.loc()
+        ),
+    )
+    printed_result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=printed_sample), _bench()
+    )
+    printed_selected = printed_result["MgO"].selected
+    assert printed_selected is not None
+    assert printed_selected.route == "printed_molar_inventory"
+    assert printed_selected.authority is WaypointAuthority.PRINTED
+    assert printed_selected.value.point == Decimal("0.5")
 
 
 def test_geometric_only_escape_does_not_satisfy_kems_readiness() -> None:

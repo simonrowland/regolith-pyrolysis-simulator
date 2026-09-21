@@ -83,6 +83,10 @@ class WaypointResult:
 class SpeciesWaypoints(Mapping[str, WaypointResult]):
     by_species: Mapping[str, WaypointResult]
     absence: WaypointAbsence | None = None
+    # Printed composition keys carrying a numeric wt% that no route could
+    # charge (e.g. unknown molar mass). Consumers must refuse the reduced
+    # charge set rather than score it as complete.
+    dropped: tuple[str, ...] = ()
 
     def __getitem__(self, key: str) -> WaypointResult:
         return self.by_species[key]
@@ -146,8 +150,11 @@ ENGINE_POINT_CONSUMERS = (
 
 
 def _result(name: str, routes: list[Waypoint], missing: tuple[str, ...]) -> WaypointResult:
-    selected = max(routes, key=lambda item: (
-        item.route.startswith("observation_"), _AUTHORITY_RANK[item.authority])) if routes else None
+    # Callers pass routes best-first. The evidence ladder (was the source
+    # printed or inferred, and how direct is the derivation) is known only
+    # where the routes are built; selecting here by route-name prefix or a
+    # second authority sort would discard that ladder.
+    selected = routes[0] if routes else None
     absence = None if selected else WaypointAbsence(name, GapReason.MISSING_EVIDENCE, missing)
     return WaypointResult(name, selected, tuple(routes), absence)
 
@@ -278,23 +285,37 @@ def charge_moles_by_species(
                 species: replace(value, selected=scoped_waypoint(value.selected) if value.selected else None,
                                  routes=tuple(scoped_waypoint(item) for item in value.routes))
                 for species, value in result.items()
-            }, result.absence)
+            }, result.absence, result.dropped)
     del bench
     routes: dict[str, list[Waypoint]] = {}
+    # Evidence ladder per species, parallel to routes: an inferred source never
+    # outranks a printed one, and a direct printed molar inventory outranks the
+    # wt% and mole-fraction derivations (which need external molar masses).
+    ranks: dict[str, list[tuple[bool, int]]] = {}
+
+    def ranked(species: str, waypoint: Waypoint, inferred: bool, directness: int) -> None:
+        routes.setdefault(species, []).append(waypoint)
+        ranks.setdefault(species, []).append((not inferred, directness))
+
+    dropped: list[str] = []
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
             for species, moles in comp.components:
-                routes.setdefault(species, []).append(
+                ranked(
+                    species,
                     Waypoint(
                         f"charge_moles_by_species.{species}",
                         Value.point_of(moles),
                         "printed_molar_inventory",
-                        WaypointAuthority.PRINTED,
+                        # An inferred inventory is a derivation, never a print.
+                        WaypointAuthority.DERIVED if composition.inference else WaypointAuthority.PRINTED,
                         ("experiment.sample.initial_composition",),
-                    )
+                    ),
+                    bool(composition.inference),
+                    2,
                 )
         elif mass is not None and comp.amount_basis is AmountBasis.MOLE_FRACTION:
             masses = [(species, _molar_mass_kg_mol(species), fraction) for species, fraction in comp.components]
@@ -311,14 +332,17 @@ def charge_moles_by_species(
                             # Premise: x_i=n_i/n_tot and m=n_tot*Σ(x_i*M_i).
                             # Algebra: n_i=x_i*m/Σ(x_j*M_j). Units: kg/(kg/mol)=mol.
                             # Sanity: 100 mg Mg2SiO4 / 0.140693 kg/mol = 7.108e-4 mol.
-                            routes.setdefault(species, []).append(
+                            ranked(
+                                species,
                                 Waypoint(
                                     f"charge_moles_by_species.{species}",
                                     value,
                                     "mass_times_mole_fraction",
                                     WaypointAuthority.DERIVED,
                                     ("experiment.sample.mass_kg", "experiment.sample.initial_composition"),
-                                )
+                                ),
+                                bool(composition.inference),
+                                0,
                             )
     printed = experiment.sample.printed_composition
     if mass is not None and printed is not None and printed.state.is_value:
@@ -338,6 +362,9 @@ def charge_moles_by_species(
             for species, wt_pct in numeric.items():
                 molar_mass = _molar_mass_kg_mol(species)
                 if molar_mass is None:
+                    # The print names a species no route can charge; the
+                    # reduced set must not be scored as the whole charge.
+                    dropped.append(species)
                     continue
                 species_mass = _multiply(
                     mass, Value.point_of(wt_pct / Decimal(100))
@@ -351,8 +378,8 @@ def charge_moles_by_species(
                     # Premise: w_i is printed wt% and m_i=m*w_i/100.
                     # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
                     # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
-                    routes.setdefault(species, []).insert(
-                        0,
+                    ranked(
+                        species,
                         Waypoint(
                             f"charge_moles_by_species.{species}",
                             value,
@@ -360,11 +387,14 @@ def charge_moles_by_species(
                             WaypointAuthority.DERIVED,
                             ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
                         ),
+                        bool(printed.inference),
+                        1,
                     )
     results = {
         species: _result(
             f"charge_moles_by_species.{species}",
-            candidates,
+            [route for _, route in sorted(
+                zip(ranks[species], candidates), key=lambda pair: pair[0], reverse=True)],
             ("experiment.sample.mass_kg", "experiment.sample.initial_composition"),
         )
         for species, candidates in routes.items()
@@ -379,7 +409,7 @@ def charge_moles_by_species(
                 "experiment.sample.initial_composition",
             ),
         )
-    return SpeciesWaypoints(results, absence)
+    return SpeciesWaypoints(results, absence, tuple(sorted(set(dropped) - set(results))))
 
 
 def normalized_composition(
@@ -514,7 +544,10 @@ def pressure_boundary(
         routes.append(point)
     printed = _value(experiment.pressure_environment.total_pressure_Pa)
     if printed is not None:
-        routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure", WaypointAuthority.PRINTED, ("experiment.pressure_environment.total_pressure_Pa",)))
+        run_pressure = experiment.pressure_environment.total_pressure_Pa
+        routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
+            WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
+            ("experiment.pressure_environment.total_pressure_Pa",)))
     speed = _value(bench.pumping_speed_m3_s)
     gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
     volume = relevant_volume(experiment, bench).selected
@@ -735,8 +768,19 @@ def thermal_path(
         # Premise: one ramp ends at the sole hold temperature; multiple arrays do not establish order.
         # Algebra: t_hold,absolute=t_ramp,end+t_hold,relative. Units: s+s=s.
         # Sanity: 300→1500 K at 2 K/s plus a 600 s hold ends at 1200 s.
+        # The composed schedule ranks behind observation-scoped points and any
+        # printed route, ahead of the single-block derivations it subsumes.
+        insert_at = next(
+            (
+                index
+                for index, route in enumerate(routes)
+                if not route.route.startswith("observation_")
+                and route.authority is not WaypointAuthority.PRINTED
+            ),
+            len(routes),
+        )
         routes.insert(
-            0,
+            insert_at,
             Waypoint(
                 "thermal_path",
                 Value(ValueKind.SERIES, series=ramp_series + shifted_holds),
@@ -773,37 +817,15 @@ def oxygen_condition(
                 WaypointAuthority.DERIVED, point_pressure.inputs))
     control = experiment.fO2_control
     if control is not None:
-        if control.buffer is not None and control.buffer.state.is_value:
-            from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
-
-            buffer = PUBLISHED_BUFFERS.get(str(control.buffer.state.value).upper())
-            thermal = thermal_path(experiment, bench, observation).selected
-            pressure = pressure_boundary(experiment, bench, observation).selected
-            if buffer is not None and thermal is not None and pressure is not None:
-                temperature = thermal.value
-                if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
-                    temperature = Value.point_of(temperature.series[0][1])
-                if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
-                        and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
-                    T = temperature.point
-                    P = pressure.value.point / Decimal(100000)
-                    # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
-                    # condensed buffer equilibrium inside its published T domain.
-                    # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
-                    # Units: K/K and (K/bar)*bar/K are dimensionless.
-                    # Sanity: IW at 1000 K, 1 bar gives -20.787.
-                    value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
-                    routes.append(Waypoint("oxygen_condition", Value.point_of(value),
-                        "buffer_relation", WaypointAuthority.DERIVED,
-                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
         pressure = _value(control.oxygen_partial_pressure_Pa)
         if pressure is not None:
             value = _log_pressure(pressure)
             if value is not None:
-                routes.insert(0, Waypoint("oxygen_condition", value, "oxygen_partial_pressure_to_log_fO2",
+                routes.append(Waypoint("oxygen_condition", value, "oxygen_partial_pressure_to_log_fO2",
                     WaypointAuthority.DERIVED, ("experiment.fO2_control.oxygen_partial_pressure_Pa",)))
     sweep = experiment.pressure_environment.sweep_gas
-    if sweep.state.is_value and sweep.state.value.species == "O2" and sweep.state.value.partial_pressure_Pa.is_value:
+    if (sweep.state.is_value and sweep.state.value.alternatives is None
+            and sweep.state.value.species == "O2" and sweep.state.value.partial_pressure_Pa.is_value):
         value = _log_pressure(Value.point_of(sweep.state.value.partial_pressure_Pa.value))
         if value is not None:
             routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_partial_pressure",
@@ -857,6 +879,31 @@ def oxygen_condition(
                                 (f"observation[{observation.observation_id}].point_conditions.gas_composition", *thermal.inputs)))
                     except OffgasFO2Unavailable:
                         pass
+    # The buffer relation is a heavier derivation (published table + thermal +
+    # pressure waypoints) than any printed pO2 above, so it ranks last.
+    if control is not None and control.buffer is not None and control.buffer.state.is_value:
+        from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
+
+        buffer = PUBLISHED_BUFFERS.get(str(control.buffer.state.value).upper())
+        thermal = thermal_path(experiment, bench, observation).selected
+        pressure = pressure_boundary(experiment, bench, observation).selected
+        if buffer is not None and thermal is not None and pressure is not None:
+            temperature = thermal.value
+            if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
+                temperature = Value.point_of(temperature.series[0][1])
+            if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
+                    and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
+                T = temperature.point
+                P = pressure.value.point / Decimal(100000)
+                # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
+                # condensed buffer equilibrium inside its published T domain.
+                # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
+                # Units: K/K and (K/bar)*bar/K are dimensionless.
+                # Sanity: IW at 1000 K, 1 bar gives -20.787.
+                value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
+                routes.append(Waypoint("oxygen_condition", Value.point_of(value),
+                    "buffer_relation", WaypointAuthority.DERIVED,
+                    ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
     return _result("oxygen_condition", routes, ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"))
 
 
