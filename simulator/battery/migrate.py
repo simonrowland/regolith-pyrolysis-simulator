@@ -2926,29 +2926,41 @@ def lineage_parents_from_source(
     values: Mapping[str, Any],
     source_id: str,
     local_ids: set[str],
-) -> tuple[str, ...]:
-    """Observation ids the source named as parents. Never invents a pointer."""
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Source-stated lineage as (parents, prose). Never invents a pointer.
+
+    A stated parent resolves only against a local observation id or an
+    already-qualified ``source::id`` reference. Bare text that names no
+    resolvable id is prose about how the value was obtained; it is returned
+    in the second tuple so the caller can route it to the queue rather than
+    minting a ``source::prose`` pointer that cannot resolve by construction.
+    """
 
     raw = values.get("derived_from")
     if raw is None:
         raw = obs.get("derived_from")
     if raw is None or raw == "":
-        return ()
+        return (), ()
     if isinstance(raw, str):
         items = [raw]
     elif isinstance(raw, (list, tuple)):
         items = [str(x) for x in raw if x]
     else:
-        return ()
+        return (), ()
     parents: list[str] = []
+    prose: list[str] = []
     prefix = f"{source_id}::"
     for item in items:
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
+        elif "::" in item:
+            # Source-stated qualified pointer; kept as written. If it
+            # dangles, the store validator flags the extract, not us.
+            parents.append(item)
         else:
-            parents.append(item if "::" in item else f"{prefix}{item}")
-    return tuple(parents)
+            prose.append(item)
+    return tuple(parents), tuple(prose)
 
 
 def map_method(regime: object) -> State[MethodToken]:
@@ -4783,7 +4795,10 @@ def _merge_located_mapping(
     if new is None:
         return dict(old)
     out: dict[str, Located[Any]] = {}
-    for key in set(old) | set(new):
+    # Insertion-ordered union: existing keys keep their positions, new keys
+    # append. set(old) | set(new) would leak PYTHONHASHSEED-dependent order
+    # into serialized output.
+    for key in dict.fromkeys((*old, *new)):
         merged = _prefer_located(old.get(key), new.get(key))
         if merged is not None:
             out[key] = merged
@@ -6457,9 +6472,22 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        derived_from = lineage_parents_from_source(
+        derived_parents, derived_prose = lineage_parents_from_source(
             obs, values, source_id, local_ids
-        ) or None
+        )
+        derived_from = derived_parents or None
+        for prose_item in derived_prose:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["derived_from"],
+                (
+                    f"derived_from {prose_item!r} is prose, not a resolvable "
+                    "observation id; retained here, never minted as a pointer"
+                ),
+                source=source_key,
+                observation_id=obs_id,
+            )
         yield_key, yield_items = _yield_table_items(values)
         if yield_items:
             yield_quantity: Quantity | State[Quantity] = (

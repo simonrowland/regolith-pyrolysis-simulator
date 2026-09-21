@@ -42,6 +42,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     convert_temperature_to_k,
     iter_observation_store_paths,
+    lineage_parents_from_source,
     map_phase,
     map_quantity,
     compilation_quantity_from_record,
@@ -501,6 +502,98 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
     migrate(root, write=True)
     assert (root / "data" / "literature" / "extracts" / "fixture-source.yaml").read_bytes() == original
     assert (root / "data" / "literature" / "works" / "ALIASES.yaml").is_file()
+
+
+def test_merge_located_mapping_order_is_hash_seed_stable() -> None:
+    """b-549: set(old) | set(new) leaked PYTHONHASHSEED-dependent key order
+    into serialized output (dump_yaml writes with sort_keys=False). The merge
+    must be insertion-ordered: existing keys keep position, new keys append.
+    Subprocesses are required — the hash seed is fixed at interpreter start.
+    """
+
+    probe = (
+        "from simulator.battery.migrate import _merge_located_mapping\n"
+        "from simulator.battery.records import Located, State\n"
+        "old = {k: Located(State.of(k)) for k in ('alpha', 'beta', 'gamma')}\n"
+        "new = {k: Located(State.of(k)) for k in ('delta', 'epsilon', 'zeta')}\n"
+        "print(','.join(_merge_located_mapping(old, new).keys()))\n"
+    )
+    orders = set()
+    for seed in ("0", "1", "2", "42"):
+        env = os.environ.copy()
+        env["PYTHONHASHSEED"] = seed
+        env["PYTHONPATH"] = str(REPO_ROOT)
+        out = subprocess.run(
+            [sys.executable, "-c", probe],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            env=env,
+            check=True,
+        ).stdout.strip()
+        orders.add(out)
+    assert orders == {"alpha,beta,gamma,delta,epsilon,zeta"}
+
+
+def test_lineage_parents_from_source_never_invents_pointer() -> None:
+    """b-549: bare prose in derived_from must not get a source prefix slapped
+    on — it can never resolve by construction. It is returned as prose so the
+    caller can route it to the queue instead of minting a dangling pointer.
+    """
+
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": "author geometric calculation from assumed cube dimensions"},
+        {},
+        "src",
+        set(),
+    )
+    assert parents == ()
+    assert prose == ("author geometric calculation from assumed cube dimensions",)
+
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": ["local_a", "other::obs", "prose note", "src::local_b"]},
+        {},
+        "src",
+        {"local_a", "local_b"},
+    )
+    assert parents == ("src::local_a", "other::obs", "src::local_b")
+    assert prose == ("prose note",)
+
+    assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
+
+
+def test_prose_derived_from_is_queued_never_pointed(tmp_path: Path) -> None:
+    """b-549 end-to-end: a prose derived_from on a derived observation yields
+    no pointer on the record, no referential_integrity hard issue, and a queue
+    entry carrying the prose plus locator (the text is never silently dropped).
+    """
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values["derived_from"] = "author estimate from assumed grain population"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=True)
+    assert result.observations
+    for obs in result.observations.values():
+        assert not obs.derived_from
+    queued = [
+        e
+        for e in result.queue
+        if "author estimate from assumed grain population" in e.why
+    ]
+    assert len(queued) == 1
+    # _resolve_queue_ids re-points entries to the realised observation id.
+    assert queued[0].observation_id.startswith("fixture-source::na_psat")
+    assert queued[0].axes == ["derived_from"]
+    assert queued[0].locator  # locator rides along — the text keeps its address
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    reasons = {(i.path.rsplit(".", 1)[-1], i.reason.value) for i in report.hard_issues}
+    assert ("derived_from", "referential_integrity") not in reasons
+    # Unstated ancestry is still a hard conditional_field — surfaced, not hidden.
+    assert ("derived_from", "conditional_field") in reasons
 
 
 def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
