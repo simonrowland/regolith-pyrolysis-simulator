@@ -19,6 +19,70 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: yamada-kato-rm6k
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hitachi RM-6K mass spectrometer with computer-controlled ion-current measurement}
+    locator: &yamada_apparatus {published_page: 244, pdf_page_index: 1, section: 'II. Experimental'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *yamada_apparatus
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina Knudsen cell with tantalum susceptor and radiation shields}
+    locator: *yamada_apparatus
+  geometry:
+    orifice_diameter_m:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0004', interval_high: '0.0006'}}
+      locator: {published_page: 244, pdf_page_index: 1, section: '1. Knudsen Cell Assembly', note: '0.4-0.6 mm; unit conversion only. No effective area computed'}
+    orifice_channel_length_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 244, pdf_page_index: 1, section: '1. Knudsen Cell Assembly'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Two W-5%Re/W-26%Re thermocouples}
+      locator: *yamada_apparatus
+  detector:
+    state: {tag: value, value: Hitachi RM-6K mass spectrometer; resolution better than 2000}
+    locator: {published_page: 245, pdf_page_index: 2, section: '2. Mass Spectrometer'}
+  ionization:
+    energy_eV:
+      state: {tag: value, value: {kind: point, point: '22'}}
+      locator: {published_page: 245, pdf_page_index: 2, section: '4. Procedure'}
+experiments:
+- experiment_id: fep-kems-1600c-series
+  bench_id: yamada-kato-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 245, pdf_page_index: 2, section: '3. Samples; 4. Procedure'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.0015', approximate: true}}
+      locator: {published_page: 245, pdf_page_index: 2, note: 'Approximately 1.5 g; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Fe-P alloys, 0.7-3.2 wt% P (1.3-5.7 at% P)'}
+      locator: {published_page: 244, pdf_page_index: 1, note: 'P content used for activity determination was calculated from weighed Fe and Fe-P alloy because P analysis was poor'}
+    pretreatment:
+      state: {tag: value, value: 'Iron melted in high vacuum and deoxidized by Al; samples again deoxidized in the Knudsen cell'}
+      locator: {published_page: 245, pdf_page_index: 2, section: '3. Samples'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 244, pdf_page_index: 1, note: 'Bench prints an unassigned 0.4-0.6 mm range'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 244, pdf_page_index: 1}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 245, pdf_page_index: 2, note: '1600 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'At 1600 C, ion-peak scanning repeated as many times as possible'}
+      locator: {published_page: 245, pdf_page_index: 2, section: '4. Procedure'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 245, pdf_page_index: 2, note: 'About 8 h describes the hypothetical four-or-five-temperature sequence, which authors did not use to avoid alloy depletion'}
 fidelity_samples:
 - species: P
   observable: activity_coefficient
@@ -62,6 +126,7 @@ species:
   P:
     observations:
     - observation_id: yamada_kato_1980_kems_geometry_and_calibration
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         published_page: 244
@@ -163,6 +228,7 @@ species:
             pdf_page_index: 2
             note: vacuum quality / chamber pressure not printed
     - observation_id: yamada_kato_1980_epsilon_P_P_1600C
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         published_page: 247
@@ -255,6 +321,7 @@ species:
             pdf_page_index: 2
             note: vacuum quality / chamber pressure not printed
     - observation_id: yamada_kato_1980_quoted_epsilon_P_P
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         published_page: 244
@@ -304,6 +371,7 @@ species:
           - 0.45
           method_as_printed: sealed capsule; extrapolated to infinite dilution
     - observation_id: yamada_kato_1980_P_plus_count_rate_1p52wt
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '9'
@@ -343,6 +411,7 @@ species:
         - 3.0
         - 4.0
     - observation_id: yamada_kato_1980_p_vapor_pressure_estimate_1wt
+      experiment: fep-kems-1600c-series
       type: psat_series
       locator:
         published_page: 245
@@ -372,6 +441,7 @@ species:
         P_wt_pct: 1.0
         p_atm_about: 1.00e-09
     - observation_id: yamada_kato_1980_fig2_P2_background_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '2'
@@ -401,6 +471,7 @@ species:
         caption: Fig. 2. Relation between the P2+ ion peak and the background ion peak
         note: Interference of M/e=62 background subtracted from 31P2+ as described later.
     - observation_id: yamada_kato_1980_fig3_ion_ratio_vs_1_over_T_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '3'
@@ -431,6 +502,7 @@ species:
         note: ln(I_Fe+/I_P+) vs 1/T; N_P=0.0180 and 0.0522 labelled; 1600 C mark. 2-sigma +/-0.05 at 1600
           C. Not digitised.
     - observation_id: yamada_kato_1980_fig4_ion_ratio_vs_N_P_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '4'
@@ -461,6 +533,7 @@ species:
         note: 'ln(I_Fe+/I_P+) vs N_P. Authors: Fig. 4 does not agree with Fig. 3 because of pulse-counting
           constants. Not digitised.'
     - observation_id: yamada_kato_1980_fig5_integration_curve_figure_only
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         figure: '5'
@@ -490,6 +563,7 @@ species:
         caption: Fig. 5. Integration curve for the Fe-P system at 1600 C
         note: ln(I_Fe+/I_P+)-ln(N_Fe/N_P) vs N_P. Source of epsilon_P^P=7.3. Not digitised.
     - observation_id: yamada_kato_1980_fig6_gamma_P_comparison_figure_only
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -520,6 +594,7 @@ species:
         note: Present work 1600 C vs Schenck, Frohberg, Ban-ya overlays. Numeric epsilon values are in
           the text/quoted observation.
     - observation_id: yamada_kato_1980_fig7_activities_figure_only
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -549,6 +624,7 @@ species:
         caption: Fig. 7. Activities of P and Fe in the dilute solution of P in liquid Fe at 1600 C
         note: a_P vs Henry's law; a_Fe vs Raoult's law. No numeric table. Not digitised.
     - observation_id: yamada_kato_1980_fig8_integration_error_figure_only
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         figure: '8'
@@ -579,6 +655,7 @@ species:
         note: 'Circles: mother alloy 10.2 wt% P; squares: 9.0 wt% P; triangles: chemical analysis. Dotted
           +/-5% ion-current bands give epsilon 5.5 and 9.3.'
     - observation_id: yamada_kato_1980_fig9_P_plus_peak_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '9'
@@ -609,6 +686,7 @@ species:
         note: Numeric average 812.7 is stored on yamada_kato_1980_P_plus_count_rate_1p52wt; curve not
           digitised.
     - observation_id: yamada_kato_1980_fig10_P2_over_P_sq_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '10'
@@ -638,6 +716,7 @@ species:
         caption: Fig. 10. Concentration dependence of the ratio of I_P2+ to (I_P+)^2
         note: 'Authors: fragment contribution to P+ negligible except the 2.18 at% P point. Not digitised.'
     - observation_id: yamada_kato_1980_fig1_cell_assembly_figure_only
+      experiment: fep-kems-1600c-series
       type: rate_series
       locator:
         figure: '1'
@@ -670,6 +749,7 @@ species:
   Fe:
     observations:
     - observation_id: yamada_kato_1980_fe_activity_slight_negative_deviation
+      experiment: fep-kems-1600c-series
       type: activity_coefficient
       locator:
         published_page: 250

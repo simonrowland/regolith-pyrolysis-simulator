@@ -19,6 +19,79 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/EXTRACT-057.md
 review_status: draft
 corrections: []
+benches:
+- id: ueshima-sic-annealing-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Vertical SiC electric furnace with gas-tight high-purity alumina tube}
+    locator: &ueshima_apparatus {published_page: 556, pdf_page_index: 1, section: '2. Experimental Method'}
+  method:
+    state: {tag: value, value: Melt equilibration, annealing and water quench}
+    locator: *ueshima_apparatus
+  cell_material_and_liner:
+    state: {tag: value, value: Alumina SSA-S crucible in tantalum container}
+    locator: *ueshima_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *ueshima_apparatus
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.012'}}
+        locator: *ueshima_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Pt-Rh (6/30) thermocouple}
+      locator: {published_page: 557, pdf_page_index: 2, section: '2. Experimental Method'}
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Calibrated at Au 1064 C and Pd 1554 C points}
+      locator: {published_page: 557, pdf_page_index: 2, section: '2. Experimental Method'}
+experiments:
+- experiment_id: femo-annealing-series
+  bench_id: ueshima-sic-annealing-furnace
+  method: melt_equilibration_quench
+  locator: {published_page: '556-557', section: '2. Experimental Method'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.001', interval_high: '0.002', approximate: true}}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'About 1-2 g granular alloy; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'Fe-Mo alloys, 30-88 at% Mo'}
+      locator: {published_page: 557, pdf_page_index: 2}
+    form:
+      state: {tag: value, value: Granular alloy from arc-melted sample}
+      locator: {published_page: 556, pdf_page_index: 1}
+  pressure_environment:
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Purified Ar at 50-100 cc/min; this series range cannot be assigned as a scalar experiment flow'}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, pdf_page_index: 1, note: 'Flowing Ar; total pressure not printed'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 557, pdf_page_index: 2, note: '1529-1622 C is a series range, not one experiment setpoint'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Furnace anneal followed by water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 557, pdf_page_index: 2, note: '0.5-10 h is a series range, not one experiment duration'}
+    cooling_or_quench:
+      state: {tag: value, value: Water quench}
+      locator: {published_page: 557, pdf_page_index: 2}
 fidelity_samples:
 - path: species.Mo.observations[ueshima_1983_femo_invariant_this_work].values.T_C
   value: 1610.0
@@ -47,6 +120,7 @@ species:
   Mo:
     observations:
     - observation_id: ueshima_1983_femo_geometry
+      experiment: femo-annealing-series
       type: gibbs_table
       locator:
         published_page: 556
@@ -99,6 +173,7 @@ species:
             pdf_page_index: 1
             paragraph: Ar flow 50-100 cc/min
     - observation_id: ueshima_1983_femo_table1_phases
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         table: '1'
@@ -503,6 +578,7 @@ species:
       uncertainty:
         note: no numeric sigma on phase IDs; aimed compositions in parentheses
     - observation_id: ueshima_1983_femo_table2_epma
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         table: '2'
@@ -708,6 +784,7 @@ species:
         note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured
           calibration
     - observation_id: ueshima_1983_femo_invariant_this_work
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         published_page: 560
@@ -735,6 +812,7 @@ species:
         note: no numeric +/- on Eq.(3); Table 1 brackets the sigma-out temperature between 1609 and 1610
           C
     - observation_id: ueshima_1983_quoted_kems_thermal_analysis
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         published_page: 560
@@ -776,6 +854,7 @@ species:
       uncertainty:
         note: quoted +/- from the previous KEMS thermal-analysis paper
     - observation_id: ueshima_1983_quoted_kems_activities
+      experiment: femo-annealing-series
       type: activity_coefficient
       locator:
         published_page: 556
@@ -800,6 +879,7 @@ species:
       uncertainty:
         note: no numeric activities printed
     - observation_id: ueshima_1983_pure_Fe_melting_check
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         published_page: 561
@@ -826,6 +906,7 @@ species:
         note: authors say Hultgren 1538 C has about +1 to -3 C uncertainty and this experiment's thermometry
           is of that order
     - observation_id: ueshima_1983_fig1_epma_calibration_figure_only
+      experiment: femo-annealing-series
       type: rate_series
       locator:
         figure: '1'
@@ -856,6 +937,7 @@ species:
       uncertainty:
         note: figure-only; 2-5 at% Mo offset vs theoretical correction
     - observation_id: ueshima_1983_fig2_epma_results_figure_only
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         figure: '2'
@@ -877,6 +959,7 @@ species:
       uncertainty:
         note: figure-only
     - observation_id: ueshima_1983_fig3_phase_diagram_figure_only
+      experiment: femo-annealing-series
       type: transition_point
       locator:
         figure: '3'

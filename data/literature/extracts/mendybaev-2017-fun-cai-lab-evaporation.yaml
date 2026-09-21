@@ -18,6 +18,80 @@ extraction:
   date: '2026-09-19'
   worker: extract-mendybaev-2017
 review_status: draft
+benches:
+- id: chicago-high-vacuum-furnace
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: 'Hashimoto (1990)'
+      for_parameters: [geometry]
+      locator: {section: '3.1', pdf_page_index: 8, note: 'Furnace details deferred to Hashimoto (1990)'}
+  apparatus_family:
+    state: {tag: value, value: High-temperature high-vacuum furnace}
+    locator: &mendy_apparatus {section: '3.1', pdf_page_index: 8, note: 'University of Chicago high-temperature high-vacuum furnace'}
+  method:
+    state: {tag: value, value: Vacuum free evaporation}
+    locator: *mendy_apparatus
+  geometry:
+    state: {tag: unknown, reason: in_cited_source}
+    locator: {section: '3.1', pdf_page_index: 8, note: 'Furnace details deferred to Hashimoto (1990)'}
+  heating_method:
+    state: {tag: value, value: Furnace heating elements}
+    locator: {section: '3.1', pdf_page_index: 8, note: 'Experiment ended by cutting power to the heating elements'}
+  detector:
+    state: {tag: value, value: 'JEOL JSM-5800LV SEM with Oxford/Link ISIS-300 EDX; LA-MC-ICPMS'}
+    locator: {section: '3.2', pdf_page_index: 9, note: 'Residue chemical and isotopic analyses'}
+experiments:
+- experiment_id: func-evaporation-series
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis
+  locator: {section: '3.1', pdf_page_index: 8, note: 'Individual evaporation experiments'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000040'}}
+      locator: {section: '3.1', pdf_page_index: 8, note: '25-40 mg; unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: '37.9 wt% MgO, 11.6 wt% Al2O3, 42.9 wt% SiO2, 7.6 wt% CaO'}
+      locator: {section: '3.1', pdf_page_index: 8}
+    form:
+      state: {tag: value, value: 'Mixture loaded onto 2.5 mm diameter iridium wire loops'}
+      locator: {section: '3.1', pdf_page_index: 8}
+    pretreatment:
+      state: {tag: value, value: 'Oxide mixture heated in platinum crucible at 1000 C for about 10 h to drive off CO2'}
+      locator: {section: '3.1', pdf_page_index: 8}
+  apparatus:
+    geometry:
+      cell_or_crucible_material:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {section: '3.1', pdf_page_index: 8, note: 'Sample was on an iridium wire loop, not in a cell or crucible during evaporation'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.0001'}}
+      locator: {section: '3.1', pdf_page_index: 8, note: 'Vacuum <10^-9 bars during evaporation; unit conversion only'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {section: '3.1', pdf_page_index: 8, note: Vacuum evaporation}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.01', approximate: true}}
+        locator: {section: '3.1', pdf_page_index: 8, note: 'Pumped down to about 10^-7 bars before heating; unit conversion only'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '2173.15'}
+      locator: {section: '3.1', pdf_page_index: 8, note: '1900 C; unit conversion only'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: '1400 C at 20 C/min, about 20 min degas; then 1900 C at 40 C/min'}
+      locator: {section: '3.1', pdf_page_index: 8}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {section: '3.1', pdf_page_index: 8, note: '0-55 min applies only to the 1900 C evaporation interval, not a total run duration'}
+    cooling_or_quench:
+      state: {tag: value, value: Cutting power to heating elements}
+      locator: {section: '3.1', pdf_page_index: 8}
 fidelity_samples:
 - species: FUNC
   observable: rate_series
@@ -67,6 +141,7 @@ species:
   FUNC:
     observations:
     - observation_id: mendybaev_2017_func_table1_mass_loss
+      experiment: func-evaporation-series
       type: rate_series
       class_tag: measured
       locator:
@@ -796,6 +871,7 @@ species:
   Ca:
     observations:
     - observation_id: mendybaev_2017_ca_non_loss
+      experiment: func-evaporation-series
       type: rate_series
       class_tag: measured
       locator:
@@ -838,6 +914,7 @@ species:
   Al:
     observations:
     - observation_id: mendybaev_2017_al_non_loss
+      experiment: func-evaporation-series
       type: rate_series
       class_tag: measured
       locator:
