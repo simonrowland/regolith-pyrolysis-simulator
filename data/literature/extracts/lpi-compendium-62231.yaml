@@ -14,7 +14,7 @@ review_status: draft
 corrections: []
 fidelity_samples:
 - species: lunar_sample_62231
-  observable: sample_characterisation
+  observable: sample_characterization
   observation_id: lpi_2010_62231_inventory_mass
   field: sample_mass_g
   value: 87
@@ -22,10 +22,7 @@ fidelity_samples:
     pdf_page_index: 4
     figure: 'processing diagram'
     section: Processing
-- species: lunar_sample_62231
-  observable: composition
-  observation_id: lpi_2010_62231_table1_chemistry
-  field: Al2O3_wt_pct
+- path: species.lunar_sample_62231.observations[lpi_2010_62231_table1_chemistry].values.rows[0].Al2O3_wt_pct
   value: 26.5
   locator:
     pdf_page_index: 3

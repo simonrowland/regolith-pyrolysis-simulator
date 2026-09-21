@@ -23,7 +23,7 @@ review_status: draft
 corrections: []
 fidelity_samples:
 - species: Bennu_sample
-  observable: sample_characterization
+  observable: rate_series
   observation_id: metsoc_2024_6224_returned_sample_mass
   field: returned_sample_mass_g
   value: 121.6
@@ -32,8 +32,8 @@ fidelity_samples:
     section: Introduction
     note: OSIRIS-REx delivered 121.6 g of material from asteroid Bennu, as printed.
 - species: Bennu_sample
-  observable: sample_preparation
-  observation_id: metsoc_2024_6224_particle_preparation
+  observable: rate_series
+  observation_id: metsoc_2024_6224_sample_preparation_and_instrumentation
   field: particles_collected_approx
   value: 100
   locator:
@@ -41,17 +41,17 @@ fidelity_samples:
     section: Methods
     note: Approximately 100 particles were collected from the avionics deck of the sample canister, as printed.
 - species: Bennu_sample
-  observable: particle_size
-  observation_id: metsoc_2024_6224_particle_preparation
-  field: particle_size_range_um_as_printed
-  value: <1 to ~300
+  observable: rate_series
+  observation_id: metsoc_2024_6224_sample_preparation_and_instrumentation
+  field: particle_size_range_as_printed
+  value: <1 µm to ~300 µm
   locator:
     pdf_page_index: 1
     section: Methods
     note: Particle sizes are printed as <1 µm to ~300 µm; the bound and approximation are retained.
 - species: Bennu_sample
-  observable: targeted_grains
-  observation_id: metsoc_2024_6224_targeted_grains
+  observable: rate_series
+  observation_id: metsoc_2024_6224_sample_preparation_and_instrumentation
   field: pyrrhotite_grains_targeted
   value: 2
   locator:
@@ -59,16 +59,16 @@ fidelity_samples:
     section: Methods
     note: Sections targeting two pyrrhotite grains were prepared and analyzed, as printed.
 - species: Bennu_sample
-  observable: targeted_grains
-  observation_id: metsoc_2024_6224_targeted_grains
+  observable: rate_series
+  observation_id: metsoc_2024_6224_sample_preparation_and_instrumentation
   field: carbonate_grains_targeted
   value: 2
   locator:
     pdf_page_index: 1
     section: Methods
     note: Sections targeting two carbonate grains were prepared and analyzed, as printed.
-- species: H2O_bearing_vesicle
-  observable: EELS_peak
+- species: Mg_silicate_inclusion
+  observable: rate_series
   observation_id: metsoc_2024_6224_h2o_bearing_vesicle
   field: EELS_peak_eV
   value: 8.6

@@ -19,10 +19,7 @@ classification:
   - Petkov and Voecks (2023) mass-spectrometry study, for the cited evolved-gas figure.
   apparatus_status: The guide reports selected downstream apparatus conditions, but does not provide a complete primary-run record for every compiled table.
 fidelity_samples:
-- species: lunar_regolith_simulants
-  observable: simulant_characterisation
-  observation_id: nasa_tm_2024_table7_bulk_chemistry
-  field: composition_wt_pct
+- path: species.lunar_regolith_simulants.observations[nasa_tm_2024_table7_bulk_chemistry].values.rows[0].SiO2
   value: 47.2
   locator: {pdf_page_index: 44, published_page: 34, table: '7', row: BP-1, column: SiO2}
 species:

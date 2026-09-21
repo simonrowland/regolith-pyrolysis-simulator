@@ -35,7 +35,7 @@ evidence_policy:
     - raw numeric pressure points underlying Figures 1 and 2
     - printed uncertainty for the cited silicate-melt KEMS points
 fidelity_samples:
-- species: SiO
+- species: VapoRock
   observable: p_partial
   observation_id: wolf_2023_abstract_factor3_model_accuracy
   field: model_accuracy_factor
@@ -45,10 +45,7 @@ fidelity_samples:
     pdf_page_index: 1
     section: abstract
     note: Abstract reports VapoRock agreement with experiments within a factor of approximately 3.
-- species: lunar_basalt_12065
-  observable: printed_major_oxide_composition
-  observation_id: wolf_2023_table2_lunar_basalt_12065_composition
-  field: composition_wt_pct.SiO2
+- path: species.external_KEMS.observations[wolf_2023_lunar_basalt_12065_composition_compiled].values.composition_wt_pct.SiO2
   value: 46.87
   locator:
     published_page: 14
@@ -58,6 +55,23 @@ fidelity_samples:
 species:
   VapoRock:
     observations:
+    - observation_id: wolf_2023_abstract_factor3_model_accuracy
+      type: p_partial
+      class_tag: model
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        section: abstract
+      phase: gas
+      regime: engine_evaluation
+      units: dimensionless factor as printed
+      values:
+        quantity: model_accuracy_factor
+        method_class: model_derived
+        generator: VapoRock
+        evidence_class: model_derived
+        model_accuracy_factor: '~3'
+        claim_as_printed: Comparison with experiments shows that pressures and melt-oxide activities (which vary over many orders of magnitude) are reproduced to within a factor of ~3, consistent with measurement uncertainties.
     - observation_id: wolf_2023_vaporock_system_and_species
       type: p_partial
       class_tag: model

@@ -15,8 +15,7 @@ corrections:
 - note: The abstract and conclusion state 44 experimentally produced glasses, while Tables 1 and 2 enumerate 43 experiment IDs; both statements are retained without reconciliation.
   locators: [published page 121269 abstract, published pages 121271-121274 Tables 1-2]
 fidelity_samples:
-- observation_id: thomas_2022_table2_abfo1
-  field: chloride_capacity_CCl
+- path: species.Cl.observations[thomas_2022_table2_experimental_conditions_and_xaf].values.rows[0].CCl
   value: 0.32
   locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121273, pdf_page_index: 5, table: '2', record: Ab/Fo-1}
 species:
