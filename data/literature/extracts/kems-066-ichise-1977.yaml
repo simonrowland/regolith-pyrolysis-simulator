@@ -72,10 +72,67 @@ fidelity_samples:
     published_page: 422
     pdf_page_index: 6
     note: Table 2 Belton and Fruehan epsilon_Al^(Al)=+10.2
+benches:
+- id: rm6k
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hitachi RM6K Knudsen-cell mass spectrometer}
+    locator: &apparatus_locator {published_page: 418, pdf_page_index: 2, section: '2.2', figure: '1'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *apparatus_locator
+  cell_material_and_liner:
+    state: {tag: value, value: Alumina Knudsen cell; tantalum cell holder}
+    locator: *apparatus_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *apparatus_locator
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 418, figure: '1', note: 12 mm body height is not separately printed as internal depth}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Thermocouples at cell-holder points A and B}
+      locator: *apparatus_locator
+experiments:
+- experiment_id: fe-al-series
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: 418, section: '2.3-2.5', note: Fe-Al alloy measurement series}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 421, table: '1', note: Multiple Fe-Al compositions retained in observation rows; starting-metal assays are not a charge}
+    pretreatment:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 418, section: '2.3', note: Some alloys were premelted under 1 atm He and others melted in the cell; row assignments are not printed}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0005'}}
+        locator: *apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: *apparatus_locator
+    ionization:
+      electron_energy_eV:
+        state: {tag: value, value: {kind: point, point: '30'}}
+        locator: {published_page: 418, section: '2.5'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1673.15', interval_high: '1873.15'}}
+        locator: {published_page: 418, section: '2.3-2.5', note: Printed 1400-1600 C measurement range; unit conversion only}
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '21600', approximate: true}}
+      locator: {published_page: 418, section: '2.5', note: About 6 h per measurement; unit conversion only}
 species:
   Al:
     observations:
     - observation_id: ichise_1977_kems_geometry_and_calibration
+      experiment: fe-al-series
       type: rate_series
       locator:
         published_page: 418
@@ -187,6 +244,7 @@ species:
             section: '2.6'
             note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
     - observation_id: ichise_1977_al_activity_table1_1400C
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         table: '1'
@@ -354,6 +412,7 @@ species:
             section: '2.6'
             note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
     - observation_id: ichise_1977_ion_ratio_NAl_0p5_1470C_30V
+      experiment: fe-al-series
       type: rate_series
       locator:
         published_page: 418
@@ -431,6 +490,7 @@ species:
             section: '2.6'
             note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
     - observation_id: ichise_1977_gamma_al_epsilon_table2_this_study_1600C
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         table: '2'
@@ -523,6 +583,7 @@ species:
           T_K: 1873.15
           epsilon_Al_Al: 10.2
     - observation_id: ichise_1977_ln_gamma_al_temperature_equations
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         published_page: 422
@@ -565,6 +626,7 @@ species:
           gamma_Al_o: 0.049
           epsilon_Al_Al: 6.4
     - observation_id: ichise_1977_gamma_al_from_Al2O_ratio_rejected
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         published_page: 423
@@ -598,6 +660,7 @@ species:
         gamma_Al_o: 0.045
         authors_adopted_instead: ion-intensity-ratio (Belton-Fruehan) gamma_Al^o = 0.027 at 1400 C
     - observation_id: ichise_1977_1600C_fig4_extrapolation_rejected
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         published_page: 422
@@ -630,6 +693,7 @@ species:
         gamma_Al_o: 0.041
         gamma_Fe_o: 0.021
     - observation_id: ichise_1977_p_Al2O_p_Al_1500C_author_estimate
+      experiment: fe-al-series
       type: psat_series
       locator:
         published_page: 423
@@ -663,6 +727,7 @@ species:
         authors_use: to argue the orifice flow approaches viscous and the reverse of eq (3) becomes likely,
           biasing the Al2O-method gamma_Al high
     - observation_id: ichise_1977_limiting_molar_heat_of_mixing_Al
+      experiment: fe-al-series
       type: gibbs_table
       locator:
         published_page: 422
@@ -695,6 +760,7 @@ species:
         woolley_elliott_quoted_cal: -15350.0
         woolley_quoted_method_class: quoted_measurement
     - observation_id: ichise_1977_eq10_11_ion_ratio_integrand_1400C
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         published_page: 420
@@ -732,6 +798,7 @@ species:
         liquid_eq11_as_printed: ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) = 8.362 N_Al - 0.085
         two_phase_ln_IAl_over_IFe: 2.93
     - observation_id: ichise_1977_fig2_temperature_correction_figure_only
+      experiment: fe-al-series
       type: rate_series
       locator:
         figure: '2'
@@ -763,6 +830,7 @@ species:
         note: 'Ordinate: Temperature of melt - Temperature at point B; Abscissa: Temperature at point
           A - Temperature at point B'
     - observation_id: ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '3'
@@ -793,6 +861,7 @@ species:
         caption: Fig. 3. Effect of the chamber voltage on the ion ratio.
         note: 'Authors: the ratio changes sharply below 20 V; 30 V chosen considering Al2O fragmentation.'
     - observation_id: ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -825,6 +894,7 @@ species:
           0.330, 0.281, 0.172, 0.134, 0.097, 0.067, 0.022. This is the raw KEMS ion-intensity-ratio series;
           not digitised.'
     - observation_id: ichise_1977_fig5_solidus_liquidus_figure_only
+      experiment: fe-al-series
       type: transition_point
       locator:
         figure: '5'
@@ -861,6 +931,7 @@ species:
           liquidus: 0.406
           note: printed in the body from Fig. 4 breaks, not read off the Fig. 5 axes
     - observation_id: ichise_1977_fig6_integration_curve_1400C_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -891,6 +962,7 @@ species:
         caption: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
         note: Solid and liquid Darken-linear regions; two-phase L+S marked. Not digitised.
     - observation_id: ichise_1977_fig7_activities_1400C_figure_only
+      experiment: fe-al-series
       type: rate_series
       locator:
         figure: '7'
@@ -922,6 +994,7 @@ species:
         note: Numeric values are Table 1. Dashed curve is a_Al from the Al2O method (authors reject).
           Not digitised.
     - observation_id: ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '8'
@@ -952,6 +1025,7 @@ species:
         caption: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
         note: Numeric slope/intercept values are eqs (15)-(18). Not digitised.
     - observation_id: ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '9'
@@ -983,6 +1057,7 @@ species:
         note: Overlays Chou & Elliott, Chipman & Floridis, Wilder & Elliott, Woolley & Elliott, Belton
           & Fruehan. This-work curves from the T-equations. Not digitised.
     - observation_id: ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '10'
@@ -1014,6 +1089,7 @@ species:
         note: Open circles heating, filled cooling; N_Al labels 0.750, 0.330, 0.172, 0.134, 0.097, 0.067.
           Not digitised.
     - observation_id: ichise_1977_fig11_quadratic_Al2O_plot_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '11'
@@ -1044,6 +1120,7 @@ species:
         caption: Fig. 11. Quadratic plots according to Equation (37).
         note: Solid and liquid lines. Used for the rejected Al2O-method a_Al. Not digitised.
     - observation_id: ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         figure: '12'
@@ -1078,6 +1155,7 @@ species:
   Fe:
     observations:
     - observation_id: ichise_1977_fe_activity_table1_1400C
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         table: '1'
@@ -1235,6 +1313,7 @@ species:
             section: '2.6'
             note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
     - observation_id: ichise_1977_ln_gamma_fe_temperature_equations
+      experiment: fe-al-series
       type: activity_coefficient
       locator:
         published_page: 422

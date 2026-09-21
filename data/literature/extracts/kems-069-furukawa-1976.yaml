@@ -53,10 +53,79 @@ fidelity_samples:
     published_page: 383
     pdf_page_index: 2
     note: An electron accelerating voltage of 19 V was applied for ionization
+benches:
+- id: thoria-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Magnetic-deflection Knudsen-cell mass spectrometer}
+    locator: &apparatus_locator {published_page: 383, pdf_page_index: 2, section: III.1 Experimental Apparatus}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *apparatus_locator
+  cell_material_and_liner:
+    state: {tag: value, value: Laboratory-made thoria Knudsen cell}
+    locator: *apparatus_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 383, section: III.1 Experimental Apparatus, note: Printed 9.5 and 11 mm dimensions are outer/body diameters}
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 383, section: III.1 Experimental Apparatus, note: 'Printed 11 mm is body height, not separately internal depth'}
+  detector:
+    state: {tag: value, value: Magnetic-deflection mass spectrometer with movable ion-source exit slit}
+    locator: *apparatus_locator
+  other_facts:
+  - name: offered_orifice_diameters_not_run_assignments
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.4 or 0.6 or 0.7'}}
+      locator: {published_page: 383, section: III.1 Experimental Apparatus, note: Used according to experimental purpose; aggregate-row assignments not printed}
+  - name: cell_upper_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '9.5'}}
+      locator: *apparatus_locator
+  - name: cell_lower_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '11'}}
+      locator: *apparatus_locator
+  - name: cell_body_height
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '11'}}
+      locator: *apparatus_locator
+experiments:
+- experiment_id: fe-ti-series
+  bench_id: thoria-kems
+  method: knudsen_effusion
+  locator: {published_page: '383-384', section: III.2 Experimental Procedure, note: Fe-Ti alloy series made in situ and measured while raising temperature stepwise}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 384, table: '2', note: Multiple Fe-Ti compositions retained in observation rows}
+    pretreatment:
+      state: {tag: value, value: Pure Fe and Ti alloyed in situ; Fe-Th alloy added at 1 at% of solute content}
+      locator: {published_page: 383, section: III.2 Experimental Procedure, note: Maximum about 0.5 at% Th at N_Ti=0.494}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 383, section: III.1 Experimental Apparatus, note: Offered diameters are not assigned to aggregate observation rows}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 383, section: III.1 Experimental Apparatus, note: Lid thickness is not a printed channel length}
+    ionization:
+      electron_energy_eV:
+        state: {tag: value, value: {kind: point, point: '19'}}
+        locator: {published_page: 383, section: III.1 Experimental Apparatus}
 species:
   Ti:
     observations:
     - observation_id: furukawa_1976_kems_geometry_and_calibration
+      experiment: fe-ti-series
       type: rate_series
       locator:
         published_page: 383
@@ -216,6 +285,7 @@ species:
         - S
         - O
     - observation_id: furukawa_1976_ion_current_ratios_table2
+      experiment: fe-ti-series
       type: rate_series
       locator:
         table: '2'
@@ -343,6 +413,7 @@ species:
             pdf_page_index: 2
             note: vacuum quality / chamber pressure not printed
     - observation_id: furukawa_1976_ti_activity_table4_1600C
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         table: '4'
@@ -498,6 +569,7 @@ species:
             pdf_page_index: 2
             note: vacuum quality / chamber pressure not printed
     - observation_id: furukawa_1976_gamma_ti_table3_this_work_1600C
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         table: '3'
@@ -612,6 +684,7 @@ species:
         G_E_cal_mol_as_printed: G^E = H^M = -9700 N_Fe N_Ti
         gamma_Ti_o_from_eq3: 0.068
     - observation_id: furukawa_1976_log_gamma_darken_equations
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         published_page: 386
@@ -647,6 +720,7 @@ species:
         print_conflict: English synopsis p. 382 intercept +0.58; body eqs (6) and Fig. 7 intercept +0.53.
           Recorded as printed in each location.
     - observation_id: furukawa_1976_heats_of_solution
+      experiment: fe-ti-series
       type: gibbs_table
       locator:
         published_page: 386
@@ -683,6 +757,7 @@ species:
         gamma_Fe_o_1600C: 0.043
         gamma_Ti_o_1600C: 0.017
     - observation_id: furukawa_1976_fig1_ion_ratio_vs_1_over_T_figure_only
+      experiment: fe-ti-series
       type: rate_series
       locator:
         figure: '1'
@@ -713,6 +788,7 @@ species:
         note: log(I+_Ti/I+_Fe) vs 1/T; orifice 0.4/0.6/0.7 mm; open heating, filled cooling. Numeric values
           are Table 2.
     - observation_id: furukawa_1976_fig2_integration_curve_figure_only
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         figure: '2'
@@ -744,6 +820,7 @@ species:
           C
         note: Includes Wagner and St. Pierre overlay converted to 54Fe+. Not digitised.
     - observation_id: furukawa_1976_fig3_activities_figure_only
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         figure: '3'
@@ -774,6 +851,7 @@ species:
         note: Liquid-reference this work; dotted solid-Ti reference; Wagner overlay. Numerics in Table
           4.
     - observation_id: furukawa_1976_fig4_comparison_figure_only
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -807,6 +885,7 @@ species:
         note: Fruehan (solid ref, 1600 C), Wagner et al. (liquid ref, 1545 C), this work (liquid ref,
           1600 C). Not digitised.
     - observation_id: furukawa_1976_fig5_heat_integration_figure_only
+      experiment: fe-ti-series
       type: rate_series
       locator:
         figure: '5'
@@ -836,6 +915,7 @@ species:
         caption: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
         note: R d ln(I+_Ti/I+_Fe) / d(1/T) vs composition. Not digitised.
     - observation_id: furukawa_1976_fig6_mixing_properties_figure_only
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -865,6 +945,7 @@ species:
         caption: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
         note: H_i^M, H^M, G^M, TS^M vs N_Fe. Not digitised.
     - observation_id: furukawa_1976_fig7_log_gamma_vs_one_minus_N_sq_figure_only
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -895,6 +976,7 @@ species:
         note: 'Printed labels: log gamma_Ti = -2.29 N_Fe^2 + 0.53; log gamma_Fe = -0.89 N_Ti^2 - 0.48.
           Not digitised.'
     - observation_id: furukawa_1976_photo1_mass_spectrum_figure_only
+      experiment: fe-ti-series
       type: rate_series
       locator:
         figure: Photo. 1
@@ -926,6 +1008,7 @@ species:
   Fe:
     observations:
     - observation_id: furukawa_1976_fe_activity_table4_1600C
+      experiment: fe-ti-series
       type: activity_coefficient
       locator:
         table: '4'

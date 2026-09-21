@@ -58,6 +58,90 @@ fidelity_samples:
     published_page: 556
     pdf_page_index: 5
     note: 'Table 3 Fe liquid+sigma: x_Mo(liquid)=0.35, x_Mo(sigma)=0.484'
+benches:
+- id: rm6k
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: HITACHI RM6K Knudsen cell-mass spectrometer}
+    locator: &apparatus_locator {published_page: 553, pdf_page_index: 2, section: II.1 Experimental Apparatus}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *apparatus_locator
+  cell_material_and_liner:
+    state: {tag: value, value: Sintered alumina crucible}
+    locator: *apparatus_locator
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *apparatus_locator
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 553, pdf_page_index: 2, section: II.1 Experimental Apparatus, note: '11 mm is printed as crucible height, not separately as internal depth'}
+  other_facts:
+  - name: cell_body_height
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '11'}}
+      locator: *apparatus_locator
+experiments:
+- experiment_id: fe-mo-low-mo-in-situ
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: '553-554', section: II.2 Samples, note: Pure Fe and Mo charged in the cell for low-Mo runs}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.002', interval_high: '0.003'}}
+      locator: {published_page: 553, section: II Experimental, note: Printed 2-3 g; individual row masses are not assigned}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 555, table: '2', note: Multiple compositions remain in observation rows}
+    pretreatment:
+      state: {tag: value, value: Pure Fe and Mo charged with Mo at the bottom and Fe above; alloying took 1-1.5 h before measurement}
+      locator: {published_page: '553-554', section: II.2 Samples, note: 'Alloying duration is preparation, not a measurement hold'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0005'}}
+        locator: *apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 553, section: II.1 Experimental Apparatus, note: Lid thickness or channel length not printed}
+- experiment_id: fe-mo-high-mo-ag-standard
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: '554-555', section: II Experimental, note: Premelted high-Mo alloy and Ag-standard comparison procedure}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 555, table: '1', note: Individual high-Mo comparison charge mass not assigned}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 555, table: '1', note: Multiple comparison compositions; no single charge composition}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0005'}}
+        locator: *apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 553, section: II.1 Experimental Apparatus, note: Lid thickness or channel length not printed}
+- experiment_id: fe-mo-phase-boundary-series
+  bench_id: rm6k
+  method: knudsen_effusion
+  locator: {published_page: 556, table: '3', note: Fe-Mo phase-boundary observations}
+  sample:
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 556, table: '3', note: Multiple compositions retained in table rows}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 556, table: '3', note: Table does not assign an orifice to phase-boundary rows}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 556, table: '3', note: No channel length printed}
 species:
   Fe:
     observations:
@@ -145,6 +229,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_table1_lambda
+      experiment: fe-mo-high-mo-ag-standard
       type: rate_series
       locator:
         table: '1'
@@ -236,6 +321,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_table2_a_Fe_1823K
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         table: '2'
@@ -359,6 +445,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_table4_partial_molar_1823K
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         table: '4'
@@ -577,6 +664,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_table5_heats
+      experiment: fe-mo-low-mo-in-situ
       type: gibbs_table
       locator:
         table: '5'
@@ -655,6 +743,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig1_ion_intensity_A4_figure_only
+      experiment: fe-mo-low-mo-in-situ
       type: rate_series
       locator:
         figure: '1'
@@ -683,6 +772,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig2_low_Mo_procedure_figure_only
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         figure: '2'
@@ -712,6 +802,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig3_Ag_standard_procedure_figure_only
+      experiment: fe-mo-high-mo-ag-standard
       type: activity_coefficient
       locator:
         figure: '3'
@@ -740,6 +831,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig4_activities_figure_only
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         figure: '4'
@@ -765,6 +857,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig5_ln_gamma_Fe_figure_only
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         figure: '5'
@@ -788,6 +881,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_fig6_error_estimate_figure_only
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         figure: '6'
@@ -812,6 +906,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_table3_phase_boundaries
+      experiment: fe-mo-phase-boundary-series
       type: transition_point
       locator:
         table: '3'
@@ -842,6 +937,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_infinite_dilution_gamma
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         published_page: 558
@@ -880,6 +976,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_interaction_parameters_liquid
+      experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
         published_page: 559
@@ -915,6 +1012,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: ichise_1982_deltaG_henrian_1wt_pct
+      experiment: fe-mo-low-mo-in-situ
       type: gibbs_table
       locator:
         published_page: 559

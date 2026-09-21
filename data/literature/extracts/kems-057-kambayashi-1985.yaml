@@ -83,6 +83,103 @@ fidelity_samples:
     pdf_page_index: 6
     figure: '8'
     note: Clausius-Clapeyron slope of Fig. 8 gives Delta-H_sub(Fe) = 429 kJ at 1370 C
+benches:
+- id: rm6e
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hitachi RM-6E Knudsen-cell mass spectrometer}
+    locator: &apparatus_locator {published_page: 1912, pdf_page_index: 2, section: '2.1', figure: '1'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *apparatus_locator
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina SSA-S cell; tantalum susceptor}
+    locator: *apparatus_locator
+  detector:
+    state: {tag: value, value: Hitachi RM-6E Knudsen-cell mass spectrometer}
+    locator: *apparatus_locator
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W-26%Re/W-5%Re thermocouple}
+      locator: *apparatus_locator
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Corrected at the melting point of pure nickel}
+      locator: *apparatus_locator
+  other_facts:
+  - name: temperature_stability_magnitude_during_measurement
+    unit: C
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
+      locator: {published_page: 1912, section: '2.1', note: 'Printed +/-1 C is measurement stability, not calibration uncertainty'}
+experiments:
+- experiment_id: pbo-p2o5-series
+  bench_id: rm6e
+  method: knudsen_effusion
+  locator: {published_page: '1912-1913', section: '2.1; 3.3', note: PbO-P2O5 system}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%}
+      locator: *apparatus_locator
+    characterization:
+      state: {tag: value, value: Chemical analysis after mass-spectrometric measurement}
+      locator: *apparatus_locator
+  apparatus:
+    geometry:
+      cell_internal_dimensions:
+        diameter_m:
+          state: {tag: value, value: {kind: point, point: '0.009'}}
+          locator: *apparatus_locator
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004', approximate: true}}
+        locator: *apparatus_locator
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1912, section: '2.1', note: Channel length not printed}
+    ionization:
+      electron_energy_eV:
+        state: {tag: value, value: {kind: point, point: '31.1'}}
+        locator: {published_page: 1913, section: '3.3'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1573.15'}}
+        locator: {published_page: 1912, section: '2.1', note: 1300 C; unit conversion only}
+- experiment_id: feto-p2o5-series
+  bench_id: rm6e
+  method: knudsen_effusion
+  locator: {published_page: '1912-1913', section: '2.1; 3.3', note: FetO-P2O5 system}
+  sample:
+    printed_composition:
+      state: {tag: value, value: FeO 99.9% and 3FeO.P2O5.8H2O 98% or above}
+      locator: *apparatus_locator
+    characterization:
+      state: {tag: value, value: Chemical analysis after mass-spectrometric measurement}
+      locator: *apparatus_locator
+    pretreatment:
+      state: {tag: value, value: 'Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed'}
+      locator: *apparatus_locator
+  apparatus:
+    geometry:
+      cell_internal_dimensions:
+        diameter_m:
+          state: {tag: value, value: {kind: point, point: '0.015'}}
+          locator: *apparatus_locator
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1912, section: '2.1', note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1912, section: '2.1', note: Channel length not printed}
+    ionization:
+      electron_energy_eV:
+        state: {tag: value, value: {kind: point, point: '23.0'}}
+        locator: {published_page: 1913, section: '3.3'}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1643.15', interval_high: '1663.15'}}
+        locator: {published_page: 1912, section: '2.1', note: 1370-1390 C; unit conversion only}
 species:
   P2O5:
     observations:
@@ -191,6 +288,7 @@ species:
       uncertainty:
         note: species identification table; no numeric uncertainty printed
     - observation_id: kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+      experiment: pbo-p2o5-series
       type: rate_series
       locator:
         table: '3'
@@ -249,6 +347,7 @@ species:
           Pd; authors say this does not affect the Gibbs-Duhem integral shape.
       equipment: *id001
     - observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         table: '4'
@@ -332,6 +431,7 @@ species:
       uncertainty:
         note: chemical analysis after the KEMS run; no numeric +/- printed on Table 4
     - observation_id: kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+      experiment: feto-p2o5-series
       type: rate_series
       locator:
         table: '5'
@@ -793,6 +893,7 @@ species:
           Fe+ and PO2+ 2-5%, PO+ about 0.2%.'
       equipment: *id001
     - observation_id: kambayashi_1985_table7_raoultian_a_p2o5
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         table: '7'
@@ -1040,6 +1141,7 @@ species:
         note: No per-cell +/- on Table 7. Absolute scale set by JANAF-extrapolated P_P4O10_sat (700, 709,
           719 atm at 1643, 1653, 1663 K).
     - observation_id: kambayashi_1985_gamma_p2o5_solid_std_henry
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         published_page: 1911
@@ -1072,6 +1174,7 @@ species:
         gamma_1390C: 1.0e-15
         as_printed: twice the standard deviation of the activity coefficients obtained at each temperature
     - observation_id: kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         published_page: 1917
@@ -1102,6 +1205,7 @@ species:
         gamma_1390C: 1.7e-13
         as_printed: +/- as printed on the converted liquid-standard coefficients
     - observation_id: kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
+      experiment: pbo-p2o5-series
       type: activity_coefficient
       locator:
         figure: '2'
@@ -1127,6 +1231,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: kambayashi_1985_fig6_henrian_a_p2o5_figure_only
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         figure: '6'
@@ -1153,6 +1258,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: kambayashi_1985_fig7_raoultian_activities_figure_only
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -1182,6 +1288,7 @@ species:
   PbO:
     observations:
     - observation_id: kambayashi_1985_pbo_table3_ion_current_ratios_1300c
+      experiment: pbo-p2o5-series
       type: rate_series
       locator:
         table: '3'
@@ -1217,6 +1324,7 @@ species:
   FeO:
     observations:
     - observation_id: kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
+      experiment: feto-p2o5-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -1245,6 +1353,7 @@ species:
   PO:
     observations:
     - observation_id: kambayashi_1985_table2_appearance_potentials_this_work
+      experiment: feto-p2o5-series
       type: gibbs_table
       locator:
         table: '2'
@@ -1304,6 +1413,7 @@ species:
         as_printed: +/- 0.5 eV on each literature cell
         note: quoted from refs 6-8 as printed in Table 2
     - observation_id: kambayashi_1985_table6_partial_pressures_and_dg
+      experiment: feto-p2o5-series
       type: psat_series
       locator:
         table: '6'
@@ -1635,6 +1745,7 @@ species:
   PO2:
     observations:
     - observation_id: kambayashi_1985_po2_table6_partial_pressure
+      experiment: feto-p2o5-series
       type: psat_series
       locator:
         table: '6'
@@ -1793,6 +1904,7 @@ species:
   P2:
     observations:
     - observation_id: kambayashi_1985_p2_table6_partial_pressure
+      experiment: feto-p2o5-series
       type: psat_series
       locator:
         table: '6'
@@ -1952,6 +2064,7 @@ species:
   P4O10:
     observations:
     - observation_id: kambayashi_1985_p4o10_sat_janaf_extrapolated
+      experiment: feto-p2o5-series
       type: psat_series
       locator:
         published_page: 1917
@@ -1985,6 +2098,7 @@ species:
   Fe:
     observations:
     - observation_id: kambayashi_1985_fe_sublimation_enthalpy_1370c
+      experiment: feto-p2o5-series
       type: gibbs_table
       locator:
         published_page: 1916
@@ -2012,6 +2126,7 @@ species:
         note: authors cite possible sensitivity drift over the long run as the reason 429 vs 395 kJ still
           'agrees well'
     - observation_id: kambayashi_1985_fig8_ion_current_vs_1T_figure_only
+      experiment: feto-p2o5-series
       type: psat_series
       locator:
         figure: '8'
@@ -2042,6 +2157,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: kambayashi_1985_fig3_time_dependence_figure_only
+      experiment: pbo-p2o5-series
       type: rate_series
       locator:
         figure: '3'
@@ -2065,6 +2181,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: kambayashi_1985_fig4_time_dependence_figure_only
+      experiment: feto-p2o5-series
       type: rate_series
       locator:
         figure: '4'
@@ -2088,6 +2205,7 @@ species:
       uncertainty:
         note: figure-only; not digitised
     - observation_id: kambayashi_1985_fig5_temperature_dependence_figure_only
+      experiment: feto-p2o5-series
       type: rate_series
       locator:
         figure: '5'
@@ -2113,6 +2231,7 @@ species:
   Pd:
     observations:
     - observation_id: kambayashi_1985_pd_internal_standard_pbo_system
+      experiment: pbo-p2o5-series
       type: rate_series
       locator:
         published_page: 1912
