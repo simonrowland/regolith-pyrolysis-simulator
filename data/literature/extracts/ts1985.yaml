@@ -96,8 +96,27 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: CO partial pressure is controlled and varied; total pressure is not printed as one run value}
     sweep_gas:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: 'Printed as CO or CO-Ar mixture, dried and deoxidized; the SweepGas shape carries one species field and cannot represent a mixture or an alternative, so the printed text is retained rather than a single species chosen.'}
+      state:
+        tag: value
+        value:
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+          alternatives:
+          - species: CO
+            flow_sccm: {tag: unknown, reason: not_published}
+            partial_pressure_Pa: {tag: unknown, reason: not_published}
+          - flow_sccm: {tag: unknown, reason: not_published}
+            partial_pressure_Pa: {tag: unknown, reason: not_published}
+            components:
+            - species: CO
+              mole_fraction: {tag: unknown, reason: not_published}
+              flow_sccm: {tag: unknown, reason: not_published}
+              partial_pressure_Pa: {tag: unknown, reason: not_published}
+            - species: Ar
+              mole_fraction: {tag: unknown, reason: not_published}
+              flow_sccm: {tag: unknown, reason: not_published}
+              partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: 'Printed as CO or CO-Ar mixture, dried and deoxidized; alternatives retained without selecting a species or inventing component fractions.'}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:

@@ -41,6 +41,8 @@ from typing import Any, Iterable, Mapping, Sequence
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
 U0_MANIFEST = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
@@ -1262,6 +1264,34 @@ def _check_fidelity_samples(
             errors.extend(check_fidelity_sample_matches(doc, sample, label=sp))
 
 
+def _check_sweep_gases(doc: Mapping[str, Any], label: str, errors: list[str]) -> None:
+    from simulator.battery.migrate import _located_from_plain, _sweep_gas_from_plain
+    from simulator.battery.validate import validate_sweep_gas
+
+    experiments = doc.get("experiments", ())
+    if isinstance(experiments, Mapping):
+        experiments = experiments.values()
+    elif not isinstance(experiments, (list, tuple)):
+        errors.append(f"{label}: experiments must be a list or mapping")
+        return
+    for i, experiment in enumerate(experiments):
+        if not isinstance(experiment, Mapping):
+            continue
+        pressure = experiment.get("pressure_environment")
+        if not isinstance(pressure, Mapping) or "sweep_gas" not in pressure:
+            continue
+        path = f"{label}:experiments[{i}].pressure_environment.sweep_gas"
+        try:
+            located = _located_from_plain(pressure["sweep_gas"], _sweep_gas_from_plain)
+            if located.state.is_value:
+                if located.locator is None:
+                    errors.append(f"{path}: empirical Located value requires a locator")
+                errors.extend(f"{issue.path}: {issue.detail}" for issue in
+                              validate_sweep_gas(located.state.value, path))
+        except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
+            errors.append(f"{path}: invalid sweep gas: {exc}")
+
+
 def validate_extract_document(
     doc: Any,
     *,
@@ -1369,6 +1399,8 @@ def validate_extract_document(
                 continue
             for i, obs in enumerate(obs_list):
                 _check_observation(obs, f"{spath}.observations[{i}]", errors, seen)
+
+    _check_sweep_gases(doc, label, errors)
 
     # ENFORCED_FOR_NEW: require samples unless source_id is pre-policy allowlisted.
     is_pre_policy = False

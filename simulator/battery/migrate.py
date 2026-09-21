@@ -110,6 +110,7 @@ from simulator.battery.records import (
     Species,
     State,
     SweepGas,
+    SweepGasComponent,
     ThermalPoint,
     ThermalRamp,
     ThermalSchedule,
@@ -1216,13 +1217,44 @@ def _apparatus_from_plain(payload: object) -> Apparatus | None:
     )
 
 
-def _sweep_gas_from_plain(payload: object) -> SweepGas:
-    assert isinstance(payload, Mapping)
-    return SweepGas(
-        species=str(payload.get("species") or ""),
-        flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
-        partial_pressure_Pa=_state_from_plain(payload["partial_pressure_Pa"], as_decimal),
-    )
+def _sweep_gas_from_plain(payload: object) -> object:
+    if not isinstance(payload, Mapping):
+        return payload
+    try:
+        if set(payload) - {item.name for item in fields(SweepGas)}:
+            return payload
+        components = None
+        if payload.get("components") is not None:
+            if not isinstance(payload["components"], (list, tuple)):
+                return payload
+            components = []
+            for component in payload["components"]:
+                if not isinstance(component, Mapping) or set(component) != {
+                    item.name for item in fields(SweepGasComponent)
+                }:
+                    return payload
+                components.append(SweepGasComponent(
+                    species=component["species"],
+                    mole_fraction=_state_from_plain(component["mole_fraction"], as_decimal),
+                    flow_sccm=_state_from_plain(component["flow_sccm"], as_decimal),
+                    partial_pressure_Pa=_state_from_plain(component["partial_pressure_Pa"], as_decimal),
+                ))
+            components = tuple(components)
+        alternatives = None
+        if payload.get("alternatives") is not None:
+            if not isinstance(payload["alternatives"], (list, tuple)):
+                return payload
+            alternatives = tuple(_sweep_gas_from_plain(v) for v in payload["alternatives"])
+        return SweepGas(
+            species=payload.get("species"),
+            flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
+            partial_pressure_Pa=_state_from_plain(payload["partial_pressure_Pa"], as_decimal),
+            components=components,
+            alternatives=alternatives,
+        )
+    except (KeyError, TypeError, ValueError, ArithmeticError):
+        # Keep malformed evidence intact for the store's typed refusal report.
+        return payload
 
 
 def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
@@ -1235,7 +1267,7 @@ def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
         ),
         sweep_gas=_located_from_plain(
             payload["sweep_gas"],
-            lambda v: _sweep_gas_from_plain(v) if isinstance(v, Mapping) else v,
+            _sweep_gas_from_plain,
         ),
         regime=FlowRegime(
             regime_class=_state_from_plain(

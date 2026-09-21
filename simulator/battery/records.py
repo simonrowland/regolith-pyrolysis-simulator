@@ -899,10 +899,20 @@ class FO2Control:
 
 
 @dataclass(frozen=True)
-class SweepGas:
+class SweepGasComponent:
     species: str
+    mole_fraction: State[Decimal]
     flow_sccm: State[Decimal]
     partial_pressure_Pa: State[Decimal]
+
+
+@dataclass(frozen=True)
+class SweepGas:
+    species: str | None
+    flow_sccm: State[Decimal]
+    partial_pressure_Pa: State[Decimal]
+    components: tuple[SweepGasComponent, ...] | None = None
+    alternatives: tuple[SweepGas, ...] | None = None
 
 
 @dataclass(frozen=True)

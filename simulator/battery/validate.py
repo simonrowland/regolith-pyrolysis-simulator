@@ -77,6 +77,8 @@ from simulator.battery.records import (
     Residual,
     Species,
     State,
+    SweepGas,
+    SweepGasComponent,
     Value,
     Work,
     as_decimal,
@@ -609,6 +611,67 @@ def validate_work(work: Work, path: str = "work") -> list[ValidationIssue]:
     return issues
 
 
+def validate_sweep_gas(gas: object, path: str) -> list[ValidationIssue]:
+    issues: list[ValidationIssue] = []
+
+    def invalid(field: str, detail: str) -> None:
+        issues.append(_issue(field, RefusalReason.CONDITIONAL_FIELD, detail))
+
+    def numeric(state: object, field: str, *, fraction: bool = False) -> None:
+        if not isinstance(state, State):
+            invalid(field, "requires a numeric State")
+        elif state.is_value and (
+            not isinstance(state.value, Decimal)
+            or not state.value.is_finite()
+            or state.value < 0
+            or (fraction and state.value > 1)
+        ):
+            invalid(field, "requires a finite nonnegative Decimal" + (" in [0, 1]" if fraction else ""))
+
+    if not isinstance(gas, SweepGas):
+        invalid(path, "sweep gas value requires a SweepGas record")
+        return issues
+    numeric(gas.flow_sccm, f"{path}.flow_sccm")
+    numeric(gas.partial_pressure_Pa, f"{path}.partial_pressure_Pa")
+    if sum(v is not None for v in (gas.species, gas.components, gas.alternatives)) != 1:
+        invalid(path, "requires exactly one of species, components, alternatives")
+    if gas.species is not None:
+        if not isinstance(gas.species, str) or not gas.species.strip():
+            invalid(f"{path}.species", "requires a nonempty species string")
+        if gas.species == "none" and any(
+            isinstance(s, State) and s.is_value
+            for s in (gas.flow_sccm, gas.partial_pressure_Pa)
+        ):
+            issues.append(_issue(path, RefusalReason.INAPPLICABLE_AXIS,
+                                 "carrier-free sweep cannot carry flow or partial-pressure values"))
+    if gas.components is not None:
+        if not isinstance(gas.components, tuple) or len(gas.components) < 2:
+            invalid(f"{path}.components", "mixture requires at least two components")
+        else:
+            species: set[str] = set()
+            for i, component in enumerate(gas.components):
+                field = f"{path}.components[{i}]"
+                if not isinstance(component, SweepGasComponent):
+                    invalid(field, "requires a SweepGasComponent record")
+                    continue
+                if not isinstance(component.species, str) or not component.species.strip() or component.species == "none":
+                    invalid(f"{field}.species", "requires a nonempty gas species")
+                elif component.species in species:
+                    invalid(f"{field}.species", "duplicate gas species")
+                else:
+                    species.add(component.species)
+                numeric(component.mole_fraction, f"{field}.mole_fraction", fraction=True)
+                numeric(component.flow_sccm, f"{field}.flow_sccm")
+                numeric(component.partial_pressure_Pa, f"{field}.partial_pressure_Pa")
+    if gas.alternatives is not None:
+        if not isinstance(gas.alternatives, tuple) or len(gas.alternatives) < 2:
+            invalid(f"{path}.alternatives", "requires at least two gas alternatives")
+        else:
+            for i, alternative in enumerate(gas.alternatives):
+                issues.extend(validate_sweep_gas(alternative, f"{path}.alternatives[{i}]"))
+    return issues
+
+
 def validate_experiment(
     experiment: Experiment,
     works: Mapping[str, Work],
@@ -664,15 +727,8 @@ def validate_experiment(
             )
         )
     sweep = experiment.pressure_environment.sweep_gas.state
-    if sweep.is_value and sweep.value is not None and sweep.value.species == "none":
-        if sweep.value.flow_sccm.is_value or sweep.value.partial_pressure_Pa.is_value:
-            issues.append(
-                _issue(
-                    f"{path}.pressure_environment.sweep_gas",
-                    RefusalReason.INAPPLICABLE_AXIS,
-                    "carrier-free sweep cannot carry flow or partial-pressure values",
-                )
-            )
+    if sweep.is_value:
+        issues.extend(validate_sweep_gas(sweep.value, f"{path}.pressure_environment.sweep_gas"))
     if experiment.fO2_control is not None:
         channel = experiment.fO2_control.channel
         if channel.is_value and channel.value is FO2Channel.BUFFER:

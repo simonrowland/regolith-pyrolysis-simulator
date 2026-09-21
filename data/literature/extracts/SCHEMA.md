@@ -323,6 +323,33 @@ chamber pressure with sample vapour pressure. There is no dedicated base-pressur
 field in the current record: the complete example preserves its typed absence
 at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
 
+`pressure_environment.sweep_gas.state.value` uses the battery `SweepGas`
+field list below. The migrator and per-file validator share its parser and
+store validation rules. Existing single-species records serialize unchanged.
+
+| SweepGas field | Meaning |
+|---|---|
+| `species` | Single gas species, or `none` for carrier-free conditions; omit for mixtures/alternatives |
+| `flow_sccm` | Required numeric State; total sweep flow |
+| `partial_pressure_Pa` | Required numeric State; pressure attributable to the whole sweep gas |
+| `components` | Optional list of at least two `SweepGasComponent` records constituting one mixture |
+| `alternatives` | Optional list of at least two `SweepGas` records printed as alternatives, never combined |
+
+Exactly one of `species`, `components`, `alternatives` must be populated.
+Each component has exactly `species`, `mole_fraction`, `flow_sccm`, and
+`partial_pressure_Pa`. The last three are required numeric States (decimal
+strings in `tag: value`, or an explicit typed absence); mole fractions are
+dimensionless. Values must be finite and nonnegative; fractions lie in [0, 1].
+Do not infer fractions, flows or partial pressures from each other. A printed
+mixture without fractions retains its components with
+`mole_fraction: {tag: unknown, reason: not_published}` on each component.
+Unknown fractions remain unknown; recording a mixture does not establish fO2.
+For “CO or CO-Ar mixture”, record alternatives: a single-species CO record
+and a mixture with CO and Ar components. Preserve the printed wording and
+locator on the enclosing Located record; do not select an alternative or
+pair independent sets of values. Carrier-free `species: none` cannot carry
+numeric flow or partial pressure. Omit unused optional fields.
+
 ### Located values and print forms
 
 Every fact is `{state: ..., locator: ...}`. Numeric fields use a tagged
