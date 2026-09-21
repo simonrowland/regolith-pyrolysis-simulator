@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import defaultdict
 from dataclasses import fields, is_dataclass
 from collections.abc import Mapping
 from pathlib import Path
@@ -250,7 +251,11 @@ def _collapse_engines(group: tuple[ConsumerReadiness, ...]) -> ConsumerReadiness
 
 
 def report(root: Path) -> dict[str, object]:
-    works, experiments, _ = load_migrated_store(root)
+    works, experiments, observations = load_migrated_store(root)
+    by_experiment = defaultdict(list)
+    for observation in observations.values():
+        if observation.point_conditions:
+            by_experiment[observation.experiment_id].append(observation)
     benches = load_migrated_benches(root)
     references = _apparatus_references(root, works)
     by_source: dict[str, list[dict[str, object]]] = {}
@@ -271,6 +276,23 @@ def report(root: Path) -> dict[str, object]:
             if bench is None
             else consumer_readiness(experiment, bench)
         )
+        if bench is not None and by_experiment[experiment.experiment_id]:
+            contexts = {}
+            for observation in by_experiment[experiment.experiment_id]:
+                key = repr(observation.point_conditions)
+                contexts.setdefault(key, observation)
+            groups = [consumer_readiness(experiment, bench, observation) for observation in contexts.values()]
+            aggregated = []
+            for base in readiness:
+                if base.consumer == "rps":
+                    aggregated.append(base)
+                    continue
+                records = [item for group in groups for item in group
+                           if item.consumer == base.consumer and item.engine == base.engine]
+                aggregated.append(ConsumerReadiness(base.consumer, _status(records),
+                    tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
+                    tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
+            readiness = tuple(aggregated)
         consumers = tuple(item for item in readiness if item.engine is None)
         consumers += (_collapse_engines(readiness),)
         engines = tuple(item for item in readiness if item.engine is not None)

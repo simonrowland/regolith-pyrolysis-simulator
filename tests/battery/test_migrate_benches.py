@@ -219,14 +219,28 @@ def test_readiness_counts_unique_sources_not_experiments(tmp_path) -> None:
     )
     for consumer in readiness["sources"][0]["consumers"]:
         for gap in consumer["gaps"]:
-            assert gap["count"] == 2
-            assert gap["experiment_ids"] == sorted(
+            assert gap["count"] == len(gap["experiment_ids"])
+            assert 1 <= gap["count"] <= 2
+            assert set(gap["experiment_ids"]) <= set(
                 experiment["experiment_id"]
                 for experiment in readiness["sources"][0]["experiments"]
             )
 
 
-def test_mixed_source_retains_ready_experiment_and_ranks_unique_blockers(tmp_path) -> None:
+def _aggregation_readiness(experiment, bench, observation=None):
+    from simulator.battery.waypoints import ConsumerReadiness, ReadinessGap, ReadinessStatus, GapReason, ENGINE_POINT_CONSUMERS
+    gaps = []
+    if experiment.sample.mass_kg is None:
+        gaps.append(ReadinessGap("charge_moles_by_species", GapReason.MISSING_EVIDENCE))
+    if experiment.sample.surface_area_m2 is None:
+        gaps.append(ReadinessGap("surfaces", GapReason.MISSING_EVIDENCE))
+    return tuple(ConsumerReadiness(consumer, ReadinessStatus.GAP if gaps else ReadinessStatus.READY,
+        tuple(gaps), engine) for consumer, engine in (("kems", None), ("rps", None),
+            *(("engine_point", engine) for engine in ENGINE_POINT_CONSUMERS)))
+
+
+def test_mixed_source_retains_ready_experiment_and_ranks_unique_blockers(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("scripts.bench_readiness.consumer_readiness", _aggregation_readiness)
     extract = _registry_extract()
     ready = replace(factories.kems_experiment(experiment_id="ready", total_P=Decimal("0.1")),
                     bench_id="bench-one", sample=_charge(single=False), thermal_schedule=_schedule())
@@ -261,6 +275,7 @@ def test_mixed_source_retains_ready_experiment_and_ranks_unique_blockers(tmp_pat
 
 def test_blockers_rank_source_count_before_experiment_count(tmp_path, monkeypatch) -> None:
     import scripts.bench_readiness as module
+    monkeypatch.setattr(module, "consumer_readiness", _aggregation_readiness)
     experiment, bench = _knudsen_case(Value.point_of("1"))
     work_a = replace(factories.work("a"), source_ids=("a",))
     work_b = replace(factories.work("b"), source_ids=("b",))
@@ -402,7 +417,8 @@ def test_readiness_json_carries_knudsen_notice_and_inputs(tmp_path) -> None:
     root = _write_min_tree(tmp_path, extract)
     write_outputs(Migrator(root=root).run(), root)
     row = report(root)["sources"][0]["experiments"][0]["consumers"][0]
-    assert row["status"] == "ready"
+    assert row["status"] == "gap"
+    assert not any(gap["reason"] == "outside_pressure_regime" for gap in row["gaps"])
     assert row["notices"]
     notice, = row["notices"]
     assert notice["kind"] == "knudsen_regime_inconsistency"

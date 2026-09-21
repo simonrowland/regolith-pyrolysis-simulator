@@ -1,0 +1,312 @@
+{
+  "charge-scope": {
+    "test": "tests/battery/test_bench_generators.py::test_fifty_observation_masses_never_collapse_and_are_derived",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "    if observation is not None:\n        if observation.experiment_id != experiment.experiment_id:",
+        "    if False:\n        if observation.experiment_id != experiment.experiment_id:"
+      ]
+    ]
+  },
+  "charge-authority": {
+    "test": "tests/battery/test_bench_generators.py::test_fifty_observation_masses_never_collapse_and_are_derived",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "\"mass_times_printed_wt_percent\",\n                            WaypointAuthority.DERIVED,",
+        "\"mass_times_printed_wt_percent\",\n                            WaypointAuthority.PRINTED,"
+      ]
+    ]
+  },
+  "uncontrolled-oxygen": {
+    "test": "tests/battery/test_bench_generators.py::test_uncontrolled_oxygen_refuses_every_engine",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "    return _result(\"oxygen_condition\", routes, (\"fO2_log\",",
+        "    if not routes:\n        routes.append(Waypoint(\"oxygen_condition\", Value.point_of(-9), \"bad_default\", WaypointAuthority.ASSUMED, ()))\n    return _result(\"oxygen_condition\", routes, (\"fO2_log\","
+      ]
+    ]
+  },
+  "buffer-domain": {
+    "test": "tests/battery/test_bench_generators.py::test_buffer_derivation_and_domain",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "and buffer.T_min_K <= temperature.point <= buffer.T_max_K",
+        "and True"
+      ]
+    ]
+  },
+  "gas-composition": {
+    "test": "tests/battery/test_bench_generators.py::test_printed_gas_composition_derives_oxygen",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "Value.point_of(fractions[\"O2\"])",
+        "Value.point_of(Decimal(\".1\"))"
+      ]
+    ]
+  },
+  "engine-list": {
+    "test": "tests/battery/test_bench_generators.py::test_engine_inputs_all_eight_and_provenance",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "    \"imcc_sf04_ext\",\n",
+        ""
+      ]
+    ]
+  },
+  "engine-bounds": {
+    "test": "tests/battery/test_bench_generators.py::test_engine_bounds_are_preserved_and_refused_without_midpoint",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:\n        raise UnsupportedValue(name)\n    return value.point",
+        "    if value.kind is ValueKind.INTERVAL:\n        return (value.interval_low + value.interval_high) / 2\n    return value.point"
+      ],
+      [
+        "simulator/battery/generators/bench.py",
+        "if not absent and consumer == \"engine_point\":",
+        "if False:"
+      ]
+    ]
+  },
+  "shared-requirements": {
+    "test": "tests/battery/test_bench_generators.py::test_every_kems_requirement_refuses_and_readiness_agrees",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "    for name in REQUIREMENTS[consumer]:",
+        "    for name in ():"
+      ]
+    ]
+  },
+  "effective-area": {
+    "test": "tests/battery/test_bench_generators.py::test_geometric_area_never_satisfies_effective_area",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "    if WaypointFlag.GEOMETRIC_ONLY in result.selected.flags:",
+        "    if False:"
+      ],
+      [
+        "simulator/battery/generators/bench.py",
+        "        if WaypointFlag.GEOMETRIC_ONLY in escape.flags:",
+        "        if False:"
+      ]
+    ]
+  },
+  "pressure-floor": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_pressure_floor_not_clamped",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "        if below:\n",
+        "        if False:\n"
+      ]
+    ]
+  },
+  "single-species": {
+    "test": "tests/battery/test_bench_generators.py::test_single_species_is_not_applicable",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "    if len(charges) == 1:",
+        "    if False:"
+      ]
+    ]
+  },
+  "modelling-authority": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_requires_operator_choices_and_labels_them",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "surfaces.append({**surface, \"source_class\": \"assumption_with_sensitivity_marker\",",
+        "surfaces.append({**surface, \"source_class\": \"literature_sidecar\","
+      ]
+    ]
+  },
+  "physical-geometry": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_requires_operator_choices_and_labels_them",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "            surfaces.append({**surface,",
+        "            surface.update(choices)\n            surfaces.append({**surface,"
+      ]
+    ]
+  },
+  "sequence-provenance": {
+    "test": "tests/battery/test_bench_generators.py::test_engine_inputs_all_eight_and_provenance",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "        elif isinstance(value, (tuple, list)):",
+        "        elif False:"
+      ]
+    ]
+  },
+  "calibration-authority": {
+    "test": "tests/battery/test_bench_generators.py::test_typed_calibration_routes_preserve_inference",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "WaypointAuthority.DERIVED if any(item.inference for item in mapping.values()) else WaypointAuthority.PRINTED",
+        "WaypointAuthority.PRINTED"
+      ]
+    ]
+  },
+  "calibration-route": {
+    "test": "tests/battery/test_bench_generators.py::test_typed_calibration_routes_preserve_inference",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "(\"temperature_calibration\", \"bench.temperature_calibration\", bench.temperature_calibration)",
+        "(\"temperature_calibration\", \"bench.temperature_calibration\", None)"
+      ]
+    ]
+  },
+  "engine-point-temperature": {
+    "test": "tests/battery/test_observation_waypoints.py::test_engine_point_uses_observation_temperature_without_schedule",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "    thermal = thermal_path(experiment, bench, observation)",
+        "    thermal = thermal_path(experiment, bench)"
+      ]
+    ]
+  },
+  "output-units": {
+    "test": "tests/battery/test_bench_generators.py::test_kems_payload_passes_real_validator",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "float(_point(inputs, \"mass_kg\") * Decimal(1000000))",
+        "float(_point(inputs, \"mass_kg\") * Decimal(1000))"
+      ]
+    ]
+  },
+  "rps-run-pressure": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_never_expands_observation_mass_or_pressure_into_run",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "_point(inputs, \"run_pressure_boundary\")",
+        "_point(inputs, \"pressure_boundary\")"
+      ]
+    ]
+  },
+  "rps-run-mass": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_never_expands_observation_mass_or_pressure_into_run",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "_point(inputs, \"run_mass_kg\")",
+        "_point(inputs, \"mass_kg\")"
+      ]
+    ]
+  },
+  "point-oxygen-units": {
+    "test": "tests/battery/test_bench_generators.py::test_point_oxygen_pressure_derives_log_units",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "_point_condition(experiment, observation, \"fO2_Pa\", \"oxygen_condition\")",
+        "_point_condition(experiment, observation, \"wrong_fO2_key\", \"oxygen_condition\")"
+      ]
+    ]
+  },
+  "scope-before-authority": {
+    "test": "tests/battery/test_bench_generators.py::test_derived_observation_scope_outranks_printed_run_scope",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "item.route.startswith(\"observation_\"), _AUTHORITY_RANK[item.authority]",
+        "False, _AUTHORITY_RANK[item.authority]"
+      ]
+    ]
+  },
+  "mass-scope-before-authority": {
+    "test": "tests/battery/test_bench_generators.py::test_derived_observation_scope_outranks_printed_run_scope",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "if routes and routes[0].route.startswith(\"observation[\"):",
+        "if False:"
+      ]
+    ]
+  },
+  "gas-scope": {
+    "test": "tests/battery/test_bench_generators.py::test_printed_gas_composition_derives_oxygen",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "\"observation_gas_composition\"",
+        "\"printed_gas_composition\""
+      ]
+    ]
+  },
+  "cli-numeric-types": {
+    "test": "tests/battery/test_bench_generators.py::test_cli_generates_schema_inputs_with_numeric_json",
+    "edits": [
+      [
+        "scripts/bench_generate.py",
+        "json.dumps(result.payload, default=str, indent=2)",
+        "json.dumps(to_plain(result.payload), indent=2)"
+      ]
+    ]
+  },
+  "missing-physical-surfaces": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_missing_physical_surface_evidence_refuses_even_with_operator_area",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "\"run_pressure_boundary\", \"surfaces\", \"gas_boundary\"),",
+        "\"run_pressure_boundary\", \"gas_boundary\"),"
+      ]
+    ]
+  },
+  "required-operator-inputs": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_requires_operator_choices_and_labels_them",
+    "edits": [
+      [
+        "simulator/battery/generators/bench.py",
+        "missing_model = tuple(\"operator.\" + key for key in required_model if key not in model)",
+        "missing_model = ()"
+      ]
+    ]
+  },
+  "notice-dedup": {
+    "test": "tests/battery/test_migrate_benches.py::test_readiness_json_carries_knudsen_notice_and_inputs",
+    "edits": [
+      [
+        "scripts/bench_readiness.py",
+        "tuple({repr(notice): notice for item in records for notice in item.notices}.values())",
+        "tuple(notice for item in records for notice in item.notices)"
+      ]
+    ]
+  },
+  "literature-gas-boundary": {
+    "test": "tests/battery/test_bench_generators.py::test_rps_requires_literature_gas_boundary",
+    "edits": [
+      [
+        "simulator/battery/consumer_inputs.py",
+        "\"run_pressure_boundary\", \"surfaces\", \"gas_boundary\"),",
+        "\"run_pressure_boundary\", \"surfaces\"),"
+      ]
+    ]
+  },
+  "gas-couple-stoichiometry": {
+    "test": "tests/battery/test_bench_generators.py::test_gas_couple_route_obeys_mass_action",
+    "edits": [
+      [
+        "simulator/battery/waypoints.py",
+        "Value.point_of(computed.log10_fO2)",
+        "Value.point_of(2 * computed.log10_fO2)"
+      ]
+    ]
+  }
+}

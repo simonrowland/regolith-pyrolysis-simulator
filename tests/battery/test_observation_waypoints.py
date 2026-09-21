@@ -49,6 +49,7 @@ def test_engine_point_uses_observation_temperature_without_schedule():
         point_conditions={
             "temperature_K": factories.located(Decimal("1500")),
             "total_pressure_Pa": factories.located(Decimal("0.01")),
+            "fO2_log": factories.located(Decimal("-9")),
         },
     )
     rows = consumer_readiness(experiment, bench, observation)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from enum import StrEnum
 from collections.abc import Iterator, Mapping
@@ -53,7 +53,7 @@ class ReadinessStatus(StrEnum):
 @dataclass(frozen=True)
 class Waypoint:
     name: str
-    value: Value
+    value: Value | Mapping[str, object] | tuple[object, ...]
     route: str
     authority: WaypointAuthority
     inputs: tuple[str, ...]
@@ -142,7 +142,8 @@ ENGINE_POINT_CONSUMERS = (
 
 
 def _result(name: str, routes: list[Waypoint], missing: tuple[str, ...]) -> WaypointResult:
-    selected = max(routes, key=lambda item: _AUTHORITY_RANK[item.authority]) if routes else None
+    selected = max(routes, key=lambda item: (
+        item.route.startswith("observation_"), _AUTHORITY_RANK[item.authority])) if routes else None
     absence = None if selected else WaypointAbsence(name, GapReason.MISSING_EVIDENCE, missing)
     return WaypointResult(name, selected, tuple(routes), absence)
 
@@ -180,7 +181,7 @@ def _point_condition(
     except (ValueError, TypeError, ArithmeticError):
         return None
     return Waypoint(
-        name, value, f"observation_{key}", WaypointAuthority.PRINTED,
+        name, value, f"observation_{key}", WaypointAuthority.DERIVED if located.inference else WaypointAuthority.PRINTED,
         (f"observation[{observation.observation_id}].point_conditions.{key}",),
     )
 
@@ -247,8 +248,33 @@ def _molar_mass_kg_mol(species: str) -> Decimal | None:
 
 
 def charge_moles_by_species(
-    experiment: Experiment, bench: Bench
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> SpeciesWaypoints:
+    if observation is not None:
+        if observation.experiment_id != experiment.experiment_id:
+            raise ValueError("Observation belongs to a different experiment")
+        conditions = observation.point_conditions or {}
+        fields = {field: conditions[key] for field, key in (
+            ("mass_kg", "mass_kg"), ("initial_composition", "composition"),
+            ("printed_composition", "printed_composition"),
+        ) if key in conditions}
+        if fields:
+            scoped = replace(experiment, sample=replace(experiment.sample, **fields))
+            result = charge_moles_by_species(scoped, bench)
+            def scoped_waypoint(item: Waypoint) -> Waypoint:
+                inputs = tuple(
+                    path.replace("experiment.sample." + field,
+                                 f"observation[{observation.observation_id}].point_conditions." +
+                                 ("composition" if field == "initial_composition" else field))
+                    if (field := path.removeprefix("experiment.sample.")) in fields else path
+                    for path in item.inputs
+                )
+                return replace(item, route="observation_" + item.route, inputs=inputs)
+            return SpeciesWaypoints({
+                species: replace(value, selected=scoped_waypoint(value.selected) if value.selected else None,
+                                 routes=tuple(scoped_waypoint(item) for item in value.routes))
+                for species, value in result.items()
+            }, result.absence)
     del bench
     routes: dict[str, list[Waypoint]] = {}
     mass = _value(experiment.sample.mass_kg)
@@ -633,22 +659,109 @@ def thermal_path(
     return _result("thermal_path", routes, ("experiment.thermal_schedule", "experiment.conditions.temperature_K"))
 
 
-def oxygen_condition(experiment: Experiment, bench: Bench) -> WaypointResult:
-    del bench
+def oxygen_condition(
+    experiment: Experiment, bench: Bench, observation: Observation | None = None
+) -> WaypointResult:
+    """Numerical log10(fO2 / 1 bar), never an uncontrolled default."""
     routes: list[Waypoint] = []
+    printed = _point_condition(experiment, observation, "fO2_log", "oxygen_condition")
+    if printed is not None:
+        routes.append(printed)
+    point_pressure = _point_condition(experiment, observation, "fO2_Pa", "oxygen_condition")
+    if point_pressure is not None:
+        value = _log_pressure(point_pressure.value)
+        if value is not None:
+            routes.append(Waypoint("oxygen_condition", value, "observation_fO2_Pa_to_log_fO2",
+                WaypointAuthority.DERIVED, point_pressure.inputs))
     control = experiment.fO2_control
     if control is not None:
         if control.buffer is not None and control.buffer.state.is_value:
-            routes.append(Waypoint("oxygen_condition", Value(ValueKind.CATEGORICAL, categorical=str(control.buffer.state.value)), "printed_buffer", WaypointAuthority.PRINTED, ("experiment.fO2_control.buffer",)))
+            from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
+
+            buffer = PUBLISHED_BUFFERS.get(str(control.buffer.state.value).upper())
+            thermal = thermal_path(experiment, bench, observation).selected
+            pressure = pressure_boundary(experiment, bench, observation).selected
+            if buffer is not None and thermal is not None and pressure is not None:
+                temperature = thermal.value
+                if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
+                    temperature = Value.point_of(temperature.series[0][1])
+                if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
+                        and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
+                    T = temperature.point
+                    P = pressure.value.point / Decimal(100000)
+                    # Premise: Frost (1991), doi:10.2138/rmg.1991.25.1, Table 1,
+                    # condensed buffer equilibrium inside its published T domain.
+                    # Algebra: log10(fO2/bar)=A/T+B+C*(P_bar-1)/T.
+                    # Units: K/K and (K/bar)*bar/K are dimensionless.
+                    # Sanity: IW at 1000 K, 1 bar gives -20.787.
+                    value = as_decimal(buffer.A_K) / T + as_decimal(buffer.B) + as_decimal(buffer.pressure_coefficient_K_per_bar) * (P - 1) / T
+                    routes.append(Waypoint("oxygen_condition", Value.point_of(value),
+                        "buffer_relation", WaypointAuthority.DERIVED,
+                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
         pressure = _value(control.oxygen_partial_pressure_Pa)
         if pressure is not None:
-            routes.append(Waypoint("oxygen_condition", pressure, "measured_oxygen_partial_pressure", WaypointAuthority.PRINTED, ("experiment.fO2_control.oxygen_partial_pressure_Pa",)))
+            value = _log_pressure(pressure)
+            if value is not None:
+                routes.insert(0, Waypoint("oxygen_condition", value, "oxygen_partial_pressure_to_log_fO2",
+                    WaypointAuthority.DERIVED, ("experiment.fO2_control.oxygen_partial_pressure_Pa",)))
     sweep = experiment.pressure_environment.sweep_gas
-    if sweep.state.is_value and sweep.state.value is not None and sweep.state.value.species not in {"", "none"}:
-        routes.append(Waypoint("oxygen_condition", Value(ValueKind.CATEGORICAL, categorical=sweep.state.value.species), "printed_gas_mix", WaypointAuthority.PRINTED, ("experiment.pressure_environment.sweep_gas",)))
-    if not routes:
-        routes.append(Waypoint("oxygen_condition", Value(ValueKind.CATEGORICAL, categorical="uncontrolled"), "uncontrolled", WaypointAuthority.ASSUMED, (), (WaypointFlag.ASSUMPTION,)))
-    return _result("oxygen_condition", routes, ())
+    if sweep.state.is_value and sweep.state.value.species == "O2" and sweep.state.value.partial_pressure_Pa.is_value:
+        value = _log_pressure(Value.point_of(sweep.state.value.partial_pressure_Pa.value))
+        if value is not None:
+            routes.append(Waypoint("oxygen_condition", value, "oxygen_sweep_partial_pressure",
+                WaypointAuthority.DERIVED, ("experiment.pressure_environment.sweep_gas",)))
+    gas = (observation.point_conditions or {}).get("gas_composition") if observation else None
+    if gas is not None and gas.state.is_value:
+        from simulator.battery.records import Composition
+
+        comp = gas.state.value
+        if isinstance(comp, Composition) and comp.amount_basis is AmountBasis.MOLE_FRACTION:
+            fractions = dict(comp.components)
+            pressure = pressure_boundary(experiment, bench, observation).selected
+            if "O2" in fractions and pressure is not None:
+                # Ideal mixture: pO2=xO2*P. Units: dimensionless*Pa=Pa.
+                # At xO2=.2 and P=1e5 Pa, log10(fO2/bar)=log10(.2)=-.69897.
+                partial = _multiply(pressure.value, Value.point_of(fractions["O2"]))
+                value = _log_pressure(partial) if partial is not None else None
+                if value is not None:
+                    routes.append(Waypoint("oxygen_condition", value, "observation_gas_composition",
+                        WaypointAuthority.DERIVED,
+                        (f"observation[{observation.observation_id}].point_conditions.gas_composition", *pressure.inputs)))
+            elif any(set(fractions) <= set(pair) | {"Ar", "He", "N2"} and set(pair) <= set(fractions)
+                     for pair in (("H2", "H2O"), ("CO", "CO2"))):
+                from simulator.chemistry.offgas_fo2 import imposed_fo2, OffgasFO2Unavailable
+
+                thermal = thermal_path(experiment, bench, observation).selected
+                if thermal is not None and thermal.value.kind is ValueKind.POINT:
+                    try:
+                        # Premise: one equilibrated H2/H2O or CO/CO2 gas couple;
+                        # NASA CEA/JANAF K(T), as documented in offgas_fo2.
+                        # Algebra: log fO2=2*(log(p_oxidized/p_reduced)-log K).
+                        # Units: pressure ratio and K dimensionless (1 bar reference).
+                        # Sanity: ratio=K gives log fO2=0 at any admitted T.
+                        computed = imposed_fo2({key: float(value) for key, value in fractions.items()}, float(thermal.value.point))
+                        if computed.log10_fO2 is not None:
+                            routes.append(Waypoint("oxygen_condition", Value.point_of(computed.log10_fO2),
+                                "observation_gas_couple_equilibrium", WaypointAuthority.DERIVED,
+                                (f"observation[{observation.observation_id}].point_conditions.gas_composition", *thermal.inputs)))
+                    except OffgasFO2Unavailable:
+                        pass
+    return _result("oxygen_condition", routes, ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"))
+
+
+def _log_pressure(pressure: Value) -> Value | None:
+    # Premise: ideal O2 gas, fO2/bar = pO2_Pa / 100000 Pa/bar.
+    # Algebra: log10(fO2/bar)=log10(pO2_Pa/100000); argument dimensionless.
+    # Sanity: pO2=1 Pa gives -5. Monotonic transform preserves bounds.
+    def convert(value: Decimal) -> Decimal:
+        return (value / Decimal(100000)).log10()
+    if pressure.kind is ValueKind.POINT and pressure.point > 0:
+        return replace(pressure, point=convert(pressure.point))
+    if pressure.kind is ValueKind.INTERVAL and pressure.interval_low > 0:
+        return replace(pressure, interval_low=convert(pressure.interval_low), interval_high=convert(pressure.interval_high))
+    if pressure.kind is ValueKind.BOUND and pressure.bound_value > 0:
+        return replace(pressure, bound_value=convert(pressure.bound_value))
+    return None
 
 
 def g1(
@@ -870,16 +983,13 @@ def _orifice_knudsen(experiment, bench, thermal, pressure):
     return kn, notice_inputs, species, gap
 
 
-def consumer_readiness(
+def _consumer_constraints(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> tuple[ConsumerReadiness, ...]:
-    charges = charge_moles_by_species(experiment, bench)
-    charge_gap = None if charges else ReadinessGap("charge_moles_by_species", GapReason.MISSING_EVIDENCE, ("experiment.sample.mass_kg", "experiment.sample.initial_composition"))
+    charges = charge_moles_by_species(experiment, bench, observation)
     thermal = thermal_path(experiment, bench)
     pressure = pressure_boundary(experiment, bench)
     escape = effective_escape_area(experiment, bench)
-    oxygen = oxygen_condition(experiment, bench)
-    surface = _value(experiment.sample.surface_area_m2)
 
     def build(
         consumer: str,
@@ -894,9 +1004,8 @@ def consumer_readiness(
             engine,
         )
 
-    common_charge = [charge_gap] if charge_gap else []
     thermal_gap = _thermal_gap(thermal)
-    kems_gaps = common_charge + [gap for gap in (thermal_gap, _effective_escape_gap(escape), _gap(oxygen)) if gap]
+    kems_gaps = [gap for gap in (_effective_escape_gap(escape),) if gap and escape.selected]
     kems_status = None
     kems_notices = ()
     method = experiment.method.value.value if experiment.method.is_value else None
@@ -924,7 +1033,7 @@ def consumer_readiness(
         kems_status = ReadinessStatus.NOT_APPLICABLE
     else:
         kems_gaps.append(kn_gap or ReadinessGap("knudsen_number_orifice", GapReason.UNSUPPORTED_PRINT_FORM, ("Kn>=10 not established",)))
-    rps_gaps = common_charge + [gap for gap in (thermal_gap, _gap(pressure)) if gap]
+    rps_gaps = [thermal_gap] if thermal_gap and thermal.selected else []
     if thermal.selected is not None and thermal.selected.route == "temperature_points_only":
         rps_gaps.append(
             ReadinessGap(
@@ -946,14 +1055,7 @@ def consumer_readiness(
             rps_status = ReadinessStatus.NOT_APPLICABLE
         else:
             rps_gaps.append(gap)
-    if surface is None and rps_status is None:
-        rps_gaps.append(ReadinessGap("surfaces", GapReason.MISSING_EVIDENCE, ("experiment.sample.surface_area_m2",)))
-    point_thermal = thermal_path(experiment, bench, observation)
-    point_pressure = pressure_boundary(experiment, bench, observation)
-    point_thermal_gap = _thermal_gap(point_thermal)
-    if point_thermal.selected is not None and point_thermal.selected.value.kind is ValueKind.POINT:
-        point_thermal_gap = None
-    engine_gaps = common_charge + [gap for gap in (point_thermal_gap, _gap(point_pressure), _gap(oxygen)) if gap]
+    engine_gaps = []
     engine_status = None
     if len(charges) == 1:
         engine_gaps = [ReadinessGap("charge_moles_by_species", GapReason.SINGLE_SPECIES_CHARGE)]
@@ -967,3 +1069,14 @@ def consumer_readiness(
         build("rps", rps_gaps, rps_status),
         *engine_results,
     )
+
+
+def consumer_readiness(experiment: Experiment, bench: Bench, observation: Observation | None = None,
+                       *, modelling_inputs=None) -> tuple[ConsumerReadiness, ...]:
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.generators.bench import kems_case, vacuum_pyrolysis_preset, engine_point_requests
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    generated = (kems_case(inputs), vacuum_pyrolysis_preset(inputs, modelling_inputs=modelling_inputs),
+                 *engine_point_requests(inputs))
+    return tuple(item.readiness for item in generated)

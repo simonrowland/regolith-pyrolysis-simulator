@@ -226,9 +226,8 @@ def test_thermal_setpoint_route_and_uncontrolled_oxygen_flag() -> None:
         (Decimal("600"), Decimal("1500")),
     )
     oxygen = oxygen_condition(experiment, _bench())
-    assert oxygen.selected is not None
-    assert oxygen.selected.authority is WaypointAuthority.ASSUMED
-    assert WaypointFlag.ASSUMPTION in oxygen.selected.flags
+    assert oxygen.selected is None
+    assert "fO2_log" in oxygen.absence.missing
 
 
 def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
@@ -276,14 +275,9 @@ def test_thermal_ramp_route_and_nonpoint_propagation() -> None:
         ),
         _bench(geometry=experiment.apparatus.geometry),
     )
-    assert all(
-        any(
-            gap.waypoint == "thermal_path"
-            and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
-            for gap in item.gaps
-        )
-        for item in readiness
-    )
+    for item in readiness:
+        name = {"kems": "temperature_program", "rps": "thermal_path", "engine_point": "temperature_K"}[item.consumer]
+        assert any(gap.waypoint == name for gap in item.gaps)
 
 
 def test_thermal_ramp_and_hold_are_composed() -> None:
@@ -350,7 +344,8 @@ def test_incomplete_or_unordered_ramp_hold_schedule_cannot_earn_readiness(ambigu
     assert result.routes  # Evidence remains inspectable, never selected as a complete path.
     for item in consumer_readiness(experiment, bench):
         assert item.status is ReadinessStatus.GAP
-        assert any(gap.waypoint == "thermal_path" for gap in item.gaps)
+        name = {"kems": "temperature_program", "rps": "thermal_path", "engine_point": "temperature_K"}[item.consumer]
+        assert any(gap.waypoint == name for gap in item.gaps)
 
 
 def test_raw_printed_area_cannot_satisfy_effective_requirement() -> None:
@@ -371,7 +366,8 @@ def test_readiness_pressure_floor_and_single_species_routing() -> None:
     )
     bench = _bench(geometry=experiment.apparatus.geometry)
     readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
-    assert readiness["rps"].status is ReadinessStatus.READY
+    assert readiness["rps"].status is ReadinessStatus.GAP
+    assert any(gap.waypoint == "operator.surfaces" for gap in readiness["rps"].gaps)
     assert readiness["engine_point"].status is ReadinessStatus.NOT_APPLICABLE
     assert readiness["engine_point"].gaps[0].reason is GapReason.SINGLE_SPECIES_CHARGE
 
@@ -422,10 +418,13 @@ def test_rps_pressure_floor_rejects_only_wholly_excluded_values(pressure, status
 
 
 def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
+    from simulator.battery.records import FO2Control
+
     experiment = replace(
         factories.kems_experiment(total_P=Decimal("0.1")),
         sample=_charge(single=False),
         thermal_schedule=_schedule(),
+        fO2_control=FO2Control(factories.State.unknown("channel not printed"), oxygen_partial_pressure_Pa=factories.located(Value.point_of("0.0001"))),
     )
     bench = _bench(geometry=experiment.apparatus.geometry)
     readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
@@ -581,7 +580,8 @@ def _knudsen_case(pressure, method=MethodToken.KNUDSEN_EFFUSION):
 def test_atmospheric_knudsen_method_gets_notice_without_refusal() -> None:
     experiment, bench = _knudsen_case(Value.point_of("101325"))
     result = consumer_readiness(experiment, bench)[0]
-    assert result.status is ReadinessStatus.READY
+    assert result.status is ReadinessStatus.GAP
+    assert not any(gap.reason is GapReason.OUTSIDE_PRESSURE_REGIME for gap in result.gaps)
     assert result.notices
     notice, = result.notices
     assert notice.threshold == Decimal("10")
@@ -600,7 +600,8 @@ def test_knudsen_notice_detects_failing_actual_ramp_segment() -> None:
         factories.located(Value.point_of("1500")),
     ),)))
     result = consumer_readiness(experiment, bench)[0]
-    assert result.status is ReadinessStatus.READY
+    assert result.status is ReadinessStatus.GAP
+    assert not any(gap.reason is GapReason.OUTSIDE_PRESSURE_REGIME for gap in result.gaps)
     assert result.notices
     notice, = result.notices
     assert float(notice.knudsen_number.interval_low) == pytest.approx(2.97236777669)
@@ -608,9 +609,9 @@ def test_knudsen_notice_detects_failing_actual_ramp_segment() -> None:
 
 
 @pytest.mark.parametrize("pressure,status", [
-    (Value.point_of("5"), ReadinessStatus.READY),
+    (Value.point_of("5"), ReadinessStatus.GAP),
     (Value.point_of("20"), ReadinessStatus.NOT_APPLICABLE),
-    (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("5")), ReadinessStatus.READY),
+    (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("5")), ReadinessStatus.GAP),
     (Value(ValueKind.BOUND, bound_operator="<", bound_value=Decimal("20")), ReadinessStatus.GAP),
     (Value(ValueKind.BOUND, bound_operator=">", bound_value=Decimal("20")), ReadinessStatus.NOT_APPLICABLE),
 ])
