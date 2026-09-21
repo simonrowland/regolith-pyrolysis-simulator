@@ -195,10 +195,87 @@ fidelity_samples:
   locator:
     page: 10
     table: '4'
+benches:
+- id: finnigan-mat-271-ir
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: FINNIGAN MAT 271 Knudsen effusion mass spectrometer}
+    locator: &b137_apparatus {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+  cell_material_and_liner:
+    state: {tag: value, value: Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields}
+    locator: *b137_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: Only 7.8 mm outer diameter is printed}
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: Only 8.5 mm crucible height is printed; it is not expressly an internal depth}
+  heating_method:
+    state: {tag: value, value: Tungsten-wire radiation below about 600 C and electron bombardment above}
+    locator: *b137_apparatus
+  detector:
+    state: {tag: value, value: Ion counter}
+    locator: *b137_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W97Re3/W75Re25 thermocouple and IGA-12 single-wavelength pyrometer}
+      locator: *b137_apparatus
+experiments:
+- experiment_id: an-di-series
+  bench_id: finnigan-mat-271-ir
+  method: knudsen_effusion
+  locator: {page: 5, table: '2', note: Runs 1_low, 2_low, and 3_high; a measurement series, not one physical charge}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00003869', interval_high: '0.0000791'}}
+      locator: {page: 5, table: '2', note: Printed initial weights across runs}
+    printed_composition:
+      state: {tag: value, value: Anorthite-diopside eutectic, 42 wt% anorthite and 58 wt% diopside; Ga, In, and Tl trace-element additions vary by run}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+    form:
+      state: {tag: value, value: Powdered glass}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+    characterization:
+      state: {tag: value, value: EPMA of pre-KEMS and post-KEMS glasses}
+      locator: {page: 6, section: '2.2.2 Electron probe micro-analyser'}
+    pretreatment:
+      state: {tag: value, value: Decarbonated 1273 K for 12 h; melted 1673 K for 1 h; quenched, reground, trace-spiked, reheated 1623 K for 30 min, and quenched}
+      locator: {page: 4, section: '2.1 Sample preparation'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0004'}}
+        locator: *b137_apparatus
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 4, note: No channel length printed}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *b137_apparatus
+    regime:
+      regime_class: {tag: value, value: molecular}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: Table 2 has run-specific isotherm and polytherm temperatures; no one series setpoint}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Isotherm and polytherm measurements; 5 min equilibration at each polytherm step}
+      locator: {page: 5, table: '2'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, table: '2', note: 15 h at 1742 K applies to 1_low only, not every series run}
 species:
   Ga:
     observations:
     - observation_id: bischof_2023_gao15_gamma_preferred_1700k
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         pdf_page_index: 23
@@ -267,6 +344,7 @@ species:
             section: 2.1. Sample preparation
             paragraph: 'nominal composition, in wt. %, of SiO2 = 50.34, Al2O3 = 15.40, MgO = 10.80, CaO = 23.46'
     - observation_id: bischof_2023_kems_geometry_and_calibration
+      experiment: an-di-series
       type: gibbs_table
       locator:
         table: '2'
@@ -483,6 +561,7 @@ species:
         note: orifice diameter 0.4 mm printed, area not computed; KC chamber pressure is the nominal ~10^-6 mbar; Table 2 masses are per-run (not one charge)
       equipment: *id001
     - observation_id: bischof_2023_table8_x_gao15
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: '8'
@@ -506,6 +585,7 @@ species:
         x_GaO1.5_3_high_polytherm: 0.0589
         note: 1_low polytherm uses x from 2_low (same starting glass). Gamma itself is not this row.
     - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S1
@@ -625,6 +705,7 @@ species:
           p_O2_calc_Pa: 0.00106
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s2_1low_isotherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S2
@@ -784,6 +865,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s3_2low_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -972,6 +1054,7 @@ species:
           K_Ga_SD: 5.0e-13
       equipment: *id001
     - observation_id: bischof_2023_gao15_gamma_s4_3high_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S4-gamma
@@ -1062,6 +1145,7 @@ species:
           K_Ga_SD: 1.05e-14
       equipment: *id001
     - observation_id: bischof_2023_ga_psat_s1_1low_polytherm
+      experiment: an-di-series
       type: psat_series
       locator:
         table: S1
@@ -1113,6 +1197,7 @@ species:
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_ga2o3_henrian_log10_gamma_model
+      experiment: an-di-series
       type: gibbs_table
       locator:
         table: '9'
@@ -1136,6 +1221,7 @@ species:
         note: A,B based on this work; used inside FactSage 8.2 Slag-LiqA for Table 9. Model coefficients,
           not a measured KEMS gamma.
     - observation_id: bischof_2023_t50c_ga_factsage_table9
+      experiment: an-di-series
       type: transition_point
       locator:
         table: '9'
@@ -1819,6 +1905,7 @@ species:
   In:
     observations:
     - observation_id: bischof_2023_ino15_gamma_preferred_1674k
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         pdf_page_index: 23
@@ -1848,6 +1935,7 @@ species:
           surface In was measured.'
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s1_1low_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S1
@@ -1966,6 +2054,7 @@ species:
           p_O2_calc_Pa: 0.00106
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s2_1low_isotherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S2
@@ -2124,6 +2213,7 @@ species:
           p_O2_calc_Pa: 0.002768
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s3_2low_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S3-cont
@@ -2322,6 +2412,7 @@ species:
           K_In_SD: 6.19e-12
       equipment: *id001
     - observation_id: bischof_2023_ino15_gamma_s4_3high_polytherm
+      experiment: an-di-series
       type: activity_coefficient
       locator:
         table: S4-gamma
@@ -2412,6 +2503,7 @@ species:
           K_In_SD: 3.72e-13
       equipment: *id001
     - observation_id: bischof_2023_in_psat_s1_1low_polytherm
+      experiment: an-di-series
       type: psat_series
       locator:
         table: S1
@@ -2463,6 +2555,7 @@ species:
           delta_IW: 1.53
       equipment: *id001
     - observation_id: bischof_2023_in2o3_henrian_log10_gamma_model
+      experiment: an-di-series
       type: gibbs_table
       locator:
         table: '9'
@@ -2486,6 +2579,7 @@ species:
         note: A,B based on this work; used inside FactSage 8.2 Slag-LiqA for Table 9. Model coefficients,
           not a measured KEMS gamma.
     - observation_id: bischof_2023_t50c_in_factsage_table9
+      experiment: an-di-series
       type: transition_point
       locator:
         table: '9'

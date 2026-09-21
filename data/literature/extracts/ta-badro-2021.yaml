@@ -363,10 +363,100 @@ runs:
       locator: {<<: *table1, paragraph: 'VP6, ratio and f columns'}
       definition_locator: *rayleigh
       note: f is fraction remaining (Mg/Mginitial or Si/Siinitial), not fraction lost or direct weighing.
+benches:
+- id: aerodynamic-levitation-laser-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Gas-mixing aerodynamic levitation laser furnace}
+    locator: {published_page: 102, pdf_page_index: 2, section: '2. Experimental setup'}
+  heating_method:
+    state: {tag: value, value: Infrared CO2 laser}
+    locator: {published_page: 102, pdf_page_index: 2, section: '2. Experimental setup'}
+  detector:
+    state: {tag: value, value: SEM-EDX and LA-MC-ICP-MS}
+    locator: {published_page: 106, pdf_page_index: 6, section: '3. Experiments and analyses'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Pyrometer}
+      locator: {published_page: 103, pdf_page_index: 3, figure: '2'}
+  other_facts:
+  - name: nozzle_gas_inlet_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '1.5'}}
+      locator: {published_page: 103, pdf_page_index: 3, section: '2. Experimental setup', note: Gas-inlet nozzle diameter; not a Knudsen orifice}
+experiments:
+- &badro_vp
+  experiment_id: vp-series
+  bench_id: aerodynamic-levitation-laser-furnace
+  method: {tag: unknown, reason: not_published}
+  locator: {published_page: 105, pdf_page_index: 5, section: '3. Experiments and analyses'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: would_invent}
+      locator: {published_page: 105, pdf_page_index: 5, note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses}
+    printed_composition:
+      state: {tag: value, value: '12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%'}
+      locator: {published_page: 105, pdf_page_index: 5, table: '1'}
+    form:
+      state: {tag: value, value: Approximately 2 mm spherical glass sample}
+      locator: {published_page: 105, pdf_page_index: 5}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 103, pdf_page_index: 3, note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873'}
+      locator: {published_page: 105, pdf_page_index: 5}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {published_page: 101, pdf_page_index: 1, section: Abstract, note: Printed 1 atm; unit conversion only}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 105, pdf_page_index: 5, note: Mixture is printed but component partial pressures and per-component flows required by this typed field are not}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 105, pdf_page_index: 5}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '180', interval_high: '900'}}
+      locator: {published_page: 105, pdf_page_index: 5, note: Methods range; abstract instead prints 60-600 s}
+    cooling_or_quench:
+      state: {tag: value, value: Laser shutdown; cooling rate about 850 C/s}
+      locator: {published_page: 105, pdf_page_index: 5}
+- <<: *badro_vp
+  experiment_id: vp1
+  thermal_schedule: &badro_individual_duration
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 105, pdf_page_index: 5, table: '1', note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges}
+- <<: *badro_vp
+  experiment_id: vp2
+  thermal_schedule: *badro_individual_duration
+- <<: *badro_vp
+  experiment_id: vp3
+  thermal_schedule: *badro_individual_duration
+- <<: *badro_vp
+  experiment_id: vp4
+  thermal_schedule: *badro_individual_duration
+- <<: *badro_vp
+  experiment_id: vp5
+  thermal_schedule: *badro_individual_duration
+- <<: *badro_vp
+  experiment_id: vp6
+  thermal_schedule: *badro_individual_duration
 species:
   Mg:
     observations:
     - observation_id: badro_2021_vp1_delta26mg
+      experiment: vp1
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP1, d26Mg-BHVO-2G and adjacent 2se'}
@@ -391,6 +481,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp2_delta26mg
+      experiment: vp2
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP2, d26Mg-BHVO-2G and adjacent 2se'}
@@ -415,6 +506,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp3_delta26mg
+      experiment: vp3
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP3, d26Mg-BHVO-2G and adjacent 2se'}
@@ -439,6 +531,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp4_delta26mg
+      experiment: vp4
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP4, d26Mg-BHVO-2G and adjacent 2se'}
@@ -463,6 +556,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp5_delta26mg
+      experiment: vp5
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP5, d26Mg-BHVO-2G and adjacent 2se'}
@@ -487,6 +581,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp6_delta26mg
+      experiment: vp6
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP6, d26Mg-BHVO-2G and adjacent 2se'}
@@ -511,6 +606,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d26Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_fit_26mg_24mg
+      experiment: vp-series
       derived_from:
       - badro_2021_vp1_delta26mg
       - badro_2021_vp2_delta26mg
@@ -544,6 +640,7 @@ species:
         locator: {<<: *table2, paragraph: 'delta 26Mg, 2SD'}
       equipment: *equipment
     - observation_id: badro_2021_vp1_delta25mg
+      experiment: vp1
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP1, d25Mg-BHVO-2G and adjacent 2se'}
@@ -568,6 +665,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp2_delta25mg
+      experiment: vp2
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP2, d25Mg-BHVO-2G and adjacent 2se'}
@@ -592,6 +690,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp3_delta25mg
+      experiment: vp3
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP3, d25Mg-BHVO-2G and adjacent 2se'}
@@ -616,6 +715,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp4_delta25mg
+      experiment: vp4
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP4, d25Mg-BHVO-2G and adjacent 2se'}
@@ -640,6 +740,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp5_delta25mg
+      experiment: vp5
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP5, d25Mg-BHVO-2G and adjacent 2se'}
@@ -664,6 +765,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp6_delta25mg
+      experiment: vp6
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP6, d25Mg-BHVO-2G and adjacent 2se'}
@@ -688,6 +790,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d25Mg-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_fit_25mg_24mg
+      experiment: vp-series
       derived_from:
       - badro_2021_vp1_delta25mg
       - badro_2021_vp2_delta25mg
@@ -723,6 +826,7 @@ species:
   Si:
     observations:
     - observation_id: badro_2021_vp1_delta30si
+      experiment: vp1
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP1, d30Si-BHVO-2G and adjacent 2se'}
@@ -747,6 +851,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp2_delta30si
+      experiment: vp2
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP2, d30Si-BHVO-2G and adjacent 2se'}
@@ -771,6 +876,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp3_delta30si
+      experiment: vp3
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP3, d30Si-BHVO-2G and adjacent 2se'}
@@ -795,6 +901,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp4_delta30si
+      experiment: vp4
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP4, d30Si-BHVO-2G and adjacent 2se'}
@@ -819,6 +926,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp5_delta30si
+      experiment: vp5
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP5, d30Si-BHVO-2G and adjacent 2se'}
@@ -843,6 +951,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp6_delta30si
+      experiment: vp6
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP6, d30Si-BHVO-2G and adjacent 2se'}
@@ -867,6 +976,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d30Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_fit_30si_28si
+      experiment: vp-series
       derived_from:
       - badro_2021_vp1_delta30si
       - badro_2021_vp2_delta30si
@@ -900,6 +1010,7 @@ species:
         locator: {<<: *table2, paragraph: 'delta 30Si, 2SD'}
       equipment: *equipment
     - observation_id: badro_2021_vp1_delta29si
+      experiment: vp1
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP1, d29Si-BHVO-2G and adjacent 2se'}
@@ -924,6 +1035,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP1, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp2_delta29si
+      experiment: vp2
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP2, d29Si-BHVO-2G and adjacent 2se'}
@@ -948,6 +1060,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP2, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp3_delta29si
+      experiment: vp3
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP3, d29Si-BHVO-2G and adjacent 2se'}
@@ -972,6 +1085,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP3, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp4_delta29si
+      experiment: vp4
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP4, d29Si-BHVO-2G and adjacent 2se'}
@@ -996,6 +1110,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP4, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp5_delta29si
+      experiment: vp5
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP5, d29Si-BHVO-2G and adjacent 2se'}
@@ -1020,6 +1135,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP5, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_vp6_delta29si
+      experiment: vp6
       type: rate_series
       class_tag: measured
       locator: {<<: *table1, paragraph: 'VP6, d29Si-BHVO-2G and adjacent 2se'}
@@ -1044,6 +1160,7 @@ species:
         locator: {<<: *table1, paragraph: 'VP6, 2se adjacent to d29Si-BHVO-2G'}
       equipment: *equipment
     - observation_id: badro_2021_fit_29si_28si
+      experiment: vp-series
       derived_from:
       - badro_2021_vp1_delta29si
       - badro_2021_vp2_delta29si

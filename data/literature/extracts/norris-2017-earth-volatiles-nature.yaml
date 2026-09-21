@@ -31,10 +31,74 @@ fidelity_samples:
     pdf_page_index: 14
     figure: '3'
     note: Figure 3 plots volatility factors at 1300 C; values are not digitised.
+benches:
+- id: stirred-gas-mixing-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: One-atmosphere gas-mixing furnace with stirring apparatus}
+    locator: {pdf_page_index: 3, section: 'Experimental apparatus'}
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity nickel crucible and stirrer mechanism}
+    locator: {pdf_page_index: 11, section: Methods}
+  geometry:
+    cell_internal_dimensions:
+      volume_m3:
+        state: {tag: value, value: {kind: point, point: '0.0000045'}}
+        locator: {pdf_page_index: 11, section: Methods, note: Printed 4.5 cm3 crucible capacity; unit conversion only}
+  heating_method:
+    state: {tag: value, value: Molybdenum-disilicide heating elements}
+    locator: {pdf_page_index: 11, section: Methods}
+  detector:
+    state: {tag: value, value: EDS and LA-ICP-MS}
+    locator: {pdf_page_index: 12, section: Analysis}
+experiments:
+- experiment_id: volatile-loss-series
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator: {pdf_page_index: 11, section: Methods}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: Natural Reykjanes Ridge basalt plus trace-element oxide mixture}
+      locator: {pdf_page_index: 11, section: Methods}
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 1300 C; unit conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {pdf_page_index: 3, section: 'Experimental apparatus', note: Printed one atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Flowing CO/CO2 mixture printed, but component flow and partial pressures required by this typed field are not}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {pdf_page_index: 4, section: 'Experimental vaporisation experiments', note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
 species:
   basaltic_silicate_melt:
     observations:
     - observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
+      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 3
@@ -71,6 +135,7 @@ species:
         major_element_homogeneity_RSD_percent: approximately 2
         trace_element_homogeneity_RSD_percent: 5-10
     - observation_id: norris_2017_starting_material_preparation
+      experiment: volatile-loss-series
       type: sample_preparation
       locator:
         pdf_page_index: 11
@@ -102,6 +167,7 @@ species:
         pellet_press: 10 ton press
       uncertainty: {}
     - observation_id: norris_2017_volatile_loss_conditions
+      experiment: volatile-loss-series
       type: rate_series
       locator:
         pdf_page_index: 3
@@ -142,6 +208,7 @@ species:
       uncertainty:
         fO2_verification: before and after each experiment; no numeric sensor uncertainty stated
     - observation_id: norris_2017_analytical_measurement_performance
+      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 12
@@ -206,6 +273,7 @@ species:
         diffusion_into_nickel_max_distance_um: 200
         diffusion_worst_case_melt_volume_percent: no more than 5
     - observation_id: norris_2017_crucible_capacity_disagreement
+      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 13
@@ -224,6 +292,7 @@ species:
   trace_elements:
     observations:
     - observation_id: norris_2017_figure2_time_series
+      experiment: volatile-loss-series
       type: rate_series
       locator:
         pdf_page_index: 15
@@ -250,6 +319,7 @@ species:
         error_bars: 1 SD
         digitised: false
     - observation_id: norris_2017_figure3_volatility_factors
+      experiment: volatile-loss-series
       type: rate_series
       locator:
         pdf_page_index: 16
@@ -283,6 +353,7 @@ species:
         figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
         digitised: false
     - observation_id: norris_2017_figure4_bse_vs_volatility
+      experiment: volatile-loss-series
       type: gibbs_table
       locator:
         pdf_page_index: 17
@@ -304,6 +375,7 @@ species:
         horizontal_error_bars: 2 standard errors
         digitised: false
     - observation_id: norris_2017_author_volatility_factor_definition
+      experiment: volatile-loss-series
       type: model_derived
       locator:
         pdf_page_index: 5

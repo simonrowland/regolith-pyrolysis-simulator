@@ -11,6 +11,93 @@ extraction:
   worker: w3-sossi-2020-cu-zn-isotope-evap-formalism
   provenance_path: data/literature/sources/sossi-2020-cu-zn-isotope-evap-formalism.pdf
 review_status: draft
+benches:
+- id: sossi-vertical-tube-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: 1 atm GERO vertical tube furnace}
+    locator: &sossi_experimental {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental'}
+  heating_method:
+    state: {tag: value, value: MoSi2 elements}
+    locator: *sossi_experimental
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: 'Type B Pt70Rh30-Pt94Rh6 thermocouple bead placed less than 5 mm above sample'}
+      locator: *sossi_experimental
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Better than +/-0.5 C describes controller stability, not calibration uncertainty'}
+  other_facts:
+  - name: alumina_tube_diameter
+    unit: cm
+    value:
+      state: {tag: value, value: {kind: point, point: '4.2'}}
+      locator: *sossi_experimental
+  - name: furnace_hotspot_length
+    unit: cm
+    value:
+      state: {tag: value, value: {kind: point, point: '3', approximate: true}}
+      locator: *sossi_experimental
+  - name: temperature_controller_stability
+    unit: C
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.5'}}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Eurotherm controller stable to better than +/-0.5 C'}
+experiments:
+- experiment_id: cu-zn-evaporation-series
+  bench_id: sossi-vertical-tube-furnace
+  method: 1-atm_vertical_tube_furnace_evaporation
+  locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Reported Cu-Zn evaporation series; per-run temperature, fO2, loop, gas flow, and duration remain in Table 1 observations'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.000025', approximate: true}}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Printed sample mass about 25 mg; SI unit conversion only'}
+    printed_composition:
+      state: {tag: value, value: 'An42Di58 with about 15 wt% forsterite and about 15 wt% Fe2O3; Cu-Zn or Metalloids trace-element mix'}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental'}
+    form:
+      state: {tag: value, value: slurry smeared on noble-metal wire loops}
+      locator: *sossi_experimental
+    pretreatment:
+      state: {tag: value, value: 'Oxide powders mixed three times in agate mortar under acetone, fired overnight at 1000 C in air to decarbonate, then Cu and Zn oxides added'}
+      locator: *sossi_experimental
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: Open wire-loop evaporation, not an effusion-orifice experiment}
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: Open wire-loop evaporation, not an effusion channel}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: Individual runs span 1300-1502 C in Table 1; no single series setpoint}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {published_page: 318, pdf_page_index: 2, section: '2.1 Experimental', note: 'Printed total pressure 1 atm; SI unit conversion only'}
+    sweep_gas:
+      state: {tag: value, value: air or CO-CO2 mixture}
+      locator: *sossi_experimental
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: commanded}
+    buffer:
+      state: {tag: value, value: CO-CO2 gas mixing; air runs had no gas flow}
+      locator: *sossi_experimental
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Run time recorded once thermocouple reached about 99% of set temperature; oxygen fugacity equilibrated about 10 min before sample introduction'}
+      locator: *sossi_experimental
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '7200'}}
+      locator: {published_page: 318, pdf_page_index: 2, table: '1', note: 'Printed Table 1 run times 5-120 min; SI unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: rapidly dropped into de-ionised-water bath}
+      locator: *sossi_experimental
 fidelity_samples:
   - path: species.Cu.observations[sossi_2020_cu_table1_measured_runs].values.rows[0]
     value:
@@ -50,6 +137,7 @@ species:
   Cu:
     observations:
       - observation_id: sossi_2020_cu_table1_measured_runs
+        experiment: cu-zn-evaporation-series
         type: rate_series
         locator: { page: 6, table: '1', section: 'Sample run conditions and Cu abundances/isotope compositions' }
         phase: glass
@@ -111,6 +199,7 @@ species:
           chamber_pressure: {value: 1, units: atm, locator: {page: 3, section: '2.1 Experimental'}}
           cell_material: {value: 'Pt wire loops; Re used at or below logfO2 -5.5', locator: {page: 3, section: '2.1 Experimental'}}
       - observation_id: sossi_2020_cu_fractionation_measured_reduced
+        experiment: cu-zn-evaporation-series
         type: alpha
         locator: {page: 7, figure: '5a', section: '3.3 Copper and Zinc isotope ratios'}
         T_range_K: [1573.15, 1775.15]
@@ -125,6 +214,7 @@ species:
             - {logfO2: [-8], alpha_65Cu_63Cu: 0.9979, uncertainty: 0.0001, N: 3, intercept_delta65Cu_per_mil: 0.17, intercept_2SD_per_mil: 0.21}
           note: 'Reduced values are regressions from measured runs, not individual measurements.'
       - observation_id: sossi_2020_cu_logKstar_model_runs
+        experiment: cu-zn-evaporation-series
         type: activity_coefficient
         locator: {page: 6, table: '1', section: 'modelled logK* values'}
         phase: glass
@@ -158,6 +248,7 @@ species:
   Zn:
     observations:
       - observation_id: sossi_2020_zn_table1_measured_runs
+        experiment: cu-zn-evaporation-series
         type: rate_series
         locator: {page: 6, table: '1', section: 'Sample run conditions and Zn abundances/isotope compositions'}
         phase: glass
@@ -205,6 +296,7 @@ species:
             - {run: P 26/12/18c, temperature_C: 1300, co_sccm: 24, co2_sccm: 176, logfO2: -8.00, time_min: 5, loop: Re, starting_mix: Cu-Zn, Zn_ppm: 2256, lnf_Zn: -1.97, delta66Zn_SM_per_mil: null, delta66Zn_2SD_per_mil: null, delta68Zn_SM_per_mil: null, delta68Zn_2SD_per_mil: null, deltaZn_N: null}
         starting_material: {delta66Zn_per_mil: 0.16, uncertainty: 0.02, reference: JMC-Lyon, source: ZnO Alfa Aesar}
       - observation_id: sossi_2020_zn_fractionation_measured_reduced
+        experiment: cu-zn-evaporation-series
         type: alpha
         locator: {page: 7, figure: '5b', section: '3.3 Copper and Zinc isotope ratios'}
         T_range_K: [1573.15, 1775.15]
@@ -221,6 +313,7 @@ species:
             - {logfO2: [-8], alpha_66Zn_64Zn: 0.9978, N: 2, intercept_forced_through_origin: true}
           note: 'Reduced values are regressions from measured runs; high-temperature reducing Zn samples marked with an asterisk were reported as contaminated and excluded from the discussed trends.'
       - observation_id: sossi_2020_zn_logKstar_model_runs
+        experiment: cu-zn-evaporation-series
         type: activity_coefficient
         locator: {page: 6, table: '1', section: 'modelled logK* values'}
         phase: glass
@@ -252,6 +345,7 @@ species:
             - {run: P 31/07/18d, temperature_C: 1500.5, logfO2: -8.00, logKstar_Zn: null, contamination_asterisk: true}
             - {run: P 01/08/18d, temperature_C: 1396.6, logfO2: -8.04, logKstar_Zn: null, contamination_asterisk: true}
       - observation_id: sossi_2020_standalone_zoning_table2_model
+        experiment: cu-zn-evaporation-series
         type: rate_series
         locator: {page: 8, table: '2', section: 'standalone elemental zoning profiles'}
         T_range_K: [1573.15, 1573.15]

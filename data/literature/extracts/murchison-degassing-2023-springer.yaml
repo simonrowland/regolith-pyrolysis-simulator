@@ -24,6 +24,59 @@ extraction:
   worker: extract-pyro-meteorite
   provenance_path: docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/
 review_status: draft
+benches:
+- id: quartz-helium-degassing-rig
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Induction-heated helium degassing rig with gas-chromatographic analysis}
+    locator: &degassing_apparatus {published_page: 573, section: 'Experimental studies'}
+  cell_material_and_liner:
+    state: {tag: value, value: Quartz-glass reactor and quartz boat}
+    locator: *degassing_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: *degassing_apparatus
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: *degassing_apparatus
+  heating_method:
+    state: {tag: value, value: Induction heater/furnace}
+    locator: *degassing_apparatus
+  detector:
+    state: {tag: value, value: Kristall-Lyuks 4000M gas chromatograph}
+    locator: {published_page: 574, section: 'Experimental studies'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Nicrobell D thermocouple beside quartz boat}
+      locator: {published_page: 574, section: 'Experimental studies'}
+  other_facts:
+  - name: quartz_boat_volume
+    unit: ml
+    value: {state: {tag: value, value: {kind: point, point: '3'}}, locator: *degassing_apparatus}
+  - name: quartz_reactor_volume
+    unit: ml
+    value: {state: {tag: value, value: {kind: point, point: '80'}}, locator: *degassing_apparatus}
+experiments:
+- &murchison_degassing_base
+  experiment_id: murchison-isothermal-series
+  bench_id: quartz-helium-degassing-rig
+  method: vacuum_pyrolysis_furnace
+  locator: {published_page: 574, table: '1', note: Murchison isothermal degassing series}
+  sample:
+    mass_kg: {state: {tag: unknown, reason: not_published}, locator: {published_page: 573, note: No aliquot mass printed}}
+    printed_composition: {state: {tag: value, value: Ground and dried Murchison CM2 material}, locator: *degassing_apparatus}
+    form: {state: {tag: unknown, reason: not_published}, locator: {published_page: 575, note: Crushed and ball-milled forms occur but tables do not assign one form per observation}}
+  conditions:
+    temperature_K: {state: {tag: unknown, reason: not_published}, locator: {published_page: 574, table: '1', note: Three isothermal setpoints, not one series temperature}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '110000', approximate: true}}, locator: {published_page: 574, note: 1.1 +/- 0.1 bar helium; unit conversion only}}
+    sweep_gas: {state: {tag: value, value: Helium}, locator: *degassing_apparatus}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *murchison_degassing_base
+  experiment_id: murchison-stepwise-series
+  locator: {published_page: 574, table: '2', note: Murchison stepped degassing series}
 corrections: []
 fidelity_samples:
 - path: species.CO.observations[voropaev_2023_murchison_isothermal_co_table1].values.points[2].yield_ug_g
@@ -57,6 +110,7 @@ species:
   Murchison_CM2:
     observations:
     - observation_id: voropaev_2023_murchison_cm2_method_and_feedstock
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         published_page: 573
@@ -191,6 +245,7 @@ species:
   H2:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_h2_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -246,6 +301,7 @@ species:
           as_printed: 372.0 +/- 3.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_h2_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -401,6 +457,7 @@ species:
   N2:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_n2_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -456,6 +513,7 @@ species:
           as_printed: 503.0 +/- 5.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_n2_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -602,6 +660,7 @@ species:
   CH4:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_ch4_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -657,6 +716,7 @@ species:
           as_printed: 197.0 +/- 2.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_ch4_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -809,6 +869,7 @@ species:
   CO:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_co_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -864,6 +925,7 @@ species:
           as_printed: 10200.0 +/- 100.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_co_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -1043,6 +1105,7 @@ species:
   CO2:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_co2_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -1098,6 +1161,7 @@ species:
           as_printed: 4040.0 +/- 40.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_co2_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -1250,6 +1314,7 @@ species:
   H2S:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_h2s_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -1305,6 +1370,7 @@ species:
           as_printed: 543.0 +/- 5.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_h2s_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -1463,6 +1529,7 @@ species:
   COS:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_cos_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -1518,6 +1585,7 @@ species:
           as_printed: 7.39 +/- 0.07
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_cos_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -1670,6 +1738,7 @@ species:
   H2O:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_h2o_table1
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         table: '1'
@@ -1725,6 +1794,7 @@ species:
           as_printed: 3350.0 +/- 30.0
       equipment: *id001
     - observation_id: voropaev_2023_murchison_stepwise_h2o_table2
+      experiment: murchison-stepwise-series
       type: rate_series
       locator:
         table: '2'
@@ -1875,6 +1945,7 @@ species:
           uncertainty_ug_g: 20.0
           as_printed: 2030.0 +/- 20.0
     - observation_id: voropaev_2023_murchison_ir_fig3_figure_only
+      experiment: murchison-isothermal-series
       type: rate_series
       locator:
         figure: '3'

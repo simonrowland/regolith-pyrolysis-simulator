@@ -42,10 +42,80 @@ fidelity_samples:
     published_page: 959
     pdf_page_index: 2
     note: electron accelerating potential 55 V
+benches:
+- id: nanjo-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass-filter mass spectrometer}
+    locator: {published_page: 958, pdf_page_index: 1, section: Introduction}
+  cell_material_and_liner:
+    state: {tag: value, value: Quartz Knudsen cell}
+    locator: {published_page: 959, pdf_page_index: 2, figure: '1'}
+  heating_method:
+    state: {tag: value, value: Shield heater heating tube}
+    locator: {published_page: 959, pdf_page_index: 2, figure: '1'}
+  detector:
+    state: {tag: value, value: Mass filter}
+    locator: {published_page: 958, pdf_page_index: 1, section: Introduction}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Thermocouple}
+      locator: {published_page: 959, pdf_page_index: 2, figure: '1'}
+  ionization:
+    energy_eV:
+      state: {tag: value, value: {kind: point, point: '55'}}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+experiments:
+- experiment_id: se-te-kems-series
+  bench_id: nanjo-kems
+  method: knudsen_effusion
+  locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.003', interval_high: '0.004'}}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure', note: Printed 3-4 g; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: Se-Te alloys prepared from pure elements of at least 99.999% purity}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+    form:
+      state: {tag: value, value: Solid lump}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+    pretreatment:
+      state: {tag: value, value: Vacuum-sealed and melted about 100 K above melting point}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.00025'}}
+        locator: {published_page: 959, pdf_page_index: 2, figure: '1', note: Printed 0.25 mm diameter; unit conversion only}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 959, pdf_page_index: 2, figure: '1'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 961, pdf_page_index: 4, note: Printed 500-800 K}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure', note: Vacuum KEMS measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heated gradually, then increased in several tens-of-K increments and held until ion intensity was stable}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
+    cooling_or_quench:
+      state: {tag: value, value: Rapid cooling}
+      locator: {published_page: 959, pdf_page_index: 2, section: 'Experimental procedure'}
 species:
   Se:
     observations:
     - observation_id: nanjo_1976_kems_geometry_and_calibration
+      experiment: se-te-kems-series
       type: gibbs_table
       locator: &id001
         published_page: 959
@@ -100,6 +170,7 @@ species:
             pdf_page_index: 2
             note: system evacuated; no Torr/Pa number printed
     - observation_id: nanjo_1976_table1_second_law_deltaHvap_Se
+      experiment: se-te-kems-series
       type: gibbs_table
       locator:
         table: '1'
@@ -147,6 +218,7 @@ species:
   Te:
     observations:
     - observation_id: nanjo_1976_table1_second_law_deltaHvap
+      experiment: se-te-kems-series
       type: gibbs_table
       locator:
         table: '1'
@@ -214,6 +286,7 @@ species:
       uncertainty:
         note: quoted; authors agree with Brooks/Gattow/Machol not Hultgren on Te2
     - observation_id: nanjo_1976_gamma_Te_regular_714k
+      experiment: se-te-kems-series
       type: activity_coefficient
       locator:
         published_page: 961
@@ -242,6 +315,7 @@ species:
       uncertainty:
         note: no +/- on the 0.33/0.32/0.27 slopes; activities themselves figure-only
     - observation_id: nanjo_1976_fig7_activities_714k_figure_only
+      experiment: se-te-kems-series
       type: activity_coefficient
       locator:
         figure: '7'

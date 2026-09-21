@@ -60,6 +60,120 @@ fidelity_samples:
     published_page: 56
     pdf_page_index: 1
     note: Table 1 Iron C=0.007 wt%
+benches:
+- id: rm-6e
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hitachi RM-6E mass spectrometer combined with Knudsen cell}
+    locator: &yam_apparatus {page: 2, published_page: 56, section: 'II.1 Experimental Apparatus and Specimen'}
+  cell_material_and_liner:
+    state: {tag: value, value: High-purity alumina SSA-S Knudsen-cell crucible}
+    locator: *yam_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *yam_apparatus
+      height_m:
+        state: {tag: unknown, reason: not_published}
+        locator: *yam_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W25%Re-W5%Re thermocouple}
+      locator: *yam_apparatus
+  temperature_calibration:
+    method:
+      state: {tag: value, value: Calibrated using melting points of pure Fe and pure Ni}
+      locator: *yam_apparatus
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, published_page: 56, note: Printed +/-1 C is temperature fluctuation, not calibration uncertainty}
+  other_facts:
+  - name: temperature_fluctuation_magnitude
+    unit: C
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '1'}}
+      locator: {page: 2, published_page: 56, note: Printed fluctuations were +/-1 C}
+experiments:
+- experiment_id: fe-sn-series
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 2, published_page: 56, note: Fe-Sn measurements; individual alloy charges are not separately specified}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: Pure Fe and pure Sn weighed to desired composition; Table 1 reports starting-metal assays, not charge composition}
+      locator: *yam_apparatus
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+    pretreatment:
+      state: {tag: value, value: Fe high-vacuum melted then hydrogen-deoxidized for 3 h at 1500 C; Sn hydrogen-deoxidized for 18 h at 1000 C}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: {page: 2, published_page: 56, note: Usually used for activity measurements}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, published_page: 56, note: Printed 1550-1610 C range applies across the series; no one run setpoint}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: 7200 s is the printed depletion-model time, not a universal experimental hold}
+- experiment_id: fe-sn-cu-series
+  bench_id: rm-6e
+  method: knudsen_effusion
+  locator: {page: 2, published_page: 56, note: Fe-Sn-Cu measurements; individual alloy charges are not separately specified}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: *yam_apparatus
+    printed_composition:
+      state: {tag: value, value: Pure Fe, pure Sn, and OFHC Cu weighed to desired composition}
+      locator: *yam_apparatus
+    form:
+      state: {tag: value, value: Alloys melted in situ}
+      locator: *yam_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 5, published_page: 60, note: 0.3 mm usually used, but no per-row assignment for Fe-Sn-Cu table}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.001'}}
+        locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+  fO2_control:
+    channel: {tag: value, value: buffer}
+    buffer:
+      state: {tag: value, value: 0.5 at% Al added in Knudsen cell}
+      locator: *yam_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 2, published_page: 56, note: Printed 1560-1610 C range applies across the series; no one run setpoint}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise decrease in temperature}
+      locator: {page: 5, published_page: 60, section: 'IV.2 Surface Depletion of Sn'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 5, published_page: 60, note: Printed t=7200 s belongs to depletion calculation, not a measurement hold}
 species:
   Fe:
     observations:
@@ -90,6 +204,7 @@ species:
             pdf_page_index: 1
             section: II.1
       observation_id: yamamoto_1983_kems_geometry_and_calibration
+      experiment: fe-sn-series
       type: gibbs_table
       locator:
         published_page: 56
@@ -161,6 +276,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_table2_ion_ratios
+      experiment: fe-sn-series
       type: rate_series
       locator:
         table: '2'
@@ -235,6 +351,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_table3_activities_and_heats
+      experiment: fe-sn-series
       type: activity_coefficient
       locator:
         table: '3'
@@ -496,6 +613,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_table4_dilute_ion_ratios_1600C
+      experiment: fe-sn-series
       type: rate_series
       locator:
         table: '4'
@@ -540,6 +658,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_table5_FeSnCu
+      experiment: fe-sn-cu-series
       type: activity_coefficient
       locator:
         table: '5'
@@ -636,6 +755,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_gamma_inf_and_epsilon
+      experiment: fe-sn-cu-series
       type: activity_coefficient
       locator:
         published_page: 56
@@ -732,6 +852,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_critical_mixing_author_estimate
+      experiment: fe-sn-series
       type: transition_point
       locator:
         published_page: 56
@@ -756,6 +877,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_figs_ion_ratios_figure_only
+      experiment: fe-sn-series
       type: rate_series
       locator:
         figure: '1'
@@ -784,6 +906,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamamoto_1983_figs_activities_figure_only
+      experiment: fe-sn-series
       type: activity_coefficient
       locator:
         figure: '3'

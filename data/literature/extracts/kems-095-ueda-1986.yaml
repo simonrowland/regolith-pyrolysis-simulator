@@ -18,6 +18,128 @@ extraction:
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: ueda-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: 'ANELVA NAG-531 quadrupole mass spectrometer with Y2O3 Knudsen cell'}
+    locator: &ueda_apparatus {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: *ueda_apparatus
+  cell_material_and_liner:
+    state: {tag: value, value: Y2O3}
+    locator: *ueda_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.009'}}
+        locator: *ueda_apparatus
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.006'}}
+        locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Printed cell depth 6 mm; body height is separately 7 mm'}
+  pumping_type:
+    state: {tag: value, value: oil diffusion pump with liquid-nitrogen cold trap}
+    locator: *ueda_apparatus
+  pumping_speed_m3_s:
+    state: {tag: value, value: {kind: point, point: '1.2'}}
+    locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Printed pumping speed 1200 L/s; SI unit conversion only'}
+  heating_method:
+    state: {tag: value, value: resistance heating with cylindrical tantalum heater}
+    locator: *ueda_apparatus
+  detector:
+    state: {tag: value, value: ANELVA NAG-531 quadrupole mass spectrometer}
+    locator: *ueda_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: W/Re 5/26 thermocouple below Knudsen cell}
+      locator: *ueda_apparatus
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Printed +/-0.1 K describes PID temperature-control precision, not calibration uncertainty'}
+  other_facts:
+  - name: cell_body_height
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '7'}}
+      locator: *ueda_apparatus
+  - name: cell_outer_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '11'}}
+      locator: *ueda_apparatus
+  - name: lid_thickness
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '1'}}
+      locator: *ueda_apparatus
+  - name: offered_orifice_diameter_not_run_assignment
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: interval, interval_low: '0.5', interval_high: '0.8'}}
+      locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Printed orifice-diameter range; no observation-row or lid-thickness assignment'}
+  - name: temperature_control_precision
+    unit: K
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.1'}}
+      locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'PID controller held temperature within +/-0.1 K; not a calibration uncertainty'}
+experiments:
+- experiment_id: ti-co-kems-series
+  bench_id: ueda-kems
+  method: knudsen_effusion
+  locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method', note: 'Reported Ti-Co measurement series; individual aperture configurations are not assigned'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0009', interval_high: '0.0012'}}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method', note: 'Printed total sample mass 0.9-1.2 g; SI unit conversion only'}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method', note: 'Multiple Ti-Co compositions are retained in observation rows; no single series composition'}
+    form:
+      state: {tag: value, value: 'Ti and Co wire, 1 mm diameter, cut 1-1.5 mm long'}
+      locator: *ueda_apparatus
+    characterization:
+      state: {tag: value, value: 'Ti oxygen analyzed by inert-gas fusion and coulometric titration'}
+      locator: *ueda_apparatus
+    pretreatment:
+      state: {tag: value, value: 'Y2O3 cell heated in air at 1273 K for about 108 ks to remove distortion'}
+      locator: *ueda_apparatus
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: '0.5-0.8 mm range printed, but no run assignment'}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Lid thickness is 1 mm; channel length is not printed'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method', note: 'Printed 1840-2020 K measurement range spans the series; no single experiment-series setpoint'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Ultimate vacuum before heating is printed, not a run pressure'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: Vacuum measurement}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.00003', approximate: true}}
+        locator: {published_page: 1082, pdf_page_index: 2, section: 'II.1 Experimental apparatus and sample', note: 'Ultimate vacuum about 3 x 10^-5 Pa'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Heated slowly to 2020 K in about 12.6 ks; held at 2020 K until ion intensity became constant; measurements alternated heating and cooling across the printed 1840-2020 K range'}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '10800', interval_high: '14400'}}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method', note: 'Printed measurement time 10.8-14.4 ks; SI unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: 'Cooled to about 373 K in about 5.4 ks after measurement'}
+      locator: {published_page: 1083, pdf_page_index: 3, section: 'II.2 Experimental method'}
 fidelity_samples:
 - path: species.Ti.observations[ueda_1986_gamma_ti_table2].values.points[10].gamma_binary_1873K
   value: 0.011
@@ -55,6 +177,7 @@ species:
   Ti:
     observations:
     - observation_id: ueda_1986_kems_geometry_and_calibration
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         published_page: 1082
@@ -154,6 +277,7 @@ species:
             pdf_page_index: 2
             note: ultimate vacuum during measurement about 3e-5 Pa
     - observation_id: ueda_1986_gamma_ti_table2
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         table: '2'
@@ -312,6 +436,7 @@ species:
             pdf_page_index: 2
             note: ultimate vacuum during measurement about 3e-5 Pa
     - observation_id: ueda_1986_mixing_functions
+      experiment: ti-co-kems-series
       type: gibbs_table
       locator:
         published_page: 1087
@@ -353,6 +478,7 @@ species:
         esin_quoted_Delta_H_Ti_infinite_dilution_kJ_mol: -119.0
         esin_quoted_method_class: quoted_measurement
     - observation_id: ueda_1986_table1_xrd
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         table: '1'
@@ -407,6 +533,7 @@ species:
           experimental: Co
           equilibrium_from_fig1: TiCo3+Co
     - observation_id: ueda_1986_fig1_phase_diagram_figure_only
+      experiment: ti-co-kems-series
       type: transition_point
       locator:
         figure: '1'
@@ -437,6 +564,7 @@ species:
         caption: Fig. 1 Ti-Co binary phase diagram.
         note: Quoted constitution diagram; not this-work KEMS.
     - observation_id: ueda_1986_fig2_apparatus_figure_only
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         figure: '2'
@@ -467,6 +595,7 @@ species:
         caption: Fig. 2 Experimental apparatus.
         note: Schematic of quadrupole MS, cell, shutter, W-Re 5/26 thermocouple.
     - observation_id: ueda_1986_fig3_cell_assembly_figure_only
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         figure: '3'
@@ -497,6 +626,7 @@ species:
         caption: Fig. 3 Knudsen cell assembly.
         note: Y2O3 cell, W holder, Ta heater, W rod, thermocouple; 5 mm scale bar.
     - observation_id: ueda_1986_fig4_time_dependence_figure_only
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         figure: '4'
@@ -530,6 +660,7 @@ species:
           alloy at 2020 K.
         note: ln(I+_Ti T), ln(I+_Co T), ln(I+_Ti/I+_Co) vs time. Not digitised.
     - observation_id: ueda_1986_fig5_ion_ratio_vs_1_over_T_figure_only
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         figure: '5'
@@ -560,6 +691,7 @@ species:
         caption: Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.
         note: ln(I+_Ti/I+_Co) vs 1/T; N_Co labels 0.1 to 0.9. This is the raw KEMS series; not digitised.
     - observation_id: ueda_1986_fig6_oxygen_vs_N_Co_figure_only
+      experiment: ti-co-kems-series
       type: rate_series
       locator:
         figure: '6'
@@ -590,6 +722,7 @@ species:
         caption: Fig. 6 Oxygen concentration in the Ti-Co alloys.
         note: 'Oxygen mol% vs N_Co after the run. Authors: O can be neglected for N_Co <= 0.6. Not digitised.'
     - observation_id: ueda_1986_fig7_integration_path_figure_only
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         figure: '7'
@@ -620,6 +753,7 @@ species:
         caption: Fig. 7 Schematic representation of the integration path for the Ti-Co binary alloys.
         note: Binary path A->E; ternary A->C->D->E. Not numeric.
     - observation_id: ueda_1986_fig8_binary_integration_1973K_figure_only
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         figure: '8'
@@ -653,6 +787,7 @@ species:
           1973 K.
         note: Numerics in Table 2 B columns. Not digitised.
     - observation_id: ueda_1986_fig9_ternary_integration_1973K_figure_only
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         figure: '9'
@@ -686,6 +821,7 @@ species:
           at 1973 K.
         note: Numerics in Table 2 T columns. Not digitised.
     - observation_id: ueda_1986_fig10_activities_figure_only
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         figure: '10'
@@ -716,6 +852,7 @@ species:
         caption: Fig. 10 Activities of the Ti-Co system at 1873 and 1973 K.
         note: Printed intercepts gamma_Co^o=0.014 and 0.028, gamma_Ti^o=0.011 and 0.021. Curves not digitised.
     - observation_id: ueda_1986_fig11_enthalpy_integrand_figure_only
+      experiment: ti-co-kems-series
       type: gibbs_table
       locator:
         figure: '11'
@@ -746,6 +883,7 @@ species:
         caption: Fig. 11 Integration curve for the partial enthalpies of mixing in the Ti-Co system.
         note: d ln(I+_Ti/I+_Co)/d(1/T) vs N_Co. Error bars 95% CI. Not digitised.
     - observation_id: ueda_1986_fig12_partial_enthalpies_figure_only
+      experiment: ti-co-kems-series
       type: gibbs_table
       locator:
         figure: '12'
@@ -776,6 +914,7 @@ species:
         caption: Fig. 12 Partial and integral enthalpies of mixing of the liquid Ti-Co system.
         note: This study vs Esin et al. dashed. Numerics in the mixing-functions observation.
     - observation_id: ueda_1986_fig13_mixing_1873K_figure_only
+      experiment: ti-co-kems-series
       type: gibbs_table
       locator:
         figure: '13'
@@ -808,6 +947,7 @@ species:
   Co:
     observations:
     - observation_id: ueda_1986_gamma_co_table2
+      experiment: ti-co-kems-series
       type: activity_coefficient
       locator:
         table: '2'

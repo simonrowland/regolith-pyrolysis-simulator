@@ -42,10 +42,94 @@ fidelity_samples:
     published_page: 528
     pdf_page_index: 3
     note: alloy mass 6-11 g
+benches:
+- id: nag-530
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen cell-quadrupole mass-filter system}
+    locator: &nak_apparatus {page: 528, published_page: 528, section: 'Apparatus and experiment', note: Newly constructed apparatus described in this work}
+  cell_material_and_liner:
+    state: {tag: value, value: Molybdenum lid, container, and orifice plate; alumina inner crucible}
+    locator: *nak_apparatus
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.016'}}
+        locator: {page: 528, published_page: 528, figure: '3', note: Alumina inner crucible diameter 16 mm}
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.022'}}
+        locator: {page: 528, published_page: 528, figure: '3', note: Alumina inner crucible height 22 mm}
+  detector:
+    state: {tag: value, value: NEVA NAG-530 quadrupole mass filter with secondary electron multiplier}
+    locator: {page: 527, published_page: 527, figure: '1'}
+  pumping_type:
+    state: {tag: value, value: Ion pumps}
+    locator: {page: 528, published_page: 528, section: 'Apparatus and experiment'}
+  pumping_speed_m3_s:
+    state: {tag: value, value: {kind: categorical, categorical: '20 and 60 L/s'}}
+    locator: {page: 528, published_page: 528, section: 'Apparatus and experiment', note: Printed pump speeds retained without pairing to a run}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Alumel-chromel thermocouple in lid well}
+      locator: *nak_apparatus
+experiments:
+- experiment_id: cd-zn-series
+  bench_id: nag-530
+  method: knudsen_effusion
+  locator: {page: 527, published_page: 527, note: Measurements of liquid Cd-Zn over the whole binary from 450 to 700 K}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.006', interval_high: '0.011'}}
+      locator: {page: 528, published_page: 528, note: Printed alloy mass 6-11 g}
+    printed_composition:
+      state: {tag: value, value: Cd-Zn alloys over the whole binary composition range}
+      locator: {page: 527, published_page: 527}
+    form:
+      state: {tag: value, value: Alloy melt in alumina inner crucible}
+      locator: *nak_apparatus
+    pretreatment:
+      state: {tag: value, value: Cd acid, water, and ethanol cleaned; alloy prepared under Ar; cell baked at about 450 K overnight after loading}
+      locator: {page: 528, published_page: 528, section: 'Apparatus and experiment'}
+    surface_area_m2:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 528, published_page: 528, note: Only an estimated sample-surface to orifice-area ratio of about 10^4:1 is printed}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.00018', approximate: true}}
+        locator: {page: 528, published_page: 528, note: Printed about 0.18 mm diameter; Fig. 5 example separately labels 0.19 mm}
+      orifice_channel_length_m:
+        state: {tag: value, value: {kind: point, point: '0.000051'}}
+        locator: {page: 528, published_page: 528, note: Printed 0.051 mm orifice-plate thickness}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.00001', approximate: true}}
+      locator: {page: 528, published_page: 528, note: Residual gas pressure during cell heating in the 10^-5 Pa range}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 528, published_page: 528, note: Ar was used for alloy preparation, not as measurement sweep gas}
+    regime:
+      regime_class: {tag: value, value: molecular}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+        locator: {page: 528, published_page: 528, note: Vacuum reached about 10^-4 Pa before heater energization}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 527, published_page: 527, note: The 450-700 K range applies across the series; no one run setpoint is published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise heating; spectra taken after ion peaks and cell temperature were nearly constant}
+      locator: {page: 528, published_page: 528, section: 'Mass spectrum'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 528, published_page: 528, note: Overnight about 450 K bakeout is not a measurement duration}
 species:
   Cd:
     observations:
     - observation_id: nakazawa_1976_kems_geometry_and_calibration
+      experiment: cd-zn-series
       type: gibbs_table
       locator: &id001
         published_page: 527
@@ -79,11 +163,10 @@ species:
         - 11.0
         purity_percent_greater_than: 99.999
         orifice_diameter_mm_as_printed: 0.18
-        orifice_plate_thickness_mm: 0.05
+        orifice_plate_thickness_mm: 0.051
         fig5_orifice_mm: 0.19
         surface_to_orifice_area_ratio_about: 10000
         thermocouple: alumel-chromel
-        max_hold_T_K: 800.0
         residual_pressure_Pa_as_printed: 10^-5 Pa range; Fig. 5 ~= 3e-5 Pa
         missing_for_motzfeldt:
         - orifice_area
@@ -95,7 +178,7 @@ species:
         cell_material:
           value: 'Mo Knudsen cell (lid, body, orifice plate) with alumina inner crucible. Fig. 3: outer
             27 mm phi, inner crucible 16 mm phi, inner height 22 mm, outer height 27 mm. Orifice about
-            0.18 mm phi in a 0.05 mm plate (Fig. 5 example annotated 0.19 O). Estimated melt-surface:orifice-area
+            0.18 mm phi in a 0.051 mm plate (Fig. 5 example annotated 0.19 O). Estimated melt-surface:orifice-area
             ratio about 1e4:1. NEVA (Nippon Electric Varian) NAG-530 quadrupole mass filter. Alumel-chromel
             thermocouple in the lid well. Ionization 70 eV, 0.1 mA for all samples.'
           locator: *id001
@@ -108,6 +191,7 @@ species:
             figure: '5'
             note: Fig. 5 residual gas pressure ~= 3 x 10^-5 Pa; text 10^-5 Pa range from ion-pump gauges
     - observation_id: nakazawa_1976_gamma_regular_667k
+      experiment: cd-zn-series
       type: activity_coefficient
       locator:
         published_page: 526
@@ -138,6 +222,7 @@ species:
       uncertainty:
         note: authors estimate the 1.35 slope error about +/-0.21; 90% confidence bars on Fig. 9
     - observation_id: nakazawa_1976_fig7_ion_intensity_figure_only
+      experiment: cd-zn-series
       type: rate_series
       locator:
         figure: '7'
@@ -166,6 +251,7 @@ species:
       uncertainty:
         note: figure-only; no ion-intensity table
     - observation_id: nakazawa_1976_fig9_activities_667k_figure_only
+      experiment: cd-zn-series
       type: activity_coefficient
       locator:
         figure: '9'
@@ -190,6 +276,7 @@ species:
   Zn:
     observations:
     - observation_id: nakazawa_1976_gamma_Zn_667k
+      experiment: cd-zn-series
       type: activity_coefficient
       locator:
         published_page: 526

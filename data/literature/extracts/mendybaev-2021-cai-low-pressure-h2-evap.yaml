@@ -10,6 +10,68 @@ extraction:
   source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
   note: 'The supplied manuscript PDF clips the right-hand continuation of Tables 1-2. Only readable cells are transcribed; clipped residue oxide compositions, final weights, and clipped rate columns are absent.'
 review_status: draft
+benches:
+- id: hokkaido-low-pressure-h2-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Low-pressure high-temperature hydrogen evaporation furnace}
+    locator: &mendy_h2_apparatus {published_page: 8, section: '3.1.2 Low-pressure H2 experiments'}
+  cell_material_and_liner:
+    state: {tag: value, value: Stainless-steel vacuum furnace with tungsten mesh heater and molybdenum heat shield}
+    locator: *mendy_h2_apparatus
+  heating_method:
+    state: {tag: value, value: Tungsten-mesh heater}
+    locator: *mendy_h2_apparatus
+  temperature_measurement:
+    sensor: {state: {tag: value, value: Molybdenum-sheathed Type C W5Re-W26Re thermocouple 22.5 mm above sample}, locator: *mendy_h2_apparatus}
+  temperature_calibration:
+    method: {state: {tag: value, value: Calibrated with Fe, Ni, and Rh-C melting temperatures at sample location}, locator: *mendy_h2_apparatus}
+  pumping_type: {state: {tag: value, value: Turbomolecular pump}, locator: *mendy_h2_apparatus}
+- id: chicago-high-vacuum-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: High-temperature high-vacuum evaporation furnace}
+    locator: &mendy_vacuum_apparatus {published_page: 7, section: '3.1.1 Vacuum evaporation experiments'}
+  heating_method: {state: {tag: value, value: Tungsten-mesh heater}, locator: *mendy_vacuum_apparatus}
+  temperature_measurement:
+    sensor: {state: {tag: value, value: Two Type G thermocouples and PYRO Micro optical pyrometer}, locator: *mendy_vacuum_apparatus}
+  pumping_type: {state: {tag: value, value: Turbomolecular pump}, locator: *mendy_vacuum_apparatus}
+experiments:
+- &mendy_h2_series
+  experiment_id: cai4b2-h2-2e-4-bar-series
+  bench_id: hokkaido-low-pressure-h2-furnace
+  method: vacuum_pyrolysis_furnace
+  locator: *mendy_h2_apparatus
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
+    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 8, note: 1600 C; unit conversion only}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '20', approximate: true}}, locator: {published_page: 8, note: ~2x10^-4 bar H2; unit conversion only}}
+    sweep_gas: {state: {tag: value, value: Hydrogen}, locator: *mendy_h2_apparatus}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- <<: *mendy_h2_series
+  experiment_id: cai4b2-h2-2e-5-bar-series
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '2', approximate: true}}, locator: {published_page: 8, note: ~2x10^-5 bar H2; unit conversion only}}
+    sweep_gas: {state: {tag: value, value: Hydrogen}, locator: *mendy_h2_apparatus}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- experiment_id: cai4b2-vacuum-series
+  bench_id: chicago-high-vacuum-furnace
+  method: vacuum_pyrolysis_furnace
+  locator: *mendy_vacuum_apparatus
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: interval, interval_low: '0.00001', interval_high: '0.00004'}}, locator: {published_page: 5, note: 10-40 mg; unit conversion only}}
+    printed_composition: {state: {tag: value, value: 16 MgO, 36 SiO2, 27 Al2O3, 21 CaO wt%}, locator: {published_page: 5, section: '3.1'}}
+    form: {state: {tag: value, value: Melt droplet on iridium wire loop}, locator: {published_page: 5, section: '3.1'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: '1873.15'}, locator: {published_page: 7, note: 1600 C; unit conversion only}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.01', approximate: true}}, locator: {published_page: 7, note: ~10^-7 bar; unit conversion only}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *mendy_vacuum_apparatus}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
 system_conditions:
   material: CAI4B2 synthetic CAI-like CMAS melt
   starting_composition_wt_pct:

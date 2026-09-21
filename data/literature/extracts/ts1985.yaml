@@ -22,10 +22,104 @@ extraction:
   date: '2026-08-27'
   worker: transcribe-activity
 review_status: draft
+benches:
+- id: ts-graphite-co-equilibration
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: graphite-crucible chemical-equilibration apparatus in SiC resistance furnace}
+    locator: &ts_apparatus {published_page: 816, pdf_page_index: 2, section: '3.2 Experimental method'}
+  cell_material_and_liner:
+    state: {tag: value, value: graphite crucible with graphite lid}
+    locator: *ts_apparatus
+  heating_method:
+    state: {tag: value, value: SiC electric resistance furnace}
+    locator: *ts_apparatus
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Pt-Pt13%Rh thermocouple beneath graphite crucible}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+  temperature_calibration:
+    uncertainty:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: 'Set-temperature +/-0.5 C is control precision, not calibration uncertainty'}
+  other_facts:
+  - name: graphite_crucible_inner_diameter
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: point, point: '15'}}
+      locator: *ts_apparatus
+  - name: mullite_reaction_tube_dimensions
+    unit: mm
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: 'outer diameter 50; inner diameter 42; length 600'}}
+      locator: *ts_apparatus
+  - name: temperature_control_precision
+    unit: C
+    value:
+      state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '0.5'}}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: 'Reaction-zone temperature controlled within set temperature +/-0.5 C'}
+experiments:
+- experiment_id: na2o-sio2-equilibration-series
+  bench_id: ts-graphite-co-equilibration
+  method: melt_equilibration_quench
+  locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method', note: 'Na2O-SiO2 activity measurement series; individual composition and CO-pressure conditions remain in observations'}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method', note: 'Multiple coexisting charge masses are printed; no single sample mass applies'}
+    printed_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method', note: 'Na2O content and Pb-Na initial content vary by run and remain in observations'}
+    form:
+      state: {tag: value, value: molten Na2O-SiO2 slag over liquid Pb-Na alloy}
+      locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method'}
+    characterization:
+      state: {tag: value, value: 'Post-run Na in slag and Pb by atomic absorption; Si by gravimetry and molybdenum-blue absorptiometry; carbon by combustion CO2 infrared absorption'}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+    pretreatment:
+      state: {tag: value, value: 'Pb-Na alloy premelted in graphite crucible at about 400 C; carbon-saturated Fe and Fe-Si-C alloys prepared in graphite crucibles'}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.3 Samples'}
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 816, pdf_page_index: 2, section: '3.2 Experimental method', note: Gas-blowing hole is not an effusion orifice}
+      orifice_channel_length_m:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {published_page: 816, pdf_page_index: 2, section: '3.2 Experimental method', note: No effusion channel}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method', note: Measurements at 1100, 1200, and 1300 C; no single series setpoint}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method', note: CO partial pressure is controlled and varied; total pressure is not printed as one run value}
+    sweep_gas:
+      state: {tag: value, value: CO or CO-Ar mixture, dried and deoxidized}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: commanded}
+    buffer:
+      state: {tag: value, value: CO partial pressure controlled by CO/Ar mixing}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Equilibrated at set temperature until Si in carbon-saturated Fe and Na in Pb became constant'}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '1800', interval_high: '7200'}}
+      locator: {published_page: 819, pdf_page_index: 5, section: '4.1 Experimental method', note: 'Principal Na2O-SiO2 series equilibrium time 0.5-2 h; SI unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: Ar quench}
+      locator: {published_page: 817, pdf_page_index: 3, section: '3.2 Experimental method'}
 species:
   Na2O:
     observations:
     - observation_id: ts1985_na2o_table2_log10_a_AT_B
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -218,6 +312,7 @@ species:
             published_page: 816
             paragraph: 3-2 実験方法 inner diameter 15 mm
     - observation_id: ts1985_na2o_prose_1200C_range
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 1
@@ -268,6 +363,7 @@ species:
           Order-of-magnitude synopsis endpoints, not Table 2 coefficients.
           60 mol% value has no Table 2 row.
     - observation_id: ts1985_na2o_table2_X0p40_T1100C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -345,6 +441,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p40_T1200C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -422,6 +519,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p40_T1300C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -499,6 +597,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p45_T1100C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -576,6 +675,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p45_T1200C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -653,6 +753,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p45_T1300C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -730,6 +831,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p50_T1100C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -807,6 +909,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p50_T1200C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -884,6 +987,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p50_T1300C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -961,6 +1065,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p55_T1100C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -1038,6 +1143,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p55_T1200C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -1115,6 +1221,7 @@ species:
             published_page: 816
             paragraph: 実験原理 / eq. (4)
     - observation_id: ts1985_na2o_table2_X0p55_T1300C
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7
@@ -1194,6 +1301,7 @@ species:
   Na:
     observations:
     - observation_id: ts1985_gamma_Na_in_Pb_table1
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 3
@@ -1275,6 +1383,7 @@ species:
   SiO2:
     observations:
     - observation_id: ts1985_sio2_gibbs_duhem_1200C_X0500
+      experiment: na2o-sio2-equilibration-series
       type: activity_coefficient
       locator:
         page: 7

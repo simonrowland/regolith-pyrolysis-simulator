@@ -21,6 +21,42 @@ extraction:
   worker: extract-pyro-meteorite
   provenance_path: docs-private/research/ocr-artifacts/murchison-hydropyrolysis-1990s-gca/
 review_status: draft
+benches:
+- id: h2-pyrolysis-reactor
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Open-system temperature-programmed hydropyrolysis reactor}
+    locator: &hydro_apparatus {published_page: 1386, section: '2.1 H2-Pyrolysis'}
+  cell_material_and_liner:
+    state: {tag: value, value: 316-grade stainless-steel reactor tube}
+    locator: *hydro_apparatus
+  detector:
+    state: {tag: value, value: Agilent 6890 gas chromatograph with 5973 mass-selective detector}
+    locator: {published_page: 1387, section: '2.2 Gas Chromatography-Mass Spectrometry'}
+experiments:
+- experiment_id: murchison-h2-pyrolysis-series
+  bench_id: h2-pyrolysis-reactor
+  method: open_system_temperature_programmed_hydropyrolysis
+  locator: *hydro_apparatus
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.00005', interval_high: '0.0003'}}
+      locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: 50-300 mg solvent-extracted sample; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: Crushed whole Murchison meteorite, solvent-extracted and catalyst-impregnated}
+      locator: *hydro_apparatus
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: Program has 220 C and 520 C endpoints, not one run temperature}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '15000000'}}
+      locator: {published_page: 1386, section: '2.1 H2-Pyrolysis', note: 15 MPa hydrogen; unit conversion only}
+    sweep_gas:
+      state: {tag: value, value: Hydrogen}
+      locator: *hydro_apparatus
+    regime: {regime_class: {tag: unknown, reason: not_published}}
 corrections: []
 fidelity_samples:
 - path: species.C.observations[sephton_2004_table1_h2_pyrolysis_carbon_wt_percent].values.points[0].C_wt_percent
@@ -55,6 +91,7 @@ species:
   Murchison_CM2:
     observations:
     - observation_id: sephton_2004_murchison_h2_pyrolysis_method
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1386
@@ -177,6 +214,7 @@ species:
           combustion_T_C: ~550
           isotopes_as_printed: 13C and 15N-poor
     - observation_id: sephton_2004_gcms_chromatograms_figure_only
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1387
@@ -209,6 +247,7 @@ species:
   C:
     observations:
     - observation_id: sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1389
@@ -241,6 +280,7 @@ species:
           note: Table 1 prints an em dash for C and N of the collected pyrolysate
         C_loss_from_starting_to_residue_wt_percent_as_printed: 44
     - observation_id: sephton_2004_table1_h2_pyrolysis_isotopes
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1389
@@ -278,6 +318,7 @@ species:
         authors_note: Measured pyrolysate isotopes are much lighter than mass-balance totals, indicating
           loss of isotopically heavy volatiles during collection
     - observation_id: sephton_2004_table1_h2_total_pyrolysate_mass_balance
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1389
@@ -457,6 +498,7 @@ species:
   N:
     observations:
     - observation_id: sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+      experiment: murchison-h2-pyrolysis-series
       type: rate_series
       locator:
         published_page: 1389

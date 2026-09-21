@@ -19,10 +19,94 @@ fidelity_samples:
   - path: species.Na.observations[2].values.sodium_disilicate_1416C[1].p_NaOH_Pa_approx
     value: 40.0
     locator: {page: 154, figure: '4.5', note: 'measured sodium-silicate square; page image checked'}
+benches:
+- id: glass-transpiration-rig
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: High-temperature transpiration set-up for glass-melt evaporation}
+    locator: {page: 127, section: '3.2.1', figure: '3.2'}
+  cell_material_and_liner:
+    state: {tag: value, value: Pt/10% Rh boat in horizontal Al2O3 tube furnace}
+    locator: {page: 127, section: '3.2.1', figure: '3.2'}
+  geometry:
+    cell_internal_dimensions:
+      length_m:
+        state: {tag: value, value: {kind: point, point: '0.050'}}
+        locator: {page: 127, section: '3.2.1', note: Printed boat dimensions 50 x 30 x 15 mm}
+      width_m:
+        state: {tag: value, value: {kind: point, point: '0.030'}}
+        locator: {page: 127, section: '3.2.1', note: Printed boat dimensions 50 x 30 x 15 mm}
+      height_m:
+        state: {tag: value, value: {kind: point, point: '0.015'}}
+        locator: {page: 127, section: '3.2.1', note: Printed boat dimensions 50 x 30 x 15 mm}
+    chamber_dimensions:
+      length_m:
+        state: {tag: value, value: {kind: point, point: '3'}}
+        locator: {page: 127, section: '3.2.1'}
+      inner_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.10'}}
+        locator: {page: 127, section: '3.2.1'}
+  heating_method:
+    state: {tag: value, value: Electrically heated horizontal Al2O3 tube furnace}
+    locator: {page: 127, section: '3.2.1'}
+  detector:
+    state: {tag: value, value: Extractive gas sampling probe, wash bottles, volume meter, and oxygen analyser}
+    locator: {page: 127, section: '3.2.2', figure: '3.2'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: Thermocouples}
+      locator: {page: 127, figure: '3.2'}
+experiments:
+- experiment_id: glass-transpiration-series
+  bench_id: glass-transpiration-rig
+  method: transpiration
+  locator: {page: 127, section: '3.2.1-3.2.2'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.025'}}
+      locator: {page: 127, section: '3.2.1', note: Printed 25 gram glass grains; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions}
+      locator: {page: 127, section: '3.2.1'}
+    form:
+      state: {tag: value, value: Quenched cullet grains, 5-10 mm}
+      locator: {page: 127, section: '3.2.1'}
+    pretreatment:
+      state: {tag: value, value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450 C}
+      locator: {page: 127, section: '3.2.1'}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 127, section: '3.2.1', note: Printed experiment temperature range 1300-1500 C; endpoint conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 127, section: '3.2.1', note: Carrier-gas experiment; no total run pressure printed}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 127, section: '3.2.2', note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are not}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 153, section: '4.4', note: Mixture controls oxygen conditions; no buffer stated}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Heating rate 2 C/min; four to six sampling periods of 5-60 min}
+      locator: {page: 127, section: '3.2.2'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '21600', interval_high: '28800', approximate: true}}
+      locator: {page: 127, section: '3.2.2', note: Printed about 6-8 h; endpoint conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Water dosing stopped and furnace cooled}
+      locator: {page: 127, section: '3.2.2'}
 species:
   Na:
     observations:
     - observation_id: van_limpt_2007_setup_c_and_sodium_conditions
+      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -54,6 +138,7 @@ species:
         furnace_temperature_C: [1300, 1500]
         measurement_status_note: "All values above are apparatus or operating conditions stated in the experimental procedure, not model output."
     - observation_id: van_limpt_2007_table42_float_and_tableware_compositions
+      experiment: glass-transpiration-series
       type: gibbs_table
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -79,6 +164,7 @@ species:
         - glass_family: tableware_glass_C
           composition_wt_pct: {SiO2: 70.4, Na2O: 10.4, CaO: 8.25, MgO: '<0.01', Al2O3: 1.06, K2O: 4.67, Fe2O3: '<0.01', SO3: 0.13, Cl: 0.03, Sb2O3: 0.06, BaO: 4.98}
     - observation_id: van_limpt_2007_fig45_naoh_saturation_measured
+      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -96,6 +182,7 @@ species:
         soda_lime_silica_1463C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 0.0}, {p_H2O_sqrt_bar_sqrt: 0.43, p_NaOH_Pa_approx: 20.0}, {p_H2O_sqrt_bar_sqrt: 0.58, p_NaOH_Pa_approx: 24.0}, {p_H2O_sqrt_bar_sqrt: 0.68, p_NaOH_Pa_approx: 26.0}]
         glass_composition_mol_pct: {SiO2: 74, Na2O: 16, CaO: 10}
     - observation_id: van_limpt_2007_table44_sodium_mass_balance
+      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -116,6 +203,7 @@ species:
         - {temperature_C: 1356, extractive_weight_loss_mg: 85, gravimetric_weight_loss_mg: 71, ratio_extractive_to_gravimetric: 1.21}
         fitted_relation: 'm_gravimetric = (1.02 ± 0.04) × m_extractive'
     - observation_id: van_limpt_2007_sodium_transpiration_operating_window
+      experiment: glass-transpiration-series
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -138,6 +226,7 @@ species:
         total_Na_evaporation_rate_mol_m2_s: {at_1400C_approx: 7.0e-05, at_1450_1460C_approx: 1.2e-04}
         dominant_species_statement: NaOH_in_humid_atmosphere; Na_in_dry_oxygen_lean_atmosphere
     - observation_id: van_limpt_2007_fig46_elemental_sodium_measured
+      experiment: glass-transpiration-series
       type: psat_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
@@ -160,6 +249,7 @@ species:
   K:
     observations:
     - observation_id: van_limpt_2007_table42_potassium_bearing_glasses
+      experiment: glass-transpiration-series
       type: gibbs_table
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.2'}
       phase: alkali_lime_silicate_melt
@@ -172,6 +262,7 @@ species:
         source_rows: [tableware_glass_A, tableware_glass_C]
         main_measured_species_under_oxidized_humid_conditions: KOH
     - observation_id: van_limpt_2007_fig15_potassium_activity_measured
+      experiment: glass-transpiration-series
       type: activity_coefficient
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 172, figure: '4.15', note: 'figure reading; measured markers kept separate from ASM model'}
       phase: alkali_lime_silicate_melt
@@ -185,6 +276,7 @@ species:
   B:
     observations:
     - observation_id: van_limpt_2007_table43_borosilicate_compositions
+      experiment: glass-transpiration-series
       type: gibbs_table
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md, page: 141, table: '4.3'}
       phase: alkali_lean_borosilicate_melt
@@ -199,6 +291,7 @@ species:
         - {glass: '2', composition_wt_pct: {B2O3: 5.0, Na2O: 0.10, Al2O3: 13.7, SiO2: 58.8, CaO: 22.4}}
         - {glass: '3', composition_wt_pct: {B2O3: 7.6, Na2O: 0.15, Al2O3: 13.8, SiO2: 54.1, CaO: 24.3}}
     - observation_id: van_limpt_2007_fig48_boron_evaporation_measured
+      experiment: glass-transpiration-series
       type: rate_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 161, figure: '4.8', note: 'page image checked; diamond markers measured, line excluded; approximate plot readings'}
       phase: alkali_free_borosilicate_melt
@@ -212,6 +305,7 @@ species:
         rows: [{p_H2O_bar: 0.0, boron_rate_mol_s: 3.7e-08}]
         refused_figure_points: "The remaining Fig. 4.8 points were not admitted: the OCR chart table does not preserve the plotted marker count/coordinates reliably, and the thesis prints no numeric point values."
     - observation_id: van_limpt_2007_boron_operating_conditions_and_uncertainties
+      experiment: glass-transpiration-series
       type: rate_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md, page: 183, section: '4.6', table: 'maximum errors table'}
       phase: silicate_melt
