@@ -853,6 +853,85 @@ def extract_reported_quantities(
     return activities, pressures
 
 
+def _plain_data(value: Any) -> Any:
+    """JSON-safe copy. Commissioning notices carry tuples; report dumps do not."""
+
+    if isinstance(value, Mapping):
+        return {str(key): _plain_data(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain_data(item) for item in value]
+    return value
+
+
+def engine_flags_from_result(
+    result: Any,
+) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
+    """Read the engine's own flag, authority, and notice once.
+
+    The IMCC battery backend stores one notice list on both
+    ``diagnostics['imcc_notices']`` and ``result.imcc_notices``. Reading
+    both appended every notice twice.
+    """
+
+    diagnostics = getattr(result, "diagnostics", None) or {}
+    if not isinstance(diagnostics, Mapping):
+        diagnostics = {}
+    notices: list[dict[str, Any]] = []
+    authority: str | None = None
+    certified_band: dict[str, Any] | None = None
+
+    commissioning = diagnostics.get("commissioning_notice")
+    if isinstance(commissioning, Mapping):
+        row = _plain_data(commissioning)
+        notices.append(row)
+        if row.get("authority"):
+            authority = str(row["authority"])
+        band = row.get("certified_band")
+        if isinstance(band, Mapping):
+            certified_band = dict(band)
+    if authority is None and diagnostics.get("authority"):
+        authority = str(diagnostics["authority"])
+    if certified_band is None and isinstance(
+        diagnostics.get("certified_band"), Mapping
+    ):
+        certified_band = _plain_data(diagnostics["certified_band"])
+
+    if diagnostics.get("imcc_notices"):
+        imcc_rows = diagnostics["imcc_notices"]
+    else:
+        imcc_rows = getattr(result, "imcc_notices", None) or []
+    for row in imcc_rows:
+        if not isinstance(row, Mapping):
+            continue
+        copied = _plain_data(row)
+        notices.append(copied)
+        if authority is None and copied.get("authority"):
+            authority = str(copied["authority"])
+    return notices, authority, certified_band
+
+
+def cell_score_authority(cell: Any, *, refused: bool) -> str:
+    """Envelope authority from the cell. Bridge only when the engine set none."""
+
+    if refused:
+        return "refused"
+    authority = getattr(cell, "authority", None)
+    if authority:
+        return str(authority)
+    for row in getattr(cell, "notices", None) or []:
+        if isinstance(row, Mapping) and row.get("authority"):
+            return str(row["authority"])
+    return "bridge"
+
+
+def cell_score_notice_kinds(cell: Any) -> tuple[str, ...]:
+    kinds: list[str] = []
+    for row in getattr(cell, "notices", None) or []:
+        if isinstance(row, Mapping) and row.get("kind"):
+            kinds.append(str(row["kind"]))
+    return tuple(kinds)
+
+
 def extract_vapor_authority(result: Any) -> dict[str, Any]:
     """Copy EquilibriumResult vapor-authority flags the harness used to drop.
 
@@ -2192,8 +2271,7 @@ def equilibrate_cell(
             engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
         vapor_authority = extract_vapor_authority(result)
-        result_notices = list(getattr(result, "imcc_notices", None) or [])
-        result_notices.extend(list(diagnostics.get("imcc_notices") or []))
+        flag_notices, flag_authority, flag_band = engine_flags_from_result(result)
         crash_diag = diagnostics.get("subprocess_failure") or {}
         exit_code = _optional_int(
             crash_diag.get("returncode") if isinstance(crash_diag, Mapping) else None
@@ -2220,7 +2298,9 @@ def equilibrate_cell(
             authoritative_for_requested_vapor_pressure=vapor_authority[
                 "authoritative_for_requested_vapor_pressure"
             ],
-            notices=result_notices,
+            notices=flag_notices,
+            authority=flag_authority,
+            certified_band=flag_band,
             exit_signal=exit_signal,
             exit_code=exit_code,
             model_id=getattr(result, "imcc_model_id", None),
