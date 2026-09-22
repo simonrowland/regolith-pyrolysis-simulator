@@ -107,7 +107,7 @@ species:
         - {standard: 40Ar+, averaged_mass_mz: '39.967 ± 0.002', mass_error_range_mz: '-0.001 to 0.012', averaged_FWHM_mz: '0.065 ± 0.005', FWHM_range_mz: '0.058-0.081'}
         - {standard: 136Xe+, averaged_mass_mz: '135.934 ± 0.027', mass_error_range_mz: '-0.046 to 0.086', averaged_FWHM_mz: '0.277 ± 0.031', FWHM_range_mz: '0.214-0.327'}
     - observation_id: mogul_2023_co2_isotope_ratios
-      type: isotope_ratio
+      type: concentration_series
       locator:
         published_page: 13
         pdf_page_index: 13
@@ -126,7 +126,7 @@ species:
         derived_combined_ratio: '13CO2+/CO2 = 1.363e-2 ± 0.132e-2; 13CO+/CO+ = 1.487e-2 ± 0.111e-2; C18O+/CO+ = 2.558e-3 ± 0.283e-3'
         disagreement_note: 13CO+/CO+ was higher than the CO2-isotopologue ratio and was interpreted as possible isobaric interference; both printed results are retained.
     - observation_id: mogul_2023_co2_density_profile
-      type: density_profile
+      type: gas_speciation
       locator:
         published_page: 16
         pdf_page_index: 16
@@ -172,7 +172,7 @@ species:
         extinction_coefficients_km_minus_1: 'V13/V14 comparison values ~0.6-2.0; V13/V14 spikes ~2.24-2.30 near ~2 km'
         interpretation: authors interpret the spikes as chemical signatures of a deep atmospheric haze, not as furnace vaporization.
     - observation_id: mogul_2023_ch4_mixing_ratio_model
-      type: mixing_ratio_series
+      type: gas_speciation
       locator:
         published_page: 19
         pdf_page_index: 19

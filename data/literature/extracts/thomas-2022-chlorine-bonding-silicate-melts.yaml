@@ -120,7 +120,7 @@ species:
         - {experiment: CNMAS-2, T_C: 1400, P_GPa: 1.5, duration_h: 2, log_fO2: -7.17, fCl2_as_printed: 2.92E-04, CCl: 2.27, E0_eV: 2824.90, Emax_eV: 2827.60, R_A: 2.27}
         note: "Rows with no pre-edge centroid show an en dash in the printed table. The wrapped f(Cl2) cells were assigned by PDF bounding-box y alignment: 1.20E-03 is AgI/Cl-021, 1.59E-05 is AgI/Cl-09, 1.38E-03 is AgI/Cl-013, and 1.66E-06 is AgI/Cl-18."
     - observation_id: thomas_2022_table1_chlorine_concentrations_all_rows
-      type: measured_composition_series
+      type: composition_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
       phase: experimentally_quenched_silicate_glass
       regime: quench_equilibration

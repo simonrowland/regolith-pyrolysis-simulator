@@ -53,7 +53,7 @@ species:
   siderophile_elements:
     observations:
     - observation_id: usgs_tab8_4_apollo11_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 11 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -69,7 +69,7 @@ species:
         - {statistic: minimum, Fe: '12.8', Co: '5.7', Ge: '60', W: '240', Ir: '0.005', Au: '0.015'}
         - {statistic: maximum, Fe: '16.8', Co: '38.5', Ge: '60', W: '430', Ir: '0.090', Au: '0.120'}
     - observation_id: usgs_tab8_4_apollo12_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 12 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -85,7 +85,7 @@ species:
         - {statistic: minimum, Fe: '13.4', Co: '25', Ni: '1', Ge: '0.7', Mo: '30', W: '104', Re: '0.0004', Os: '0.00190.', Ir: '.0046'}
         - {statistic: maximum, Fe: '17.2', Co: '69', Ni: '150', Ge: '100', Mo: '50', W: '290', Re: '0.056', Os: '0.20', Ir: '0.072'}
     - observation_id: usgs_tab8_4_apollo14_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 14 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -101,7 +101,7 @@ species:
         - {statistic: minimum, Fe: '12.1', Co: '28.7', Ni: '4', Ge: '175', W: '150', Re: '0.0051', Ir: '0.00150', Au: '.11'}
         - {statistic: maximum, Fe: '13.9', Co: '29.0', Ni: '39', Ge: '640', W: '550', Re: '0.0066', Ir: '0.0440', Au: '.30'}
     - observation_id: usgs_tab8_4_apollo15_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 15 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -117,7 +117,7 @@ species:
         - {statistic: minimum, Fe: '12.9', Co: '34.4', Ni: '16', Ge: '2.8', W: '59', Re: '0.00060', Os: '.020', Ir: '0.0043', Au: '0.005'}
         - {statistic: maximum, Fe: '18.8', Co: '89', Ni: '150', Ge: '50', W: '1200', Re: '0.36', Os: '0.032', Ir: '0.144', Au: '0.36'}
     - observation_id: usgs_tab8_4_apollo16_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 16 MBAS (clast in breccia 60639)'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -133,7 +133,7 @@ species:
         - {statistic: minimum}
         - {statistic: maximum}
     - observation_id: usgs_tab8_4_apollo17_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Apollo 17 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -149,7 +149,7 @@ species:
         - {statistic: minimum, Fe: '12.6', Co: '13.7', Ni: '1.0', Ge: '1.27', W: '60', Re: '0.0007', Ir: '0.003', Au: '0.007'}
         - {statistic: maximum, Fe: '15.5', Co: '22.5', Ni: '3.6', Ge: '5.7', W: '120', Re: '0.0031', Ir: '0.140', Au: '0.26'}
     - observation_id: usgs_tab8_4_luna16_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Luna 16 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -165,7 +165,7 @@ species:
         - {statistic: minimum, Fe: '14.0', Co: '17.0'}
         - {statistic: maximum, Fe: '15.7', Co: '21.7'}
     - observation_id: usgs_tab8_4_luna24_mbas
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 1, table: A8.4, row_group: 'Luna 24 MBAS'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -181,7 +181,7 @@ species:
         - {statistic: minimum, Fe: '14.7', Co: '36.0', Ni: '15'}
         - {statistic: maximum, Fe: '17.4', Co: '59.3', Ni: '80'}
     - observation_id: usgs_tab8_4_apollo11_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 11 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -197,7 +197,7 @@ species:
         - {statistic: minimum, Co: '27.2', Ni: '150', Ge: '240', Pd: '7', Re: '7.6', Os: '5.4', Ir: '1.4'}
         - {statistic: maximum, Co: '34.8', Ni: '280', Ge: '1400', Pd: '13', Re: '8.1', Os: '11.6', Ir: '8.5'}
     - observation_id: usgs_tab8_4_apollo12_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 12 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -213,7 +213,7 @@ species:
         - {statistic: minimum, Co: '34', Ni: '130', Ge: '200', W: '450', Ru: '5.5', Pd: '6.5', Re: '0.25', Os: '3.8', Ir: '2.7', Au: '0.82'}
         - {statistic: maximum, Co: '55', Ni: '730', Ge: '355', W: '740', Ru: '71', Pd: '13.5', Re: '0.67', Os: '7.5', Ir: '11', Au: '5.7'}
     - observation_id: usgs_tab8_4_apollo14_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 14 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -229,7 +229,7 @@ species:
         - {statistic: minimum, Co: '27.5', Ni: '273', Ge: '590', Sb: '2', W: '500', Ru: '17', Pd: '20', Re: '0.86', Ir: '7.3', Au: '2.3'}
         - {statistic: maximum, Co: '43.5', Ni: '700', Ge: '790', Sb: '5.7', W: '1950', Ru: '22', Pd: '28', Re: '1.34', Ir: '19', Au: '11'}
     - observation_id: usgs_tab8_4_apollo15_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 15 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -245,7 +245,7 @@ species:
         - {statistic: minimum, Co: '35.4', Ni: '90', Ge: '120', Sb: '0.85', W: '130', Ru: '5', Pd: '6.2', Re: '0.2', Os: '4.0', Ir: '2.1', Au: '1.0'}
         - {statistic: maximum, Co: '66', Ni: '360', Ge: '790', Sb: '2.7', W: '1800', Ru: '25', Pd: '6.8', Re: '1.2', Os: '7.3', Ir: '11', Au: '8'}
     - observation_id: usgs_tab8_4_apollo16_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 16 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -261,7 +261,7 @@ species:
         - {statistic: minimum, Co: '9', Ni: '80', Ge: '245', Sb: '0.73', W: '74', Ru: '9', Pd: '8.4', Re: '0.37', Os: '4.5', Ir: '2.8', Au: '1.5'}
         - {statistic: maximum, Co: '59', Ni: '693', Ge: '1630', Sb: '4.23', W: '350', Ru: '34', Pd: '19.6', Re: '2.6', Os: '8.5', Ir: '26', Au: '16.6'}
     - observation_id: usgs_tab8_4_apollo17_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Apollo 17 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -277,7 +277,7 @@ species:
         - {statistic: minimum, Co: '24.5', Ni: '64', Ge: '105', Sb: '0.55', W: '88', Ru: '3', Pd: '5', Re: '0.052', Ir: '0.021', Au: '0.7'}
         - {statistic: maximum, Co: '68', Ni: '550', Ge: '625', Sb: '1.81', W: '520', Ru: '19', Pd: '10', Re: '1.07', Ir: '25', Au: '13'}
     - observation_id: usgs_tab8_4_luna16_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Luna 16 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -293,7 +293,7 @@ species:
         - {statistic: minimum, Co: '26', Ni: '132', Ge: '1300', Sb: '3.3', Pd: '3.4', Ir: '9.6', Au: '1.7'}
         - {statistic: maximum, Co: '57.3', Ni: '200', Ge: '1300', Sb: '4.2', Pd: '3.7', Ir: '9.8', Au: '2.9'}
     - observation_id: usgs_tab8_4_luna20_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 2, table: A8.4, row_group: 'Luna 20 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -309,7 +309,7 @@ species:
         - {statistic: minimum, Co: '27', Ni: '230', Ge: '430', Sb: '1.5', Pd: '1.04', Ir: '9.5', Au: '3.29'}
         - {statistic: maximum, Co: '34', Ni: '267', Ge: '485', Sb: '9.8', Pd: '1.04', Ir: '9.52', Au: '7.8'}
     - observation_id: usgs_tab8_4_luna24_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 3, table: A8.4, row_group: 'Luna 24 S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
@@ -325,7 +325,7 @@ species:
         - {statistic: minimum, Co: '42', Ni: '90', Ir: '5.7', Au: '5.9'}
         - {statistic: maximum, Co: '60', Ni: '350', Ir: '8', Au: '8'}
     - observation_id: usgs_tab8_4_amet_srb
-      type: compiled_statistics
+      type: concentration_series
       locator: {page: 3, table: A8.4, row_group: 'AMET S&RB'}
       phase: lunar_material_compilation
       regime: compiled_siderophile_element_concentrations
