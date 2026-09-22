@@ -446,6 +446,90 @@ def load_pdfs(root: Path) -> dict[str, dict]:
 def corpus_available(corpus: Path, commit: str | None) -> bool:
     return bool(commit) or any((corpus / name).is_dir() for name in ("raw", "extracts", "ledger"))
 
+
+# Bibliographic source_id of the NIST-JANAF compilation. Distinct from the
+# manual `janaf-4th` extract: those rows were not read from these files.
+_NIST_JANAF_SOURCE_ID = "nist-janaf-4th"
+_NIST_JANAF_TXT_RELATIVE = "raw/janaf-nist-txt"
+
+
+def nist_janaf_txt_tables(root: Path, corpus: Path) -> dict:
+    """Tables asset for the NIST .txt files the compilation was parsed from.
+
+    ``choose_read_from`` selects any tables path for a locator under ``tables/``.
+    The conventional ``tables/nist-janaf-4th`` directory is not that download.
+    Point the asset at ``raw/janaf-nist-txt`` only when its stems are exactly
+    the compilation table ids; otherwise leave the path empty so a missing or
+    foreign directory is not registered as the source.
+    """
+    directory = corpus / "raw" / "janaf-nist-txt"
+    tables_dir = root / "data/literature/compilations/janaf/tables"
+    stems = {path.stem for path in tables_dir.glob("*.yaml")} if tables_dir.is_dir() else set()
+    txts = {path.stem for path in directory.glob("*.txt")} if directory.is_dir() else set()
+    if stems and stems == txts:
+        return {"path": _NIST_JANAF_TXT_RELATIVE, "exists": True, "file_count": len(txts)}
+    return {"path": "", "exists": False, "file_count": 0}
+
+
+def _manifest_header_citation(header: str) -> str | None:
+    match = re.search(r"^  citation:\s*(.+)$", header, re.M)
+    if not match:
+        return None
+    value = match.group(1).strip().strip("'\"")
+    if value.lower() in {"", "null", "none", "~"}:
+        return None
+    return value
+
+
+def nist_janaf_index_row(
+    root: Path,
+    corpus: Path,
+    commit: str | None,
+    compilations: dict,
+) -> dict | None:
+    """INDEX row for the compilation. None when the manifest is not that source."""
+    manifest = root / "data/literature/compilations/janaf/manifest.yaml"
+    if not manifest.is_file():
+        return None
+    header = manifest.read_bytes()[:8192].decode("utf-8", "replace")
+    source_id, doi, _raw_ids = compilation_manifest_identity(manifest, scan_raw=False)
+    if source_id != _NIST_JANAF_SOURCE_ID:
+        return None
+    citation = _manifest_header_citation(header)
+    src = {"citation": citation, "doi": doi, "url": "https://janaf.nist.gov/"}
+    corpus_block = corpus_pointers(
+        corpus,
+        source_id,
+        None,
+        root / "data/literature/extracts" / f"{source_id}.yaml",
+        commit,
+    )
+    if isinstance(corpus_block, dict):
+        corpus_block["tables"] = nist_janaf_txt_tables(root, corpus)
+    return {
+        "source_id": source_id,
+        "aliases": [],
+        "citation": citation,
+        "doi": doi,
+        "report_number": None,
+        "identifier": doi,
+        "pdf_status": "ABSENT",
+        "pdf_path": None,
+        "pdf_last_seen": [],
+        "pdf_sha256": None,
+        "pdf_tracked": None,
+        "sidecar_path": None,
+        "sidecar_missing_fields": list(SIDECAR_FIELDS),
+        "access_status": access_for(source_id, src, None, compilations, False),
+        "extracts": [],
+        "battery_datasets": [],
+        "hunt_ids": [],
+        "copies": [],
+        "measurement_sets": [],
+        "corpus_status": "available" if corpus_available(corpus, commit) else "unavailable",
+        "corpus": corpus_block,
+    }
+
 def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
                     extract_path: Path, commit: str | None) -> dict:
     if not corpus_available(corpus, commit):
@@ -728,6 +812,10 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
             "corpus": corpus_pointers(corpus, source_id, (pdf or {}).get("sha256"),
                                       root / "data/literature/extracts" / f"{source_id}.yaml", corpus_commit),
         })
+    janaf_row = nist_janaf_index_row(root, corpus, corpus_commit, compilations)
+    if janaf_row is not None and all(row["source_id"] != janaf_row["source_id"] for row in rows):
+        rows.append(janaf_row)
+        rows.sort(key=lambda row: row["source_id"])
     pdfs_wo = sorted(r["source_id"] for r in rows if r["pdf_status"] == "present" and not r["extracts"])
     extracts_wo = sorted(r["source_id"] for r in rows if r["extracts"] and r["pdf_status"] == "ABSENT")
     private_locators = [r["source_id"] for r in rows

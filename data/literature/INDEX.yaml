@@ -9,7 +9,7 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 167
+  sources: 168
   extracts: 166
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 37
@@ -6999,6 +6999,61 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 2ef619255debb2beb4718b52908a77d8cf504b5f
+- source_id: nist-janaf-4th
+  aliases: []
+  citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data
+    Monograph 9 (1998)
+  doi: 10.18434/T42S31
+  report_number: null
+  identifier: 10.18434/T42S31
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nist-janaf-4th/nist-janaf-4th.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/nist-janaf-4th/sidecar.yaml
+      present: false
+    text:
+      path: text/nist-janaf-4th
+      exists: false
+      file_count: 0
+    tables:
+      path: raw/janaf-nist-txt
+      exists: true
+      file_count: 1655
+    extract:
+      path: extracts/nist-janaf-4th.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nist-janaf-4th.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: b07e8ee3af2461e7ea8c459c60bdf2b6c22926e9
 - source_id: nist-srd69-p4
   aliases: []
   citation: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage)

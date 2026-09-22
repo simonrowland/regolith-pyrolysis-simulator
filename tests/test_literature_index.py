@@ -722,6 +722,67 @@ def test_compilation_manifest_identity_header_fixture(tmp_path):
     assert (sid_only, doi_only, raw_only) == ("fixture-compilation", "10.9999/fixture-compilation", ())
 
 
+def test_nist_janaf_index_asset_is_the_corpus_txt_download() -> None:
+    """The compilation's INDEX tables asset is raw/janaf-nist-txt, not an empty convention path.
+
+    Null hypothesis: the row is attached to tables/nist-janaf-4th or to the
+    absent monograph PDF. Those paths are not the files the tables were parsed
+    from. choose_read_from would still accept them for a tables/ locator.
+    """
+    import hashlib
+
+    from simulator.battery.migrate import choose_read_from, source_files_for, unmatched_read_from_reason
+    from simulator.battery.records import Locator, Work
+
+    index = builder.build_index(REPO_ROOT)
+    rows = {row["source_id"]: row for row in index["sources"]}
+    row = rows["nist-janaf-4th"]
+    tables = row["corpus"]["tables"]
+    assert tables["path"] == "raw/janaf-nist-txt"
+    assert tables["exists"] is True
+    assert tables["file_count"] == 1655
+    assert row["pdf_status"] == "ABSENT"
+    assert row["pdf_path"] is None
+    assert row["extracts"] == []
+    assert row["aliases"] == []
+    assert row["doi"] == "10.18434/T42S31"
+    legacy = rows["janaf-4th"]
+    assert legacy["corpus"]["tables"]["path"] != "raw/janaf-nist-txt"
+    assert "nist-janaf-4th" not in legacy["aliases"]
+
+    corpus_root = Path(index["scan"]["corpus_root"])
+    txt = corpus_root / "raw" / "janaf-nist-txt" / "K-001.txt"
+    header = (REPO_ROOT / "data/literature/compilations/janaf/tables/K-001.yaml").read_text(
+        encoding="utf-8", errors="replace"
+    )[:2000]
+    recorded = None
+    for line in header.splitlines():
+        if "source_sha256" in line:
+            recorded = line.split(":", 1)[-1].strip().strip(",").strip().strip('"')
+            break
+    assert recorded
+    assert hashlib.sha256(txt.read_bytes()).hexdigest() == recorded
+
+    files = source_files_for("nist-janaf-4th", row)
+    asset = next(item for item in files.files if item.asset_id == "tables:nist-janaf-4th")
+    assert asset.path == "raw/janaf-nist-txt"
+    work = Work(
+        work_id="nist-janaf-4th",
+        citation=row["citation"],
+        source_ids=("nist-janaf-4th",),
+        source_files=files,
+        doi=row["doi"],
+    )
+    locator = Locator(
+        table="K-001",
+        source_path="data/literature/compilations/janaf/tables/K-001.yaml",
+        record="K-001",
+    )
+    read_from = choose_read_from(work, locator)
+    assert read_from == "tables:nist-janaf-4th"
+    assert unmatched_read_from_reason(locator, read_from) is None
+
+
 def test_source_status_regenerates_byte_identically(tmp_path, monkeypatch):
     root, corpus = _status_tree(tmp_path, monkeypatch)
     sid = "alpha-2020"
