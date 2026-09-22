@@ -297,6 +297,12 @@ def report(root: Path) -> dict[str, object]:
     for experiment in sorted(experiments.values(), key=lambda item: item.experiment_id):
         work = works.get(experiment.work_id or "")
         source_ids = work.source_ids if work is not None else (experiment.work_id or "unknown",)
+        # Work.source_ids lists every citation alias of one work (e.g.
+        # janaf-4th / nist-janaf-4th). Attribute the experiment to exactly one
+        # readiness row — the first-registered (canonical) source id — so an
+        # aliased work is not double-counted. All aliases stay valid lookup
+        # keys for apparatus references and acquisition leads below.
+        row_source_ids = source_ids[:1]
         bench = benches.get(experiment.bench_id or "")
         implicit = experiment.bench_id is None
         if implicit:
@@ -316,7 +322,7 @@ def report(root: Path) -> dict[str, object]:
                 # Single cited apparatus whose reference the corpus acquisition
                 # ledger has not obtained: actionable, an acquisition work item.
                 experiment_pending[experiment.experiment_id] = ref.cited_as
-                for source_id in source_ids:
+                for source_id in row_source_ids:
                     source_pending.setdefault(source_id, {}).setdefault(
                         ref.cited_as, set()
                     ).add(experiment.experiment_id)
@@ -345,7 +351,7 @@ def report(root: Path) -> dict[str, object]:
         consumers = tuple(item for item in readiness if item.engine is None)
         consumers += (_collapse_engines(readiness),)
         engines = tuple(item for item in readiness if item.engine is not None)
-        for source_id in source_ids:
+        for source_id in row_source_ids:
             by_source.setdefault(source_id, []).append(
                 {
                     "work_id": experiment.work_id,

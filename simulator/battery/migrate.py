@@ -8035,6 +8035,12 @@ class Migrator:
             require_rail_if_stated(point)
             count.rows_in += 1
             source_id = str(point.get("source_id") or path.stem)
+            if source_id == "janaf" and path.name == "species_rail_differential_ledger.yaml":
+                # The ledger's "janaf" token names the compilation compared
+                # against, not a battery work; the work migrated here is the
+                # differential ledger itself. works/ALIASES.yaml pins this
+                # label to the existing work id so experiment ids are unchanged.
+                source_id = "species-rail-differential"
             citation = source_id
             index_row = self.index.get(source_id)
             work = self._work_from_citation(

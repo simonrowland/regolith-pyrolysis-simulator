@@ -462,3 +462,39 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
     assert digest.hexdigest() == (
         "b9544d3f4a80ab2814bf326d966a44df00b8ad83c2b25879a09b0ce48f3e7718"
     )
+
+
+def test_aliased_work_counts_each_experiment_under_one_canonical_source(tmp_path, monkeypatch) -> None:
+    """Work.source_ids lists citation aliases of one work; readiness must
+    attribute each experiment to exactly one row (the first-registered
+    source id) instead of fanning out one row per alias."""
+    import scripts.bench_readiness as module
+    monkeypatch.setattr(module, "consumer_readiness", _aggregation_readiness)
+    experiment, bench = _knudsen_case(Value.point_of("1"))
+    experiment = replace(experiment, bench_id=bench.id)
+    work = replace(
+        factories.work("janaf-work"), source_ids=("janaf-4th", "nist-janaf-4th")
+    )
+    experiments = {
+        f"exp-{i}": replace(experiment, experiment_id=f"exp-{i}", work_id="janaf-work")
+        for i in range(3)
+    }
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: ({"janaf-work": work}, experiments, {}),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+    readiness = module.report(tmp_path)
+    assert readiness["source_count"] == 1
+    row = readiness["sources"][0]
+    assert row["source_id"] == "janaf-4th"
+    assert sorted(e["experiment_id"] for e in row["experiments"]) == [
+        "exp-0",
+        "exp-1",
+        "exp-2",
+    ]
+    for counts in readiness["summary"]["by_consumer"].values():
+        assert sum(counts.values()) == 1
+    for counts in readiness["summary"]["by_engine"].values():
+        assert sum(counts.values()) == 1

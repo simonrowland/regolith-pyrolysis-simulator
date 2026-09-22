@@ -4737,3 +4737,57 @@ def test_d036_dangling_equipment_context_fk_refuses_typed(tmp_path: Path) -> Non
     assert not any(
         issue.path.endswith(".equipment_context_id") for issue in report.issues
     )
+
+
+def test_species_rail_janaf_token_migrates_under_ledger_label(tmp_path: Path) -> None:
+    """The species-rail ledger's ``source_id: janaf`` names the compilation
+    compared against, not a battery work; the migrated work is the ledger
+    itself, labelled ``species-rail-differential``."""
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": "janaf::Mg-001:T=1363::nasa_cea_9::delta_fG_kJ_mol",
+                        "source_id": "janaf",
+                        "observation_id": "Mg-001",
+                        "species": "Mg",
+                        "comparison_quantity": "delta_fG_kJ_mol",
+                        "temperature_K": 1363,
+                        "table_kJ_mol": -500.0,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    ledger_works = [
+        work for work in result.works.values() if "species-rail-differential" in work.source_ids
+    ]
+    assert len(ledger_works) == 1
+    work = ledger_works[0]
+    assert work.source_ids == ("species-rail-differential",)
+    assert work.citation == "species-rail-differential"
+    assert all("janaf" not in candidate.source_ids for candidate in result.works.values())
+    assert "janaf" not in result.aliases
+    assert result.aliases["species-rail-differential"] == work.work_id
+    observation = result.observations["janaf::Mg-001:T=1363::nasa_cea_9::delta_fG_kJ_mol"]
+    assert observation.source_id == "species-rail-differential"
+    experiment_ids = result.experiments_by_work[work.work_id]
+    assert experiment_ids == [f"{work.work_id}::Mg-001"]
+
+
+def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
+    """The alias registry resolves the ledger label to the historical work id
+    (keeping experiment ids stable) and no longer claims a ``janaf`` work."""
+    from simulator.battery.migrate import load_aliases
+
+    aliases = load_aliases()
+    assert "janaf" not in aliases
+    assert aliases["species-rail-differential"] == citation_hash("janaf")
+    assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
