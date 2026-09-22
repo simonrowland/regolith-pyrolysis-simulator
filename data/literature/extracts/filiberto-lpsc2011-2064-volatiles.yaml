@@ -41,9 +41,10 @@ unmapped_lab_parameter_names:
 - volatile_addition_wt_pct
 species:
   F:
-    observations:
+    observations: []
+    context:
     - observation_id: filiberto_2011_experimental_method_fluorine
-      type: method_reference
+      type: method
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 1
@@ -63,9 +64,10 @@ species:
       uncertainty:
         reported_status: not_reported
   Cl:
-    observations:
+    observations: []
+    context:
     - observation_id: filiberto_2011_experimental_method_chlorine
-      type: method_reference
+      type: method
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 1
@@ -85,9 +87,10 @@ species:
       uncertainty:
         reported_status: not_reported
   H2O:
-    observations:
+    observations: []
+    context:
     - observation_id: filiberto_2011_experimental_method_water
-      type: method_reference
+      type: method
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 1
@@ -169,6 +172,7 @@ species:
         numeric_points: not_digitized
       uncertainty:
         reported_status: qualitative_comparison_only
+    context:
     - observation_id: filiberto_2011_author_calculated_martian_effects
       type: planetary_implication
       locator:
@@ -207,9 +211,10 @@ species:
       uncertainty:
         reported_status: not_reported
   planetary_volatile_abundances:
-    observations:
+    observations: []
+    context:
     - observation_id: filiberto_2011_quoted_martian_volatile_abundances
-      type: composition_reference
+      type: composition
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 2
@@ -229,7 +234,7 @@ species:
       uncertainty:
         reported_status: not_reported
     - observation_id: filiberto_2011_quoted_lunar_volatile_abundances
-      type: composition_reference
+      type: composition
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 2

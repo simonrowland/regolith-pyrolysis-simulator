@@ -16,88 +16,6 @@ review_status: draft
 species:
   lunar_sample_14240:
     observations:
-    - observation_id: lpi_14240_sample_mass_conflicting_reports
-      type: sample_characterization
-      locator:
-        published_page: 2
-        section: Processing
-      units: g
-      values:
-        quantity: named_sample_mass
-        method_class: secondary_compilation
-        sample: Apollo_14_14240
-        official_LRL_weight_g: 168
-        actual_weight_when_opened_g: 184
-        attribution:
-          official_LRL_weight: "difference between hardware and returned sample"
-          actual_weight_when_opened: "sample opened at UCB Space Science Laboratory; Burlingame 1971"
-        disagreement: "The compendium reports both 168 g official LRL weight and 184 g actual opened-sample weight; neither is reconciled."
-    - observation_id: lpi_14240_trench_provenance
-      type: sample_characterization
-      locator:
-        published_page: 1
-        section: Introduction
-      units: as_published
-      values:
-        quantity: named_sample_provenance
-        method_class: secondary_compilation
-        sample: Apollo_14_14240
-        collection_site: Soil Mechanics Trench, station G, rim of approximately 6 m crater
-        collection_depth_cm: "25-36"
-        planned_trench_depth_cm: "60"
-        actual_trench_depth_cm: "~30"
-        collection_position: bottom of trench
-        contamination_note: "may contain material slumped from trench walls"
-        maturity_Is_FeO: 46
-        comparison_sample: Apollo_14_14149
-        comparison_maturity_Is_FeO: 53
-        material_description: "immature lunar soil; subsurface sample"
-        locators:
-          collection_depth: "page 2, Petrography"
-          maturity: "page 2, Petrography"
-          collection_site: "page 1, Introduction; page 2, Petrography"
-    - observation_id: lpi_14240_sesc_aliquot_and_sieve_masses
-      type: sample_characterization
-      locator:
-        published_page: 4
-        figure: 'sample subdivision schematic'
-      units: g
-      values:
-        quantity: printed_sample_subdivision_masses
-        method_class: secondary_compilation
-        sample: Apollo_14_14240
-        opened_in: Berkeley
-        aliquots_g:
-          - label: 1
-            mass_g: 7
-          - label: 3
-            mass_g: 4.3
-          - label: 28
-            mass_g: 13.3
-          - label: 29
-            mass_g: 16.5
-          - label: 31
-            mass_g: 11.1
-          - label: 53
-            mass_g: 14
-          - label: 60
-            mass_g: 7.2
-          - label: 59
-            mass_g: 7.3
-          - label: 22
-            mass_g: 2.5
-          - label: 23
-            mass_g: 5
-          - label: 24
-            mass_g: 2.1
-          - label: 26
-            mass_g: 4.5
-          - label: 30
-            mass_g: 41.4
-        sieve_fraction:
-          size_range_micrometre: 250-500
-          mass_g: 41.4
-        note: "The schematic prints these aliquot masses; it does not state a complete mass-balance treatment or identify every reserve mass."
     - observation_id: lpi_14240_chemical_composition_table1
       type: composition_series
       locator:
@@ -264,3 +182,86 @@ species:
           a: "INAA"
           b: "microchemical"
       note: "This is a secondary compilation of cited analyses by Laul et al. 1972, Rose et al. 1972, and Laul et al. 1982; it is not a new laboratory analysis in Meyer 2007."
+    context:
+    - observation_id: lpi_14240_sample_mass_conflicting_reports
+      type: characterization
+      locator:
+        published_page: 2
+        section: Processing
+      units: g
+      values:
+        quantity: named_sample_mass
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        official_LRL_weight_g: 168
+        actual_weight_when_opened_g: 184
+        attribution:
+          official_LRL_weight: "difference between hardware and returned sample"
+          actual_weight_when_opened: "sample opened at UCB Space Science Laboratory; Burlingame 1971"
+        disagreement: "The compendium reports both 168 g official LRL weight and 184 g actual opened-sample weight; neither is reconciled."
+    - observation_id: lpi_14240_trench_provenance
+      type: characterization
+      locator:
+        published_page: 1
+        section: Introduction
+      units: as_published
+      values:
+        quantity: named_sample_provenance
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        collection_site: Soil Mechanics Trench, station G, rim of approximately 6 m crater
+        collection_depth_cm: "25-36"
+        planned_trench_depth_cm: "60"
+        actual_trench_depth_cm: "~30"
+        collection_position: bottom of trench
+        contamination_note: "may contain material slumped from trench walls"
+        maturity_Is_FeO: 46
+        comparison_sample: Apollo_14_14149
+        comparison_maturity_Is_FeO: 53
+        material_description: "immature lunar soil; subsurface sample"
+        locators:
+          collection_depth: "page 2, Petrography"
+          maturity: "page 2, Petrography"
+          collection_site: "page 1, Introduction; page 2, Petrography"
+    - observation_id: lpi_14240_sesc_aliquot_and_sieve_masses
+      type: characterization
+      locator:
+        published_page: 4
+        figure: 'sample subdivision schematic'
+      units: g
+      values:
+        quantity: printed_sample_subdivision_masses
+        method_class: secondary_compilation
+        sample: Apollo_14_14240
+        opened_in: Berkeley
+        aliquots_g:
+          - label: 1
+            mass_g: 7
+          - label: 3
+            mass_g: 4.3
+          - label: 28
+            mass_g: 13.3
+          - label: 29
+            mass_g: 16.5
+          - label: 31
+            mass_g: 11.1
+          - label: 53
+            mass_g: 14
+          - label: 60
+            mass_g: 7.2
+          - label: 59
+            mass_g: 7.3
+          - label: 22
+            mass_g: 2.5
+          - label: 23
+            mass_g: 5
+          - label: 24
+            mass_g: 2.1
+          - label: 26
+            mass_g: 4.5
+          - label: 30
+            mass_g: 41.4
+        sieve_fraction:
+          size_range_micrometre: 250-500
+          mass_g: 41.4
+        note: "The schematic prints these aliquot masses; it does not state a complete mass-balance treatment or identify every reserve mass."

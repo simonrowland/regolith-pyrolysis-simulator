@@ -32,49 +32,6 @@ fidelity_samples:
 species:
   lunar_sample_62231:
     observations:
-    - observation_id: lpi_2010_62231_inventory_mass
-      type: sample_characterization
-      locator:
-        pdf_page_index: 4
-        figure: 'processing diagram'
-        section: Processing
-        note: Printed inventory diagram for the 62230/62231 bag; 62231 is the named sample row.
-      phase: lunar_soil
-      regime: lunar_sample_inventory
-      units: g as printed
-      values:
-        quantity: sample_mass_and_sieving_inventory
-        method_class: measured_direct
-        sample: '62231'
-        sample_mass_g: 87
-        sample_mass_note: printed sample inventory mass; the original weighing procedure is not stated
-        sieved_fraction_less_than_1_mm_g: 27
-        sieved_fraction_4_to_10_mm_g: 50
-        reserve_fraction_g: 4.5
-        fraction_assignment_note: diagram labels the three 62231-associated fractions as <1 mm, 4-10 mm, and reserve; no further size distribution is reported
-      uncertainty:
-        note: no uncertainty printed
-      equipment:
-        note: no collection, weighing, sieve, or recovery apparatus details are stated
-    - observation_id: lpi_2010_62231_maturity_and_grain_size
-      type: sample_characterization
-      locator:
-        pdf_page_index: 2
-        section: Petrography
-      phase: lunar_soil
-      regime: lunar_soil_characterisation
-      units: as published
-      values:
-        quantity: maturity_and_grain_size_characterisation
-        method_class: quoted_attributed
-        maturity_index_Is_over_FeO: 91
-        maturity_index_source: Morris (1978)
-        grain_size_distribution: not reported
-        coarse_particle_catalogue: 4-10 mm particles cataloged by Marvin (1972)
-      uncertainty:
-        note: no uncertainty printed
-      equipment:
-        note: analytical apparatus for the cited maturity and particle catalogue is not stated in this entry
     - observation_id: lpi_2010_62231_table1_chemistry
       type: composition_summary
       locator:
@@ -141,3 +98,47 @@ species:
         note: plotted uncertainty or error bars are not printed in extractable text
       equipment:
         note: no apparatus details stated for the plotted source data
+    context:
+    - observation_id: lpi_2010_62231_inventory_mass
+      type: characterization
+      locator:
+        pdf_page_index: 4
+        figure: 'processing diagram'
+        section: Processing
+        note: Printed inventory diagram for the 62230/62231 bag; 62231 is the named sample row.
+      phase: lunar_soil
+      regime: lunar_sample_inventory
+      units: g as printed
+      values:
+        quantity: sample_mass_and_sieving_inventory
+        method_class: measured_direct
+        sample: '62231'
+        sample_mass_g: 87
+        sample_mass_note: printed sample inventory mass; the original weighing procedure is not stated
+        sieved_fraction_less_than_1_mm_g: 27
+        sieved_fraction_4_to_10_mm_g: 50
+        reserve_fraction_g: 4.5
+        fraction_assignment_note: diagram labels the three 62231-associated fractions as <1 mm, 4-10 mm, and reserve; no further size distribution is reported
+      uncertainty:
+        note: no uncertainty printed
+      equipment:
+        note: no collection, weighing, sieve, or recovery apparatus details are stated
+    - observation_id: lpi_2010_62231_maturity_and_grain_size
+      type: characterization
+      locator:
+        pdf_page_index: 2
+        section: Petrography
+      phase: lunar_soil
+      regime: lunar_soil_characterisation
+      units: as published
+      values:
+        quantity: maturity_and_grain_size_characterisation
+        method_class: quoted_attributed
+        maturity_index_Is_over_FeO: 91
+        maturity_index_source: Morris (1978)
+        grain_size_distribution: not reported
+        coarse_particle_catalogue: 4-10 mm particles cataloged by Marvin (1972)
+      uncertainty:
+        note: no uncertainty printed
+      equipment:
+        note: analytical apparatus for the cited maturity and particle catalogue is not stated in this entry

@@ -114,9 +114,10 @@ model_tables:
     - {value: 'up to six orders of magnitude', quantity: partial_pressure_difference_between_LavAtmos_2_and_volatile_free_method, condition: 'spectroscopically important CO2, CO, H2O, and SO2 species', locator_note: 'page 16, section 6'}
 species:
   BSE:
-    observations:
+    observations: []
+    context:
     - observation_id: vanbuchem_2025_table_1_volatile_atmosphere_inputs
-      type: model_input_table
+      type: model_input
       locator: {page: 4, table: '1'}
       phase: BSE_lava_ocean
       regime: thermochemical_equilibrium_model

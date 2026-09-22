@@ -104,6 +104,41 @@ species:
         - He(g)
         - CO(g)
         note: The abstract does not print the complete 18-species list.
+    - observation_id: tachibana_1998_forsterite_fig1_model_grid
+      type: rate_series
+      class: figure_only
+      locator:
+        page: 2
+        figure: '1'
+        caption: Calculated evaporation rate of forsterite, jFo, with alpha=0.1 plotted in the T-ptotal condition
+      phase: forsterite_dust
+      regime: FED_HRD_HBD_model_grid
+      units: mol cm^-2 s^-1; temperature K; total pressure bar
+      values:
+        quantity: evaporation_rate_vs_temperature_and_pressure
+        method_class: figure_only
+        generator: authors' Hertz-Knudsen plus 18-species thermochemical gas-chemistry calculation
+        alpha: 0.1
+        digitized: false
+        note: Contours and paths are not transcribed as numeric data; the figure is retained as a qualitative model result.
+    - observation_id: tachibana_1998_forsterite_fig2_dynamic_static_comparison
+      type: mass_loss
+      class: figure_only
+      locator:
+        page: 2
+        figure: '2'
+        caption: The amount of forsterite evaporated, dust/(dust+gas) ratio, plotted against distance from the protosun
+      phase: forsterite_dust
+      regime: dynamic_and_equilibrium_nebula_model
+      units: dust/(dust+gas) ratio vs r/AU
+      values:
+        quantity: evaporated_forsterite_fraction
+        method_class: figure_only
+        generator: dynamic and equilibrium (static) models [7]
+        digitized: false
+        qualitative_result: dynamic-model evaporated amount is almost the same as the equilibrium static model along the modeled mid-plane paths
+        note: No numeric curve read-offs are recorded.
+    context:
     - observation_id: tachibana_1998_forsterite_regime_model
       type: regime_classification
       class: model
@@ -128,23 +163,6 @@ species:
         - name: H2O_H2_buffer_dominated
           condition: increasing ptotal where peH2O approximately equals pH2O
           rate_dependence: jFo becomes constant when pH2O is buffered by constant H2O/H2 ratio
-    - observation_id: tachibana_1998_forsterite_fig1_model_grid
-      type: rate_series
-      class: figure_only
-      locator:
-        page: 2
-        figure: '1'
-        caption: Calculated evaporation rate of forsterite, jFo, with alpha=0.1 plotted in the T-ptotal condition
-      phase: forsterite_dust
-      regime: FED_HRD_HBD_model_grid
-      units: mol cm^-2 s^-1; temperature K; total pressure bar
-      values:
-        quantity: evaporation_rate_vs_temperature_and_pressure
-        method_class: figure_only
-        generator: authors' Hertz-Knudsen plus 18-species thermochemical gas-chemistry calculation
-        alpha: 0.1
-        digitized: false
-        note: Contours and paths are not transcribed as numeric data; the figure is retained as a qualitative model result.
     - observation_id: tachibana_1998_forsterite_dynamic_model_dust_size
       type: model_input
       class: model_derived
@@ -186,20 +204,3 @@ species:
             Model-3: 840
             Model-4: 1910
         note: Values are printed in the Figure 1 caption; model identity follows the caption's Models-1 through 4 order.
-    - observation_id: tachibana_1998_forsterite_fig2_dynamic_static_comparison
-      type: mass_loss
-      class: figure_only
-      locator:
-        page: 2
-        figure: '2'
-        caption: The amount of forsterite evaporated, dust/(dust+gas) ratio, plotted against distance from the protosun
-      phase: forsterite_dust
-      regime: dynamic_and_equilibrium_nebula_model
-      units: dust/(dust+gas) ratio vs r/AU
-      values:
-        quantity: evaporated_forsterite_fraction
-        method_class: figure_only
-        generator: dynamic and equilibrium (static) models [7]
-        digitized: false
-        qualitative_result: dynamic-model evaporated amount is almost the same as the equilibrium static model along the modeled mid-plane paths
-        note: No numeric curve read-offs are recorded.

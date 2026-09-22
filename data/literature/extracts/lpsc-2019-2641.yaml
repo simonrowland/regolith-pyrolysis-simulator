@@ -30,6 +30,27 @@ fidelity_samples:
 species:
   calibration_reference_gases:
     observations:
+    - observation_id: lpsc_2019_2641_flow_calibration_range
+      type: rate_series
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+      phase: calibration_gas
+      standard_state: continuous-flow QMS calibration
+      regime: qms_calibration
+      units: mbar/s as printed
+      values:
+        quantity: reference_gas_flow_rate_calibration
+        method_class: measured_direct
+        evidence_class: authors_own_calibration
+        flow_rate_range_mbar_per_s: 1e-8 to 1e-4
+        flow_rate_determination: reference gas accumulated in the Baratron volume for a stated accumulation time; pressure recorded after equilibration; procedure repeated for different accumulation times
+        pressure_instrument: high-sensitivity and high-precision MKS Baratron capacitance manometer
+        conversion_note: flow rate can be converted into ml/s only if the accumulation volume is determined
+        concentration_note: integrating release curves gives gas concentrations in ml/g
+      uncertainty:
+        note: no numerical uncertainty printed for the flow-rate range
+    context:
     - observation_id: lpsc_2019_2641_calibration_gas_mixture
       type: composition
       locator:
@@ -74,28 +95,8 @@ species:
           locator:
             pdf_page_index: 1
             section: Experimental technique
-    - observation_id: lpsc_2019_2641_flow_calibration_range
-      type: rate_series
-      locator:
-        pdf_page_index: 1
-        section: Introduction
-      phase: calibration_gas
-      standard_state: continuous-flow QMS calibration
-      regime: qms_calibration
-      units: mbar/s as printed
-      values:
-        quantity: reference_gas_flow_rate_calibration
-        method_class: measured_direct
-        evidence_class: authors_own_calibration
-        flow_rate_range_mbar_per_s: 1e-8 to 1e-4
-        flow_rate_determination: reference gas accumulated in the Baratron volume for a stated accumulation time; pressure recorded after equilibration; procedure repeated for different accumulation times
-        pressure_instrument: high-sensitivity and high-precision MKS Baratron capacitance manometer
-        conversion_note: flow rate can be converted into ml/s only if the accumulation volume is determined
-        concentration_note: integrating release curves gives gas concentrations in ml/g
-      uncertainty:
-        note: no numerical uncertainty printed for the flow-rate range
     - observation_id: lpsc_2019_2641_qms_calibration_power_law_fits
-      type: calibration_fit
+      type: calibration
       locator:
         pdf_page_index: 1
         figure: '2'
@@ -161,36 +162,6 @@ species:
         note: not printed
   Murchison_CM2_meteorite:
     observations:
-    - observation_id: lpsc_2019_2641_murchison_apparatus
-      type: apparatus
-      locator:
-        pdf_page_index: 1
-        section: Experimental technique
-      phase: powdered_meteorite_sample
-      standard_state: custom-built QEGA apparatus as printed
-      regime: continuously_pumped_qms_evolved_gas_analysis
-      units: as printed
-      values:
-        quantity: evolved_gas_apparatus
-        method_class: measured_direct
-        evidence_class: authors_own_experiment
-        instrument: custom-built Finesse mass-spectrometer system
-        qms: Hiden Analytical quadrupole mass spectrometer with electron multiplier
-        pumping: turbomolecular and ion pumps
-        sample_container: pure Pt foil
-        furnace: linear heating furnace capable of reaching 1500 °C
-        qms_operation: continuous flow, peak-jumping mode and ion counting
-        water_calibration: not made; water could condense in the vacuum line because uniform heating to 100 °C was challenging
-        recorded_mass_range: 2 to 132
-        recorded_masses_as_printed: [2, 4, 12, 14, 16, 18, 20, 22, 28, 29, 30, 32, 36, 40, 44, 84, 132]
-        temperature_measurement_and_calibration: not stated
-        sample_form: not separately stated for the calibration samples; Murchison sample is stated as powdered
-        exposed_area: not stated
-        gas_identity_and_pressure_during_sample_run: not stated
-        fO2_control: not stated
-        run_duration: not stated
-      uncertainty:
-        note: no numerical uncertainty printed for apparatus geometry or temperature calibration
     - observation_id: lpsc_2019_2641_murchison_heating_program
       type: rate_series
       locator:
@@ -284,6 +255,37 @@ species:
         release_pattern_data_status: figure shows the pattern; no curve points digitized
       uncertainty:
         note: no numerical uncertainty printed
+    context:
+    - observation_id: lpsc_2019_2641_murchison_apparatus
+      type: apparatus
+      locator:
+        pdf_page_index: 1
+        section: Experimental technique
+      phase: powdered_meteorite_sample
+      standard_state: custom-built QEGA apparatus as printed
+      regime: continuously_pumped_qms_evolved_gas_analysis
+      units: as printed
+      values:
+        quantity: evolved_gas_apparatus
+        method_class: measured_direct
+        evidence_class: authors_own_experiment
+        instrument: custom-built Finesse mass-spectrometer system
+        qms: Hiden Analytical quadrupole mass spectrometer with electron multiplier
+        pumping: turbomolecular and ion pumps
+        sample_container: pure Pt foil
+        furnace: linear heating furnace capable of reaching 1500 °C
+        qms_operation: continuous flow, peak-jumping mode and ion counting
+        water_calibration: not made; water could condense in the vacuum line because uniform heating to 100 °C was challenging
+        recorded_mass_range: 2 to 132
+        recorded_masses_as_printed: [2, 4, 12, 14, 16, 18, 20, 22, 28, 29, 30, 32, 36, 40, 44, 84, 132]
+        temperature_measurement_and_calibration: not stated
+        sample_form: not separately stated for the calibration samples; Murchison sample is stated as powdered
+        exposed_area: not stated
+        gas_identity_and_pressure_during_sample_run: not stated
+        fO2_control: not stated
+        run_duration: not stated
+      uncertainty:
+        note: no numerical uncertainty printed for apparatus geometry or temperature calibration
     - observation_id: lpsc_2019_2641_murchison_figures_not_digitized
       type: figure_only
       locator:
