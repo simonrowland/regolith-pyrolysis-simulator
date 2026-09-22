@@ -13,6 +13,8 @@ Sibling files, not an in-place ``battery_v2`` block:
 * ``data/literature/works/ALIASES.yaml`` — explicit alias registry
   (source_id / raw DOI → canonical work_id). Never title-only merging.
 * ``data/battery/migration-queue.yaml`` — page_grounded work list.
+  Entries that share a work, source, reason, and axes are one group;
+  each observation id and locator is kept on that group.
 * ``data/battery/migration-report.md`` — counts (measured vs spec).
 
 Why sibling files: the brief requires old extract *rows* to stay
@@ -8853,6 +8855,191 @@ class Migrator:
         return self.result
 
 
+# Flat queue files repeated the same reason once per observation. Grouping
+# keeps that reason once. Locator key order is fixed so two writes match.
+QUEUE_SCHEMA_VERSION = "battery_migration_queue.v2"
+_QUEUE_LOCATOR_KEY_ORDER = (
+    "page",
+    "published_page",
+    "pdf_page_index",
+    "table",
+    "figure",
+    "paragraph",
+    "section",
+    "equation",
+    "line_range",
+    "note",
+    "source_path",
+    "record",
+)
+
+
+def _queue_sort_token(value: object) -> tuple[int, str]:
+    if value is None:
+        return (1, "")
+    if isinstance(value, str):
+        return (0, value)
+    return (0, json.dumps(value, sort_keys=True, default=str))
+
+
+def _canonicalize_locator(locator: object) -> dict[str, object]:
+    if locator is None:
+        return {}
+    if not isinstance(locator, Mapping):
+        raise TypeError(
+            f"queue locator must be a mapping or null, got {type(locator).__name__}"
+        )
+    present = {str(key): value for key, value in locator.items()}
+    ordered: dict[str, object] = {}
+    for key in _QUEUE_LOCATOR_KEY_ORDER:
+        if key in present:
+            ordered[key] = present[key]
+    for key in sorted(set(present) - set(_QUEUE_LOCATOR_KEY_ORDER)):
+        ordered[key] = present[key]
+    return ordered
+
+
+def _flat_queue_entry(entry: QueueEntry | Mapping[str, Any]) -> dict[str, Any]:
+    if isinstance(entry, QueueEntry):
+        work_id: object = entry.work_id
+        locator: object = entry.locator
+        axes: object = entry.axes
+        why: object = entry.why
+        source: object = entry.source
+        observation_id: object = entry.observation_id
+    elif isinstance(entry, Mapping):
+        work_id = entry.get("work_id")
+        locator = entry.get("locator")
+        axes = entry.get("axes") or []
+        why = entry.get("why")
+        source = entry.get("source")
+        observation_id = entry.get("observation_id")
+    else:
+        raise TypeError(
+            f"queue entry must be a QueueEntry or mapping, got {type(entry).__name__}"
+        )
+    if isinstance(axes, str) or not isinstance(axes, Iterable):
+        raise TypeError(f"queue axes must be a list, got {type(axes).__name__}")
+    return {
+        "work_id": work_id,
+        "locator": _canonicalize_locator(locator),
+        "axes": list(axes),
+        "why": why,
+        "source": source,
+        "observation_id": observation_id,
+    }
+
+
+def _observation_sort_key(observation: Mapping[str, Any]) -> tuple:
+    locator = observation.get("locator") or {}
+    return (
+        _queue_sort_token(observation.get("observation_id")),
+        json.dumps(locator, sort_keys=True, ensure_ascii=False, default=str),
+    )
+
+
+def _group_sort_key(key: tuple[object, object, object, tuple[object, ...]]) -> tuple:
+    work_id, source, why, axes = key
+    return (
+        _queue_sort_token(work_id),
+        _queue_sort_token(source),
+        _queue_sort_token(why),
+        tuple(_queue_sort_token(axis) for axis in axes),
+    )
+
+
+def group_queue_entries(
+    entries: Iterable[QueueEntry | Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Group flat queue entries by work, source, reason, and axes.
+
+    Each group lists every observation id with its locator. Duplicate flat
+    entries stay duplicated so a reason count does not change.
+    """
+
+    grouped: dict[
+        tuple[object, object, object, tuple[object, ...]],
+        list[dict[str, Any]],
+    ] = {}
+    for raw in entries:
+        flat = _flat_queue_entry(raw)
+        key = (flat["work_id"], flat["source"], flat["why"], tuple(flat["axes"]))
+        grouped.setdefault(key, []).append(
+            {
+                "observation_id": flat["observation_id"],
+                "locator": flat["locator"],
+            }
+        )
+    groups: list[dict[str, Any]] = []
+    for key in sorted(grouped, key=_group_sort_key):
+        work_id, source, why, axes = key
+        observations = sorted(grouped[key], key=_observation_sort_key)
+        groups.append(
+            {
+                "work_id": work_id,
+                "source": source,
+                "why": why,
+                "axes": list(axes),
+                "observations": observations,
+            }
+        )
+    return groups
+
+
+def expand_queue_entries(entries: Iterable[object]) -> list[dict[str, Any]]:
+    """Expand grouped queue entries to the flat work/locator/axes/why list.
+
+    A legacy flat entry (one observation id on the entry itself) is returned
+    unchanged, so a reader can ask the same questions of either shape.
+    """
+
+    flat: list[dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, Mapping):
+            raise TypeError(
+                f"queue entry must be a mapping, got {type(entry).__name__}"
+            )
+        if "observations" in entry and "observation_id" not in entry:
+            observations = entry.get("observations")
+            if not isinstance(observations, list):
+                raise TypeError(
+                    "grouped queue entry observations must be a list, "
+                    f"got {type(observations).__name__}"
+                )
+            for observation in observations:
+                if not isinstance(observation, Mapping):
+                    raise TypeError(
+                        "grouped queue observation must be a mapping, "
+                        f"got {type(observation).__name__}"
+                    )
+                flat.append(
+                    {
+                        "work_id": entry.get("work_id"),
+                        "locator": _canonicalize_locator(observation.get("locator")),
+                        "axes": list(entry.get("axes") or []),
+                        "why": entry.get("why"),
+                        "source": entry.get("source"),
+                        "observation_id": observation.get("observation_id"),
+                    }
+                )
+            continue
+        flat.append(_flat_queue_entry(entry))
+    return flat
+
+
+def migration_queue_document(
+    entries: Iterable[QueueEntry | Mapping[str, Any]],
+    dedupe_aliases: Iterable[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Grouped migration-queue document. Alias order is the caller's order."""
+
+    return {
+        "schema_version": QUEUE_SCHEMA_VERSION,
+        "entries": group_queue_entries(entries),
+        "dedupe_aliases": [dict(alias) for alias in (dedupe_aliases or ())],
+    }
+
+
 def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     root = root or REPO_ROOT
     works_dir = root / "data" / "literature" / "works"
@@ -9015,28 +9202,17 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         )
 
     dump_yaml(
-        {
-            "schema_version": "battery_migration_queue.v1",
-            "entries": [
-                {
-                    "work_id": e.work_id,
-                    "locator": e.locator,
-                    "axes": e.axes,
-                    "why": e.why,
-                    "source": e.source,
-                    "observation_id": e.observation_id,
-                }
-                for e in result.queue
-            ],
-            "dedupe_aliases": [
+        migration_queue_document(
+            result.queue,
+            (
                 {
                     "observation_id": alias.observation_id,
                     "source": alias.source,
                     "row_indices": list(alias.row_indices),
                 }
                 for alias in result.dedupe_aliases
-            ],
-        },
+            ),
+        ),
         battery / "migration-queue.yaml",
     )
     write_report(result, battery / "migration-report.md")
