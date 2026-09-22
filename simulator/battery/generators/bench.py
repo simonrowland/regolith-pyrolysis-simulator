@@ -44,8 +44,12 @@ def _requirements(inputs, consumer, engine=None):
             absent = waypoint.selected is None
             missing = waypoint.absence.missing if waypoint.absence else ()
             if not absent and consumer == "engine_point" and name != "normalized_composition":
-                if not isinstance(waypoint.selected.value, Value) or waypoint.selected.value.kind is not ValueKind.POINT:
-                    gaps.append(ReadinessGap(name, GapReason.UNSUPPORTED_PRINT_FORM, (name,)))
+                selected = waypoint.selected.value
+                if not isinstance(selected, Value) or selected.kind is not ValueKind.POINT:
+                    reason = (GapReason.INTERVAL_NEEDS_POINT
+                              if isinstance(selected, Value) and selected.kind is ValueKind.INTERVAL
+                              else GapReason.UNSUPPORTED_PRINT_FORM)
+                    gaps.append(ReadinessGap(name, reason, (name,)))
         if absent:
             reason = (waypoint.absence.reason if name == "normalized_composition" and waypoint.absence
                       else GapReason.MISSING_EVIDENCE)

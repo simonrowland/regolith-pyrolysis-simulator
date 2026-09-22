@@ -39,6 +39,10 @@ class GapReason(StrEnum):
     MISSING_EVIDENCE = "missing_evidence"
     CONSUMER_INPUT_NOT_SUPPLIED = "consumer_input_not_supplied"
     UNSUPPORTED_PRINT_FORM = "unsupported_print_form"
+    # A printed interval is a real fact, but a point consumer cannot run on a
+    # range: the typed refusal says "interval printed, engine needs a point"
+    # instead of hiding the form behind the generic unsupported kind.
+    INTERVAL_NEEDS_POINT = "interval_needs_point"
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"

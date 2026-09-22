@@ -192,6 +192,35 @@ def test_engine_bounds_are_preserved_and_refused_without_midpoint(name):
     assert results[0].provenance["waypoints"][waypoint]["selected"]["value"]["kind"] == "interval"
 
 
+@pytest.mark.parametrize("name", ["temperature_K", "total_pressure_Pa", "fO2_log"])
+def test_engine_interval_refusal_is_typed_interval_needs_point(name):
+    """An interval is a real printed fact; the engine needs a point. The typed
+    refusal must say so — 'interval printed, engine needs point' — rather than
+    the generic unsupported-print-form kind (t-953)."""
+    experiment, bench, observation = case()
+    interval = Value(ValueKind.INTERVAL, interval_low=Decimal(1), interval_high=Decimal(2))
+    observation = replace(observation, point_conditions={**observation.point_conditions, name: f.located(interval)})
+    results = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    waypoint = {"total_pressure_Pa": "pressure_boundary", "fO2_log": "oxygen_condition"}.get(name, name)
+    assert all(result.payload is None for result in results)
+    for result in results:
+        assert result.readiness.status is ReadinessStatus.GAP
+        assert any(gap.waypoint == waypoint and gap.reason is GapReason.INTERVAL_NEEDS_POINT
+                   for gap in result.readiness.gaps), result.readiness.gaps
+
+
+def test_engine_bound_refusal_stays_unsupported_print_form():
+    """Only the interval form is re-typed; bounds keep the generic refusal."""
+    experiment, bench, observation = case()
+    bound = Value(ValueKind.BOUND, bound_operator="<=", bound_value=Decimal(2))
+    observation = replace(observation, point_conditions={**observation.point_conditions, "fO2_log": f.located(bound)})
+    results = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert all(result.payload is None for result in results)
+    for result in results:
+        assert any(gap.waypoint == "oxygen_condition" and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                   for gap in result.readiness.gaps), result.readiness.gaps
+
+
 def test_single_species_is_not_applicable():
     results = engine_point_requests(collect_consumer_inputs(*case(single=True)))
     assert all(result.readiness.status is ReadinessStatus.NOT_APPLICABLE for result in results)
