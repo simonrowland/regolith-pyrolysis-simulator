@@ -97,6 +97,7 @@ from contextlib import contextmanager
 import fcntl
 import math
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -131,6 +132,18 @@ from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
+)
+from simulator.melt_backend.pure_phase import (
+    GIBBS_CONVENTION_APPARENT_298,
+    PHASE_FACTOR_UNAVAILABLE,
+    PHASE_NOT_PURE_AT_EQUILIBRIUM,
+    PHASE_NOT_STABLE_AT_TP,
+    PropertyAbsence,
+    PurePhaseAccessError,
+    PurePhaseBulkMismatchError,
+    PurePhaseProperties,
+    PurePhaseUnknownSymbolError,
+    PurePhaseUnsupportedDatabaseError,
 )
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -346,6 +359,326 @@ def _magemin_bulk_projection_details(
             - bulk_projection.projected_sum_wt_pct,
         )
     return details
+
+
+# ----------------------------------------------------------------------
+# Pure-phase registry and stdout/matlab parsers (diagnostic accessor)
+# ----------------------------------------------------------------------
+
+# Minimum endmember wt-fraction for a stable solution phase's S/Cp/H to be
+# reported as the pure endmember's properties (else typed absence).
+_MAGEMIN_PURITY_MIN = 0.999
+
+# Absolute wt-fraction tolerance for the SYS-row bulk-echo guard.  The KLB1
+# fallback moves SiO2 by ~0.38 wt-fraction; the token SiO2=1e-6 used to clear
+# the upstream arg_bulk[0]>0 gate moves it 1e-8.  3e-3 sits between.
+_MAGEMIN_BULK_ECHO_TOL = 3.0e-3
+
+
+@dataclass(frozen=True)
+class _MAGEMinPurePhaseSpec:
+    """How to reach one phase's standard-state properties in the ig DB."""
+
+    host_phase: Optional[str]  # solution host ('ol','fper','opx'); None = PP
+    endmember: str             # symbol in the Verb=1 endmember table
+    assemblage_phase: str      # name in the matlab stable-assemblage table
+    formula: str               # formula unit of the returned mol basis
+    formula_basis: str         # basis note incl. divisor derivation
+    formula_divisor: float     # engine formula units per `formula` unit
+    polymorph: str
+    bulk_wt_pct: Mapping[str, float]
+
+
+# Bulk vectors are wt% in ig oxide names.  Derivation of the stoichiometric
+# bulks (CIAAW masses: Mg 24.305, Si 28.085, O 15.999):
+#   MgO      40.3044 ; MgSiO3   100.3887 ; Mg2SiO4 140.6931 g/mol
+#   enstatite bulk: SiO2 60.0843/100.3887 = 59.8515, MgO 40.3044/100.3887
+#   forsterite bulk: SiO2 60.0843/140.6931 = 42.7059, MgO 80.6088/140.6931
+# The periclase bulk carries a token SiO2=1e-6 because upstream
+# src/toolkit.c retrieve_bulk_PT honors --Bulk only when its first (SiO2)
+# component is > 0; zero falls back to the KLB1 test bulk silently (the
+# guard below refuses the run if the SYS echo ever disagrees).
+_MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
+    'fo': _MAGEMinPurePhaseSpec(
+        host_phase='ol',
+        endmember='fo',
+        assemblage_phase='ol',
+        formula='Mg2SiO4',
+        formula_basis='per 1 mol Mg2SiO4',
+        formula_divisor=1.0,
+        polymorph='forsterite',
+        bulk_wt_pct={'SiO2': 42.7059, 'MgO': 57.2941},
+    ),
+    'per': _MAGEMinPurePhaseSpec(
+        host_phase='fper',
+        endmember='per',
+        assemblage_phase='fper',
+        formula='MgO',
+        formula_basis='per 1 mol MgO',
+        formula_divisor=1.0,
+        polymorph='periclase',
+        bulk_wt_pct={'SiO2': 1.0e-6, 'MgO': 100.0},
+    ),
+    # ig opx 'en' endmember is Mg2Si2O6 (HP ds6 orthopyroxene basis), so all
+    # per-formula properties are divided by 2 onto the JANAF MgSiO3 basis.
+    'en': _MAGEMinPurePhaseSpec(
+        host_phase='opx',
+        endmember='en',
+        assemblage_phase='opx',
+        formula='MgSiO3',
+        formula_basis='per 1 mol MgSiO3 (engine endmember Mg2Si2O6 / 2)',
+        formula_divisor=2.0,
+        polymorph='orthoenstatite',
+        bulk_wt_pct={'SiO2': 59.8515, 'MgO': 40.1485},
+    ),
+    'q': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='q',
+        assemblage_phase='q',
+        formula='SiO2',
+        formula_basis='per 1 mol SiO2',
+        formula_divisor=1.0,
+        polymorph='quartz',
+        bulk_wt_pct={'SiO2': 100.0},
+    ),
+    'crst': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='crst',
+        assemblage_phase='crst',
+        formula='SiO2',
+        formula_basis='per 1 mol SiO2',
+        formula_divisor=1.0,
+        polymorph='cristobalite',
+        bulk_wt_pct={'SiO2': 100.0},
+    ),
+    'trd': _MAGEMinPurePhaseSpec(
+        host_phase=None,
+        endmember='trd',
+        assemblage_phase='trd',
+        formula='SiO2',
+        formula_basis='per 1 mol SiO2',
+        formula_divisor=1.0,
+        polymorph='tridymite',
+        bulk_wt_pct={'SiO2': 100.0},
+    ),
+}
+
+_MAGEMIN_PP_GBASE_RE = re.compile(
+    r'^\s*([A-Za-z0-9_]+):\s+(-?\d+\.\d+)\s+\+?(-?\d+\.\d+)\s*$'
+)
+_MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
+_MAGEMIN_ASSEMBLAGE_ROW_RE = re.compile(
+    r'^\s*\d+\s*\|\s*([A-Za-z0-9_]+)\s*\|([^|]+)\|([^|]+)\|([^|]+)\|'
+)
+
+
+def _parse_magemin_gbase_tables(
+    stdout: str,
+) -> Tuple[Dict[str, Tuple[float, float]], Dict[str, Dict[str, float]]]:
+    """Parse the Verb=1 pre-minimisation gbase table.
+
+    Returns ({pp_name: (gbase_kJ_per_mol_formula, factor)},
+             {ss_host: {endmember: gbase_kJ_per_mol_formula}}).
+    First occurrence wins; the table is printed once before levelling.
+    """
+    pp: Dict[str, Tuple[float, float]] = {}
+    ss: Dict[str, Dict[str, float]] = {}
+    lines = stdout.splitlines()
+    for i, line in enumerate(lines):
+        m = _MAGEMIN_PP_GBASE_RE.match(line)
+        if m:
+            pp.setdefault(m.group(1), (float(m.group(2)), float(m.group(3))))
+            continue
+        m = _MAGEMIN_SS_BLOCK_RE.match(line)
+        if (
+            m
+            and i + 3 < len(lines)
+            and lines[i + 1].strip().startswith('----')
+            and m.group(1) not in ss
+        ):
+            names = lines[i + 2].split()
+            try:
+                values = [float(v) for v in lines[i + 3].split()]
+            except ValueError:
+                continue
+            if len(names) == len(values):
+                ss[m.group(1)] = dict(zip(names, values))
+    return pp, ss
+
+
+def _parse_magemin_assemblage_factors(stdout: str) -> Dict[str, float]:
+    """Per-phase ``factor`` from the Verb=1 PHASE ASSEMBLAGE table.
+
+    Rows look like::
+        1 | fper |  +0.041778 |  +0.000001 |  +1.168795 |  +1.000000 | ...
+    i.e. ON | phase | fraction | delta_G | factor | sum_xi | ...
+    The table repeats per global iteration; the last occurrence wins.
+    """
+    factors: Dict[str, float] = {}
+    for line in stdout.splitlines():
+        m = _MAGEMIN_ASSEMBLAGE_ROW_RE.match(line)
+        if not m:
+            continue
+        try:
+            factor = float(m.group(4))
+        except ValueError:
+            continue
+        factors[m.group(1)] = factor
+    return factors
+
+
+def _parse_magemin_matlab_assemblage(
+    matlab_text: str,
+) -> Dict[str, List[Dict[str, float]]]:
+    """Rows of the out_matlab 'Stable mineral assemblage:' table.
+
+    Column bases (upstream headers partly mislabelled; see class notes):
+    G and H in kJ per mol formula, Cp in kJ/K per mol formula, Entropy in
+    kJ/K scaled by the phase factor.  Returns ordered row lists per phase
+    name: compositionally split SS instances print one row per instance, and
+    the instance order matches the 'End-members fractions' block.
+    """
+    rows: Dict[str, List[Dict[str, float]]] = {}
+    in_table = False
+    for line in matlab_text.splitlines():
+        if line.startswith('Stable mineral assemblage:'):
+            in_table = True
+            continue
+        if not in_table:
+            continue
+        if line.strip().startswith('phase') or not line.strip():
+            continue
+        tokens = line.split()
+        if tokens[0] == 'SYS':
+            break
+        if len(tokens) < 10:
+            continue
+        try:
+            row = {
+                'frac_wt': float(tokens[1]),
+                'G_kJ': float(tokens[2]),
+                'Cp_kJ_K': float(tokens[5]),
+                'S_kJ_K': float(tokens[8]),
+                'H_kJ': float(tokens[9]),
+            }
+        except ValueError:
+            continue
+        rows.setdefault(tokens[0], []).append(row)
+    return rows
+
+
+def _parse_magemin_endmember_fractions(
+    matlab_text: str,
+) -> Dict[str, List[Dict[str, float]]]:
+    """The matlab 'End-members fractions[wt fr]' block: {phase: [{em: fr}]}.
+
+    One entry per phase INSTANCE, in table order (matching the stable
+    assemblage row order).  Header rows carry '-' placeholders over padding
+    columns while value rows carry numbers there, so the zip is positional
+    and only name != '-' pairs survive.
+    """
+    fractions: Dict[str, List[Dict[str, float]]] = {}
+    in_block = False
+    header: List[str] = []
+    for line in matlab_text.splitlines():
+        if line.startswith('End-members fractions'):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        if line.startswith('Site fractions'):
+            break
+        tokens = line.split()
+        if not tokens:
+            continue
+        is_value_row = any(_is_float_token(t) for t in tokens[1:])
+        if is_value_row:
+            row = {
+                name: float(value)
+                for name, value in zip(header, tokens[1:])
+                if name != '-' and _is_float_token(value)
+            }
+            fractions.setdefault(tokens[0], []).append(row)
+        else:
+            header = tokens
+    return fractions
+
+
+def _is_float_token(token: str) -> bool:
+    try:
+        float(token)
+        return True
+    except ValueError:
+        return False
+
+
+def _parse_magemin_sys_oxide_row(
+    matlab_text: str,
+) -> Optional[Dict[str, float]]:
+    """The SYS row of the matlab 'Oxide compositions [wt fr]' block."""
+    in_block = False
+    header: List[str] = []
+    for line in matlab_text.splitlines():
+        if line.startswith('Oxide compositions'):
+            in_block = True
+            continue
+        if not in_block:
+            continue
+        tokens = line.split()
+        if not tokens:
+            if header:
+                break
+            continue
+        if not header:
+            header = tokens
+            continue
+        if tokens[0] == 'SYS':
+            values = [float(t) for t in tokens[1:]]
+            if len(values) != len(header):
+                return None
+            return dict(zip(header, values))
+    return None
+
+
+def _assert_magemin_bulk_echo(
+    requested_wt_pct: Mapping[str, float],
+    matlab_text: str,
+) -> None:
+    """KLB1-trap guard: the SYS oxide row must equal the requested bulk.
+
+    Upstream src/toolkit.c honors --Bulk only when its first component
+    (SiO2 in ig) is > 0, else silently minimizes the default KLB1 bulk.
+    Comparing the matlab SYS row against the request catches that and any
+    future bulk-mangling regression.  The 'O' column is excluded: the qfm
+    buffer pseudo-phase carries oxygen into the system by design.
+    """
+    sys_row = _parse_magemin_sys_oxide_row(matlab_text)
+    if sys_row is None:
+        raise PurePhaseBulkMismatchError(
+            'matlab dump lacks a parseable SYS oxide row; cannot verify '
+            'the bulk MAGEMin actually ran'
+        )
+    total = sum(float(v) for v in requested_wt_pct.values())
+    if total <= 0.0:
+        raise PurePhaseBulkMismatchError('requested bulk sums to zero')
+    order = MAGEMinBackend._DB_BULK_ORDERS['ig']
+    for ig_name in order:
+        if ig_name == 'O':
+            continue  # buffer-controlled component
+        sys_name = 'FeO' if ig_name == 'FeOt' else ig_name
+        got = sys_row.get(sys_name)
+        if got is None:
+            raise PurePhaseBulkMismatchError(
+                f'matlab SYS row lacks oxide column {sys_name!r}'
+            )
+        want = float(requested_wt_pct.get(ig_name, 0.0)) / total
+        if abs(got - want) > _MAGEMIN_BULK_ECHO_TOL:
+            raise PurePhaseBulkMismatchError(
+                f'MAGEMin ran a different bulk than requested: SYS row '
+                f'{sys_name}={got:.6f} vs requested {want:.6f} '
+                f'(tol {_MAGEMIN_BULK_ECHO_TOL:g}); upstream ignores --Bulk '
+                'when its first component is 0 (KLB1 fallback)'
+            )
 
 
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
@@ -1825,6 +2158,280 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 continue
             phases[name] = {'mass_kg': fraction}
         return phases
+
+    # ------------------------------------------------------------------
+    # Pure-phase standard-state properties (diagnostic accessor)
+    # ------------------------------------------------------------------
+    #
+    # This path never touches equilibrate(): it runs the binary with
+    # --Verb=1 --out_matlab=1 and parses two additional stdout/file blocks.
+    #
+    # Units and bases (derivations verified against upstream source and
+    # NIST-JANAF, see docs-private/research/2026-09-22-janaf-p4a-scout/):
+    #
+    #   * The Verb=1 pre-minimisation table prints, per pure phase and per
+    #     solution endmember, ``gbase`` in kJ per mol of the printed formula
+    #     (Holland-Powell apparent Gibbs energy of formation: elements
+    #     referenced at 298.15 K only).  ``G_J = gbase_kJ * 1000 / divisor``.
+    #     The opx ``en`` endmember formula is Mg2Si2O6 (HP ds6), so
+    #     divisor=2 puts it on the JANAF MgSiO3 basis.
+    #   * The out_matlab "Stable mineral assemblage" table prints, per STABLE
+    #     phase: G [kJ/mol formula] (the "G[J]" header is mislabelled upstream;
+    #     verified: quartz at 298.15 K prints -923.048, matching apparent G in
+    #     kJ), Cp [kJ/K per mol formula, unscaled], and Entropy/Enthalpy
+    #     [kJ/K resp. kJ] scaled by the phase's ``factor``
+    #     (src/toolkit.c:1525,1555,1648,1651: phase_entropy =
+    #     -dGdT*factor; phase_enthalpy = phase_entropy*T + G*factor).
+    #     factor = fbc/ape (system bulk atoms-per-oxide over phase
+    #     atoms-per-formula, src/pp_min_function.c:117) is printed per phase:
+    #     for pure phases as the second column of the Verb=1 pure-phase table
+    #     line, for solution phases in the final "PHASE ASSEMBLAGE" table.
+    #     Molar S = printed/factor; sanity anchor: forsterite-bulk ol at
+    #     298.15 K prints S=31.708 J/K with factor 1/3 -> 95.13 J/K vs JANAF
+    #     Mg2SiO4 S(298.15) = 95.14 J/K/mol.
+    #   * S/Cp/H exist ONLY when the phase is stable for the stoichiometric
+    #     bulk at the requested T,P (the table lists stable phases only).
+    #     A solution phase must additionally sit at its endmember (purity
+    #     gate), else its S/Cp/H describe a mixture, not the pure phase.
+    #     Enstatite is never stable for an MgSiO3 bulk in ig at 298-1500 K
+    #     (ol + silica instead) -> typed absence, not a number.
+
+    def pure_phase_properties(
+        self,
+        phase_id: str,
+        *,
+        temperature_K: float,
+        pressure_bar: float,
+    ) -> PurePhaseProperties:
+        """G/S/Cp/H of one named phase at (T, P) from the MAGEMin binary.
+
+        ``phase_id`` is an ig-database symbol: ``fo`` (olivine endmember),
+        ``per`` (ferropericlase endmember), ``en`` (orthopyroxene endmember,
+        Mg2Si2O6 basis), or the pure phases ``q`` / ``crst`` / ``trd``.
+        Cold subprocess: same binary and slot discipline as the production
+        subprocess bridge; equilibrate() is untouched.
+        """
+        if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+            raise ValueError(
+                f'pure_phase temperature_K must be finite and positive: '
+                f'{temperature_K!r}'
+            )
+        if not math.isfinite(pressure_bar) or pressure_bar <= 0.0:
+            raise ValueError(
+                f'pure_phase pressure_bar must be finite and positive: '
+                f'{pressure_bar!r}'
+            )
+        if self._database != 'ig':
+            raise PurePhaseUnsupportedDatabaseError(
+                f'pure-phase map verified for db=ig only; loaded {self._database!r}'
+            )
+        spec = _MAGEMIN_PURE_PHASES.get(str(phase_id))
+        if spec is None:
+            raise PurePhaseUnknownSymbolError(
+                f'unknown ig pure-phase id {phase_id!r}; known: '
+                f'{sorted(_MAGEMIN_PURE_PHASES)}'
+            )
+        if (
+            not self._available
+            or self._bridge != 'subprocess'
+            or self._binary_path is None
+        ):
+            raise PurePhaseAccessError(
+                'MAGEMin pure-phase query requires the subprocess bridge '
+                '(initialized binary); equilibrate warm-pool requests carry '
+                'only equilibrate payloads'
+            )
+
+        temperature_C = temperature_K - 273.15
+        # bar -> kbar: 1 kbar = 1000 bar (CLI --Pres takes kbar).
+        pressure_kbar = float(pressure_bar) * 1.0e-4
+        stdout, matlab_text, warnings = self._run_pure_phase_probe(
+            bulk_wt_ig=dict(spec.bulk_wt_pct),
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+        )
+        _assert_magemin_bulk_echo(spec.bulk_wt_pct, matlab_text)
+
+        pp_gbase, ss_endmember_gbase = _parse_magemin_gbase_tables(stdout)
+        pp_factor: Optional[float] = None
+        if spec.host_phase is None:
+            g_entry = pp_gbase.get(spec.endmember)
+            if g_entry is not None:
+                g_kJ, pp_factor = g_entry
+        else:
+            g_kJ = ss_endmember_gbase.get(spec.host_phase, {}).get(
+                spec.endmember
+            )
+            g_entry = g_kJ
+        if g_entry is None:
+            raise PurePhaseAccessError(
+                f'MAGEMin ig endmember table lacks {spec.endmember!r} '
+                f'(host {spec.host_phase!r}); cannot certify phase identity'
+            )
+        G_J_mol = g_kJ * 1000.0 / spec.formula_divisor
+
+        absences: List[PropertyAbsence] = []
+        S_J_K_mol: Optional[float] = None
+        Cp_J_K_mol: Optional[float] = None
+        H_J_mol: Optional[float] = None
+
+        assemblage = _parse_magemin_matlab_assemblage(matlab_text)
+        phase_rows = assemblage.get(spec.assemblage_phase) or []
+        # A compositionally split SS prints one row per instance; the
+        # dominant instance (max wt fraction) is the candidate pure phase.
+        phase_index: Optional[int] = None
+        if phase_rows:
+            phase_index = max(
+                range(len(phase_rows)),
+                key=lambda i: phase_rows[i]['frac_wt'],
+            )
+        phase_row = phase_rows[phase_index] if phase_index is not None else None
+        if phase_row is None or phase_row['frac_wt'] <= 0.0:
+            absences.extend(
+                PropertyAbsence(prop, PHASE_NOT_STABLE_AT_TP)
+                for prop in ('S', 'Cp', 'H')
+            )
+        else:
+            if spec.host_phase is not None:
+                # Instance order matches between the two matlab blocks; the
+                # endmember fractions of the dominant instance decide purity.
+                em_rows = _parse_magemin_endmember_fractions(
+                    matlab_text
+                ).get(spec.host_phase) or []
+                em_row = (
+                    em_rows[phase_index]
+                    if phase_index is not None and phase_index < len(em_rows)
+                    else None
+                )
+                endmember_fraction = (em_row or {}).get(spec.endmember)
+                if (
+                    endmember_fraction is None
+                    or endmember_fraction < _MAGEMIN_PURITY_MIN
+                ):
+                    absences.extend(
+                        PropertyAbsence(prop, PHASE_NOT_PURE_AT_EQUILIBRIUM)
+                        for prop in ('S', 'Cp', 'H')
+                    )
+                    phase_row = None
+            if phase_row is not None:
+                factor = (
+                    pp_factor
+                    if spec.host_phase is None
+                    else _parse_magemin_assemblage_factors(stdout).get(
+                        spec.host_phase
+                    )
+                )
+                if factor is None or factor <= 0.0:
+                    absences.extend(
+                        PropertyAbsence(prop, PHASE_FACTOR_UNAVAILABLE)
+                        for prop in ('S', 'Cp', 'H')
+                    )
+                else:
+                    Cp_J_K_mol = (
+                        phase_row['Cp_kJ_K'] * 1000.0 / spec.formula_divisor
+                    )
+                    S_J_K_mol = (
+                        phase_row['S_kJ_K'] / factor * 1000.0
+                        / spec.formula_divisor
+                    )
+                    H_J_mol = (
+                        phase_row['H_kJ'] / factor * 1000.0
+                        / spec.formula_divisor
+                    )
+
+        return PurePhaseProperties(
+            engine='magemin',
+            phase_id=str(phase_id),
+            host_phase=spec.host_phase,
+            polymorph=spec.polymorph,
+            formula=spec.formula,
+            formula_basis=spec.formula_basis,
+            database='ig (Holland et al. 2018 -> Green et al. 2024; THERMOCALC ds6 family)',
+            gibbs_convention=GIBBS_CONVENTION_APPARENT_298,
+            temperature_K=float(temperature_K),
+            pressure_bar=float(pressure_bar),
+            G_J_mol=G_J_mol,
+            S_J_K_mol=S_J_K_mol,
+            Cp_J_K_mol=Cp_J_K_mol,
+            H_J_mol=H_J_mol,
+            absences=tuple(absences),
+            warnings=tuple(warnings),
+        )
+
+    def _run_pure_phase_probe(
+        self,
+        *,
+        bulk_wt_ig: Mapping[str, float],
+        temperature_C: float,
+        pressure_kbar: float,
+    ) -> Tuple[str, str, List[str]]:
+        """Run the binary at Verb=1 + out_matlab=1 for one stoich bulk.
+
+        Returns (stdout, matlab_output_text, buffer_warnings). Same slot
+        lock, buffer translation, and TemporaryDirectory discipline as
+        ``_call_magemin_subprocess``; only the verbosity/output flags and the
+        parsed payload differ.
+        """
+        if self._binary_path is None:
+            raise PurePhaseAccessError('MAGEMin binary path not resolved')
+        binary_path = self._binary_path.resolve()
+
+        order = self._DB_BULK_ORDERS[self._database]
+        vector = [float(bulk_wt_ig.get(name, 0.0)) for name in order]
+        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=-9.0,
+        )
+        args = [
+            str(binary_path),
+            '--Verb=1',
+            f'--db={self._database}',
+            f'--Temp={temperature_C:.6f}',
+            f'--Pres={pressure_kbar:.6f}',
+            '--sys_in=wt',
+            '--Bulk=' + ','.join(f'{value:.8g}' for value in vector),
+            f'--buffer={buffer_name}',
+            f'--buffer_n={buffer_n:.6f}',
+            '--out_matlab=1',
+        ]
+        timeout_s = float(self._config.get('timeout_s', 60.0))
+        try:
+            with _magemin_subprocess_slot(timeout_s):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    completed = subprocess.run(  # noqa: S603 - adapter-built
+                        args,
+                        cwd=tmpdir,
+                        capture_output=True,
+                        text=True,
+                        timeout=timeout_s,
+                        check=False,
+                    )
+                    matlab_path = (
+                        Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    )
+                    matlab_text = (
+                        matlab_path.read_text() if matlab_path.exists() else ''
+                    )
+        except subprocess.TimeoutExpired as exc:
+            raise PurePhaseAccessError(
+                f'MAGEMin binary timed out after {timeout_s:g}s'
+            ) from exc
+        except OSError as exc:
+            raise PurePhaseAccessError(
+                f'MAGEMin binary could not be executed: {exc}'
+            ) from exc
+        if completed.returncode != 0:
+            stderr = (completed.stderr or '').strip()
+            raise PurePhaseAccessError(
+                f'MAGEMin binary exited {completed.returncode}: '
+                f'{stderr or "no stderr"}'
+            )
+        if not matlab_text:
+            raise PurePhaseAccessError(
+                'MAGEMin produced no output/_matlab_output.txt '
+                '(out_matlab=1); cannot verify the bulk echo'
+            )
+        return completed.stdout or '', matlab_text, buffer_warnings
 
     # ------------------------------------------------------------------
     # Composition projection / result parsing
