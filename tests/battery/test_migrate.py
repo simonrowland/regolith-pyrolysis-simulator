@@ -32,6 +32,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
+    QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
     Migrator,
     UnknownRailSpellingError,
@@ -44,6 +45,7 @@ from simulator.battery.migrate import (
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
+    dump_yaml,
     iter_observation_store_paths,
     lineage_parents_from_source,
     load_migrated_context,
@@ -51,7 +53,10 @@ from simulator.battery.migrate import (
     map_quantity,
     compilation_quantity_from_record,
     load_migrated_store,
+    expand_queue_entries,
+    group_queue_entries,
     migrate,
+    migration_queue_document,
     pressure_from_equipment,
     resolve_equipment_context,
     select_declared_source,
@@ -3459,14 +3464,13 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
     if isinstance(entries, dict):
         entries = entries.get("items") or []
     by_id: dict[str, list[str]] = {}
-    if isinstance(entries, list):
-        for e in entries:
-            if not isinstance(e, dict):
-                continue
-            oid = str(e.get("observation_id") or "")
-            why = str(e.get("why") or "")
-            axes = e.get("axes") or []
-            by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
+    # Grouped files keep observation_id under each group's observations list.
+    flat_entries = expand_queue_entries(entries) if isinstance(entries, list) else []
+    for e in flat_entries:
+        oid = str(e.get("observation_id") or "")
+        why = str(e.get("why") or "")
+        axes = e.get("axes") or []
+        by_id.setdefault(oid, []).append(why + " " + " ".join(str(a) for a in axes))
     missing = []
     scanned = 0
     summary = load_observation_store_summary(REPO_ROOT)
@@ -3494,6 +3498,143 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
                     missing.append(f"{oid} queue={blob!r} token={token!r}")
     assert scanned > 0
     assert not missing, missing[:20]
+
+
+def _queue_fingerprints(entries: list[dict]) -> list[str]:
+    return [
+        json.dumps(
+            {
+                "work_id": entry["work_id"],
+                "source": entry["source"],
+                "why": entry["why"],
+                "axes": list(entry["axes"]),
+                "observation_id": entry["observation_id"],
+                "locator": entry["locator"],
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        for entry in entries
+    ]
+
+
+def _reason_and_axis_counts(entries: list[dict]) -> tuple[dict[str, int], dict[str, int]]:
+    reasons: dict[str, int] = {}
+    axes: dict[str, int] = {}
+    for entry in entries:
+        why = entry["why"]
+        reasons[why] = reasons.get(why, 0) + 1
+        for axis in entry["axes"]:
+            axes[axis] = axes.get(axis, 0) + 1
+    return reasons, axes
+
+
+def test_queue_group_roundtrip_is_lossless(tmp_path: Path) -> None:
+    """Grouping then expanding returns the same entries, reasons, and axes.
+
+    Two writes of the same entries, in different input order, are the same bytes.
+    A long extract path stays one contiguous substring so the freshness check
+    can still see it.
+    """
+
+    long_source = "data/literature/extracts/" + ("long-extract-stem-" * 6) + "tail.yaml"
+    assert len(long_source) > 120
+    shared = {
+        "work_id": "w-shared",
+        "source": long_source,
+        "why": "source does not state phase",
+        "axes": ["phase"],
+    }
+    locator_page = {"figure": "10", "published_page": 18, "note": "same page"}
+    locator_other = {"note": "other page", "published_page": 19}
+    entries = [
+        {
+            "work_id": "w-other",
+            "source": "data/literature/extracts/other.yaml",
+            "why": "declared quantity is unknown",
+            "axes": ["quantity", "value"],
+            "observation_id": "obs-two-axes",
+            "locator": {"table": "2", "page": "4"},
+        },
+        {**shared, "observation_id": "obs-b", "locator": dict(locator_other)},
+        {
+            **shared,
+            "observation_id": "obs-a",
+            "locator": {"note": "same page", "published_page": 18, "figure": "10"},
+        },
+        {**shared, "observation_id": "obs-a", "locator": dict(locator_page)},
+        {**shared, "observation_id": "obs-a", "locator": dict(locator_other)},
+    ]
+    expected = expand_queue_entries(entries)
+    grouped = group_queue_entries(entries)
+    expanded = expand_queue_entries(grouped)
+
+    assert all("observations" in group and "observation_id" not in group for group in grouped)
+    phase_groups = [group for group in grouped if group["why"] == shared["why"]]
+    assert len(phase_groups) == 1
+    assert len(phase_groups[0]["observations"]) == 4
+    assert {item["observation_id"] for item in phase_groups[0]["observations"]} == {
+        "obs-a",
+        "obs-b",
+    }
+
+    assert set(_queue_fingerprints(expanded)) == set(_queue_fingerprints(expected))
+    assert sorted(_queue_fingerprints(expanded)) == sorted(_queue_fingerprints(expected))
+    assert _reason_and_axis_counts(expanded) == _reason_and_axis_counts(expected)
+    page_fingerprint = _queue_fingerprints(
+        [{**shared, "observation_id": "obs-a", "locator": locator_page}]
+    )[0]
+    # Same observation and locator twice must stay two entries.
+    assert _queue_fingerprints(expanded).count(page_fingerprint) == 2
+
+    legacy = expand_queue_entries(
+        [
+            {
+                "work_id": "w-legacy",
+                "locator": {"page": "1"},
+                "axes": ["value"],
+                "why": "missing value",
+                "source": "data/literature/extracts/legacy.yaml",
+                "observation_id": "obs-legacy",
+            }
+        ]
+    )
+    assert legacy[0]["observation_id"] == "obs-legacy"
+    assert legacy[0]["why"] == "missing value"
+    assert legacy[0]["axes"] == ["value"]
+
+    aliases = [
+        {
+            "observation_id": "alias-1",
+            "source": long_source,
+            "row_indices": [3, 1],
+        }
+    ]
+    first = tmp_path / "queue-a.yaml"
+    second = tmp_path / "queue-b.yaml"
+    dump_yaml(migration_queue_document(entries, aliases), first)
+    dump_yaml(migration_queue_document(list(reversed(entries)), aliases), second)
+    assert first.read_bytes() == second.read_bytes()
+    text = first.read_text(encoding="utf-8")
+    assert text.startswith(f"schema_version: {QUEUE_SCHEMA_VERSION}\n")
+    filename = long_source.split("extracts/", 1)[1]
+    assert f"extracts/{filename}" in text
+
+
+def test_committed_migration_queue_is_canonical_grouped_form() -> None:
+    path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
+    if not path.is_file():
+        pytest.skip("migrated store not generated yet")
+    document = yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+    assert isinstance(document, dict)
+    assert document.get("schema_version") == QUEUE_SCHEMA_VERSION
+    entries = document.get("entries") or []
+    expanded = expand_queue_entries(entries)
+    rebuilt = migration_queue_document(expanded, document.get("dedupe_aliases") or [])
+    assert rebuilt["entries"] == entries
+    assert rebuilt["dedupe_aliases"] == document.get("dedupe_aliases")
+    assert expanded
+    assert len(expanded) == sum(len(group["observations"]) for group in entries)
 
 
 def test_l05c5_unavailable_value_is_queued(tmp_path: Path) -> None:
