@@ -158,6 +158,8 @@ NEIGHBOUR_SIGN_SCAN_CATCHES = (
 # already a named enthalpy erratum) stay disclosed, not a store refusal.
 GIBBS_IDENTITY_SCAN_STATUS = "advisory-only"
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
+# Printed GLASS <--> LIQUID (or LIQ) on a liquid table. Not a measured Tg.
+_GLASS_REGION_LABEL = "supercooled liquid / glass-transition region"
 
 _UNITS = {
     "temperature": "K",
@@ -571,6 +573,121 @@ def _short_rows(
             )
         )
     return rows, refused_rows
+
+
+def _glass_liquid_markers(rows: Sequence[_Row]) -> tuple[_Boundary, ...]:
+    """Printed glass/liquid labels. Other spans are not boundaries."""
+
+    found: list[_Boundary] = []
+    for row in rows:
+        parts = _phase_change(row.label)
+        if parts is None:
+            continue
+        left, right = parts
+        if {_side_phase(left), _side_phase(right)} == {Phase.GLASS, Phase.L}:
+            found.append(
+                _Boundary(row.temperature, row.label or "", left, right, row.order)
+            )
+    return tuple(found)
+
+
+def _on_printed_left(row: _Row, marker: _Boundary) -> bool:
+    """Same-temperature rule as segment assignment: the labelled row stays left."""
+
+    later_short = (
+        marker.temperature == row.temperature
+        and row.is_short
+        and marker.row_order < row.order
+    )
+    return marker.temperature > row.temperature or (
+        marker.temperature == row.temperature and not later_short
+    )
+
+
+def _on_glass_side(row: _Row, marker: _Boundary) -> bool:
+    on_left = _on_printed_left(row, marker)
+    if _side_phase(marker.left) is Phase.GLASS:
+        return on_left
+    return not on_left
+
+
+def _row_stores_number(
+    row: _Row, table_id: str, scale_error_orders: set[int]
+) -> bool:
+    for column in _COLUMN_QUANTITIES:
+        cell = (
+            row.numeric_tail.get(column)
+            if row.numeric_tail is not None and column in _FORMATION_TAIL_COLUMNS
+            else row.cells.get(column)
+        )
+        if cell is None or cell.value is None:
+            continue
+        if _printed_cell_erratum(table_id, row, column) is not None:
+            continue
+        if (
+            row.numeric_tail is not None
+            and column in _FORMATION_TAIL_COLUMNS
+            and cell.value != 0
+        ):
+            continue
+        if column in _FORMATION_PAIR_COLUMNS and row.order in scale_error_orders:
+            continue
+        return True
+    return False
+
+
+def _glass_region_segment(
+    segment: _Segment,
+    marker: _Boundary,
+    rows: Sequence[_Row],
+    *,
+    table_id: str,
+    scale_error_orders: set[int],
+    temperature_token: str,
+) -> _Segment:
+    """Relabel a liquid series that stores glass-side rows.
+
+    One observation per series stays one observation. A series that stores
+    both sides is not stamped liquid: species.phase holds one phase.
+    """
+
+    glass = False
+    liquid = False
+    for row in rows:
+        if not _row_stores_number(row, table_id, scale_error_orders):
+            continue
+        if _on_glass_side(row, marker):
+            glass = True
+        else:
+            liquid = True
+        if glass and liquid:
+            break
+    if not glass:
+        return segment
+    if liquid:
+        reason = (
+            f'printed "{marker.label}" at {temperature_token} K; rows through '
+            f"that labelled transition are the {_GLASS_REGION_LABEL} and "
+            "following rows are liquid; v2.1 species.phase has one phase axis "
+            "and cannot hold both, so this series is not stamped liquid"
+        )
+        phase: State[Phase] = State.unknown(reason)
+        basis = reason
+    else:
+        basis = (
+            f'printed "{marker.label}" at {temperature_token} K; every stored '
+            f"row is on the glass side ({_GLASS_REGION_LABEL})"
+        )
+        phase = State.of(Phase.GLASS)
+    return _Segment(
+        segment.index,
+        phase,
+        segment.polymorph,
+        basis,
+        segment.lower_K,
+        segment.upper_K,
+        segment.boundary_labels,
+    )
 
 
 def _phase_change(label: str | None) -> tuple[str, str] | None:
@@ -1570,6 +1687,23 @@ def generate_table(
             f"{table_id}: unexplained raw numeric tokens: "
             f"source={raw_numeric_source_tokens} accounted={accounted_numeric_cells} "
             f"refused={refused_concatenated_numeric_tokens}"
+        )
+
+    glass_markers = _glass_liquid_markers(short) if state == "l" else ()
+    if len(glass_markers) == 1 and len(segments) == 1:
+        marker = glass_markers[0]
+        temperature_token = next(
+            row.temperature_token for row in short if row.order == marker.row_order
+        )
+        segments = (
+            _glass_region_segment(
+                segments[0],
+                marker,
+                all_rows,
+                table_id=table_id,
+                scale_error_orders=set(scale_error_by_order),
+                temperature_token=temperature_token,
+            ),
         )
 
     points: dict[tuple[int, str], list[tuple[Decimal, Decimal, int]]] = defaultdict(list)
