@@ -1,0 +1,98 @@
+diff --git a/simulator/melt_backend/vaporock.py b/simulator/melt_backend/vaporock.py
+index 9e5c054d0..0286bd952 100644
+--- a/simulator/melt_backend/vaporock.py
++++ b/simulator/melt_backend/vaporock.py
+@@ -1776,26 +1776,6 @@ class VapoRockBackend(MeltBackend):
+                 ],
+                 diagnostics=diagnostics,
+             )
+-
+-        # VapoRock rides the MELTS liquid model, so its default commissioning
+-        # band is the MELTS band until battery qualification re-sets it.
+-        commissioning = assess_engine_commissioning(
+-            self.name,
+-            sio2_wt_pct=comp_wt.get('SiO2', 0.0),
+-            temperature_K=temperature_K,
+-        )
+-        if commissioning.notice is not None:
+-            notice = dict(commissioning.notice)
+-            projection_diagnostics = dict(projection_diagnostics)
+-            projection_diagnostics.update({
+-                'commissioning_notice': notice,
+-                'authority': notice['authority'],
+-                'certified_band': notice['certified_band'],
+-            })
+-            prior_warnings.append(
+-                'CommissioningNotice: out of certified band; '
+-                f"authority={notice['authority']}; engine will run"
+-            )
+         if (
+             projection.dropped_mass_kg_by_species
+             or dropped_accounts
+@@ -1841,6 +1821,29 @@ class VapoRockBackend(MeltBackend):
+                 diagnostics=diagnostics,
+             )
+ 
++        # VapoRock rides the MELTS liquid model, so its default commissioning
++        # band is the MELTS band until battery qualification re-sets it.
++        # Assess only on paths that will call the engine (or report an engine
++        # outcome): typed input refusals above must not carry
++        # authority=extrapolated or "engine will run".
++        commissioning = assess_engine_commissioning(
++            self.name,
++            sio2_wt_pct=comp_wt.get('SiO2', 0.0),
++            temperature_K=temperature_K,
++        )
++        if commissioning.notice is not None:
++            notice = dict(commissioning.notice)
++            projection_diagnostics = dict(projection_diagnostics)
++            projection_diagnostics.update({
++                'commissioning_notice': notice,
++                'authority': notice['authority'],
++                'certified_band': notice['certified_band'],
++            })
++            prior_warnings.append(
++                'CommissioningNotice: out of certified band; '
++                f"authority={notice['authority']}; engine will run"
++            )
++
+         temperature_value = (
+             temperature_C + 273.15
+             if self._temperature_units == 'K'
+diff --git a/tests/test_vaporock_backend.py b/tests/test_vaporock_backend.py
+index f7795b798..99e68dd52 100644
+--- a/tests/test_vaporock_backend.py
++++ b/tests/test_vaporock_backend.py
+@@ -351,6 +351,32 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
+     assert observed['low'] == observed['in_band']
+     assert observed['high'] == observed['in_band']
+ 
++    # T-axis: 1500 C = 1773.15 K is inside the VapoRock hard gate
++    # [1350, 1950] K but above the MELTS certified ceiling 1700 K.
++    hot = backend.equilibrate(
++        1500.0,
++        composition_kg={'SiO2': 50.0, 'Na2O': 50.0},
++        fO2_log=-8.25,
++        pressure_bar=2e-6,
++    )
++    hot_notice = hot.diagnostics['commissioning_notice']
++    assert hot_notice['reason'] == 'temperature_range'
++    assert hot_notice['authority'] == 'extrapolated'
++    assert dict(getattr(hot, 'vaporock_full_speciation_Pa', {})) == observed['in_band']
++
++    # Typed input refusal must not claim "engine will run" or stamp
++    # authority=extrapolated (commissioning is notice+run only).
++    refused = backend.equilibrate(
++        1400.0,
++        composition_kg={'SiO2': 20.0, 'Na2O': 70.0, 'WeirdStuff': 10.0},
++        fO2_log=-8.25,
++        pressure_bar=2e-6,
++    )
++    assert refused.status == 'out_of_domain'
++    assert 'commissioning_notice' not in refused.diagnostics
++    assert 'authority' not in refused.diagnostics
++    assert not any('CommissioningNotice' in w for w in refused.warnings)
++
+ 
+ def test_vaporock_non_basis_projection_is_out_of_domain(monkeypatch):
+     seen = {}

@@ -1,0 +1,33 @@
+diff --git a/simulator/battery/migrate.py b/simulator/battery/migrate.py
+index 404d35994..164bf32f7 100644
+--- a/simulator/battery/migrate.py
++++ b/simulator/battery/migrate.py
+@@ -5547,6 +5547,11 @@ def _walk_printed_oxygen(
+             quote = node.get("quote") if isinstance(node, Mapping) else None
+             quote_text = str(quote).strip() if quote else None
+             if name in _PRINTED_LOG_FO2_KEYS:
++                # 10^n strings are pressure amounts (e.g. "10^-9.1" atm), not
++                # log values. Feeding them through _printed_decimal would land
++                # ~1e-9 as fO2_log and stamp oxygen_condition near zero.
++                if isinstance(raw, str) and _power_of_ten(_normalize_printed_token(raw)) is not None:
++                    continue
+                 units = str(node.get("units") or node.get("unit") or "").strip().lower()
+                 if units not in _OXYGEN_LOG_UNITS:
+                     continue
+@@ -6194,8 +6199,14 @@ class Migrator:
+             and control.oxygen_partial_pressure_Pa.state.is_value
+         ):
+             previous = control.oxygen_partial_pressure_Pa.state.value
+-            if isinstance(previous, Value) and previous.kind is ValueKind.POINT:
+-                existing = previous.point
++            if isinstance(previous, Value):
++                if previous.kind is ValueKind.POINT:
++                    existing = previous.point
++                else:
++                    # Interval/bound already present (e.g. printed log range
++                    # landed as pO2_Pa). Do not collapse it to one point.
++                    self._oxygen_pressure_conflict.add(experiment_id)
++                    return
+         if existing is not None and existing != raw.point:
+             self._oxygen_pressure_conflict.add(experiment_id)
+             if experiment_id in self._oxygen_pressure_landed and control is not None:

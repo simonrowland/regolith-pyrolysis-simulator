@@ -1,0 +1,68 @@
+--- a/simulator/battery/waypoints.py
++++ b/simulator/battery/waypoints.py
+@@ -165,7 +165,14 @@
+     # not missing. A bare tuple is already the evaluated absence (dynamic
+     # refusal sites pass it through unchanged).
+     if present is not None:
+-        missing = tuple(label for label, is_present in present.items() if not is_present)
++        evaluated = tuple(label for label, is_present in present.items() if not is_present)
++        # Never emit MISSING_EVIDENCE with an empty missing list: if every OR
++        # member was marked present yet no route fired, the presence predicate
++        # lied — fall back to the full OR-set rather than naming nothing.
++        if evaluated or selected is not None:
++            missing = evaluated
++        else:
++            missing = tuple(present)
+     absence = None if selected else WaypointAbsence(name, GapReason.MISSING_EVIDENCE, missing)
+     return WaypointResult(name, selected, tuple(routes), absence)
+ 
+@@ -867,9 +874,19 @@
+         temp_value = raw_temperature if isinstance(raw_temperature, Value) else Value.point_of(raw_temperature)
+         if temp_value.kind is ValueKind.POINT:
+             routes.append(Waypoint("thermal_path", Value(ValueKind.SERIES, series=((Decimal(0), temp_value.point),)), "temperature_points_only", WaypointAuthority.PRINTED, ("experiment.conditions.temperature_K",)))
++    # Presence must track what the router actually accepted. Located-but-unusable
++    # schedule fragments or non-POINT conditions temperatures are not "present"
++    # for this OR-set; counting them present produced empty MISSING_EVIDENCE lists.
++    schedule_used = any(
++        any(item.startswith("experiment.thermal_schedule") for item in route.inputs)
++        for route in routes
++    )
++    conditions_used = any(
++        "experiment.conditions.temperature_K" in route.inputs for route in routes
++    )
+     thermal_inputs = {
+-        "experiment.thermal_schedule": _schedule_temperature_present(schedule),
+-        "experiment.conditions.temperature_K": _located_present(experiment.conditions.get("temperature_K")),
++        "experiment.thermal_schedule": schedule_used,
++        "experiment.conditions.temperature_K": conditions_used,
+     }
+     return _result("thermal_path", routes, tuple(thermal_inputs), present=thermal_inputs)
+ 
+@@ -984,13 +1001,21 @@
+             routes,
+             ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"),
+         )
+-    point_fo2 = (observation.point_conditions or {}).get("fO2_log") if observation is not None else None
+-    control_present = control is not None and (
+-        _value(control.oxygen_partial_pressure_Pa) is not None
+-        or (control.buffer is not None and control.buffer.state.is_value)
+-    )
++    # On the no-route path, observation fO2_log already failed _point_condition
++    # (otherwise a route would have fired). experiment.conditions.fO2_log is not
++    # an oxygen_condition input — never treat it as present evidence.
++    pressure = _value(control.oxygen_partial_pressure_Pa) if control is not None else None
++    buffer_name = None
++    if control is not None and control.buffer is not None and control.buffer.state.is_value:
++        from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
++
++        buffer_name = str(control.buffer.state.value).upper()
++        buffer_known = buffer_name in PUBLISHED_BUFFERS
++    else:
++        buffer_known = False
++    control_present = (pressure is not None and _log_pressure(pressure) is not None) or buffer_known
+     oxygen_inputs = {
+-        "fO2_log": _located_present(point_fo2) or _condition_value(experiment, "fO2_log") is not None,
++        "fO2_log": False,
+         "experiment.fO2_control": control_present,
+         "temperature_K": thermal_path(experiment, bench, observation).selected is not None,
+         "total_pressure_Pa": pressure_boundary(experiment, bench, observation).selected is not None,

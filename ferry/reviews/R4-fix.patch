@@ -1,0 +1,99 @@
+--- a/simulator/battery/migrate.py
++++ b/simulator/battery/migrate.py
+@@ -6472,8 +6472,16 @@
+                     raise ValueError(
+                         "extract context entry requires an observation_id"
+                     )
++                context_id = f"{source_id}::context::{raw_id}"
++                if any(
++                    str(existing.get("context_id")) == context_id
++                    for existing in self.result.context_by_work[work.work_id]
++                ):
++                    raise ValueError(
++                        f"duplicate context_id {context_id!r} under work {work.work_id!r}"
++                    )
+                 record = dict(row)
+-                record["context_id"] = f"{source_id}::context::{raw_id}"
++                record["context_id"] = context_id
+                 record["work_id"] = work.work_id
+                 record["source_id"] = source_id
+                 record["species"] = str(formula)
+@@ -6504,6 +6512,19 @@
+             self._registry_id(work.work_id, "experiment", raw_experiment),
+         )
+         experiment = self.result.experiments.get(experiment_id)
++        if experiment is not None and experiment.work_id != work.work_id:
++            self.result.registry_issues.append(
++                ValidationIssue(
++                    path=f"context[{record['context_id']}].experiment",
++                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
++                    detail=(
++                        f"equipment context row names experiment {experiment_id!r} "
++                        f"owned by work {experiment.work_id!r}, not {work.work_id!r}; "
++                        "no equipment_context_id written"
++                    ),
++                )
++            )
++            return
+         if experiment is None:
+             self.result.registry_issues.append(
+                 ValidationIssue(
+@@ -8934,6 +8955,13 @@
+         }
+         dump_yaml(payload, dest)
+ 
++    # extracts-v2 has no wipe-all path (unlike observations-v2). Unlink siblings
++    # whose stem is no longer a live extract (delete / rename), then empty-
++    # rewrite zero-observation extracts that still exist.
++    for stale in list(extracts_v2.glob("*.yaml")):
++        if stale.stem not in extract_stems:
++            stale.unlink()
++
+     # A zero-observation extract is absent from family_groups. Its previous
+     # sibling would otherwise survive and keep rows that now live in context
+     # (d-032: context is never an Observation). Replace that sibling only.
+--- a/simulator/battery/validate.py
++++ b/simulator/battery/validate.py
+@@ -727,18 +727,31 @@
+                 f"bench_id {experiment.bench_id!r} does not resolve",
+             )
+         )
+-    if (
+-        context_rows is not None
+-        and experiment.equipment_context_id is not None
+-        and experiment.equipment_context_id not in context_rows
+-    ):
+-        issues.append(
+-            _issue(
+-                f"{path}.equipment_context_id",
+-                RefusalReason.REFERENTIAL_INTEGRITY,
+-                f"equipment_context_id {experiment.equipment_context_id!r} does not resolve",
++    if context_rows is not None and experiment.equipment_context_id is not None:
++        row = context_rows.get(experiment.equipment_context_id)
++        if row is None:
++            issues.append(
++                _issue(
++                    f"{path}.equipment_context_id",
++                    RefusalReason.REFERENTIAL_INTEGRITY,
++                    f"equipment_context_id {experiment.equipment_context_id!r} does not resolve",
++                )
++            )
++        elif (
++            isinstance(row, Mapping)
++            and row.get("work_id") is not None
++            and str(row.get("work_id")) != experiment.work_id
++        ):
++            issues.append(
++                _issue(
++                    f"{path}.equipment_context_id",
++                    RefusalReason.REFERENTIAL_INTEGRITY,
++                    (
++                        f"equipment_context_id {experiment.equipment_context_id!r} "
++                        f"belongs to work {row.get('work_id')!r}, not {experiment.work_id!r}"
++                    ),
++                )
+             )
+-        )
+     sweep = experiment.pressure_environment.sweep_gas.state
+     if sweep.is_value:
+         issues.extend(validate_sweep_gas(sweep.value, f"{path}.pressure_environment.sweep_gas"))
