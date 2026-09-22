@@ -105,6 +105,20 @@ experiments:
       locator:
         pdf_page_index: 11
         section: Methods
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.0000000101325'
+          interval_high: '0.0101325'
+          approximate: false
+      locator:
+        pdf_page_index: 3
+        section: Experimental vaporisation experiments
+        note: 'Printed log fO2 range -7 to -13 with fO2 in atm (values.log_fO2_range; fidelity_samples.log_fO2_range_as_printed).
+          Landed as pO2_Pa interval by SI conversion only: pO2_Pa = 10^(log_fO2) * 101325. Range preserved; not collapsed
+          to a point. Author log remains in observation values.'
   bench_id: 10.1038/nature23645::bench::stirred-gas-mixing-furnace
   thermal_schedule:
     total_duration_s:

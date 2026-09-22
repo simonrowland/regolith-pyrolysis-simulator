@@ -19,74 +19,6 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.icarus.2022.115374
 experiments:
-- experiment_id: 10.1016/j.icarus.2022.115374::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'electron_ionization_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2022.115374
-  locator:
-    published_page: 6
-    pdf_page_index: 6
-    table: '1'
-    section: '3.3'
-    note: averaged pre-sampling counts from four mass sweeps; fitted values are identified as fitted in the paper
-- experiment_id: 10.1016/j.icarus.2022.115374::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'electron_ionization_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2022.115374
-  locator:
-    published_page: 7
-    pdf_page_index: 7
-    table: '3'
-    section: '3.3'
-    note: fitted internal standards across descent profile
 - experiment_id: 10.1016/j.icarus.2022.115374::9
   kind: literature
   method:
@@ -125,7 +57,7 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'magnetic_sector_neutral_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'mass_spectral_isotope_analysis' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -150,18 +82,240 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.icarus.2022.115374
   locator:
+    published_page: 13
+    pdf_page_index: 13
+    section: '3.9'
+    note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
+context:
+- observation_id: mogul_2023_lnms_haze_clog_observations
+  type: instrument_anomaly
+  locator:
+    published_page: 17
+    pdf_page_index: 17
+    section: '3.13'
+    note: printed prose describing count spikes and partial-clog altitudes
+  phase: Venus_atmosphere_aerosol_instrument_interaction
+  regime: LNMS_descent_sampling
+  units: km, fold change, and km^-1 as published
+  values:
+    quantity: inlet_clog_and_mass_signal_anomalies
+    method_class: measured_reduced
+    partial_clog_altitudes_km:
+    - ~15 ± 2
+    - ~10 ± 3
+    - ~3 ± 1
+    affected_mass_positions: '>37 between m/z 10-208'
+    count_spike_range: ~5-500-fold
+    extinction_coefficients_km_minus_1: V13/V14 comparison values ~0.6-2.0; V13/V14 spikes ~2.24-2.30 near ~2 km
+    interpretation: authors interpret the spikes as chemical signatures of a deep atmospheric haze, not as furnace vaporization.
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_lnms_haze_clog_observations
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2
+- observation_id: mogul_2023_lnms_model_scope_and_fit_quality
+  type: model_diagnostics
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    sections: 2.4-2.6
+    note: targeted fit, normalization, and calibration method
+  phase: Venus_atmosphere_mass_spectral_model
+  regime: analytical_model
+  units: dimensionless R2 and percent as published
+  values:
+    quantity: fitted_model_diagnostics
+    method_class: model_derived
+    generator: authors' Gauss-function regressions and calibration-curve model
+    rows:
+    - fit_coverage: each minimized mass-cluster fit accounted for ≥95% of included counts
+    - FWHM_mass_regression_R2: 0.998 ± 0.002 across 64.2-0.9 km
+    - R2_30_eV: 0.996 ± 0.006, 3 spectra
+    - R2_22_eV: 0.995 ± 0.008, 3 spectra
+    - CO2_calibration_power_regression_R2: ≥0.987
+    - atmospheric_density_regression_R2: ≥0.999
+    normalization: 136Xe2+ primary; 136Xe+ and 136Xe3+ comparative; main-clog normalization used 134Xe2+/136Xe2+ at 49.4 km
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_lnms_model_scope_and_fit_quality
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2
+- observation_id: mogul_2023_lnms_operations_and_sampling
+  type: apparatus
+  locator:
     published_page: 2
     pdf_page_index: 2
     section: '2.1'
     note: LNMS operations and inlet description
-  apparatus:
-    ionization:
-      electron_energy_eV:
-        state:
-          tag: value
-          value: 70; 30; 22
-        locator:
-          published_page: 2
-          pdf_page_index: 2
-          section: '2.1'
-          note: LNMS operations and inlet description
+  phase: Venus_atmosphere
+  regime: magnetic_sector_neutral_mass_spectrometry
+  units: as published
+  values:
+    quantity: instrument_sampling_conditions
+    method_class: measured_direct
+    instrument: Pioneer Venus Large Probe Neutral Mass Spectrometer (LNMS)
+    mass_range_mz: 1-208
+    preselected_mass_positions: 232
+    mass_channels: m/z 1-16 and 15-208
+    inlet_tubes: 2
+    inlet_material: ceramic-coated tantalum
+    inlet_diameter_mm: '3.2'
+    primary_inlet_rate_nL_per_s: '0.1'
+    secondary_inlet_rate_nL_per_s: 1
+    secondary_inlet_control: Valve 1
+    valve_1_closure_altitude_km: ~47
+    variable_conductance_valve_getter: zirconium-aluminum getter G1
+    getter_material: zirconium-aluminum
+    electron_energy_eV:
+    - 70
+    - 30
+    - 22
+    complete_spectra_at_70_eV: 39
+    incomplete_spectra_at_70_eV: 1
+    spectra_at_30_eV: 3
+    spectra_at_22_eV: 3
+    total_spectra: 46
+    sweep_duration_s: 64
+    stepped_measurement_duration_s: 59
+    recalibration_duration_s: 5
+    ion_acceleration_tolerance: ~0.02%
+    internal_calibrants: CH4 and 136Xe
+    note: Inlet flow and transmission changed with valve configuration; do not treat this as a constant-pressure experiment.
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_lnms_operations_and_sampling
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2
+- observation_id: mogul_2023_presampling_internal_counts
+  type: calibration
+  locator:
+    table: '1'
+    published_page: 6
+    pdf_page_index: 6
+    section: '3.3'
+    note: averaged pre-sampling counts from four mass sweeps; fitted values are identified as fitted in the paper
+  phase: LNMS_internal_calibrant_and_fragmentation_standards
+  regime: electron_ionization_mass_spectrometry
+  units: raw ion counts as published; mean ± standard deviation
+  values:
+    quantity: presampling_counts
+    method_class: measured_direct
+    spectra: 3-4
+    rows:
+    - species: 13CH4+
+      counts: 127 ± 18
+      representation: raw
+    - species: CH4+
+      counts: 15707 ± 355
+      representation: fitted
+    - species: CH3+
+      counts: 12613 ± 454
+      representation: fitted
+    - species: CH2+
+      counts: 3571 ± 110
+      representation: fitted
+    - species: C+
+      counts: 613 ± 9
+      representation: fitted
+    - species: H+
+      counts: 1952 ± 69
+      representation: fitted
+    - species: 136Xe+
+      counts: 8671 ± 137
+      representation: fitted
+    - species: 136Xe2+
+      counts: 3840 ± 111
+      representation: fitted
+    - species: 136Xe3+
+      counts: 32 ± 2
+      representation: fitted
+    uncertainty_note: Combined standard deviations were 1.4-3.6% for fitted species; the authors applied a minimum 3.6% error
+      to higher-count descent species and reported 6.3-14.2% for one-point low-count species.
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_presampling_internal_counts
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2
+- observation_id: mogul_2023_quoted_reference_conditions
+  type: quoted_attributed
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    section: '3.2'
+    note: conditions and values attributed to earlier Pioneer Venus literature
+  phase: Venus_atmosphere
+  regime: quoted_literature
+  units: as published
+  values:
+    quantity: quoted_probe_and_pvgc_conditions
+    method_class: quoted_attributed
+    model_generator_for_converted_rows: authors' equation-of-state mass-percent conversion using quoted PVGC volume percent,
+      molecular weights, and quoted N2 composition
+    rows:
+    - probe_internal_pressure_initial_bar: '1.3'
+      status: quoted_attributed
+    - probe_internal_pressure_touchdown_bar: '1.8'
+      status: quoted_attributed
+    - probe_void_volume_L: ~180
+      status: quoted_attributed
+    - PVGC_carrier_gas: He
+      flow_mL_per_min: 35
+      pressure_bar: 17
+      temperature_C: 18
+      operation_time_min: 60
+      status: quoted_attributed
+    - PVGC_CO2_volume_percent_at_51.6_km: 95.4%
+      pressure_bar: '0.698'
+      status: quoted_attributed
+    - PVGC_CO2_volume_percent_at_21.6_km: 96.4%
+      pressure_bar: '17.8'
+      status: quoted_attributed
+    - PVGC_CO2_mass_percent_at_51.6_km: 97.0% w/w
+      status: model_converted_from_quoted_volume_percent
+    - PVGC_CO2_mass_percent_at_21.6_km: 97.7% w/w
+      status: model_converted_from_quoted_volume_percent
+    note: These values are context/calibration inputs and are not reclassified as direct measurements from Mogul et al.
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_quoted_reference_conditions
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2
+- observation_id: mogul_2023_table3_internal_peak_standards
+  type: calibration
+  locator:
+    table: '3'
+    published_page: 7
+    pdf_page_index: 7
+    section: '3.3'
+    note: fitted internal standards across descent profile
+  phase: LNMS_internal_standards
+  regime: electron_ionization_mass_spectrometry
+  units: Da or m/z as published; mean ± standard deviation; FWHM ranges as published
+  values:
+    quantity: fitted_mass_and_peak_width
+    method_class: measured_reduced
+    rows:
+    - standard: CH3+
+      averaged_mass_mz: 15.023 ± 0.001
+      mass_error_range_mz: -0.003 to 0.001
+      averaged_FWHM_mz: 0.018 ± 0.001
+      FWHM_range_mz: 0.015-0.020
+    - standard: CO+
+      averaged_mass_mz: 27.995 ± 0.001
+      mass_error_range_mz: -0.017 to 0.001
+      averaged_FWHM_mz: 0.040 ± 0.003
+      FWHM_range_mz: 0.033-0.042
+    - standard: N2+
+      averaged_mass_mz: 28.006 ± 0.003
+      mass_error_range_mz: -0.019 to 0.009
+      averaged_FWHM_mz: 0.041 ± 0.004
+      FWHM_range_mz: 0.033-0.042
+    - standard: 40Ar+
+      averaged_mass_mz: 39.967 ± 0.002
+      mass_error_range_mz: -0.001 to 0.012
+      averaged_FWHM_mz: 0.065 ± 0.005
+      FWHM_range_mz: 0.058-0.081
+    - standard: 136Xe+
+      averaged_mass_mz: 135.934 ± 0.027
+      mass_error_range_mz: -0.046 to 0.086
+      averaged_FWHM_mz: 0.277 ± 0.031
+      FWHM_range_mz: 0.214-0.327
+  context_id: mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_table3_internal_peak_standards
+  work_id: 10.1016/j.icarus.2022.115374
+  source_id: mogul-2023-pioneer-venus-co2-icarus
+  species: CO2

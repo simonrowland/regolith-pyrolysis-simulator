@@ -18,97 +18,206 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1051/0004-6361/202450992
-experiments:
-- experiment_id: 10.1051/0004-6361/202450992::1
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/202450992
-  locator:
-    page: 4
-    table: '1'
-- experiment_id: 10.1051/0004-6361/202450992::3
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1051/0004-6361/202450992
+experiments: []
+context:
+- observation_id: vanbuchem_2025_figure_only_results
+  type: figure_only_model_output
   locator:
     page: 5
     figure: '3'
-- experiment_id: 10.1051/0004-6361/202450992::vanbuchem-2025-lavatmos2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  phase: BSE_lava_ocean
+  regime: thermochemical_equilibrium_model
+  units: plotted output; curves not digitised
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    generator: LavAtmos 2.0 calculations; LavAtmos 1 and cited models where named in captions
+    quantity: plotted_partial_pressure_trends
+    rows_as_printed:
+    - figure: '2'
+      page: 4
+      result: LavAtmos 2.0 compared with Charnoz et al. (2023) at 2000 K for BSE melt; SiO2 differs significantly.
+    - figure: '3'
+      page: 5
+      result: SiO2, SiO, and Si partial pressures above a BSE lava ocean.
+    - figure: '4'
+      page: 6
+      result: Major volatile species in pure C, H, N, S, and P atmospheres.
+    - figure: '5'
+      page: 7
+      result: 'Pure C atmosphere: O2, SiO, TiO, Fe, Na, and K; Fe may dominate over Na at about 2000 K.'
+    - figure: '6'
+      page: 9
+      result: Complex N-dominated atmosphere increases Si and SiO at high volatile pressure and lower temperature.
+    - figure: '7'
+      page: 10
+      result: S chemistry forms SiS and TiS; C chemistry forms NaCN and KCN at high pressure.
+    - figure: '8'
+      page: 11
+      result: LavAtmos 2.0 versus volatile-free partial pressures for SiO, SiO2, Na, K, and O2.
+    - figure: '9'
+      page: 12
+      result: Total O pressure for LavAtmos 2.0, volatile-free, and no-lava-vaporisation cases.
+    - figure: '10'
+      page: 14
+      result: CO, CO2, H2O, and SO2 partial pressures.
+    - figure: '11'
+      page: 15
+      result: C/O ratio versus total volatile pressure and temperature.
+    - figure: '12'
+      page: 16
+      result: MELTS melt endmember activities with dissolved water.
+  context_id: vanbuchem-2025-lavatmos2::context::vanbuchem_2025_figure_only_results
   work_id: 10.1051/0004-6361/202450992
+  source_id: vanbuchem-2025-lavatmos2
+  species: BSE
+- observation_id: vanbuchem_2025_model_scope_conditions
+  type: model_conditions
   locator:
     page: 2
     section: 2.1 Workflow
+  phase: BSE_lava_ocean
+  regime: thermochemical_equilibrium_model
+  units: as printed
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: LavAtmos 2.0
+    quantity: explicitly_stated_model_conditions
+    conditions_as_printed:
+    - surface_temperature_K: '2000'
+      context: validation comparison with Charnoz et al. (2023), BSE melt
+    - total_volatile_pressure: 220.64 bars steam
+      context: validation example
+    - pressure_limit_for_MELTS_effect_note: beyond 100 bar
+      context: activity-pressure note
+  context_id: vanbuchem-2025-lavatmos2::context::vanbuchem_2025_model_scope_conditions
+  work_id: 10.1051/0004-6361/202450992
+  source_id: vanbuchem-2025-lavatmos2
+  species: BSE
+- observation_id: vanbuchem_2025_model_workflow_equations
+  type: model_definition
+  locator:
+    page: 2
+    section: 2.1 Workflow
+  phase: BSE_lava_ocean
+  regime: thermochemical_equilibrium_model
+  units: as printed
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: LavAtmos 2.0 with MELTS and FastChem 3; JANAF thermochemical tables
+    quantity: stated_inputs_assumptions_and_mass_action_relations
+    equations_as_printed:
+    - number: 1
+      reaction: SiO2(l) ↔ SiO2(g)
+    - number: 2
+      reaction: SiO2(l) − 1/2 O2(g) ↔ SiO(g)
+    - number: 3
+      relation: P_SiO2(g) = K1(T) a_SiO2(l)
+    - number: 4
+      relation: P_SiO(g) = K2(T) a_SiO2(l) P_O2^−1/2
+    - number: 5
+      relation: 0 = P_O2 + 1/2 P_H2O − P_SiO2 − 1/2 P_SiO
+  context_id: vanbuchem-2025-lavatmos2::context::vanbuchem_2025_model_workflow_equations
+  work_id: 10.1051/0004-6361/202450992
+  source_id: vanbuchem-2025-lavatmos2
+  species: BSE
+- observation_id: vanbuchem_2025_printed_model_findings
+  type: model_output_summary
+  locator:
+    page: 12
+    section: 4.1 Vaporised partial pressure comparison
+  phase: BSE_lava_ocean
+  regime: thermochemical_equilibrium_model
+  units: as printed
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: LavAtmos 2.0 and LavAtmos 1 volatile-free vaporisation comparator
+    quantity: explicitly_printed_model_output_thresholds
+    values_as_printed:
+    - value: about 0.2 bar
+      quantity: total_pressure_of_pure_melt_vapour
+      condition: 3000 K
+      locator_note: page 4, section 3.1
+    - value: about 3500 K
+      quantity: temperature_where_vapour_species_overwhelm_fixed_volatile_pressure
+      condition: pure volatile atmosphere comparison
+      locator_note: page 7, section 3.1
+    - value: around 1e-2 bar
+      quantity: method_divergence_onset
+      condition: 55-Cnc e-like comparison at 2500 K
+      locator_note: page 12, section 4.1
+    - value: up to three orders of magnitude
+      quantity: LavAtmos_2_increase_in_total_O_pressure_relative_to_volatile_free_case
+      condition: total volatile pressure sweep
+      locator_note: page 13, section 4.1
+    - value: up to six orders of magnitude
+      quantity: partial_pressure_difference_between_LavAtmos_2_and_volatile_free_method
+      condition: CO2, CO, H2O, and SO2
+      locator_note: page 16, section 6
+  context_id: vanbuchem-2025-lavatmos2::context::vanbuchem_2025_printed_model_findings
+  work_id: 10.1051/0004-6361/202450992
+  source_id: vanbuchem-2025-lavatmos2
+  species: BSE
+- observation_id: vanbuchem_2025_table_1_volatile_atmosphere_inputs
+  type: model_input
+  locator:
+    page: 4
+    table: '1'
+  phase: BSE_lava_ocean
+  regime: thermochemical_equilibrium_model
+  units: w%
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: LavAtmos 2.0 input cases constructed by the authors
+    quantity: volatile_components_in_complex_atmosphere_compositions
+    rows_as_printed:
+    - atmosphere_type: C dominated
+      C_w_pct: '80.00'
+      H_w_pct: '10.00'
+      N_w_pct: '9'
+      S_w_pct: '0.50'
+      P_w_pct: '0.50'
+      O_w_pct: '-'
+    - atmosphere_type: H dominated
+      C_w_pct: '1.00'
+      H_w_pct: '80.00'
+      N_w_pct: '18.00'
+      S_w_pct: '0.50'
+      P_w_pct: '0.50'
+      O_w_pct: '-'
+    - atmosphere_type: N dominated
+      C_w_pct: '1.00'
+      H_w_pct: '18.00'
+      N_w_pct: '80.00'
+      S_w_pct: '0.50'
+      P_w_pct: '0.50'
+      O_w_pct: '-'
+    - atmosphere_type: S dominated
+      C_w_pct: '5.00'
+      H_w_pct: '1.00'
+      N_w_pct: '4.00'
+      S_w_pct: '60.00'
+      P_w_pct: '30.00'
+      O_w_pct: '-'
+    - atmosphere_type: Carbon poor
+      C_w_pct: '9.09e-6'
+      H_w_pct: '99.01'
+      N_w_pct: '0.90'
+      S_w_pct: '3.33e-6'
+      P_w_pct: '6.67e-6'
+      O_w_pct: '9.09e-7'
+    - atmosphere_type: Carbon rich
+      C_w_pct: '0.91'
+      H_w_pct: '79.21'
+      N_w_pct: '0.79'
+      S_w_pct: '6.67'
+      P_w_pct: '3.33'
+      O_w_pct: '9.09'
+  context_id: vanbuchem-2025-lavatmos2::context::vanbuchem_2025_table_1_volatile_atmosphere_inputs
+  work_id: 10.1051/0004-6361/202450992
+  source_id: vanbuchem-2025-lavatmos2
+  species: BSE

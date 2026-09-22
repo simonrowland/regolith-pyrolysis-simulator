@@ -81,7 +81,7 @@ experiments:
   locator:
     page: 2
     figure: '2'
-    note: caption=Results by dynamic models which includes dust movement and evaporation of 100 micrometre forsterite
+    note: caption=The amount of forsterite evaporated, dust/(dust+gas) ratio, plotted against distance from the protosun
 - experiment_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4::tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   kind: literature
   method:
@@ -114,3 +114,81 @@ experiments:
     page: 1
     section: Evaporation rates
     equation: '1'
+context:
+- observation_id: tachibana_1998_forsterite_dynamic_model_dust_size
+  type: model_input
+  class: model_derived
+  locator:
+    page: 2
+    figure: '2'
+    caption: Results by dynamic models which includes dust movement and evaporation of 100 micrometre forsterite
+  phase: forsterite_dust
+  regime: dynamic_and_equilibrium_nebula_model
+  units: micrometre
+  values:
+    quantity: modeled_dust_size
+    method_class: model_derived
+    generator: dynamic dust-transport/evaporation model cited as [7]
+    dust_diameter_um: 100
+  context_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::context::tachibana_1998_forsterite_dynamic_model_dust_size
+  work_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  species: forsterite
+- observation_id: tachibana_1998_forsterite_nebula_model_paths
+  type: model_input
+  class: model_derived
+  locator:
+    page: 2
+    figure: '1'
+    caption: solar-nebula model paths at the active stage
+  phase: forsterite_dust
+  regime: protoplanetary_disk_active_stage
+  units: K at stated AU locations
+  values:
+    quantity: model_temperature_paths
+    method_class: model_derived
+    generator: four cited solar-nebula models [7]
+    model_temperatures_K:
+      at_1_AU:
+        Model-1: 1176
+        Model-2: 678
+        Model-3: 420
+        Model-4: 1573
+      at_0_5_AU:
+        Model-1: 1661
+        Model-2: 1356
+        Model-3: 840
+        Model-4: 1910
+    note: Values are printed in the Figure 1 caption; model identity follows the caption's Models-1 through 4 order.
+  context_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::context::tachibana_1998_forsterite_nebula_model_paths
+  work_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  species: forsterite
+- observation_id: tachibana_1998_forsterite_regime_model
+  type: regime_classification
+  class: model
+  locator:
+    page: 1
+    section: Evaporation rates
+    paragraphs: Free evaporation and hydrogen reaction regimes; H2O/H2 buffer regime
+  phase: forsterite_dust
+  regime: nebular_evaporation_regime_map
+  units: as printed
+  values:
+    quantity: evaporation_regime
+    method_class: model_derived
+    generator: authors' Hertz-Knudsen plus thermochemical gas-chemistry model
+    regimes:
+    - name: free_evaporation_dominated
+      condition: ptotal sufficiently smaller than equilibrium vapor pressure peFo
+      rate_dependence: jFo is only a function of T
+    - name: hydrogen_reaction_dominated
+      condition: ptotal much greater than peFo
+      rate_dependence: H2(g) acts as reducing agent; jFo increases with pH2 approximately equal to ptotal
+    - name: H2O_H2_buffer_dominated
+      condition: increasing ptotal where peH2O approximately equals pH2O
+      rate_dependence: jFo becomes constant when pH2O is buffered by constant H2O/H2 ratio
+  context_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::context::tachibana_1998_forsterite_regime_model
+  work_id: 7266c5ddf7a789ddbf0a7274f339f6ae119c3f5bb53088a359ee5d4b2b8a92e4
+  source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  species: forsterite

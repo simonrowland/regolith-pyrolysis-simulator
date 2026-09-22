@@ -18,69 +18,6 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::1-2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'qms_calibration' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
-  locator:
-    pdf_page_index: 1
-    figure: 1-2
-- experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::2
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'qms_calibration' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
-  locator:
-    pdf_page_index: 1
-    figure: '2'
-    note: Figure 1 also prints the two pressure-versus-time calibration lines below.
 - experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::3
   kind: literature
   method:
@@ -113,37 +50,6 @@ experiments:
     pdf_page_index: 2
     figure: '3'
     section: Analysis of the PROSPECT reference Murchison meteorite sample
-- experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::3-4
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'continuously_pumped_qms_evolved_gas_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
-  locator:
-    pdf_page_index: 2
-    figure: 3-4
 - experiment_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32::4
   kind: literature
   method:
@@ -215,13 +121,13 @@ experiments:
               pdf_page_index: 2
               section: Analysis of the PROSPECT reference Murchison meteorite sample
         output_unit: kg
-    container:
+    form:
       state:
         tag: value
-        value: pure Pt foil
+        value: powdered sample
       locator:
-        pdf_page_index: 1
-        section: Experimental technique
+        pdf_page_index: 2
+        section: Analysis of the PROSPECT reference Murchison meteorite sample
   conditions:
     temperature_K:
       state:
@@ -243,16 +149,203 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-    pumping:
-      pumping:
-        state:
-          tag: value
-          value: turbomolecular and ion pumps
-        locator:
-          pdf_page_index: 1
-          section: Experimental technique
   work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
   locator:
     pdf_page_index: 1
-    paragraph: reference-gas mixture composition
+    section: Introduction
+context:
+- observation_id: lpsc_2019_2641_calibration_figures_not_digitized
+  type: figure_only
+  locator:
+    pdf_page_index: 1
+    figure: 1-2
+  phase: calibration_gas
+  standard_state: graphical calibration curves
+  regime: qms_calibration
+  units: as printed on figures
+  values:
+    quantity: calibration_curve_shapes
+    method_class: figure_only
+    evidence_class: figure_only_graphical_data
+    status: curves not digitized; no point values inferred
+    note: Figure 1 shows pressure versus time for PZT-valve and capillary delivery; Figure 2 shows signal intensity versus
+      flow rate for H2, N2, CO and He.
+  uncertainty:
+    note: not printed
+  context_id: lpsc-2019-2641::context::lpsc_2019_2641_calibration_figures_not_digitized
+  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
+  source_id: lpsc-2019-2641
+  species: calibration_reference_gases
+- observation_id: lpsc_2019_2641_calibration_gas_mixture
+  type: composition
+  locator:
+    pdf_page_index: 1
     section: Calibration procedures
+    paragraph: reference-gas mixture composition
+  phase: calibration_gas
+  standard_state: reference gas composition as printed
+  regime: qms_calibration
+  units: vol% as printed
+  values:
+    quantity: calibration_reference_gas_composition
+    method_class: measured_direct
+    evidence_class: authors_own_calibration
+    gas_species:
+      H2: '56.78'
+      He: '15.91'
+      CH4: '1.452'
+      Ne: '0.1011'
+      N2: '15.42'
+      CO: '1.03'
+      O2: '2.98'
+      Ar: '1.002'
+      CO2: '5.288'
+      Kr: '0.02022'
+      Xe: '0.01516'
+    abundance_unit: vol%
+    abundance_uncertainty_as_printed: approximately 1% relative
+    source_note: Single gases or this 11-species mixture were used; the printed list is split across the two-column page.
+  uncertainty:
+    relative_abundance: approximately 1% relative
+  equipment:
+    reference_gas_pressure:
+      value: 5-10
+      units: bar
+      bound_kind: range_as_printed
+      locator:
+        pdf_page_index: 1
+        section: Experimental technique
+    vessel_and_restriction:
+      value: vessel connected to the vacuum system via a capillary leak or piezo-electric (PZT) metering valve
+      locator:
+        pdf_page_index: 1
+        section: Experimental technique
+  context_id: lpsc-2019-2641::context::lpsc_2019_2641_calibration_gas_mixture
+  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
+  source_id: lpsc-2019-2641
+  species: calibration_reference_gases
+- observation_id: lpsc_2019_2641_murchison_apparatus
+  type: apparatus
+  locator:
+    pdf_page_index: 1
+    section: Experimental technique
+  phase: powdered_meteorite_sample
+  standard_state: custom-built QEGA apparatus as printed
+  regime: continuously_pumped_qms_evolved_gas_analysis
+  units: as printed
+  values:
+    quantity: evolved_gas_apparatus
+    method_class: measured_direct
+    evidence_class: authors_own_experiment
+    instrument: custom-built Finesse mass-spectrometer system
+    qms: Hiden Analytical quadrupole mass spectrometer with electron multiplier
+    pumping: turbomolecular and ion pumps
+    sample_container: pure Pt foil
+    furnace: linear heating furnace capable of reaching 1500 °C
+    qms_operation: continuous flow, peak-jumping mode and ion counting
+    water_calibration: not made; water could condense in the vacuum line because uniform heating to 100 °C was challenging
+    recorded_mass_range: 2 to 132
+    recorded_masses_as_printed:
+    - 2
+    - 4
+    - 12
+    - 14
+    - 16
+    - 18
+    - 20
+    - 22
+    - 28
+    - 29
+    - 30
+    - 32
+    - 36
+    - 40
+    - 44
+    - 84
+    - 132
+    temperature_measurement_and_calibration: not stated
+    sample_form: not separately stated for the calibration samples; Murchison sample is stated as powdered
+    exposed_area: not stated
+    gas_identity_and_pressure_during_sample_run: not stated
+    fO2_control: not stated
+    run_duration: not stated
+  uncertainty:
+    note: no numerical uncertainty printed for apparatus geometry or temperature calibration
+  context_id: lpsc-2019-2641::context::lpsc_2019_2641_murchison_apparatus
+  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
+  source_id: lpsc-2019-2641
+  species: Murchison_CM2_meteorite
+- observation_id: lpsc_2019_2641_murchison_figures_not_digitized
+  type: figure_only
+  locator:
+    pdf_page_index: 2
+    figure: 3-4
+  phase: powdered_Murchison_CM2_meteorite
+  standard_state: graphical gas-release curves
+  regime: continuously_pumped_qms_evolved_gas_analysis
+  units: gas flow rate in mbar/s and temperature in °C as printed on figures
+  values:
+    quantity: gas_release_curves
+    method_class: figure_only
+    evidence_class: figure_only_graphical_data
+    status: curves not digitized; no values read off the figures
+    figures: Figure 3 major components (H2, CO, N2, H2O, CO2); Figure 4 minor components (He, O2, Ar, Kr)
+  uncertainty:
+    note: not printed
+  context_id: lpsc-2019-2641::context::lpsc_2019_2641_murchison_figures_not_digitized
+  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
+  source_id: lpsc-2019-2641
+  species: Murchison_CM2_meteorite
+- observation_id: lpsc_2019_2641_qms_calibration_power_law_fits
+  type: calibration
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    note: Figure 1 also prints the two pressure-versus-time calibration lines below.
+  phase: calibration_gas
+  standard_state: QMS signal calibration against reference-gas flow
+  regime: qms_calibration
+  units: signal intensity in cps; flow rate in mbar/s as printed
+  values:
+    quantity: author_power_law_calibration_fits
+    method_class: model_derived
+    model_generator: authors' power-law fit to calibration data
+    x_definition: gas flow rate in mbar/s
+    y_definition: QMS signal intensity at the named mass in cps
+    fits:
+    - gas: H2
+      mass_as_printed: 2
+      expression_as_printed: y = 2.9654e+9 * x^(0.91649)
+      R: '0.98853'
+    - gas: N2
+      mass_as_printed: 28
+      expression_as_printed: y = 9.1723e+9 * x^(0.99396)
+      R: '0.99171'
+    - gas: CO
+      mass_as_printed: 12
+      expression_as_printed: y = 1.0564e+8 * x^(0.92995)
+      R: '0.99996'
+    - gas: He
+      mass_as_printed: 4
+      expression_as_printed: y = 2.4383e+8 * x^(0.91815)
+      R: '0.99956'
+    figure_1_pressure_time_lines:
+    - valve: PZT
+      expression_as_printed: y = -0.0039292 + 0.00073213x
+      R: '0.99908'
+    - valve: capillary
+      expression_as_printed: y = 9.5333e-6 + 3.2248e-6x
+      R: '0.99999'
+    calibration_interference_observations:
+    - CO contribution to mass 28 was not observed above scatter in pure-N2 versus mixture calibration
+    - mass 12 was used for CO because pure CO also gives mass 12, about 30 times less than mass 28
+    - second-order masses: N2 -> 14; CO -> 12; O2 -> 16; CO2 -> 28 and 16 in nearly equal amounts
+  uncertainty:
+    fit_residuals: R values are printed for each fit; no parameter uncertainties are printed
+    calibration_coefficient_variation: approximately +/-30% from the average coefficient across gases
+    water_calibration: not made; uniform heating of the vacuum line to 100 °C was challenging, so average calibration coefficient
+      was used to estimate water content
+  context_id: lpsc-2019-2641::context::lpsc_2019_2641_qms_calibration_power_law_fits
+  work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
+  source_id: lpsc-2019-2641
+  species: calibration_reference_gases

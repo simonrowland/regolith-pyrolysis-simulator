@@ -19,38 +19,6 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::/Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'high_pressure_graphite_capsule_experiment' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
-  locator:
-    published_page: 1
-    section: Experimental technique
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
 - experiment_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d::1
   kind: literature
   method:
@@ -117,3 +85,175 @@ experiments:
     figure: '2'
     section: Liquidus Depression
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+context:
+- observation_id: filiberto_2011_author_calculated_lunar_effects
+  type: planetary_implication
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 2
+    section: Implications
+  phase: lunar_magma
+  regime: author_calculation_from_volatile_abundances
+  units: °C and dimensionless Kd as printed
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: authors' calculation using cited lunar volatile abundances and the experimental trends
+    liquidus_shift_C: < 10
+    KDmin_Fe-Mg_shift: '-0.005'
+    note: Printed bound and estimate retained separately; no point value substituted for the liquidus bound.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_author_calculated_lunar_effects
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: Fe-Mg
+- observation_id: filiberto_2011_author_calculated_martian_effects
+  type: planetary_implication
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 2
+    section: Implications
+  phase: Martian_basalt_melt_and_minerals
+  regime: author_calculation_from_volatile_abundances
+  units: °C and dimensionless Kd as printed
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    generator: authors' calculation using cited Martian volatile abundances and the experimental trends
+    liquidus_shift_C: 30
+    KDmin_Fe-Mg_shift: '-0.01'
+    affected_minerals:
+    - pyroxene
+    - olivine
+    note: Printed expectation, not a new measurement; source says the Fe-Mg shift applies to both pyroxene and olivine.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_author_calculated_martian_effects
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: Fe-Mg
+- observation_id: filiberto_2011_experimental_method_chlorine
+  type: method
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 1
+    section: Experimental technique
+  phase: synthetic_Humphrey_basalt
+  regime: high_pressure_graphite_capsule_experiment
+  units: as printed
+  values:
+    method_class: method_only
+    starting_material: Martian Adirondack-class basalt Humphrey
+    volatile_condition: chlorine-bearing comparison
+    volatile_addition_wt_pct: '0.7'
+    additive: AgCl
+    capsule: graphite
+    pressure_GPa_range:
+    - '0.5'
+    - 2
+    note: Nominal starting addition and experiment condition; not a tabulated measured melt concentration.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_experimental_method_chlorine
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: Cl
+- observation_id: filiberto_2011_experimental_method_fluorine
+  type: method
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 1
+    section: Experimental technique
+  phase: synthetic_Humphrey_basalt
+  regime: high_pressure_graphite_capsule_experiment
+  units: as printed
+  values:
+    method_class: method_only
+    starting_material: Martian Adirondack-class basalt Humphrey
+    volatile_condition: nominally volatile free and fluorine-bearing comparison
+    volatile_addition_wt_pct: '1.75'
+    additive: AgF2
+    capsule: graphite
+    pressure_GPa_range:
+    - '0.5'
+    - 2
+    note: Nominal starting addition and experiment condition; not a tabulated measured melt concentration.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_experimental_method_fluorine
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: F
+- observation_id: filiberto_2011_experimental_method_water
+  type: method
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 1
+    section: Experimental technique
+  phase: similar_high_Fe_basalt
+  regime: high_pressure_experiment
+  units: wt% and GPa as printed
+  values:
+    method_class: method_only
+    volatile_condition: hydrous comparison
+    bulk_H2O_wt_pct: '0.8'
+    pressure_GPa_range:
+    - '0.5'
+    - 2
+    note: The abstract says hydrous experiments were conducted on a similar bulk composition; it does not state graphite capsules
+      for this arm.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_experimental_method_water
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: H2O
+- observation_id: filiberto_2011_quoted_lunar_volatile_abundances
+  type: composition
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 2
+    section: Fe-Mg Partitioning
+  phase: lunar_magma
+  regime: quoted_literature_composition
+  units: ppm as printed
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    generator: cited literature [5, 7, 9]
+    reported_values:
+      H2O_ppm: < 850
+      Cl_ppm: similar_amounts_to_H2O
+      F_ppm: 10
+    note: Bounds and qualitative comparison retained as printed; no point estimate substituted for similar amounts.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_quoted_lunar_volatile_abundances
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: planetary_volatile_abundances
+- observation_id: filiberto_2011_quoted_martian_volatile_abundances
+  type: composition
+  locator:
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+    published_page: 2
+    section: Fe-Mg Partitioning
+  phase: Martian_basalt
+  regime: quoted_literature_composition
+  units: wt% as printed
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    generator: cited literature [3, 18]
+    upper_bounds_or_typical_values:
+      F_wt_pct: '0.2'
+      Cl_wt_pct: '0.3'
+      H2O_wt_pct: '0.2'
+    note: Attributed in source to cited literature; not measured by this abstract.
+  uncertainty:
+    reported_status: not_reported
+  context_id: filiberto-lpsc2011-2064-volatiles::context::filiberto_2011_quoted_martian_volatile_abundances
+  work_id: f3930b0e0dff504aaa075f0bf4a67ea1357bbd66e54050ffac0f32cabf33006d
+  source_id: filiberto-lpsc2011-2064-volatiles
+  species: planetary_volatile_abundances

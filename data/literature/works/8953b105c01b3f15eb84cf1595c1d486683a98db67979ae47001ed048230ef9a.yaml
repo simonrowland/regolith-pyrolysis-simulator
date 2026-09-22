@@ -49,65 +49,100 @@ experiments:
     published_page: 3
     table: '1'
     section: Chemistry
-- experiment_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a::lpi-compendium-14240
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a
+context:
+- observation_id: lpi_14240_sample_mass_conflicting_reports
+  type: characterization
   locator:
     published_page: 2
     section: Processing
-- experiment_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a::sample subdivision schematic
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  units: g
+  values:
+    quantity: named_sample_mass
+    method_class: secondary_compilation
+    sample: Apollo_14_14240
+    official_LRL_weight_g: 168
+    actual_weight_when_opened_g: 184
+    attribution:
+      official_LRL_weight: difference between hardware and returned sample
+      actual_weight_when_opened: sample opened at UCB Space Science Laboratory; Burlingame 1971
+    disagreement: The compendium reports both 168 g official LRL weight and 184 g actual opened-sample weight; neither is
+      reconciled.
+  context_id: lpi-compendium-14240::context::lpi_14240_sample_mass_conflicting_reports
   work_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a
+  source_id: lpi-compendium-14240
+  species: lunar_sample_14240
+- observation_id: lpi_14240_sesc_aliquot_and_sieve_masses
+  type: characterization
   locator:
     published_page: 4
     figure: sample subdivision schematic
+  units: g
+  values:
+    quantity: printed_sample_subdivision_masses
+    method_class: secondary_compilation
+    sample: Apollo_14_14240
+    opened_in: Berkeley
+    aliquots_g:
+    - label: 1
+      mass_g: 7
+    - label: 3
+      mass_g: '4.3'
+    - label: 28
+      mass_g: '13.3'
+    - label: 29
+      mass_g: '16.5'
+    - label: 31
+      mass_g: '11.1'
+    - label: 53
+      mass_g: 14
+    - label: 60
+      mass_g: '7.2'
+    - label: 59
+      mass_g: '7.3'
+    - label: 22
+      mass_g: '2.5'
+    - label: 23
+      mass_g: 5
+    - label: 24
+      mass_g: '2.1'
+    - label: 26
+      mass_g: '4.5'
+    - label: 30
+      mass_g: '41.4'
+    sieve_fraction:
+      size_range_micrometre: 250-500
+      mass_g: '41.4'
+    note: The schematic prints these aliquot masses; it does not state a complete mass-balance treatment or identify every
+      reserve mass.
+  context_id: lpi-compendium-14240::context::lpi_14240_sesc_aliquot_and_sieve_masses
+  work_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a
+  source_id: lpi-compendium-14240
+  species: lunar_sample_14240
+- observation_id: lpi_14240_trench_provenance
+  type: characterization
+  locator:
+    published_page: 1
+    section: Introduction
+  units: as_published
+  values:
+    quantity: named_sample_provenance
+    method_class: secondary_compilation
+    sample: Apollo_14_14240
+    collection_site: Soil Mechanics Trench, station G, rim of approximately 6 m crater
+    collection_depth_cm: 25-36
+    planned_trench_depth_cm: '60'
+    actual_trench_depth_cm: ~30
+    collection_position: bottom of trench
+    contamination_note: may contain material slumped from trench walls
+    maturity_Is_FeO: 46
+    comparison_sample: Apollo_14_14149
+    comparison_maturity_Is_FeO: 53
+    material_description: immature lunar soil; subsurface sample
+    locators:
+      collection_depth: page 2, Petrography
+      maturity: page 2, Petrography
+      collection_site: page 1, Introduction; page 2, Petrography
+  context_id: lpi-compendium-14240::context::lpi_14240_trench_provenance
+  work_id: 8953b105c01b3f15eb84cf1595c1d486683a98db67979ae47001ed048230ef9a
+  source_id: lpi-compendium-14240
+  species: lunar_sample_14240
