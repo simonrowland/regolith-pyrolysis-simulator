@@ -45,6 +45,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.reference_data.janaf import (
+    COMPILATION_ROLE,
     ELEMENT_SYMBOLS,
     GRID_ORDER_REASON,
     GRID_RANGE_REASON,
@@ -1382,6 +1383,9 @@ def _observation(
             inputs=(source_path,),
             parameters=(),
             output_unit=QUANTITY_UNITS[quantity],
+            pure_substance_reference=True
+            if COMPILATION_ROLE.get("pure_substance_reference") is True
+            else None,
         ),
     )
 

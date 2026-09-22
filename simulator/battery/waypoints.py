@@ -46,9 +46,9 @@ class GapReason(StrEnum):
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
-    # Pure-substance engine-reference tabulation (compilation_role carries
-    # engine_reference_input=true and scoring_eligible=false; identity.composition
-    # is not_applicable). engine_point reproduces a melt composition at a bench
+    # Pure-substance engine-reference tabulation. The generator declares
+    # derivation.pure_substance_reference; identity.composition is
+    # not_applicable. engine_point reproduces a melt composition at a bench
     # point; that consumer does not apply. Scored by the pure-phase consumer.
     PURE_SUBSTANCE_REFERENCE = "pure_substance_reference"
     # Permanent typed absence: several apparatuses are cited and the no-select
@@ -1291,24 +1291,16 @@ def _compilation_role_flags(relation: str) -> dict[str, bool | None]:
     return flags
 
 
-# JANAF generator stamps this printed-cell accounting clause into
-# derivation.relation; peer USGS/USBM Gibbs-table generators do not.
-# Used as a data-driven conjunct so engine_point N/A under d-039/t-955
-# targets the JANAF tabulation shape without matching on a source-id token.
-_PRINTED_CELL_ACCOUNTING = "printed cells blank or infinite"
-
-
 def is_pure_substance_engine_reference(observation: Observation) -> bool:
-    """True when the observation is a pure-substance engine-reference table row.
+    """True when the row declares itself a pure-substance engine reference.
 
-    Conjuncts (all required), taken from fields the row already carries:
+    All required, and none of them is a source id:
     - ``identity.composition`` is ``not_applicable`` (no melt composition axis)
+    - ``derivation.pure_substance_reference`` is true (declared by the
+      generator; absent on peer Gibbs tables that share the role stamps)
     - derivation.relation stamps ``engine_reference_input=true``
     - derivation.relation stamps ``scoring_eligible=false`` (not a melt /
       engine_point scoring reference; pure-phase scoring is a separate consumer)
-    - derivation.relation stamps the printed-cell accounting clause unique to
-      the JANAF tabulation lift (peer USGS/USBM Gibbs tables share the three
-      markers above but not this clause — keeps t-955 scoped to JANAF rows)
     """
 
     identity = observation.identity
@@ -1316,7 +1308,9 @@ def is_pure_substance_engine_reference(observation: Observation) -> bool:
     if composition is None or not composition.is_not_applicable:
         return False
     derivation = observation.derivation
-    if derivation is None or not derivation.relation:
+    if derivation is None or derivation.pure_substance_reference is not True:
+        return False
+    if not derivation.relation:
         return False
     flags = _compilation_role_flags(derivation.relation)
     if flags.get("engine_reference_input") is not True:
@@ -1324,8 +1318,6 @@ def is_pure_substance_engine_reference(observation: Observation) -> bool:
     # scoring_eligible=false: not a melt/engine_point scoring reference.
     # (Pure-phase scoring of MAGEMin/ThermoEngine is a separate consumer.)
     if flags.get("scoring_eligible") is not False:
-        return False
-    if _PRINTED_CELL_ACCOUNTING not in derivation.relation.lower():
         return False
     return True
 

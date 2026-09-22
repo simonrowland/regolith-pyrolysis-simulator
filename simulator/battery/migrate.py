@@ -645,11 +645,13 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
         if isinstance(item, (list, tuple)) and len(item) == 2:
             parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
     inputs = payload.get("inputs") or ()
+    raw_marker = payload.get("pure_substance_reference")
     return Derivation(
         relation=str(payload.get("relation") or "identity"),
         inputs=tuple(str(x) for x in inputs),
         parameters=tuple(parameters),
         output_unit=str(payload.get("output_unit") or "as_published"),
+        pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
     )
 
 
