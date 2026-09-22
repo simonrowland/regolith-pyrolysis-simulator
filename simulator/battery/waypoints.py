@@ -49,6 +49,9 @@ class GapReason(StrEnum):
     # Permanent typed absence: several apparatuses are cited and the no-select
     # ruling forbids picking one, so no acquisition can ever close this gap.
     UNATTRIBUTABLE_BY_CONSTRUCTION = "unattributable_by_construction"
+    # The work is in the store but has no observation a point consumer can
+    # score. Context rows are not observations, and absence is not a zero.
+    NO_SCOREABLE_OBSERVATIONS = "no_scoreable_observations"
 
 
 class ReadinessStatus(StrEnum):
