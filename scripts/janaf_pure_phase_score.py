@@ -27,7 +27,6 @@ import dataclasses
 import json
 import os
 import sys
-from dataclasses import replace
 from pathlib import Path
 from typing import Dict, Mapping, Optional, Tuple
 
@@ -45,6 +44,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (  # noqa: E402
     PRESSURE_BAR,
     REACTIONS,
     PhaseRow,
+    PolymorphMismatchError,
     ReactionRow,
     RefusalRow,
     build_phase_row,
@@ -139,41 +139,61 @@ def build_all_rows(
 
     for reaction in REACTIONS:
         for engine in engines:
-            refusal = preflight_reaction(reaction, engine)
-            if refusal is not None:
-                refusals.extend(
-                    replace(refusal, temperature_K=T)
-                    for T in DEFAULT_TEMPERATURES_K
-                )
-                continue
             for T in DEFAULT_TEMPERATURES_K:
-                rows.append(
-                    build_reaction_row(
-                        reaction,
-                        engine,
-                        T,
-                        engine_query=engine_query(engine),
-                        janaf_query=janaf,
-                    )
+                refusal = preflight_reaction(
+                    reaction, engine, temperature_K=T
                 )
+                if refusal is not None:
+                    refusals.append(refusal)
+                    continue
+                try:
+                    rows.append(
+                        build_reaction_row(
+                            reaction,
+                            engine,
+                            T,
+                            engine_query=engine_query(engine),
+                            janaf_query=janaf,
+                        )
+                    )
+                except PolymorphMismatchError as exc:
+                    refusals.append(
+                        RefusalRow(
+                            reason=POLYMORPH_MISMATCH,
+                            detail=str(exc),
+                            engine=engine,
+                            reaction_id=reaction.reaction_id,
+                            temperature_K=T,
+                        )
+                    )
     for request in DEFAULT_PHASE_REQUESTS:
         if request.engine not in engines:
             continue
-        refusal = preflight_phase_request(request)
-        if refusal is not None:
-            refusals.extend(
-                replace(refusal, temperature_K=T) for T in request.temperatures_K
-            )
-            continue
         for T in request.temperatures_K:
-            rows.append(
-                build_phase_row(
-                    request,
-                    T,
-                    engine_query=engine_query(request.engine),
-                    janaf_query=janaf,
+            refusal = preflight_phase_request(request, temperature_K=T)
+            if refusal is not None:
+                refusals.append(refusal)
+                continue
+            try:
+                rows.append(
+                    build_phase_row(
+                        request,
+                        T,
+                        engine_query=engine_query(request.engine),
+                        janaf_query=janaf,
+                    )
                 )
-            )
+            except PolymorphMismatchError as exc:
+                refusals.append(
+                    RefusalRow(
+                        reason=POLYMORPH_MISMATCH,
+                        detail=str(exc),
+                        engine=request.engine,
+                        phase_id=request.phase_id,
+                        janaf_table_id=request.janaf_table_id,
+                        temperature_K=T,
+                    )
+                )
     return rows, refusals
 
 

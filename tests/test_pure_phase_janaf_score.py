@@ -2,20 +2,11 @@
 
 No engine is touched: engine sides are fixed PurePhaseProperties fixtures
 (verbatim probe values, noted per fixture) and the JANAF side is the
-printed table row.  The anchor is a hand-computed reaction sum: e.g. at
-1000 K, MgO + SiO2(quartz) -> MgSiO3(clinoenstatite)
-
-    d_rG = dfG(Mg-012) - dfG(Mg-008) - dfG(O-037)
-         = -1257.958 - (-492.952) - (-730.256) = -34.750 kJ/mol
-
-and the ThermoEngine apparent-G sum of the same reaction
-
-    d_rG = G(cEn) - G(Per) - G(Qz)
-         = (-1663150.6062 + 650763.6656 + 982731.2394) J / 1000
-         = -29.656 kJ/mol   (residual +5.094 kJ/mol vs JANAF)
-
-which is exactly the number the live engines must reproduce through the
-consumer's reaction-sum path.
+printed table row.  The anchor is a hand-computed reaction sum.  At
+1000 K the forsterite reaction is scored.  The MgSiO3 sum at 1000 K is
+still the printed arithmetic (Mg-012 form II), but it is not an engine
+residual: Mg-012's bands are the printed tokens i/ii/iii, not
+clinoenstatite, so a cEn row at 1000 K is refused.
 """
 
 from __future__ import annotations
@@ -39,6 +30,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (
     REACTION_FORSTERITE,
     JanafValues,
     PhaseScoreRequest,
+    bands_for_table_id,
     build_phase_row,
     build_reaction_row,
     engine_phase_polymorph,
@@ -56,7 +48,7 @@ from simulator.melt_backend.pure_phase_janaf_score import (
 JANAF_DFG_1000 = {
     'Mg-008': -492.952,   # MgO(cr)
     'O-037': -730.256,    # SiO2 quartz
-    'Mg-012': -1257.958,  # MgSiO3(cr) clinoenstatite
+    'Mg-012': -1257.958,  # MgSiO3(cr) printed form II, not a clino label
     'Mg-028': -1778.598,  # Mg2SiO4(cr) forsterite
 }
 # 298.15 K:
@@ -105,6 +97,7 @@ def _props(engine, phase_id, polymorph, G_J_mol, **kwargs) -> PurePhasePropertie
         Cp_J_K_mol=kwargs.pop('Cp_J_K_mol', None),
         H_J_mol=kwargs.pop('H_J_mol', None),
         absences=kwargs.pop('absences', ()),
+        warnings=kwargs.pop('warnings', ()),
     )
 
 
@@ -177,6 +170,10 @@ def test_build_reaction_row_thermoengine_apparent_sum_1000K():
     assert row.residual_kJ_mol == pytest.approx(5.5636977, abs=1e-6)
     assert row.sio2_polymorph == 'quartz'
     assert {t.role for t in row.terms} == {'MgO', 'SiO2', 'Mg2SiO4'}
+    sio2 = next(t for t in row.terms if t.role == 'SiO2')
+    # 1000 K is above O-037's printed I->II at 847 K, so the row is beta.
+    assert sio2.janaf_polymorph == 'beta'
+    assert any('sub-form beta' in note for note in row.notes)
     # MELTS QUARTZ_ADJUSTMENT variant: nu_Qz = -1, ADJ = -1.291 kJ, so the
     # no-adjustment sum is drG - nu*ADJ = -56.8743023 - 1.291 = -58.1653023.
     assert row.drG_engine_no_quartz_adjustment_kJ_mol == pytest.approx(
@@ -188,21 +185,20 @@ def test_build_reaction_row_thermoengine_apparent_sum_1000K():
     assert any('QUARTZ_ADJUSTMENT' in note for note in row.notes)
 
 
-def test_build_reaction_row_thermoengine_clinoenstatite_1000K():
+def test_build_reaction_row_enstatite_1000K_refused_not_scored():
+    """Mg-012 at 1000 K is printed form ii, not clinoenstatite."""
     fixtures = {
         phase: _props('thermoengine', phase, TE_POLY[phase], G_J)
         for phase, G_J in TE_G_1000_J.items()
     }
-    row = build_reaction_row(
-        REACTION_ENSTATITE,
-        'thermoengine',
-        1000.0,
-        engine_query=lambda phase_id, T: fixtures[phase_id],
-        janaf_query=_janaf_stub,
-    )
-    # -1663150.6062 + 650763.6656 + 982731.2394 = -29655.7012 J -> -29.656 kJ
-    assert row.drG_engine_kJ_mol == pytest.approx(-29.6557012, abs=1e-6)
-    assert row.residual_kJ_mol == pytest.approx(5.0942988, abs=1e-6)
+    with pytest.raises(PolymorphMismatchError, match='clinoenstatite'):
+        build_reaction_row(
+            REACTION_ENSTATITE,
+            'thermoengine',
+            1000.0,
+            engine_query=lambda phase_id, T: fixtures[phase_id],
+            janaf_query=_janaf_stub,
+        )
 
 
 def test_build_reaction_row_magemin_apparent_sum_1000K():
@@ -230,16 +226,48 @@ def test_build_reaction_row_magemin_apparent_sum_1000K():
 
 
 def test_require_polymorph_match():
-    require_polymorph_match('quartz', JANAF_TABLES['O-037'], context='t')
-    require_polymorph_match('clinoenstatite', JANAF_TABLES['Mg-012'], context='t')
+    quartz_1000 = require_polymorph_match(
+        'quartz', JANAF_TABLES['O-037'], temperature_K=1000.0, context='t'
+    )
+    assert quartz_1000.polymorph == 'beta'
+    quartz_500 = require_polymorph_match(
+        'quartz', JANAF_TABLES['O-037'], temperature_K=500.0, context='t'
+    )
+    assert quartz_500.polymorph == 'alpha'
     with pytest.raises(PolymorphMismatchError):
         require_polymorph_match(
-            'orthoenstatite', JANAF_TABLES['Mg-012'], context='t'
+            'orthoenstatite', JANAF_TABLES['Mg-012'],
+            temperature_K=500.0, context='t',
         )
     with pytest.raises(PolymorphMismatchError):
-        require_polymorph_match('cristobalite', JANAF_TABLES['O-037'], context='t')
+        require_polymorph_match(
+            'cristobalite', JANAF_TABLES['O-037'],
+            temperature_K=1000.0, context='t',
+        )
     with pytest.raises(PolymorphMismatchError):
-        require_polymorph_match(None, JANAF_TABLES['O-037'], context='t')
+        require_polymorph_match(
+            None, JANAF_TABLES['O-037'], temperature_K=1000.0, context='t'
+        )
+    high = require_polymorph_match(
+        'cristobalite_high', JANAF_TABLES['O-035'],
+        temperature_K=1000.0, context='t',
+    )
+    assert high.polymorph == 'cristobalite_high'
+    low = require_polymorph_match(
+        'cristobalite_low', JANAF_TABLES['O-036'],
+        temperature_K=1000.0, context='t',
+    )
+    assert low.polymorph == 'cristobalite_low'
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'cristobalite', JANAF_TABLES['O-035'],
+            temperature_K=1000.0, context='t',
+        )
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'cristobalite_low', JANAF_TABLES['O-035'],
+            temperature_K=1000.0, context='t',
+        )
 
 
 def test_engine_phase_polymorph_reads_engine_maps():
@@ -250,32 +278,46 @@ def test_engine_phase_polymorph_reads_engine_maps():
     assert engine_phase_polymorph('thermoengine', 'Nope') is None
 
 
-def test_preflight_enstatite_reaction_refused_for_magemin_only():
-    """MAGEMin 'en' is orthoenstatite vs JANAF clinoenstatite: refuse typed."""
-    refusal = preflight_reaction(REACTION_ENSTATITE, 'magemin')
-    assert refusal is not None
-    assert refusal.reason == POLYMORPH_MISMATCH
-    assert refusal.engine_polymorph == 'orthoenstatite'
-    assert refusal.janaf_polymorph == 'clinoenstatite'
-    assert refusal.phase_id == 'en'
-    # forsterite reaction matches on both engines; enstatite matches for TE.
-    assert preflight_reaction(REACTION_FORSTERITE, 'magemin') is None
-    assert preflight_reaction(REACTION_FORSTERITE, 'thermoengine') is None
-    assert preflight_reaction(REACTION_ENSTATITE, 'thermoengine') is None
+def test_preflight_enstatite_reaction_refused_for_both_engines():
+    """Neither ortho nor clino is a printed Mg-012 band."""
+    for engine, polymorph in (
+        ('magemin', 'orthoenstatite'),
+        ('thermoengine', 'clinoenstatite'),
+    ):
+        refusal = preflight_reaction(
+            REACTION_ENSTATITE, engine, temperature_K=298.15
+        )
+        assert refusal is not None
+        assert refusal.reason == POLYMORPH_MISMATCH
+        assert refusal.engine_polymorph == polymorph
+        assert refusal.janaf_polymorph == 'i'
+        assert refusal.phase_id in ('en', 'cEn')
+        hot = preflight_reaction(
+            REACTION_ENSTATITE, engine, temperature_K=1000.0
+        )
+        assert hot is not None and hot.janaf_polymorph == 'ii'
+    assert preflight_reaction(
+        REACTION_FORSTERITE, 'magemin', temperature_K=1000.0
+    ) is None
+    assert preflight_reaction(
+        REACTION_FORSTERITE, 'thermoengine', temperature_K=1000.0
+    ) is None
 
 
 def test_preflight_phase_requests_refusals():
     by_phase = {r.phase_id: r for r in DEFAULT_PHASE_REQUESTS}
-    en_te = preflight_phase_request(by_phase['En'])
+    en_te = preflight_phase_request(by_phase['En'], temperature_K=1000.0)
     assert en_te is not None and en_te.reason == POLYMORPH_MISMATCH
-    en_mm = preflight_phase_request(by_phase['en'])
+    en_mm = preflight_phase_request(by_phase['en'], temperature_K=1000.0)
     assert en_mm is not None and en_mm.reason == POLYMORPH_MISMATCH
-    trd = preflight_phase_request(by_phase['trd'])
+    cen = preflight_phase_request(by_phase['cEn'], temperature_K=500.0)
+    assert cen is not None and cen.reason == POLYMORPH_MISMATCH
+    assert cen.janaf_polymorph == 'i'
+    trd = preflight_phase_request(by_phase['trd'], temperature_K=1500.0)
     assert trd is not None
     assert trd.reason == NO_JANAF_TABLE_FOR_POLYMORPH
     assert trd.engine_polymorph == 'tridymite'
-    assert preflight_phase_request(by_phase['cEn']) is None
-    assert preflight_phase_request(by_phase['q']) is None
+    assert preflight_phase_request(by_phase['q'], temperature_K=1000.0) is None
 
 
 def test_build_reaction_row_live_polymorph_recheck_refuses():
@@ -360,9 +402,10 @@ def test_build_phase_row_typed_absence_never_zero():
         assert prop.absence_reason == PHASE_NOT_STABLE_AT_TP
 
 
-def test_build_phase_row_magemin_host_phase_impurity_note():
-    """MAGEMin S/Cp/H come from the slightly impure equilibrium SS instance
-    while G is the pure endmember (controller review): rows are labelled."""
+def test_build_phase_row_magemin_passes_accessor_warnings_not_impurity():
+    """S/Cp/H are derivatives of pure-endmember G.  Do not label them impure."""
+
+    derived = 'S/Cp/H are central differences of the pure-endmember gbase'
 
     def mm_query(phase_id, T):
         assert phase_id == 'per'
@@ -372,18 +415,15 @@ def test_build_phase_row_magemin_host_phase_impurity_note():
             temperature_K=T,
             S_J_K_mol=81.495, Cp_J_K_mol=50.85,
             H_J_mol=-568900.0 if T != 298.15 else -601700.0,
+            warnings=(derived,),
         )
 
     request = PhaseScoreRequest('magemin', 'per', 'Mg-008')
     row = build_phase_row(
         request, 1000.0, engine_query=mm_query, janaf_query=_janaf_stub
     )
-    assert any('slightly impure' in note for note in row.notes)
-    # ThermoEngine pure phases carry no such note.
-    assert not any('slightly impure' in note for note in build_phase_row(
-        PhaseScoreRequest('thermoengine', 'Fo', 'Mg-028'),
-        1000.0, engine_query=_te_fo_query, janaf_query=_janaf_stub,
-    ).notes)
+    assert any(derived in note for note in row.notes)
+    assert not any('slightly impure' in note for note in row.notes)
 
 
 def test_default_temperatures_cover_brief_grid():
@@ -406,3 +446,82 @@ def test_janaf_values_at_real_table_mgo_1000K():
 def test_janaf_values_at_missing_temperature_returns_none():
     document = load_janaf_table('Mg-008')
     assert janaf_values_at(document, 999.0) is None
+
+
+def _printed_solid_solid_temperatures(table_id: str) -> list[float]:
+    document = load_janaf_table(table_id)
+    found = []
+    for item in document['table'].get('parse_ambiguities') or ():
+        raw = str(item.get('raw_line') or '')
+        fields = raw.split('\t')
+        label = fields[-1].strip() if fields else ''
+        if '<-->' not in label or 'LIQUID' in label.upper():
+            continue
+        found.append(float(fields[0].split()[0]))
+    return found
+
+
+def test_mg012_printed_bands_refuse_outside_the_matching_polymorph():
+    """Bands come from Mg-012's own I->II and II->III markers.
+
+    Form i is scored only inside its band.  clinoenstatite is not a
+    printed band at any temperature, including below the first marker.
+    """
+
+    markers = _printed_solid_solid_temperatures('Mg-012')
+    assert markers == [903.0, 1258.0]
+    info = bands_for_table_id('Mg-012')
+    assert info.title_polymorph is None
+    assert [band.polymorph for band in info.bands] == ['i', 'ii', 'iii']
+    assert info.bands[0].t_max_K == markers[0]
+    assert info.bands[1].t_min_K == markers[0]
+    assert info.bands[1].t_max_K == markers[1]
+    assert info.bands[2].t_min_K == markers[1]
+    assert all(band.polymorph != 'clinoenstatite' for band in info.bands)
+    low = require_polymorph_match(
+        'i', JANAF_TABLES['Mg-012'], temperature_K=500.0, context='t'
+    )
+    assert low.polymorph == 'i'
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'i', JANAF_TABLES['Mg-012'], temperature_K=1000.0, context='t'
+        )
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'clinoenstatite', JANAF_TABLES['Mg-012'],
+            temperature_K=298.15, context='t',
+        )
+    with pytest.raises(PolymorphMismatchError):
+        require_polymorph_match(
+            'clinoenstatite', JANAF_TABLES['Mg-012'],
+            temperature_K=1500.0, context='t',
+        )
+
+
+def test_absence_token_beats_a_numeric_engine_value():
+    """A 0.0 plus PropertyAbsence must not become a scored residual."""
+
+    def mm_query(phase_id, T):
+        return _props(
+            'magemin', 'q', 'quartz', -1.0e6,
+            temperature_K=T,
+            S_J_K_mol=0.0,
+            Cp_J_K_mol=0.0,
+            H_J_mol=0.0,
+            absences=tuple(
+                PropertyAbsence(p, PHASE_NOT_STABLE_AT_TP)
+                for p in ('S', 'Cp', 'H')
+            ),
+        )
+
+    row = build_phase_row(
+        PhaseScoreRequest('magemin', 'q', 'O-037'),
+        1500.0,
+        engine_query=mm_query,
+        janaf_query=_janaf_stub,
+    )
+    for prop in row.properties:
+        assert prop.engine is None
+        assert prop.residual is None
+        assert prop.absence_reason == PHASE_NOT_STABLE_AT_TP
+    assert any('absence wins' in note for note in row.notes)

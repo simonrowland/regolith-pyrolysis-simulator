@@ -881,6 +881,7 @@ def _handle_thermoengine_worker_request(
             temperature_K=float(request['temperature_K']),
             pressure_bar=float(request['pressure_bar']),
         )
+    # request_kind is reserved for the branch above; equilibrate payloads omit it.
     return _handle_thermoengine_request(transport, request, errlog)
 
 
