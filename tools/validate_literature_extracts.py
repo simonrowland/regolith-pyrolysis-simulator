@@ -18,6 +18,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``_fidelity_pre_policy_allowlist.yaml``)
 * fidelity sample structure: path-based *or* structured line-item form
   (species, observable, T/index, value, locator)
+* structured fidelity samples resolve rows in ``observations[]`` or the
+  sibling ``context[]`` container (d-032); an id matching rows in both
+  containers is an ambiguity error, not a silent pick
 * no silent acceptance of unknown top-level observation types
 * sibling ``context`` container rows (unscored experiment context, d-032):
   observation-shaped contract, but a scored observation ``type`` parked
@@ -714,7 +717,15 @@ def _find_observation(
     observation_id: str | None = None,
     observable: str | None = None,
 ) -> Mapping[str, Any]:
-    """Locate one observation block under ``species``."""
+    """Locate one observation-shaped row under ``species``.
+
+    Structured pins resolve against both the scored ``observations[]`` list and
+    the sibling ``context[]`` container (d-032), so a pin survives a row moving
+    between the two. The observation_id namespace is file-unique across both
+    containers (enforced under ``validate_extract_document``), so an id matching
+    exactly one row is unambiguous; an id matching rows in both containers is a
+    typed ambiguity error, never a silent pick.
+    """
     species_map = doc.get("species")
     if not isinstance(species_map, Mapping) or species not in species_map:
         raise KeyError(f"species {species!r} not in extract")
@@ -724,32 +735,53 @@ def _find_observation(
     obs_list = block.get("observations") or []
     if not isinstance(obs_list, list):
         raise KeyError(f"species {species!r} observations is not a list")
+    ctx_list = block.get("context") or []
+    if not isinstance(ctx_list, list):
+        raise KeyError(f"species {species!r} context is not a list")
+    containers = (("observations", obs_list), ("context", ctx_list))
     if observation_id:
-        for obs in obs_list:
-            if isinstance(obs, Mapping) and obs.get("observation_id") == observation_id:
-                if observable and obs.get("type") != observable:
-                    raise KeyError(
-                        f"observation_id {observation_id!r} has type "
-                        f"{obs.get('type')!r}, not requested observable {observable!r}"
-                    )
-                return obs
-        raise KeyError(
-            f"observation_id {observation_id!r} not found under species {species!r}"
-        )
-    if observable:
         matches = [
-            o
-            for o in obs_list
-            if isinstance(o, Mapping) and o.get("type") == observable
+            (container, row)
+            for container, rows in containers
+            for row in rows
+            if isinstance(row, Mapping) and row.get("observation_id") == observation_id
         ]
         if not matches:
             raise KeyError(
-                f"no observation with type={observable!r} under species {species!r}"
+                f"observation_id {observation_id!r} not found under species "
+                f"{species!r} (searched observations[] and context[])"
+            )
+        if len(matches) > 1:
+            where = ", ".join(f"{container}[]" for container, _row in matches)
+            raise KeyError(
+                f"ambiguous observation_id {observation_id!r} under species "
+                f"{species!r}: {len(matches)} rows match ({where}); "
+                f"observation_id must be unique across observations[] and context[]"
+            )
+        row = matches[0][1]
+        if observable and row.get("type") != observable:
+            raise KeyError(
+                f"observation_id {observation_id!r} has type "
+                f"{row.get('type')!r}, not requested observable {observable!r}"
+            )
+        return row
+    if observable:
+        matches = [
+            row
+            for _container, rows in containers
+            for row in rows
+            if isinstance(row, Mapping) and row.get("type") == observable
+        ]
+        if not matches:
+            raise KeyError(
+                f"no observation with type={observable!r} under species {species!r} "
+                f"(searched observations[] and context[])"
             )
         if len(matches) > 1:
             raise KeyError(
                 f"ambiguous type={observable!r} under species {species!r} "
-                f"({len(matches)} matches; set observation_id)"
+                f"({len(matches)} matches across observations[] and context[]; "
+                f"set observation_id)"
             )
         return matches[0]
     raise KeyError("structured sample needs observation_id or observable")
@@ -767,7 +799,9 @@ def resolve_fidelity_sample(
     * **structured** (preferred for OCR): ``species`` + ``observation_id``
       and/or ``observable``, optional ``field`` / ``value_key`` into
       ``values``, optional ``index`` into a series list, optional ``T_K``
-      match against a series point's temperature key
+      match against a series point's temperature key. The addressed row may
+      live in ``observations[]`` or the sibling ``context[]`` container
+      (d-032); an id matching rows in both is an ambiguity error.
     """
     mode_errors = _sample_mode_errors(sample)
     if mode_errors:

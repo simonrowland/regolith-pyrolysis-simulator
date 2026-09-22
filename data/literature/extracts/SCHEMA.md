@@ -111,6 +111,13 @@ of `T_K`/`T`, one of `value`/`draft_value`, one of
 both `observation_id` and `observable` are supplied, the selected observation's
 type must equal `observable`; no null or contradictory alias may be decorative.
 
+A structured sample addresses one observation-shaped row, whether it lives in
+`observations[]` or in the sibling `context[]` container (d-032): the resolver
+searches both, so a pin survives a row moving between containers. The
+`observation_id` namespace is file-unique across both containers, so an id
+matching exactly one row is unambiguous; an id matching rows in both is an
+ambiguity error, never a silent pick.
+
 A parameterized checked-in test
 (`tests/test_literature_extracts.py::test_fidelity_sample_matches_extract`)
 resolves every sample against the extract and asserts equality. Mutating a

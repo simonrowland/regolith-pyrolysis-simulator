@@ -380,6 +380,99 @@ def test_context_and_observations_share_id_namespace():
     assert any("duplicate observation_id" in e for e in errs)
 
 
+def test_structured_fidelity_sample_resolves_context_row():
+    """Structured pins resolve rows in the sibling context[] container (d-032)."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["context"] = [_context_row()]
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_bench_note",
+        "observable": "apparatus",
+        "field": "furnace",
+        "value": "muffle",
+        "locator": {"page": 3, "section": "experimental"},
+    }
+    assert vle.resolve_fidelity_sample(doc, sample) == "muffle"
+    assert vle.check_fidelity_sample_matches(doc, sample) == []
+    # Observable-only addressing resolves a context row the same way.
+    obs_only = {
+        "species": "Fe",
+        "observable": "apparatus",
+        "field": "furnace",
+        "value": "muffle",
+        "locator": {"page": 3, "section": "experimental"},
+    }
+    assert vle.check_fidelity_sample_matches(doc, obs_only) == []
+    doc["fidelity_samples"].extend([sample, obs_only])
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert errs == [], errs
+
+
+def test_structured_fidelity_sample_survives_d032_move():
+    """Null-hypothesis (b-562): before the fix, moving a pinned row from
+    observations[] to context[] broke the structured pin ('not found')."""
+    row = {
+        "observation_id": "fe_bench_note",
+        "type": "apparatus",
+        "locator": {"page": 3, "section": "experimental"},
+        "units": "as printed",
+        "values": {"quantity": "apparatus_note", "furnace": "muffle"},
+    }
+    sample = {
+        "species": "Fe",
+        "observation_id": "fe_bench_note",
+        "observable": "apparatus",
+        "field": "furnace",
+        "value": "muffle",
+        "locator": {"page": 3, "section": "experimental"},
+    }
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"].append(row)
+    assert vle.check_fidelity_sample_matches(doc, sample) == []
+    # d-032 move: same row, same pin — the match must survive the relocation.
+    doc["species"]["Fe"]["observations"].remove(row)
+    doc["species"]["Fe"]["context"] = [row]
+    assert vle.check_fidelity_sample_matches(doc, sample) == []
+
+
+def test_structured_fidelity_sample_ambiguous_id_is_typed_error():
+    """An id matching rows in BOTH containers is a typed ambiguity error,
+    never a silent pick of the observation over the context row."""
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"].append(
+        {
+            "observation_id": "shared_id",
+            "type": "alpha",
+            "locator": {"table": "9"},
+            "units": "dimensionless",
+            "values": {"alpha": 0.99},
+        }
+    )
+    doc["species"]["Fe"]["context"] = [
+        _context_row(
+            observation_id="shared_id",
+            values={"quantity": "apparatus_note", "alpha": 0.11},
+        )
+    ]
+    sample = {
+        "species": "Fe",
+        "observation_id": "shared_id",
+        "field": "alpha",
+        "value": 0.99,
+        "locator": {"page": 3},
+    }
+    with pytest.raises(KeyError, match="ambiguous observation_id"):
+        vle.resolve_fidelity_sample(doc, sample)
+    errs = vle.check_fidelity_sample_matches(doc, sample)
+    assert errs and any("ambiguous observation_id" in e for e in errs), errs
+    # The duplicate id is itself refused, and the pin reports the typed
+    # ambiguity instead of resolving either row's value.
+    doc["fidelity_samples"].append(sample)
+    doc_errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert any("duplicate observation_id" in e for e in doc_errs)
+    assert any("ambiguous observation_id" in e for e in doc_errs), doc_errs
+
+
 @pytest.mark.parametrize(
     "new_type",
     [

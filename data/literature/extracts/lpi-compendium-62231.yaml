@@ -13,7 +13,10 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- path: species.lunar_sample_62231.context[lpi_2010_62231_inventory_mass].values.sample_mass_g
+- species: lunar_sample_62231
+  observable: characterization
+  observation_id: lpi_2010_62231_inventory_mass
+  field: sample_mass_g
   value: 87
   locator:
     pdf_page_index: 4
