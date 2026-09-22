@@ -148,3 +148,9 @@ docs/chemistry-provenance.notes.md
 # Source PDFs live in the private corpus repository (regolith-corpus raw/<source_id>/),
 # never in the simulator repository. Sidecar .md notes and extracts stay here.
 *.pdf
+
+# Generated battery scoring output. It reached 262 MB, exceeding GitHub's 100 MB
+# per-file hard limit, and its presence in 143 commits made this branch unpushable.
+# Purged from this branch's history 2026-09-22; regenerate from the score tooling
+# (write_residuals_jsonl) rather than committing it.
+data/battery/residuals.jsonl
