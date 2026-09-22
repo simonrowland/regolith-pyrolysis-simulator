@@ -154,13 +154,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:H_minus_H298:segment-1
@@ -267,13 +267,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:H_minus_H298:segment-2
@@ -414,13 +414,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='IDEAL GAS' in "LIQUID
       <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:S:segment-0
@@ -560,13 +560,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:S:segment-1
@@ -673,13 +673,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:S:segment-2
@@ -820,13 +820,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='IDEAL GAS' in "LIQUID
       <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:cp:segment-0
@@ -966,13 +966,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:cp:segment-1
@@ -1079,13 +1079,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:cp:segment-2
@@ -1226,13 +1226,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='IDEAL GAS' in "LIQUID
       <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-001:delta_fG:segment-0
@@ -1370,7 +1370,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -1378,7 +1378,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:delta_fG:segment-1
@@ -1485,7 +1485,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -1493,7 +1493,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:delta_fG:segment-2
@@ -1636,7 +1636,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -1644,7 +1644,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='IDEAL GAS' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:delta_fH:segment-0
@@ -1782,7 +1782,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -1790,7 +1790,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:delta_fH:segment-1
@@ -1897,7 +1897,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -1905,7 +1905,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:delta_fH:segment-2
@@ -2048,7 +2048,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -2056,7 +2056,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='IDEAL GAS' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-001:log10_Kf:segment-0
@@ -2194,7 +2194,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -2202,7 +2202,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-001:log10_Kf:segment-1
@@ -2309,7 +2309,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -2317,7 +2317,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"; 'LIQUID' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-001:log10_Kf:segment-2
@@ -2460,7 +2460,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -2468,7 +2468,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='IDEAL GAS' in "LIQUID <--> IDEAL GAS"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-001:transition_temperature:crystal-liquid
@@ -2481,7 +2481,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2555,13 +2556,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-001:transition_temperature:liquid-ideal-gas
@@ -2574,7 +2575,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "LIQUID <--> IDEAL GAS"
+        reason: transition spans phases named by "LIQUID <--> IDEAL GAS" (l -> g); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -2648,13 +2650,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-001.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-001.yaml
     record: Cr-001
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "LIQUID <--> IDEAL GAS"; total_pressure_basis=table declared standard state "p° =
       0.1 MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-002:H_minus_H298:segment-0
@@ -2813,13 +2815,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-002:S:segment-0
@@ -2978,13 +2980,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-002:cp:segment-0
@@ -3143,13 +3145,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-002:delta_fG:segment-0
@@ -3304,7 +3306,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -3312,7 +3314,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-002:delta_fH:segment-0
@@ -3467,7 +3469,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -3475,7 +3477,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-002:log10_Kf:segment-0
@@ -3630,7 +3632,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -3638,7 +3640,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-002:transition_temperature:crystal-liquid
@@ -3651,7 +3653,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3725,13 +3728,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-002.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-002.yaml
     record: Cr-002
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-003:H_minus_H298:segment-0
@@ -3898,13 +3901,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-003:S:segment-0
@@ -4071,13 +4074,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-003:cp:segment-0
@@ -4244,13 +4247,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-003:delta_fG:segment-0
@@ -4411,7 +4414,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -4419,7 +4422,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-003:delta_fH:segment-0
@@ -4580,7 +4583,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -4588,7 +4591,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-003:log10_Kf:segment-0
@@ -4749,7 +4752,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -4757,7 +4760,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-003:transition_temperature:crystal-liquid
@@ -4770,7 +4773,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -4844,13 +4848,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-003:transition_temperature:glass-liquid
@@ -4863,7 +4867,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "GLASS <--> LIQUID"
+        reason: transition spans phases named by "GLASS <--> LIQUID" (glass -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -4937,13 +4942,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-003.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-003.yaml
     record: Cr-003
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "GLASS <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-004:H_minus_H298:segment-0
@@ -5089,13 +5094,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:H_minus_H298:segment-1
@@ -5214,13 +5219,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:S:segment-0
@@ -5366,13 +5371,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-004:S:segment-1
@@ -5491,13 +5496,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-004:cp:segment-0
@@ -5643,13 +5648,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-004:cp:segment-1
@@ -5768,13 +5773,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-004:delta_fG:segment-0
@@ -5918,7 +5923,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -5926,7 +5931,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:delta_fG:segment-1
@@ -6043,7 +6048,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -6051,7 +6056,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:delta_fH:segment-0
@@ -6195,7 +6200,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -6203,7 +6208,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:delta_fH:segment-1
@@ -6320,7 +6325,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -6328,7 +6333,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-004:log10_Kf:segment-0
@@ -6472,7 +6477,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -6480,7 +6485,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-004:log10_Kf:segment-1
@@ -6597,7 +6602,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -6605,7 +6610,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-004:transition_temperature:crystal-liquid
@@ -6618,7 +6623,8 @@ observations:
       formula: Cr
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -6692,13 +6698,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-004.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-004.yaml
     record: Cr-004
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-005:H_minus_H298:segment-0
@@ -6917,13 +6923,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-005:S:segment-0
@@ -7142,13 +7148,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-005:cp:segment-0
@@ -7367,13 +7373,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-005:delta_fG:segment-0
@@ -7594,7 +7600,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -7602,7 +7608,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-005:delta_fH:segment-0
@@ -7823,7 +7829,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -7831,7 +7837,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-005:log10_Kf:segment-0
@@ -8050,7 +8056,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-005.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-005.yaml
     record: Cr-005
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -8058,7 +8064,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-006:H_minus_H298:segment-0
@@ -8275,13 +8281,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-006:S:segment-0
@@ -8498,13 +8504,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-006:cp:segment-0
@@ -8721,13 +8727,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-006:delta_fG:segment-0
@@ -8940,7 +8946,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -8948,7 +8954,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-006:delta_fH:segment-0
@@ -9163,7 +9169,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -9171,7 +9177,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-006:log10_Kf:segment-0
@@ -9384,7 +9390,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-006.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-006.yaml
     record: Cr-006
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -9392,7 +9398,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-007:H_minus_H298:segment-0
@@ -9609,13 +9615,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-007:S:segment-0
@@ -9832,13 +9838,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-007:cp:segment-0
@@ -10055,13 +10061,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-007:delta_fG:segment-0
@@ -10274,7 +10280,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -10282,7 +10288,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-007:delta_fH:segment-0
@@ -10497,7 +10503,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -10505,7 +10511,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-007:log10_Kf:segment-0
@@ -10718,7 +10724,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-007.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-007.yaml
     record: Cr-007
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -10726,7 +10732,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-008:H_minus_H298:segment-0
@@ -10868,13 +10874,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-008:S:segment-0
@@ -11016,13 +11022,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-008:cp:segment-0
@@ -11164,13 +11170,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-008:delta_fG:segment-0
@@ -11316,7 +11322,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -11324,7 +11330,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-008:delta_fH:segment-0
@@ -11470,7 +11476,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -11478,7 +11484,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-008:log10_Kf:segment-0
@@ -11622,7 +11628,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-008.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-008.yaml
     record: Cr-008
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -11630,7 +11636,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-009:H_minus_H298:segment-0
@@ -11847,13 +11853,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-009:S:segment-0
@@ -12070,13 +12076,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-009:cp:segment-0
@@ -12293,13 +12299,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-009:delta_fG:segment-0
@@ -12520,7 +12526,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -12528,7 +12534,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-009:delta_fH:segment-0
@@ -12749,7 +12755,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -12757,7 +12763,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-009:log10_Kf:segment-0
@@ -12976,7 +12982,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-009.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-009.yaml
     record: Cr-009
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -12984,7 +12990,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-010:H_minus_H298:segment-0
@@ -13201,13 +13207,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-010:S:segment-0
@@ -13424,13 +13430,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-010:cp:segment-0
@@ -13647,13 +13653,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-010:delta_fG:segment-0
@@ -13874,7 +13880,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -13882,7 +13888,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-010:delta_fH:segment-0
@@ -14103,7 +14109,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -14111,7 +14117,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-010:log10_Kf:segment-0
@@ -14330,7 +14336,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-010.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-010.yaml
     record: Cr-010
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -14338,7 +14344,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-011:H_minus_H298:segment-0
@@ -14555,13 +14561,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-011:S:segment-0
@@ -14778,13 +14784,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-011:cp:segment-0
@@ -15001,13 +15007,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-011:delta_fG:segment-0
@@ -15228,7 +15234,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -15236,7 +15242,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-011:delta_fH:segment-0
@@ -15457,7 +15463,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -15465,7 +15471,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-011:log10_Kf:segment-0
@@ -15684,7 +15690,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-011.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-011.yaml
     record: Cr-011
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -15692,7 +15698,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-012:H_minus_H298:segment-0
@@ -15909,13 +15915,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-012:S:segment-0
@@ -16132,13 +16138,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-012:cp:segment-0
@@ -16355,13 +16361,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-012:delta_fG:segment-0
@@ -16582,7 +16588,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -16590,7 +16596,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-012:delta_fH:segment-0
@@ -16811,7 +16817,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -16819,7 +16825,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-012:log10_Kf:segment-0
@@ -17038,7 +17044,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-012.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-012.yaml
     record: Cr-012
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -17046,7 +17052,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'g'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-013:H_minus_H298:segment-0
@@ -17182,13 +17188,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-013:S:segment-0
@@ -17324,13 +17330,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-013:cp:segment-0
@@ -17466,13 +17472,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-013:delta_fG:segment-0
@@ -17612,7 +17618,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -17620,7 +17626,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-013:delta_fH:segment-0
@@ -17760,7 +17766,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -17768,7 +17774,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-013:log10_Kf:segment-0
@@ -17908,7 +17914,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-013.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-013.yaml
     record: Cr-013
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -17916,7 +17922,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-014:H_minus_H298:segment-0
@@ -18074,13 +18080,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-014:S:segment-0
@@ -18238,13 +18244,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-014:cp:segment-0
@@ -18402,13 +18408,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-014:delta_fG:segment-0
@@ -18562,7 +18568,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -18570,7 +18576,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-014:delta_fH:segment-0
@@ -18724,7 +18730,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -18732,7 +18738,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-014:log10_Kf:segment-0
@@ -18884,7 +18890,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -18892,7 +18898,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'cr'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-014:transition_temperature:crystal-liquid
@@ -18905,7 +18911,8 @@ observations:
       formula: Cr2O3
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -18979,13 +18986,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-014.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-014.yaml
     record: Cr-014
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-015:H_minus_H298:segment-0
@@ -19166,13 +19173,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-015:S:segment-0
@@ -19353,13 +19360,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-015:cp:segment-0
@@ -19540,13 +19547,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis=phase declared by JANAF
       index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-015:delta_fG:segment-0
@@ -19723,7 +19730,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -19731,7 +19738,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-015:delta_fH:segment-0
@@ -19908,7 +19915,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -19916,7 +19923,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-015:log10_Kf:segment-0
@@ -20093,7 +20100,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -20101,7 +20108,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis=phase declared by JANAF index state 'l'
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-015:transition_temperature:crystal-liquid
@@ -20114,7 +20121,8 @@ observations:
       formula: Cr2O3
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -20188,13 +20196,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-015:transition_temperature:glass-liquid
@@ -20207,7 +20215,8 @@ observations:
       formula: Cr2O3
       phase:
         tag: unknown
-        reason: transition spans phases named by "GLASS <--> LIQUID"
+        reason: transition spans phases named by "GLASS <--> LIQUID" (glass -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -20281,13 +20290,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-015.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-015.yaml
     record: Cr-015
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "GLASS <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K
 - observation_id: nist-janaf-4th:Cr-016:H_minus_H298:segment-0
@@ -20437,13 +20446,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:H_minus_H298:segment-1
@@ -20570,13 +20579,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:S:segment-0
@@ -20726,13 +20735,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-016:S:segment-1
@@ -20859,13 +20868,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-016:cp:segment-0
@@ -21015,13 +21024,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='CRYSTAL' in "CRYSTAL
       <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-016:cp:segment-1
@@ -21148,13 +21157,13 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; phase_basis='LIQUID' in "CRYSTAL <-->
       LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
 - observation_id: nist-janaf-4th:Cr-016:delta_fG:segment-0
@@ -21302,7 +21311,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -21310,7 +21319,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:delta_fG:segment-1
@@ -21439,7 +21448,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -21447,7 +21456,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:delta_fH:segment-0
@@ -21595,7 +21604,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -21603,7 +21612,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:delta_fH:segment-1
@@ -21732,7 +21741,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -21740,7 +21749,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
 - observation_id: nist-janaf-4th:Cr-016:log10_Kf:segment-0
@@ -21886,7 +21895,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -21894,7 +21903,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='CRYSTAL' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-016:log10_Kf:segment-1
@@ -22023,7 +22032,7 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
@@ -22031,7 +22040,7 @@ observations:
       v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
       phase_basis='LIQUID' in "CRYSTAL <--> LIQUID"
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: dimensionless
 - observation_id: nist-janaf-4th:Cr-016:transition_temperature:crystal-liquid
@@ -22044,7 +22053,8 @@ observations:
       formula: Cr2O3
       phase:
         tag: unknown
-        reason: transition spans phases named by "CRYSTAL <--> LIQUID"
+        reason: transition spans phases named by "CRYSTAL <--> LIQUID" (cr -> l); v2.1 species.phase has one phase axis and
+          cannot hold both
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -22118,12 +22128,12 @@ observations:
     note: 'NIST download_url: https://janaf.nist.gov/tables/Cr-016.txt'
     source_path: data/literature/compilations/janaf/tables/Cr-016.yaml
     record: Cr-016
-  read_from: unknown:nist-janaf-4th
+  read_from: tables:nist-janaf-4th
   derivation:
     relation: Direct JANAF labelled row "CRYSTAL <--> LIQUID"; total_pressure_basis=table declared standard state "p° = 0.1
       MPa (as published by JANAF)"; no adjacent PRESSURE row; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.
     inputs:
-    - unknown:nist-janaf-4th
+    - tables:nist-janaf-4th
     parameters: []
     output_unit: K

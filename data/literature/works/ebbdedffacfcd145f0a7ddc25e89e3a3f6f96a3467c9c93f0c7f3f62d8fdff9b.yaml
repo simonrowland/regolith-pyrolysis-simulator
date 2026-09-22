@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: b07e8ee3af2461e7ea8c459c60bdf2b6c22926e9
     files:
     - asset_id: pdf:janaf-4th
       role: pdf
@@ -35,6 +35,24 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
+    - asset_id: pdf:nist-janaf-4th
+      role: pdf
+      path: raw/nist-janaf-4th/nist-janaf-4th.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:nist-janaf-4th
+      role: pdftotext
+      path: text/nist-janaf-4th
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nist-janaf-4th
+      role: table_csv
+      path: raw/janaf-nist-txt
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:nist-janaf-4th
       role: pdftotext
       path: unknown
