@@ -453,6 +453,7 @@ def normalized_composition(
     point = (observation.point_conditions or {}) if observation else {}
     routes = []
     evidence_ranks = []
+    absent = []
     missing = []
     unsupported = False
     printed_species: set[str] | None = None
@@ -462,8 +463,8 @@ def normalized_composition(
         located = point.get(key) if key in point else getattr(experiment.sample, field)
         path = (f"observation[{observation.observation_id}].point_conditions.{key}"
                 if key in point else f"experiment.sample.{field}")
-        missing.append(path)
         if located is None or not located.state.is_value:
+            absent.append(path)
             continue
         raw = located.state.value
         if field == "printed_composition" and isinstance(raw, Mapping):
@@ -509,9 +510,10 @@ def normalized_composition(
             evidence_ranks.append((not bool(located.inference), directness))
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
+            missing.append(path)
     routes = [route for _, route in sorted(zip(evidence_ranks, routes),
                                           key=lambda pair: pair[0], reverse=True)]
-    result = _result("normalized_composition", routes, tuple(missing))
+    result = _result("normalized_composition", routes, tuple(absent))
     if result.selected is not None and printed_species is not None:
         dropped = tuple(sorted(
             printed_species - {str(species) for species in result.selected.value}))
