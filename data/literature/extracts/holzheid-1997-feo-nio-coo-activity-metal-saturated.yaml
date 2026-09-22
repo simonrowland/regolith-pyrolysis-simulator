@@ -133,7 +133,7 @@ species:
         method_class: measured_direct
         quantity: CoO_solubility_and_MgO_dependence
         fidelity_pin_CoO_wt_pct: 2.03
-        rows:
+        series:
         - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 2.03, CoO_sd_pct: 5, MgO_wt_pct: 6.97, MgO_sd_pct: 5, gamma_CoO: 1.72}
         - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, CoO_wt_pct: 2.80, CoO_sd_pct: 5, MgO_wt_pct: 10.1, MgO_sd_pct: 5, gamma_CoO: 1.31}
         - {run: V 70, T_K: 1670, duration_h: 48, log_fO2: -9.93, CoO_wt_pct: 1.85, CoO_sd_pct: 5, MgO_wt_pct: 10.8, MgO_sd_pct: 5, gamma_CoO: 1.46}
@@ -160,7 +160,7 @@ species:
       values:
         method_class: measured_direct
         quantity: CoO_solubility_and_MgO_dependence
-        rows:
+        series:
         - {run: BK57, T_K: 1673, duration_h: 66, log_fO2: -9.58, CoO_wt_pct: 2.40, CoO_sd_pct: 5, FeO_wt_pct: 4.48, FeO_sd_pct: 5, MgO_wt_pct: 10.6, MgO_sd_pct: 1, Co_wt_pct: 91.3, Co_sd_pct: 1, Fe_wt_pct: 6.38, Fe_sd_pct: 1, gamma_CoO: 1.21, gamma_FeO: 2.33}
         - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, CoO_wt_pct: 1.78, CoO_sd_pct: 5, FeO_wt_pct: 2.65, FeO_sd_pct: 6, MgO_wt_pct: 17.7, MgO_sd_pct: 6, Co_wt_pct: 91.4, Co_sd_pct: 2, Fe_wt_pct: 8.06, Fe_sd_pct: 5, gamma_CoO: 2.08, gamma_FeO: 3.44}
         - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, CoO_wt_pct: 2.13, CoO_sd_pct: 5, FeO_wt_pct: 2.20, FeO_sd_pct: 10, MgO_wt_pct: 17.9, MgO_sd_pct: 1, Co_wt_pct: 90.8, Co_sd_pct: 1, Fe_wt_pct: 7.12, Fe_sd_pct: 1, gamma_CoO: 1.48, gamma_FeO: 3.24}
@@ -186,7 +186,7 @@ species:
         method_class: measured_direct
         quantity: NiO_solubility_and_MgO_dependence
         fidelity_pin_NiO_wt_pct: 0.17
-        rows:
+        series:
         - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.17, NiO_sd_pct: 5, MgO_wt_pct: 7.22, MgO_sd_pct: 5, gamma_NiO: 3.06}
         - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.64, NiO_wt_pct: 0.21, NiO_sd_pct: 5, MgO_wt_pct: 8.94, MgO_sd_pct: 5, gamma_NiO: 2.60}
         - {run: AD 12, T_K: 1677, duration_h: 48, log_fO2: -9.64, NiO_wt_pct: 0.26, NiO_sd_pct: 5, MgO_wt_pct: 10.4, MgO_sd_pct: 5, gamma_NiO: 2.61}
@@ -215,7 +215,7 @@ species:
       values:
         method_class: measured_direct
         quantity: NiO_solubility_and_MgO_dependence
-        rows:
+        series:
         - {run: BK57, T_K: 1673, duration_h: 66, log_fO2: -9.58, NiO_wt_pct: 0.219, NiO_sd_pct: 5, FeO_wt_pct: 2.01, FeO_sd_pct: 12, MgO_wt_pct: 11.1, MgO_sd_pct: 1, Ni_wt_pct: 91.1, Ni_sd_pct: 1, Fe_wt_pct: 5.65, Fe_sd_pct: 6, gamma_NiO: 2.33, gamma_FeO: 1.65}
         - {run: V 68, T_K: 1667, duration_h: 49, log_fO2: -9.70, NiO_wt_pct: 0.167, NiO_sd_pct: 5, FeO_wt_pct: 2.19, FeO_sd_pct: 5, MgO_wt_pct: 17.4, MgO_sd_pct: 6, Ni_wt_pct: 89.5, Ni_sd_pct: 1, Fe_wt_pct: 9.50, Fe_sd_pct: 6, gamma_NiO: 2.84, gamma_FeO: 2.79}
         - {run: V 64, T_K: 1675, duration_h: 49, log_fO2: -9.79, NiO_wt_pct: 0.130, NiO_sd_pct: 10, FeO_wt_pct: 1.72, FeO_sd_pct: 5, MgO_wt_pct: 17.5, MgO_sd_pct: 1, Ni_wt_pct: 90.5, Ni_sd_pct: 1, Fe_wt_pct: 8.52, Fe_sd_pct: 3, gamma_NiO: 3.15, gamma_FeO: 2.59}
@@ -241,7 +241,7 @@ species:
         method_class: measured_direct
         quantity: FeO_solubility_and_MgO_dependence
         fidelity_pin_FeO_wt_pct: 26.0
-        rows:
+        series:
         - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.465, CoO_sd_pct: 5, NiO_wt_pct: 0.0518, NiO_sd_pct: 18, FeO_wt_pct: 26.0, FeO_sd_pct: 5, MgO_wt_pct: 4.87, MgO_sd_pct: 5, gamma_CoO: 1.65, gamma_NiO: 3.68, gamma_FeO: 1.72}
         - {run: V 69, T_K: 1673, duration_h: 50, log_fO2: -9.63, CoO_wt_pct: 0.531, CoO_sd_pct: 5, NiO_wt_pct: 0.0502, NiO_sd_pct: 15, FeO_wt_pct: 20.8, FeO_sd_pct: 5, MgO_wt_pct: 6.83, MgO_sd_pct: 5, gamma_CoO: 1.75, gamma_NiO: 4.35, gamma_FeO: 1.83}
         - {run: AD 10, T_K: 1677, duration_h: 50, log_fO2: -10.31, CoO_wt_pct: 0.334, CoO_sd_pct: 5, NiO_wt_pct: 0.0360, NiO_sd_pct: 7, FeO_wt_pct: 7.15, FeO_sd_pct: 5, MgO_wt_pct: 9.73, MgO_sd_pct: 5, gamma_CoO: 1.51, gamma_NiO: 3.82, gamma_FeO: 1.62}

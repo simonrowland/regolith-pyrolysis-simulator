@@ -10,6 +10,7 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+from simulator.battery.enums import ValueKind
 from simulator.battery.identity import PA_PER_ATM_DEC, atm_to_pa
 from simulator.battery.migrate import (
     PrintedOxygenFacts,
@@ -154,3 +155,139 @@ def test_sossi_table_row_keeps_its_printed_log(tmp_path: Path) -> None:
     assert obs.point_conditions["fO2_log"].state.value == Decimal("-0.68")
     assert obs.point_conditions["fO2_log"].inference is None
     assert isinstance(obs.point_conditions["fO2_log"].state.value, Decimal)
+
+
+# Printed per-run log fO2 that sat under ``rows``/``runs``, or in the unscored
+# context container, never reached the store. Those tables are per-run series,
+# so they use the ``series`` key the landing machinery iterates (the sossi-2019
+# pattern above). Values land as printed: no buffer conversion, no shift.
+
+
+def _exploded_points(result: object, parent: str) -> list:
+    points = [
+        obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(parent + "::point:")
+    ]
+    return sorted(points, key=lambda obs: obs.observation_id)
+
+
+def test_holzheid_table3_rows_land_printed_log_per_run(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "holzheid-1997-feo-nio-coo-activity-metal-saturated"
+    )
+    stem = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
+    parent = f"{stem}::holzheid_1997_table3a_ad_co_variable_mgo"
+    points = _exploded_points(result, parent)
+    assert len(points) == 8
+    first = points[0]
+    located = first.point_conditions["fO2_log"]
+    assert located.state.value == Decimal("-9.63")
+    assert located.inference is None
+    # A later row keeps its own printed log. Not collapsed, not shifted to dIW.
+    assert points[2].point_conditions["fO2_log"].state.value == Decimal("-9.93")
+    assert points[2].point_conditions["fO2_log"].inference is None
+    assert first.value.kind is not ValueKind.POINT or first.value.point != Decimal("-9.63")
+    # Table 3 prints T_K per run; it lands beside the printed log.
+    assert first.point_conditions["temperature_K"].state.value == Decimal("1673")
+    # Every run of the five Table 3 panels carries its printed log.
+    landed = [
+        obs
+        for oid, obs in result.observations.items()
+        if "::point:" in oid and "fO2_log" in (obs.point_conditions or {})
+    ]
+    assert len(landed) == 33
+    # The printed log resolves the oxygen_condition waypoint as PRINTED.
+    experiment = result.experiments[first.experiment_id]
+    bench = result.benches[experiment.bench_id]
+    oxygen = oxygen_condition(experiment, bench, first)
+    assert oxygen.selected is not None
+    assert oxygen.selected.route == "observation_fO2_log"
+    assert oxygen.selected.authority is WaypointAuthority.PRINTED
+    assert oxygen.selected.value.point == Decimal("-9.63")
+
+
+def test_sossi_2020_table1_rows_land_printed_log_and_celsius(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "sossi-2020-cu-zn-isotope-evap-formalism")
+    stem = "sossi-2020-cu-zn-isotope-evap-formalism"
+    cu_points = _exploded_points(result, f"{stem}::sossi_2020_cu_table1_measured_runs")
+    zn_points = _exploded_points(result, f"{stem}::sossi_2020_zn_table1_measured_runs")
+    assert len(cu_points) == 34
+    assert len(zn_points) == 36
+    first = cu_points[0]
+    # Table 1 prints log10(fO2/bar) = -0.68 and 1500 C for run P 5/04/17b.
+    located = first.point_conditions["fO2_log"]
+    assert located.state.value == Decimal("-0.68")
+    assert located.inference is None
+    # Run P 31/07/18a is series index 10 and prints -2.74, not the air value.
+    # No bar/atm shift. Look up the id, not a lexicographic sort of point:N.
+    run = result.observations[
+        f"{stem}::sossi_2020_cu_table1_measured_runs::point:10"
+    ]
+    assert run.point_conditions["fO2_log"].state.value == Decimal("-2.74")
+    assert run.point_conditions["fO2_log"].inference is None
+    assert first.value.kind is not ValueKind.POINT or first.value.point != Decimal("-0.68")
+    temperature = first.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1773.15")
+    # The kelvin figure is the code's C-to-K unit conversion of the printed
+    # 1500 C, so it is typed as a conversion, never as a second printed fact.
+    assert temperature.inference is not None
+    zn_first = zn_points[0]
+    assert zn_first.point_conditions["fO2_log"].state.value == Decimal("-0.68")
+    assert zn_first.point_conditions["fO2_log"].inference is None
+
+
+def test_heck_run_log_lands_printed_log_per_run(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-140-heck-2025")
+    parent = "kems-140-heck-2025::heck_2025_t1_experimental_conditions"
+    points = _exploded_points(result, parent)
+    assert len(points) == 81
+    located = points[0].point_conditions["fO2_log"]
+    # Ex 7 prints log10 fO2 = -0.68 (the air row) and T_K = 1673.
+    assert located.state.value == Decimal("-0.68")
+    assert located.inference is None
+    assert points[0].point_conditions["temperature_K"].state.value == Decimal("1673")
+    landed = {
+        obs.point_conditions["fO2_log"].state.value
+        for obs in points
+        if "fO2_log" in (obs.point_conditions or {})
+    }
+    assert landed == {
+        Decimal("-0.68"),
+        Decimal("-4.3049"),
+        Decimal("-4.8"),
+        Decimal("-5.3049"),
+        Decimal("-7.3"),
+        Decimal("-7.3144"),
+        Decimal("-9"),
+    }
+
+
+def test_thomas_table2_log_fO2_lands_printed_per_run(tmp_path: Path) -> None:
+    # Table 2 header is "log f(O2)". No buffer symbol and no bar/atm unit.
+    # The printed log lands unchanged. f(Cl2) stays a linear fugacity and is
+    # not logged. The run log is not a Gibbs energy, so the point value is
+    # unavailable rather than one of the table's other numbers.
+    result = _migrate_real_extract(tmp_path, "thomas-2022-chlorine-bonding-silicate-melts")
+    parent = "thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_table2_experimental_conditions_and_xaf"
+    points = _exploded_points(result, parent)
+    assert len(points) == 43
+    located = points[0].point_conditions["fO2_log"]
+    assert located.state.value == Decimal("-7.17")
+    assert located.inference is None
+    assert points[0].point_conditions["temperature_K"].state.value == Decimal("1673.15")
+    assert points[0].point_conditions["temperature_K"].inference is not None
+    assert points[0].value.kind is ValueKind.UNAVAILABLE
+    landed = {
+        obs.point_conditions["fO2_log"].state.value
+        for obs in points
+        if "fO2_log" in (obs.point_conditions or {})
+    }
+    assert landed == {
+        Decimal("-7.17"),
+        Decimal("-7.9"),
+        Decimal("-8.2"),
+        Decimal("-6.66"),
+    }
+    for obs in points:
+        assert "fO2_Pa" not in (obs.point_conditions or {})
