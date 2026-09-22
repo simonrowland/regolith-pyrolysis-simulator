@@ -330,8 +330,15 @@ def report(root: Path) -> dict[str, object]:
     works, experiments, observations = load_migrated_store(root)
     by_experiment = defaultdict(list)
     by_experiment_all: dict[str, list] = defaultdict(list)
+    # Secondary index: (source_id, locator.table) → observations. Lets an
+    # experiment whose id does not match the observation experiment_id (legacy
+    # hash::table rows) still resolve pure-substance markers via its locator.
+    by_source_table: dict[tuple[str, str], list] = defaultdict(list)
     for observation in observations.values():
         by_experiment_all[observation.experiment_id].append(observation)
+        table = observation.locator.table if observation.locator is not None else None
+        if observation.source_id and table:
+            by_source_table[(observation.source_id, table)].append(observation)
         if observation.point_conditions:
             by_experiment[observation.experiment_id].append(observation)
     benches = load_migrated_benches(root)
@@ -402,9 +409,15 @@ def report(root: Path) -> dict[str, object]:
                     tuple(dict.fromkeys(gap for item in records for gap in item.gaps)), base.engine,
                     tuple({repr(notice): notice for item in records for notice in item.notices}.values())))
             readiness = tuple(aggregated)
-        # Own observations only. An alias that shares locator.table does not
-        # lend another source's pure_substance_reference declaration.
-        linked_obs = by_experiment_all.get(experiment.experiment_id, ())
+        # Pure-substance engine-reference tabulations (identity.composition
+        # not_applicable + compilation_role engine_reference_input /
+        # scoring_eligible on derivation.relation) are not engine_point
+        # candidates. Mark before aggregating consumers so gaps are not counted.
+        linked_obs = list(by_experiment_all.get(experiment.experiment_id, ()))
+        table = experiment.locator.table if experiment.locator is not None else None
+        if table:
+            for source_id in source_ids:
+                linked_obs.extend(by_source_table.get((source_id, table), ()))
         if any(is_pure_substance_engine_reference(item) for item in linked_obs):
             gap = pure_substance_engine_point_gap()
             readiness = tuple(
