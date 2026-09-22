@@ -8501,6 +8501,12 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
         obs_list.extend(observations)
         sources.append(src)
 
+    written_extract_stems = {
+        dest.stem
+        for key, (dest, _observations, _sources) in family_groups.items()
+        if key.startswith("extract:")
+    }
+
     if observations_v2.exists():
         for stale in iter_observation_store_paths(observations_v2):
             stale.unlink()
@@ -8521,6 +8527,29 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
             ],
         }
         dump_yaml(payload, dest)
+
+    # A zero-observation extract is absent from family_groups. Its previous
+    # sibling would otherwise survive and keep rows that now live in context
+    # (d-032: context is never an Observation). Replace that sibling only.
+    for extract_path in discover_extracts(root / "data" / "literature" / "extracts"):
+        if extract_path.stem in written_extract_stems:
+            continue
+        dest = extracts_v2 / f"{extract_path.stem}.yaml"
+        if not dest.is_file():
+            continue
+        rel = (
+            extract_path.relative_to(root).as_posix()
+            if extract_path.is_relative_to(root)
+            else extract_path.as_posix()
+        )
+        dump_yaml(
+            {
+                "schema_version": "battery_observations.v2.1",
+                "sources": [rel],
+                "observations": [],
+            },
+            dest,
+        )
 
     dump_yaml(
         {

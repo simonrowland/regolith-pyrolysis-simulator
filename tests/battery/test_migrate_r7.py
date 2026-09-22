@@ -422,11 +422,42 @@ def absence_audit(paths=STORE_PATHS):
     return judged, bad
 
 
+def _source_observation_rows(path: Path) -> int | None:
+    """Observation-row count of the extract behind an extracts-v2 sibling.
+
+    None for compilations and for a sibling whose source extract is absent.
+    Zero is a real count: an all-context extract has nothing to audit.
+    """
+
+    if _store_kind(path) != "extracts-v2":
+        return None
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / path.name
+    if not source_path.is_file():
+        return None
+    source_doc = yaml.load(source_path.read_text(), Loader=yaml.CSafeLoader)
+    if not isinstance(source_doc, dict):
+        return None
+    species = source_doc.get("species") or {}
+    if not isinstance(species, dict):
+        return 0
+    total = 0
+    for body in species.values():
+        if not isinstance(body, dict):
+            continue
+        rows = body.get("observations") or []
+        if isinstance(rows, list):
+            total += len(rows)
+    return total
+
+
 @pytest.mark.parametrize("path", STORE_PATHS, ids=lambda p: p.name)
 def test_g1_whole_store_absence_claims_match_sources(path):
     judged, bad = absence_audit([path])
     if _store_kind(path) == "extracts-v2" or compilation_family_from_store_path(path):
-        assert judged, "no source families judged"
+        # Zero source rows have no absence claims. Leaked context ids still
+        # fail inside absence_audit (they are not in the source observations).
+        if _source_observation_rows(path) != 0:
+            assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
 
 
