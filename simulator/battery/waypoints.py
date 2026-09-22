@@ -149,14 +149,42 @@ ENGINE_POINT_CONSUMERS = (
 )
 
 
-def _result(name: str, routes: list[Waypoint], missing: tuple[str, ...]) -> WaypointResult:
+def _result(
+    name: str,
+    routes: list[Waypoint],
+    missing: tuple[str, ...] = (),
+    *,
+    present: Mapping[str, bool] | None = None,
+) -> WaypointResult:
     # Callers pass routes best-first. The evidence ladder (was the source
     # printed or inferred, and how direct is the derivation) is known only
     # where the routes are built; selecting here by route-name prefix or a
     # second authority sort would discard that ladder.
     selected = routes[0] if routes else None
+    # `present` is an OR-set evaluated for this context. A resolved member is
+    # not missing. A bare tuple is already the evaluated absence (dynamic
+    # refusal sites pass it through unchanged).
+    if present is not None:
+        missing = tuple(label for label, is_present in present.items() if not is_present)
     absence = None if selected else WaypointAbsence(name, GapReason.MISSING_EVIDENCE, missing)
     return WaypointResult(name, selected, tuple(routes), absence)
+
+
+def _located_present(located: Located | None) -> bool:
+    return located is not None and located.state.is_value
+
+
+def _schedule_temperature_present(schedule: ThermalSchedule | None) -> bool:
+    if schedule is None:
+        return False
+    located: list[Located | None] = []
+    for point in schedule.points or ():
+        located.extend((point.time_s, point.temperature_K))
+    for ramp in schedule.ramps or ():
+        located.extend((ramp.rate_K_s, ramp.start_temperature_K, ramp.end_temperature_K))
+    for hold in schedule.setpoints_and_holds or ():
+        located.extend((hold.temperature_K, hold.hold_duration_s))
+    return any(_located_present(item) for item in located)
 
 
 def _value(located: Located[Value] | None) -> Value | None:
@@ -401,13 +429,16 @@ def charge_moles_by_species(
     }
     absence = None
     if not results:
+        charge_inputs = {
+            "experiment.sample.mass_kg": _located_present(experiment.sample.mass_kg),
+            "experiment.sample.initial_composition": _located_present(
+                experiment.sample.initial_composition
+            ),
+        }
         absence = WaypointAbsence(
             "charge_moles_by_species",
             GapReason.MISSING_EVIDENCE,
-            (
-                "experiment.sample.mass_kg",
-                "experiment.sample.initial_composition",
-            ),
+            tuple(label for label, is_present in charge_inputs.items() if not is_present),
         )
     return SpeciesWaypoints(results, absence, tuple(sorted(set(dropped) - set(results))))
 
@@ -496,8 +527,14 @@ def normalized_composition(
     return result
 
 
-def _rectangular_volume(dimensions: Mapping[str, Located[Value]] | None) -> Value | None:
+def _dimensions_present(dimensions: Mapping[str, Located[Value]] | None) -> bool:
     if not dimensions:
+        return False
+    return all(_value(dimensions.get(key)) is not None for key in ("length_m", "width_m", "height_m"))
+
+
+def _rectangular_volume(dimensions: Mapping[str, Located[Value]] | None) -> Value | None:
+    if not _dimensions_present(dimensions):
         return None
     keys = ("length_m", "width_m", "height_m")
     values = [_value(dimensions.get(key)) for key in keys]
@@ -532,7 +569,19 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
             value = _rectangular_volume(geometry.chamber_dimensions)
             if value is not None:
                 routes.append(Waypoint("relevant_volume", value, "chamber_internal_dimensions", WaypointAuthority.DERIVED, ("bench.geometry.chamber_dimensions",)))
-    return _result("relevant_volume", routes, (("bench.geometry.cell_internal_dimensions",) if knudsen else ("bench.geometry.chamber_volume_m3", "bench.geometry.chamber_dimensions")))
+    if knudsen:
+        volume_inputs = {
+            "bench.geometry.cell_internal_dimensions": geometry is not None
+            and _dimensions_present(geometry.cell_internal_dimensions),
+        }
+    else:
+        volume_inputs = {
+            "bench.geometry.chamber_volume_m3": geometry is not None
+            and _value(geometry.chamber_volume_m3) is not None,
+            "bench.geometry.chamber_dimensions": geometry is not None
+            and _dimensions_present(geometry.chamber_dimensions),
+        }
+    return _result("relevant_volume", routes, tuple(volume_inputs), present=volume_inputs)
 
 
 def pressure_boundary(
@@ -560,7 +609,14 @@ def pressure_boundary(
                 # Algebra: 0=Q-S*P, so P=Q/S (V cancels). Units: Pa*m3/s /(m3/s)=Pa.
                 # Sanity: Q=1e-5 Pa*m3/s and S=1e-2 m3/s gives 1e-3 Pa.
                 routes.append(Waypoint("pressure_boundary", derived, "steady_gas_load_over_pump_speed", WaypointAuthority.DERIVED, ("bench.other_facts.gas_load_Pa_m3_s", "bench.pumping_speed_m3_s", "relevant_volume")))
-    return _result("pressure_boundary", routes, ("experiment.pressure_environment.total_pressure_Pa", "bench.other_facts.gas_load_Pa_m3_s", "bench.pumping_speed_m3_s"))
+    pressure_inputs = {
+        "experiment.pressure_environment.total_pressure_Pa": _value(
+            experiment.pressure_environment.total_pressure_Pa
+        ) is not None,
+        "bench.other_facts.gas_load_Pa_m3_s": gas_load is not None and _value(gas_load.value) is not None,
+        "bench.pumping_speed_m3_s": speed is not None,
+    }
+    return _result("pressure_boundary", routes, tuple(pressure_inputs), present=pressure_inputs)
 
 
 def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResult:
@@ -568,7 +624,12 @@ def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResul
     routes: list[Waypoint] = []
     geometry = bench.geometry
     if geometry is None:
-        return _result("effective_escape_area", routes, ("bench.geometry",))
+        return _result(
+            "effective_escape_area",
+            routes,
+            ("bench.geometry",),
+            present={"bench.geometry": False},
+        )
     area = _value(geometry.orifice_area_m2)
     diameter = _value(geometry.orifice_diameter_m)
     clausing = _value(geometry.clausing_factor)
@@ -607,7 +668,13 @@ def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResul
                 if effective is not None:
                     routes.append(Waypoint("effective_escape_area", effective, "diameter_times_clausing", WaypointAuthority.DERIVED, tuple(inputs + ["bench.geometry.clausing_factor"])))
             routes.append(geometric_route)
-    result = _result("effective_escape_area", routes, ("bench.geometry.orifice_area_m2", "bench.geometry.orifice_diameter_m"))
+    escape_inputs = {
+        "bench.geometry.orifice_area_m2": area is not None,
+        "bench.geometry.orifice_diameter_m": diameter is not None,
+    }
+    result = _result(
+        "effective_escape_area", routes, tuple(escape_inputs), present=escape_inputs
+    )
     effective = [route for route in routes if WaypointFlag.GEOMETRIC_ONLY not in route.flags]
     if effective:
         return WaypointResult(result.name, _result(result.name, effective, ()).selected, result.routes)
@@ -798,7 +865,11 @@ def thermal_path(
         temp_value = raw_temperature if isinstance(raw_temperature, Value) else Value.point_of(raw_temperature)
         if temp_value.kind is ValueKind.POINT:
             routes.append(Waypoint("thermal_path", Value(ValueKind.SERIES, series=((Decimal(0), temp_value.point),)), "temperature_points_only", WaypointAuthority.PRINTED, ("experiment.conditions.temperature_K",)))
-    return _result("thermal_path", routes, ("experiment.thermal_schedule", "experiment.conditions.temperature_K"))
+    thermal_inputs = {
+        "experiment.thermal_schedule": _schedule_temperature_present(schedule),
+        "experiment.conditions.temperature_K": _located_present(experiment.conditions.get("temperature_K")),
+    }
+    return _result("thermal_path", routes, tuple(thermal_inputs), present=thermal_inputs)
 
 
 def oxygen_condition(
@@ -904,7 +975,30 @@ def oxygen_condition(
                 routes.append(Waypoint("oxygen_condition", Value.point_of(value),
                     "buffer_relation", WaypointAuthority.DERIVED,
                     ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
-    return _result("oxygen_condition", routes, ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"))
+    if routes:
+        # A fired route is the decision. The OR-set is consulted only for the gap text.
+        return _result(
+            "oxygen_condition",
+            routes,
+            ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"),
+        )
+    point_fo2 = (observation.point_conditions or {}).get("fO2_log") if observation is not None else None
+    control_present = control is not None and (
+        _value(control.oxygen_partial_pressure_Pa) is not None
+        or (control.buffer is not None and control.buffer.state.is_value)
+    )
+    oxygen_inputs = {
+        "fO2_log": _located_present(point_fo2) or _condition_value(experiment, "fO2_log") is not None,
+        "experiment.fO2_control": control_present,
+        "temperature_K": thermal_path(experiment, bench, observation).selected is not None,
+        "total_pressure_Pa": pressure_boundary(experiment, bench, observation).selected is not None,
+    }
+    return _result(
+        "oxygen_condition",
+        routes,
+        ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"),
+        present=oxygen_inputs,
+    )
 
 
 def _log_pressure(pressure: Value) -> Value | None:
@@ -979,10 +1073,16 @@ def g1(
                 )
     absence = None
     if not results:
+        g1_inputs = {
+            "charge_moles_by_species": any(item.selected is not None for item in charges.values()),
+            "p_sat": p_sat is not None and not (isinstance(p_sat, Mapping) and len(p_sat) == 0),
+            "relevant_volume": volume is not None,
+            "thermal_path": thermal is not None,
+        }
         absence = WaypointAbsence(
             "G1",
             GapReason.MISSING_EVIDENCE,
-            ("charge_moles_by_species", "p_sat", "relevant_volume", "thermal_path"),
+            tuple(label for label, is_present in g1_inputs.items() if not is_present),
         )
     return SpeciesWaypoints(results, absence)
 
@@ -1020,15 +1120,14 @@ def g2(experiment: Experiment, bench: Bench) -> WaypointResult:
                     tuple(dict.fromkeys(escape.flags + alpha_flags)),
                 )
             )
-    return _result(
-        "G2",
-        routes,
-        (
-            "effective_escape_area",
-            "experiment.sample.surface_area_m2",
-            "experiment.conditions.evaporation_alpha",
-        ),
-    )
+    g2_inputs = {
+        "effective_escape_area": escape is not None,
+        "experiment.sample.surface_area_m2": surface is not None,
+        "experiment.conditions.evaporation_alpha": _condition_value(
+            experiment, "evaporation_alpha"
+        ) is not None,
+    }
+    return _result("G2", routes, tuple(g2_inputs), present=g2_inputs)
 
 
 def g3(experiment: Experiment, bench: Bench) -> WaypointResult:
@@ -1041,7 +1140,11 @@ def g3(experiment: Experiment, bench: Bench) -> WaypointResult:
             # Premise: vessel pressure response geometry scales with volume per escape area.
             # Algebra: G3=V/S_eff. Units: m3/m2=m. Sanity: 1e-3/1e-6=1000 m.
             routes.append(Waypoint("G3", value, "volume_over_escape_area", WaypointAuthority.DERIVED, ("relevant_volume", "effective_escape_area"), escape.flags))
-    return _result("G3", routes, ("relevant_volume", "effective_escape_area"))
+    g3_inputs = {
+        "relevant_volume": volume is not None,
+        "effective_escape_area": escape is not None,
+    }
+    return _result("G3", routes, tuple(g3_inputs), present=g3_inputs)
 
 
 def _gap(result: WaypointResult) -> ReadinessGap | None:
