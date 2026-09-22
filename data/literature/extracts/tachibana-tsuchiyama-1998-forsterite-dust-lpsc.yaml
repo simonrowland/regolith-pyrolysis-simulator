@@ -15,7 +15,7 @@ species:
   forsterite:
     observations:
     - observation_id: tachibana_1998_forsterite_hkl_flux_equation
-      type: evaporation_rate
+      type: rate_series
       class: model
       locator:
         page: 1
@@ -38,7 +38,7 @@ species:
           k: Boltzmann constant
         note: The equation is printed as the model definition; no numeric flux value is printed in the prose.
     - observation_id: tachibana_1998_forsterite_hbd_alpha_assumption
-      type: evaporation_coefficient
+      type: alpha
       class: model
       locator:
         page: 1
@@ -56,7 +56,7 @@ species:
         qualifier: approximate
         note: Assumed model input, not a measured evaporation coefficient.
     - observation_id: tachibana_1998_forsterite_prior_experiment_alpha_constraint
-      type: evaporation_coefficient
+      type: alpha
       class: quoted_attributed
       locator:
         page: 1
@@ -81,7 +81,7 @@ species:
         qualifier: approximately; range and bound retained as printed
         note: This is a reported constraint from cited experiments, not a direct measurement performed in this abstract.
     - observation_id: tachibana_1998_forsterite_gas_chemistry_species_model
-      type: vapor_composition
+      type: gas_speciation
       class: model
       locator:
         page: 1
@@ -129,7 +129,7 @@ species:
           condition: increasing ptotal where peH2O approximately equals pH2O
           rate_dependence: jFo becomes constant when pH2O is buffered by constant H2O/H2 ratio
     - observation_id: tachibana_1998_forsterite_fig1_model_grid
-      type: evaporation_rate
+      type: rate_series
       class: figure_only
       locator:
         page: 2
@@ -187,7 +187,7 @@ species:
             Model-4: 1910
         note: Values are printed in the Figure 1 caption; model identity follows the caption's Models-1 through 4 order.
     - observation_id: tachibana_1998_forsterite_fig2_dynamic_static_comparison
-      type: mass_loss_fraction
+      type: mass_loss
       class: figure_only
       locator:
         page: 2

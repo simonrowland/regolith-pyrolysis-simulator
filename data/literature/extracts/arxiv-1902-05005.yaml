@@ -17,7 +17,7 @@ species:
   Al:
     observations:
     - observation_id: sossi_fegley_2018_table1_parent_oxide_vapour_species
-      type: vapour_species_temperature_ranges
+      type: gas_speciation
       locator: {pdf_page_index: 12, table: '1', note: 'Table 1, printed p. 13; values are compilation rows and superscript references.'}
       phase: pure_oxide
       regime: equilibrium_saturated_vapour_compilation
@@ -44,7 +44,7 @@ species:
   Fe:
     observations:
     - observation_id: sossi_fegley_2018_table2_activity_coefficients
-      type: activity_coefficient_table
+      type: activity_coefficient
       locator: {pdf_page_index: 22, table: '2', note: 'Table 2, printed pp. 23-24; all 28 listed oxide species transcribed below.'}
       phase: complex_silicate_melt
       regime: compiled_activity_measurements

@@ -106,7 +106,7 @@ species:
   F_Cl_H2O:
     observations:
     - observation_id: filiberto_2011_figure1_near_liquidus_relations
-      type: phase_relation
+      type: phase_transition
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 1
@@ -130,7 +130,7 @@ species:
       uncertainty:
         reported_status: not_reported
     - observation_id: filiberto_2011_figure2_liquidus_depression_relation
-      type: liquidus_depression
+      type: phase_transition
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 1
@@ -152,7 +152,7 @@ species:
   Fe-Mg:
     observations:
     - observation_id: filiberto_2011_figure1_fe_mg_partitioning
-      type: partitioning_trend
+      type: concentration_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
         published_page: 2

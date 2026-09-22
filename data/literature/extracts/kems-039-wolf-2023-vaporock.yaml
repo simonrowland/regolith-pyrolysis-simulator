@@ -127,7 +127,7 @@ species:
         logK_expression: 10278/T - 4.0436
         proxy_expression: fO2 = (pSiO2 / (pSiO * K(7)))^2
     - observation_id: wolf_2023_lunar_vaporock_activity_fits
-      type: activity
+      type: activity_coefficient
       class_tag: model
       locator:
         published_page: 12
@@ -149,7 +149,7 @@ species:
           T_1500_K: 0.009
         model_comparison: VapoRock pNa agrees within factor 2 at 1400 and 1500 K extremes; pK is about 3 times low, improving to factor 2 by 1500 K.
     - observation_id: wolf_2023_illite_and_srm_activity_fits
-      type: activity
+      type: activity_coefficient
       class_tag: model
       locator:
         published_page: 11
