@@ -11,10 +11,11 @@ JANAF Delta_fG(T) convention (elements in their reference states at T).
 Per-phase apparent G must therefore never be compared against JANAF
 Delta_fG(T); only balanced-reaction sums cancel the element terms exactly.
 
-A property that is not reachable (e.g. a phase that is not stable at the
-requested T,P in MAGEMin's ig database) is a TYPED absence in
-``absences`` with a ``None`` value — never a fabricated or proxied number
-(absence is never a zero).
+A property that is not reachable is a TYPED absence in ``absences`` with
+a ``None`` value — never a fabricated or proxied number (absence is never
+a zero).  MAGEMin S/Cp/H for the mapped phases are central differences of
+the pure-endmember gbase, including phases that are metastable at the
+requested (T, P); those are values, not absences.
 """
 
 from __future__ import annotations

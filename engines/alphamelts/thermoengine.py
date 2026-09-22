@@ -710,6 +710,69 @@ _TE_PURE_PHASE_POLYMORPH = {
     'pEn': 'protoenstatite',
 }
 
+# BermanStoichiometricPhases.m `#define QUARTZ_ADJUSTMENT -1291.0`, added
+# to quartz H (and therefore G) on both branches when the process-wide
+# QuartzBerman.quartzSettings.isQuartzCorrectionUsed flag is set.  Default
+# is on.  Do not remove it.  The sub-373 K lambda integral (~-2.7 J and
+# ~-0.0086 J/K) is an upstream artefact; it is not patched here.
+_MELTS_QUARTZ_ADJUSTMENT_J = -1291.0
+
+
+def _thermoengine_phase_formula(phase: Any, symbol: str) -> str:
+    """Formula of a Berman phase.  Missing formula is a typed refusal.
+
+    Falling back to the bare symbol (``Fo``) would label the molar basis
+    with something that is not a formula.
+    """
+    formula = getattr(phase, 'formula', None)
+    if callable(formula):
+        formula = formula()
+    if formula is None or str(formula).strip() == '':
+        raise PurePhaseAccessError(
+            f'ThermoEngine phase {symbol!r} exposes no formula; refusing '
+            f'to label the molar basis with the bare symbol'
+        )
+    return str(formula)
+
+
+def _melts_quartz_correction_used(phase: Any) -> Optional[bool]:
+    """Read QuartzBerman's process-wide correction flag.
+
+    ``None`` means the flag could not be read.  Callers must not invent it.
+    The getter is a zero-argument ObjC method; bool() of the unbound method
+    object would be True even when the flag is off.
+    """
+    phase_cls = getattr(phase, '_phase_cls', None)
+    if phase_cls is None:
+        return None
+    try:
+        settings = phase_cls.quartzSettings()
+        return bool(settings.isQuartzCorrectionUsed())
+    except Exception:  # noqa: BLE001 - ObjC boundary; unread is not a value
+        return None
+
+
+def _quartz_provenance(database: str, *, applied: Optional[bool]) -> tuple[str, str]:
+    """Database label plus warning naming the -1291 J flag state."""
+    if applied is None:
+        return database, (
+            'MELTS QUARTZ_ADJUSTMENT=-1291 J flag '
+            '(QuartzBerman.quartzSettings.isQuartzCorrectionUsed) could '
+            'not be read; quartz H/G provenance is incomplete'
+        )
+    state = 'applied' if applied else 'not applied'
+    labelled = (
+        f'{database}; QUARTZ_ADJUSTMENT={_MELTS_QUARTZ_ADJUSTMENT_J:.0f} J '
+        f'{state} (isQuartzCorrectionUsed={applied})'
+    )
+    warning = (
+        f'MELTS quartz correction is {state}: QUARTZ_ADJUSTMENT='
+        f'{_MELTS_QUARTZ_ADJUSTMENT_J:.0f} J '
+        f'{"added to" if applied else "not added to"} quartz H and G '
+        '(BermanStoichiometricPhases.m; process-wide switch, default on)'
+    )
+    return labelled, warning
+
 
 def thermoengine_diagnostic_log_path(
     log_dir: str | os.PathLike[str] | None = None,
@@ -1221,10 +1284,7 @@ print('ok')
                 f'{symbol!r} is not a phase symbol in the ThermoEngine Berman '
                 f'database: {exc}'
             ) from exc
-        formula = getattr(phase, 'formula', None)
-        if callable(formula):
-            formula = formula()
-        formula = str(formula) if formula else str(symbol)
+        formula = _thermoengine_phase_formula(phase, str(symbol))
         values = {}
         for field_name, method_name in (
             ('G_J_mol', 'gibbs_energy'),
@@ -1239,6 +1299,17 @@ print('ok')
                 raw,
                 context=f'ThermoEngine {symbol} {method_name}',
             )
+        database = (
+            f'Berman 1988 MELTS {self._melts_version} '
+            f'(liq_mod {self._liq_model}; calib=True)'
+        )
+        warnings: list[str] = []
+        if str(symbol) == 'Qz':
+            database, quartz_warning = _quartz_provenance(
+                database,
+                applied=_melts_quartz_correction_used(phase),
+            )
+            warnings.append(quartz_warning)
         return PurePhaseProperties(
             engine='thermoengine',
             phase_id=str(symbol),
@@ -1246,13 +1317,11 @@ print('ok')
             polymorph=_TE_PURE_PHASE_POLYMORPH.get(str(symbol)),
             formula=formula,
             formula_basis=f'per 1 mol {formula}',
-            database=(
-                f'Berman 1988 MELTS {self._melts_version} '
-                f'(liq_mod {self._liq_model}; calib=True)'
-            ),
+            database=database,
             gibbs_convention=GIBBS_CONVENTION_APPARENT_298,
             temperature_K=float(temperature_K),
             pressure_bar=float(pressure_bar),
+            warnings=tuple(warnings),
             **values,
         )
 

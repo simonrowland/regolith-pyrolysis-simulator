@@ -30,14 +30,13 @@ import pytest
 from simulator.melt_backend.magemin import (
     MAGEMinBackend,
     _assert_magemin_bulk_echo,
-    _parse_magemin_endmember_fractions,
+    _check_magemin_solver_status,
+    _lambda_stencil_warning,
     _parse_magemin_gbase_tables,
-    _parse_magemin_matlab_assemblage,
     _parse_magemin_sys_oxide_row,
 )
 from simulator.melt_backend.pure_phase import (
     GIBBS_CONVENTION_APPARENT_298,
-    PHASE_NOT_STABLE_AT_TP,
     PurePhaseAccessError,
     PurePhaseBulkMismatchError,
     PurePhaseProperties,
@@ -88,8 +87,8 @@ def _magemin_backend() -> MAGEMinBackend:
 def test_magemin_forsterite_full_property_row_298():
     """fo at 298.15 K: full G/S/Cp/H against JANAF-anchored bands.
 
-    The S assertion is the factor-correction catch: the raw matlab column is
-    31.7 J/K (molar x factor 1/3); only the corrected value lands near 95.14.
+    S and Cp are central differences of the pure-endmember G.  A sign error
+    on dG/dT lands near -95 J/K and fails the S band.
     """
     backend = _magemin_backend()
     try:
@@ -113,6 +112,11 @@ def test_magemin_forsterite_full_property_row_298():
     assert r.Cp_J_K_mol == pytest.approx(118.688, rel=0.01)
     # H(298.15) is dHf(298.15) in the apparent convention.
     assert r.H_J_mol == pytest.approx(-2176.9e3, abs=5.0e3)
+    # S/Cp/H are the same endmember as G, so the Gibbs relation closes.
+    assert r.G_J_mol - (r.H_J_mol - r.temperature_K * r.S_J_K_mol) == (
+        pytest.approx(0.0, abs=1.0e-6)
+    )
+    assert any("pure-endmember gbase" in note for note in r.warnings)
 
 
 @needs_magemin_binary
@@ -138,7 +142,12 @@ def test_magemin_periclase_1000K():
 
 @needs_magemin_binary
 def test_magemin_silica_polymorph_ladder():
-    """q stable at 298.15/1000 K; at 1500 K q refuses typed and trd answers."""
+    """q and trd both answer, including metastable quartz at 1500 K.
+
+    S/Cp/H are derivatives of the endmember G, so stability in the
+    assemblage is not required.  Near-pure silica bulks return solver
+    status -1 (PGE guard); that is a warning, not a refusal.
+    """
     backend = _magemin_backend()
     try:
         q_1000 = backend.pure_phase_properties(
@@ -156,12 +165,12 @@ def test_magemin_silica_polymorph_ladder():
     assert q_1000.absences == ()
     assert q_1000.S_J_K_mol == pytest.approx(116.018, rel=0.01)
     assert q_1000.Cp_J_K_mol == pytest.approx(68.952, rel=0.01)
-    # 1500 K: quartz is metastable (tridymite stable) -> typed absence for
-    # S/Cp/H, but the endmember-table G is still returned.
-    assert q_1500.G_J_mol is not None
-    assert q_1500.S_J_K_mol is None
-    assert {a.property for a in q_1500.absences} == {"S", "Cp", "H"}
-    assert all(a.reason == PHASE_NOT_STABLE_AT_TP for a in q_1500.absences)
+    assert any("status -1" in note for note in q_1000.warnings)
+    # 1500 K: quartz is metastable, but its endmember G still has a
+    # derivative.  JANAF's metastable extension is S(1500) = 144.925.
+    assert q_1500.absences == ()
+    assert q_1500.S_J_K_mol == pytest.approx(144.925, rel=0.03)
+    assert q_1500.Cp_J_K_mol is not None and q_1500.H_J_mol is not None
     assert trd_1500.polymorph == "tridymite"
     assert trd_1500.absences == ()
     # JANAF prints no tridymite table; the quartz table's 1500 K metastable
@@ -171,7 +180,14 @@ def test_magemin_silica_polymorph_ladder():
 
 
 @needs_magemin_binary
-def test_magemin_cristobalite_g_only_typed_absence():
+def test_magemin_cristobalite_derived_from_endmember_g():
+    """crst is metastable at 1000 K; S/Cp still come from its own G(T).
+
+    ds62 cristobalite (TC_endmembers.c "crst"): S0 = 50.86 J/K,
+    Cp = a + b T + c T^-2 with a = 72.7 J/K, b = 1.304e-3 J/K^2,
+    c = -4.129e6 J K.  At 1000 K that polynomial is 69.875 J/K.
+    Integrating Cp/T from 298.15 K gives S(1000) = 118.59 J/K.
+    """
     backend = _magemin_backend()
     try:
         r = backend.pure_phase_properties(
@@ -180,28 +196,39 @@ def test_magemin_cristobalite_g_only_typed_absence():
     finally:
         backend.close()
     assert r.polymorph == "cristobalite"
+    assert r.absences == ()
     assert r.G_J_mol == pytest.approx(-981.0e3, abs=2.0e3)
-    assert r.S_J_K_mol is None and r.Cp_J_K_mol is None and r.H_J_mol is None
-    assert {a.property for a in r.absences} == {"S", "Cp", "H"}
-    assert all(a.reason == PHASE_NOT_STABLE_AT_TP for a in r.absences)
+    assert r.Cp_J_K_mol == pytest.approx(69.875, abs=1.0)
+    assert r.S_J_K_mol == pytest.approx(118.59, abs=1.0)
+    assert r.G_J_mol - (r.H_J_mol - r.temperature_K * r.S_J_K_mol) == (
+        pytest.approx(0.0, abs=1.0e-6)
+    )
 
 
 @needs_magemin_binary
-def test_magemin_enstatite_g_on_mgsio3_basis_typed_absence():
-    """en G must be on the MgSiO3 basis (engine endmember is Mg2Si2O6)."""
+def test_magemin_enstatite_g_on_mgsio3_basis():
+    """en is on the MgSiO3 basis (engine endmember is Mg2Si2O6 / 2).
+
+    ds62 en S0 = 0.1325 kJ/K per Mg2Si2O6 = 66.25 J/K per MgSiO3
+    (TC_endmembers.c "en").  A missed /2 would report ~132.5.
+    """
     backend = _magemin_backend()
     try:
         r = backend.pure_phase_properties(
             "en", temperature_K=1000.0, pressure_bar=1.0
         )
+        r298 = backend.pure_phase_properties(
+            "en", temperature_K=298.15, pressure_bar=1.0
+        )
     finally:
         backend.close()
     assert r.formula == "MgSiO3"
     assert "Mg2Si2O6" in r.formula_basis
-    # Endmember-table gbase is -3325.230 kJ per Mg2Si2O6; /2 -> per MgSiO3.
+    assert r.absences == ()
     assert r.G_J_mol == pytest.approx(-1662.6e3, abs=2.0e3)
-    assert r.S_J_K_mol is None and r.Cp_J_K_mol is None and r.H_J_mol is None
-    assert all(a.reason == PHASE_NOT_STABLE_AT_TP for a in r.absences)
+    assert r298.S_J_K_mol == pytest.approx(66.25, abs=0.2)
+    # 2x basis slip would land near 252 J/K, outside this band.
+    assert r.Cp_J_K_mol == pytest.approx(126.0, abs=5.0)
 
 
 @needs_magemin_binary
@@ -286,6 +313,34 @@ def test_klb1_fallback_refused_live():
         _assert_magemin_bulk_echo({"MgO": 100.0}, matlab_text)
 
 
+@needs_magemin_binary
+def test_magemin_periclase_high_pressure_matches_volume_integral():
+    """G(10 kbar) - G(1 bar) must match integral V dP, not a 10x-low pressure.
+
+    Holland ds62 periclase, the volume this binary's EOS uses
+    (TC_endmembers.c "per"): V = 1.125 kJ/kbar at the 298.15 K reference.
+    Delta-P = 10 kbar - 0.001 kbar = 9.999 kbar.
+    Incompressible integral V dP = 1.125 * 9.999 = 11.248875 kJ.
+    Compressibility at 10 kbar moves that by only tens of joules.
+    Passing bar * 1e-4 instead of bar * 1e-3 evaluates 1 kbar and yields
+    ~1.12 kJ, outside the +/-1 kJ band.
+    """
+    integral_J = 1.125 * (10.0 - 0.001) * 1000.0
+    backend = _magemin_backend()
+    try:
+        low = backend.pure_phase_properties(
+            "per", temperature_K=298.15, pressure_bar=1.0
+        )
+        high = backend.pure_phase_properties(
+            "per", temperature_K=298.15, pressure_bar=10_000.0
+        )
+    finally:
+        backend.close()
+    assert low.pressure_bar == 1.0
+    assert high.pressure_bar == 10_000.0
+    assert high.G_J_mol - low.G_J_mol == pytest.approx(integral_J, abs=1.0e3)
+
+
 # --- MAGEMin: parser unit tests (no binary) --------------------------------
 
 
@@ -310,44 +365,55 @@ def test_gbase_tables_parse_pp_and_ss_endmembers():
     assert ss["fper"]["per"] == pytest.approx(-650.29822)
 
 
-def test_endmember_fractions_positional_zip_with_padding():
-    """Header '-' pads must not shift the name<->value alignment (two ol
-    instances, dominant fo-rich first)."""
-    text = (
-        "End-members fractions[wt fr]\n"
-        "            mont         fa         fo        cfm          -\n"
-        "    ol   0.00000    0.00021    0.99979    0.00000          -\n"
-        "            mont         fa         fo        cfm          -\n"
-        "    ol   0.99982    0.00118    0.00000   -0.00100          -\n"
-        "             per         wu          -\n"
-        "  fper   0.99932    0.00068          -\n"
-        "\n"
-        "Site fractions:\n"
+def test_gbase_nonfinite_solution_endmember_refuses():
+    """float() accepts nan/inf; a non-finite gbase must refuse, not pass."""
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2435.70603  nan  -2340.23243  -2024.09828\n"
     )
-    fracs = _parse_magemin_endmember_fractions(text)
-    assert fracs["ol"][0]["fo"] == pytest.approx(0.99979)
-    assert fracs["ol"][1]["mont"] == pytest.approx(0.99982)
-    assert fracs["fper"][0]["per"] == pytest.approx(0.99932)
+    with pytest.raises(PurePhaseAccessError, match="not finite"):
+        _parse_magemin_gbase_tables(stdout)
 
 
-def test_matlab_assemblage_keeps_instance_order():
-    text = (
-        "Stable mineral assemblage:\n"
-        " phase   fraction[wt]          G[J]  V_molar[cm3/mol]    V_partial[cm3]"
-        "     Cp[kJ/K]   Rho[kg/m3]   Alpha[1/K] Entropy[J/K]  Enthalpy[J]"
-        " BulkMod[GPa] ShearMod[GPa]     Vp[km/s]     Vs[km/s]\n"
-        "    ol       +0.84348   -2317.86613         +44.98000         +12.89060"
-        "     +0.17605  +3190.00351  +0.00000395    +0.093602      -680.4303"
-        "      +111.04       +69.68        +8.00        +4.67\n"
-        "    ol       +0.06921   -2413.18248         +52.73479          +1.12227"
-        "     +0.17677  +3006.70722  +0.00000382    +0.099813      -706.0491"
-        "       +98.64       +42.81        +7.20        +3.77\n"
-        "   SYS                   -771.86636                            +0.00312\n"
+def test_sys_oxide_row_nonfinite_refuses():
+    """A NaN SYS value must not slip the bulk-echo comparison (NaN > tol is False)."""
+    text = _matlab_text_with_sys_row(
+        [float("nan"), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     )
-    rows = _parse_magemin_matlab_assemblage(text)
-    assert len(rows["ol"]) == 2
-    assert rows["ol"][0]["frac_wt"] == pytest.approx(0.84348)
-    assert rows["ol"][0]["Cp_kJ_K"] == pytest.approx(0.17605)
+    assert _parse_magemin_sys_oxide_row(text) is None
+    with pytest.raises(PurePhaseBulkMismatchError):
+        _assert_magemin_bulk_echo({"MgO": 100.0}, text)
+
+
+def test_solver_status_success_is_silent_and_failure_refuses():
+    warnings: list[str] = []
+    _check_magemin_solver_status(
+        "Status             :            0 \t [success]\n", warnings
+    )
+    assert warnings == []
+    _check_magemin_solver_status(
+        "Status : 1 [success, under-relaxed]\n", warnings
+    )
+    assert warnings and "under-relaxed" in warnings[-1]
+    guard: list[str] = []
+    _check_magemin_solver_status("Status             :           -1\n", guard)
+    assert guard and "status -1" in guard[0]
+    for text in (
+        "Status : 3 [failure, reached maximum iterations]\n",
+        "Status : 4 [failure, terminated due to slow convergence or divergence]\n",
+        "Status : 9\n",
+        "no status here\n",
+    ):
+        with pytest.raises(PurePhaseAccessError):
+            _check_magemin_solver_status(text, [])
+
+
+def test_quartz_lambda_stencil_is_flagged_only_when_straddled():
+    assert _lambda_stencil_warning("q", 847.0) is not None
+    assert _lambda_stencil_warning("q", 1000.0) is None
+    assert _lambda_stencil_warning("fo", 847.0) is None
 
 
 # --- ThermoEngine: live access path ----------------------------------------
@@ -414,6 +480,58 @@ def test_thermoengine_clinoenstatite_matches_janaf_mgsio3(te_backend):
     assert r.formula == "MgSiO3"
     assert r.Cp_J_K_mol == pytest.approx(120.34, rel=0.02)
     assert r.G_J_mol == pytest.approx(-1663.2e3, abs=2.0e3)
+
+
+def test_thermoengine_missing_formula_refuses():
+    from engines.alphamelts.thermoengine import _thermoengine_phase_formula
+
+    class _Bare:
+        formula = ""
+
+    with pytest.raises(PurePhaseAccessError, match="no formula"):
+        _thermoengine_phase_formula(_Bare(), "Fo")
+
+    class _Present:
+        formula = "Mg2SiO4"
+
+    assert _thermoengine_phase_formula(_Present(), "Fo") == "Mg2SiO4"
+
+    class _Method:
+        def formula(self):
+            return "SiO2"
+
+    assert _thermoengine_phase_formula(_Method(), "Qz") == "SiO2"
+
+
+def test_quartz_provenance_records_adjustment_flag():
+    from engines.alphamelts.thermoengine import _quartz_provenance
+
+    on, on_note = _quartz_provenance("Berman 1988", applied=True)
+    off, off_note = _quartz_provenance("Berman 1988", applied=False)
+    unread, unread_note = _quartz_provenance("Berman 1988", applied=None)
+    assert "QUARTZ_ADJUSTMENT=-1291 J applied" in on
+    assert "isQuartzCorrectionUsed=True" in on
+    assert "-1291" in on_note
+    assert "not applied" in off and "isQuartzCorrectionUsed=False" in off
+    assert "-1291" in off_note
+    # Unread flag is not stamped as a value.
+    assert unread == "Berman 1988"
+    assert "could not be read" in unread_note
+
+
+@needs_thermoengine
+def test_thermoengine_quartz_records_melts_adjustment(te_backend):
+    qz = te_backend.pure_phase_properties(
+        "Qz", temperature_K=298.15, pressure_bar=1.0
+    )
+    fo = te_backend.pure_phase_properties(
+        "Fo", temperature_K=298.15, pressure_bar=1.0
+    )
+    assert "QUARTZ_ADJUSTMENT=-1291 J applied" in qz.database
+    assert "isQuartzCorrectionUsed=True" in qz.database
+    assert any("-1291" in note for note in qz.warnings)
+    assert "QUARTZ_ADJUSTMENT" not in fo.database
+    assert qz.formula == "SiO2"
 
 
 @needs_thermoengine
