@@ -2,7 +2,7 @@
 
 Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `review/janaf-batch-2026-09-22`.
 
-## Reviews R1–R9
+## Reviews R1–R10
 
 | Task | Verdict |
 | --- | --- |
@@ -15,6 +15,7 @@ Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `
 | R7 JANAF phase labels | LAND P0=0 P1=0 P2=0 P3=1 |
 | R8 alias double count | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=2 |
 | R9 interval printed conditions | LAND P0=0 P1=0 P2=0 P3=0 |
+| R10 JANAF p4a2 score (`7d11e6d60`) | LAND-WITH-FIXES P0=0 P1=1 P2=1 P3=3 |
 
 ## Class sweeps S1–S6
 
@@ -26,4 +27,4 @@ Never merge. Base tip at first landing: `fbe3491b2`. Later files may reference `
 | S4 untrue report claims | sites=11 live=2 P0=0 P1=5 P2=4 P3=2 |
 | S6 absence becomes number | sites=26 live=24 P0=9 P1=7 P2=8 P3=2 |
 
-Optional `R*-fix.patch` files sit beside write-ups. R10 / W1 / S5 / S7–S9 still in flight.
+Optional `R*-fix.patch` files sit beside write-ups (incl. R10). W1 / S5 / S7–S9 still in flight.
