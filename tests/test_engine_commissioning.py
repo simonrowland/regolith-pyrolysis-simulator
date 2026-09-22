@@ -78,6 +78,7 @@ def _valid_table_payload() -> dict:
         'engines': {
             'alphamelts': dict(engine),
             'thermoengine': dict(engine),
+            'vaporock': dict(engine),
         },
     }
 
@@ -271,6 +272,20 @@ def test_unknown_engine_is_rejected(tmp_path: Path) -> None:
     payload['engines']['not_an_engine'] = dict(payload['engines']['alphamelts'])
     path = _write_table(tmp_path / 'unknown-engine.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='unknown engine'):
+        parse_engine_commissioning_file(path)
+
+
+def test_missing_vaporock_row_fails_at_load(tmp_path: Path) -> None:
+    """t-959/P3-6: vaporock is a required row now that the adapter consumes it.
+
+    The adapter calls assess_engine_commissioning() inside equilibrate(); an
+    absent row must fail loud at table load (typed), matching alphamelts and
+    thermoengine, not raise per call from inside equilibrate().
+    """
+    payload = _valid_table_payload()
+    del payload['engines']['vaporock']
+    path = _write_table(tmp_path / 'missing-vaporock.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='missing required engine'):
         parse_engine_commissioning_file(path)
 
 

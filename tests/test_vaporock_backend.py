@@ -305,6 +305,164 @@ def test_fake_vaporock_receives_oxide_wt_pct_basis(monkeypatch):
     assert "input_composition_projection" not in result.diagnostics
 
 
+def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
+    """Out-of-band VapoRock runs carry the project commissioning notice
+    (t-894 band, t-959 wiring); the notice annotates but never alters the
+    prediction."""
+
+    def calc_vapor_pressures(composition=None, T_C=None, **_kwargs):
+        # Composition- and temperature-dependent fake: if attaching the
+        # notice altered anything the engine receives, these pressures move.
+        composition = composition or {}
+        return {
+            'Na': float(composition.get('Na2O', 0.0)) * (float(T_C) + 1.0) * 1e-9,
+            'SiO': float(composition.get('SiO2', 0.0)) * 1e-9,
+        }
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({'warm_worker': False}) is True
+
+    def run(temperature_C, composition_kg):
+        return backend.equilibrate(
+            temperature_C,
+            composition_kg=composition_kg,
+            fO2_log=-8.25,
+            pressure_bar=2e-6,
+        )
+
+    # The hot case is 1800 K: above the certified [1073.15, 1700] K band but
+    # inside the adapter's hard [1350, 1950] K gate. The certified lower T
+    # bound is unreachable through that gate, so only the upper bound can
+    # produce a temperature notice here.
+    cases = {
+        'in_band': (1400.0, {'SiO2': 50.0, 'Na2O': 50.0}, None, None),
+        'low_sio2': (
+            1400.0,
+            {'SiO2': 20.0, 'Na2O': 80.0},
+            'silicate_window',
+            ('silicate_network_band',),
+        ),
+        'high_sio2': (
+            1400.0,
+            {'SiO2': 90.0, 'Na2O': 10.0},
+            'silicate_window',
+            ('silicate_network_band',),
+        ),
+        'hot': (
+            1800.0 - 273.15,
+            {'SiO2': 50.0, 'Na2O': 50.0},
+            'temperature_range',
+            ('temperature_range',),
+        ),
+    }
+    notice_warning = (
+        'CommissioningNotice: out of certified band; '
+        'authority=extrapolated; engine will run'
+    )
+    real_assess = vaporock_module.assess_engine_commissioning
+    observed = {}
+    for label, (temperature_C, composition_kg, reason, failed) in cases.items():
+        result = run(temperature_C, composition_kg)
+        observed[label] = dict(
+            getattr(result, 'vaporock_full_speciation_Pa', {})
+        )
+        # A/B: the same point with the assessment stubbed to no-notice must
+        # give byte-identical predicted values and identical diagnostics
+        # modulo the three notice keys.
+        monkeypatch.setattr(
+            vaporock_module,
+            'assess_engine_commissioning',
+            lambda *args, **kwargs: types.SimpleNamespace(notice=None),
+        )
+        try:
+            bare = run(temperature_C, composition_kg)
+        finally:
+            monkeypatch.setattr(
+                vaporock_module, 'assess_engine_commissioning', real_assess
+            )
+        assert bare.status == result.status, label
+        assert bare.vapor_pressures_Pa == result.vapor_pressures_Pa, label
+        assert dict(getattr(bare, 'vaporock_full_speciation_Pa', {})) == (
+            observed[label]
+        ), label
+        stripped = {
+            key: value
+            for key, value in result.diagnostics.items()
+            if key not in ('commissioning_notice', 'authority', 'certified_band')
+        }
+        assert stripped == bare.diagnostics, label
+
+        notice = result.diagnostics.get('commissioning_notice')
+        if reason is None:
+            assert notice is None
+            assert 'authority' not in result.diagnostics
+            assert 'certified_band' not in result.diagnostics
+            assert notice_warning not in result.warnings
+            assert result.warnings == bare.warnings
+        else:
+            assert notice['reason'] == reason
+            assert notice['authority'] == 'extrapolated'
+            assert notice['certified_band'] == {
+                'sio2_wt_pct': [30.0, 80.0],
+                'temperature_K': [1073.15, 1700.0],
+            }
+            assert notice['failed_constraints'] == failed
+            assert result.diagnostics['authority'] == 'extrapolated'
+            assert (
+                result.diagnostics['certified_band'] == notice['certified_band']
+            )
+            assert notice_warning in result.warnings
+            assert [
+                w for w in result.warnings if w != notice_warning
+            ] == bare.warnings
+    # The fake engine depends on its inputs, so the A/B equalities above are
+    # not tautological: distinct compositions give distinct pressures.
+    assert observed['low_sio2'] != observed['in_band']
+    assert observed['high_sio2'] != observed['in_band']
+
+
+def test_vaporock_refusal_paths_carry_no_commissioning_notice(monkeypatch):
+    """t-959 P2: a refused run never calls the engine, so it carries no
+    commissioning notice and no authority label -- even when the projected
+    melt would read out of band (an empty melt reads 0 wt% SiO2)."""
+    calls = []
+
+    def calc_vapor_pressures(**kwargs):
+        calls.append(kwargs)
+        return {'Na': 1e-4}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({'warm_worker': False}) is True
+
+    refused = {
+        # Fe drops out of the MELTS basis, leaving a 0 wt% SiO2 melt that is
+        # refused for the dropped non-basis species before the engine runs.
+        'non_basis': dict(composition_mol={'Na2O': 1.0, 'Fe': 5.0}),
+        # Nothing to project at all: empty wt% projection refusal.
+        'empty': dict(composition_kg={}),
+    }
+    for label, kwargs in refused.items():
+        result = backend.equilibrate(
+            1400.0, fO2_log=-8.25, pressure_bar=2e-6, **kwargs
+        )
+        assert result.status == 'out_of_domain', label
+        assert 'commissioning_notice' not in result.diagnostics, label
+        assert 'authority' not in result.diagnostics, label
+        assert 'certified_band' not in result.diagnostics, label
+        assert not any(
+            'CommissioningNotice' in warning for warning in result.warnings
+        ), label
+    assert calls == []
+
+
 def test_vaporock_non_basis_projection_is_out_of_domain(monkeypatch):
     seen = {}
 

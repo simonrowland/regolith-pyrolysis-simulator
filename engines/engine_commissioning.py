@@ -41,9 +41,11 @@ PUBLISHED_AUTHORITY_OUTSIDE: str = 'extrapolated'
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMMISSIONING_PATH = _REPO_ROOT / 'data' / 'engine_commissioning.yaml'
 
-_REQUIRED_ENGINES: frozenset[str] = frozenset({'alphamelts', 'thermoengine'})
+_REQUIRED_ENGINES: frozenset[str] = frozenset(
+    {'alphamelts', 'thermoengine', 'vaporock'}
+)
 _OPTIONAL_ENGINES: frozenset[str] = frozenset(
-    {'vaporock', 'magemin', 'imcc_sf04', 'imcc_sf04_ext'}
+    {'magemin', 'imcc_sf04', 'imcc_sf04_ext'}
 )
 _ALLOWED_ENGINES: frozenset[str] = _REQUIRED_ENGINES | _OPTIONAL_ENGINES
 

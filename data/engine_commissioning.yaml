@@ -27,8 +27,7 @@
 #   simulator/melt_backend/melt_envelope.py
 #   MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']. Certified T is notice+run.
 #
-# Closed keys. Extra engine blocks (vaporock / magemin / imcc_sf04) may be
-# added later with the same shape; they are omitted until commissioned.
+# Closed keys. Additional engine blocks use the same shape when commissioned.
 
 schema_version: 1
 
@@ -67,6 +66,21 @@ engines:
         recorded 0 crashes in the qualification sweep;
         observed_crash_floor_wt_pct is not_applicable.
 
-  # vaporock:
+  vaporock:
+    # Default to the MELTS commissioning band until battery qualification
+    # re-sets VapoRock's band.
+    sio2_wt_pct:
+      certified: [30.0, 80.0]
+      observed_crash_floor_wt_pct: not_applicable
+    temperature_K:
+      certified: [1073.15, 1700.0]
+    authority_outside: extrapolated
+    source:
+      kind: adapter_default
+      ref: "t-894 MELTS-family commissioning band"
+      note: >
+        VapoRock rides the MELTS liquid model; this default row uses the
+        MELTS commissioning band until battery qualification re-sets it.
+
   # magemin:
   # imcc_sf04:
