@@ -169,26 +169,19 @@ def _result(
     # not missing. A bare tuple is already the evaluated absence (dynamic
     # refusal sites pass it through unchanged).
     if present is not None:
-        missing = tuple(label for label, is_present in present.items() if not is_present)
+        evaluated = tuple(label for label, is_present in present.items() if not is_present)
+        # A presence map can mark every member located while no route accepts
+        # any of them. An empty missing list would claim nothing is absent;
+        # name the whole set instead.
+        if not evaluated and selected is None:
+            evaluated = tuple(present)
+        missing = evaluated
     absence = None if selected else WaypointAbsence(name, GapReason.MISSING_EVIDENCE, missing)
     return WaypointResult(name, selected, tuple(routes), absence)
 
 
 def _located_present(located: Located | None) -> bool:
     return located is not None and located.state.is_value
-
-
-def _schedule_temperature_present(schedule: ThermalSchedule | None) -> bool:
-    if schedule is None:
-        return False
-    located: list[Located | None] = []
-    for point in schedule.points or ():
-        located.extend((point.time_s, point.temperature_K))
-    for ramp in schedule.ramps or ():
-        located.extend((ramp.rate_K_s, ramp.start_temperature_K, ramp.end_temperature_K))
-    for hold in schedule.setpoints_and_holds or ():
-        located.extend((hold.temperature_K, hold.hold_duration_s))
-    return any(_located_present(item) for item in located)
 
 
 def _value(located: Located[Value] | None) -> Value | None:
@@ -439,11 +432,12 @@ def charge_moles_by_species(
                 experiment.sample.initial_composition
             ),
         }
-        absence = WaypointAbsence(
+        absence = _result(
             "charge_moles_by_species",
-            GapReason.MISSING_EVIDENCE,
-            tuple(label for label, is_present in charge_inputs.items() if not is_present),
-        )
+            [],
+            tuple(charge_inputs),
+            present=charge_inputs,
+        ).absence
     return SpeciesWaypoints(results, absence, tuple(sorted(set(dropped) - set(results))))
 
 
@@ -871,11 +865,14 @@ def thermal_path(
         temp_value = raw_temperature if isinstance(raw_temperature, Value) else Value.point_of(raw_temperature)
         if temp_value.kind is ValueKind.POINT:
             routes.append(Waypoint("thermal_path", Value(ValueKind.SERIES, series=((Decimal(0), temp_value.point),)), "temperature_points_only", WaypointAuthority.PRINTED, ("experiment.conditions.temperature_K",)))
-    thermal_inputs = {
-        "experiment.thermal_schedule": _schedule_temperature_present(schedule),
-        "experiment.conditions.temperature_K": _located_present(experiment.conditions.get("temperature_K")),
-    }
-    return _result("thermal_path", routes, tuple(thermal_inputs), present=thermal_inputs)
+    # Used as gap text only when no route was accepted. On that path a located
+    # schedule fragment or non-point conditions temperature was not usable, so
+    # name both OR members instead of a weaker presence check.
+    return _result(
+        "thermal_path",
+        routes,
+        ("experiment.thermal_schedule", "experiment.conditions.temperature_K"),
+    )
 
 
 def oxygen_condition(
@@ -993,13 +990,18 @@ def oxygen_condition(
             routes,
             ("fO2_log", "experiment.fO2_control", "temperature_K", "total_pressure_Pa"),
         )
-    point_fo2 = (observation.point_conditions or {}).get("fO2_log") if observation is not None else None
-    control_present = control is not None and (
-        _value(control.oxygen_partial_pressure_Pa) is not None
-        or (control.buffer is not None and control.buffer.state.is_value)
-    )
+    # No route fired, so observation fO2_log already failed _point_condition.
+    # experiment.conditions.fO2_log is not an oxygen input. A located pO2 that
+    # _log_pressure accepts would already have fired oxygen_partial_pressure_to_log_fO2,
+    # so control is present here only when the buffer name is a published buffer.
+    buffer_known = False
+    if control is not None and control.buffer is not None and control.buffer.state.is_value:
+        from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
+
+        buffer_known = str(control.buffer.state.value).upper() in PUBLISHED_BUFFERS
+    control_present = buffer_known
     oxygen_inputs = {
-        "fO2_log": _located_present(point_fo2) or _condition_value(experiment, "fO2_log") is not None,
+        "fO2_log": False,
         "experiment.fO2_control": control_present,
         "temperature_K": thermal_path(experiment, bench, observation).selected is not None,
         "total_pressure_Pa": pressure_boundary(experiment, bench, observation).selected is not None,
@@ -1090,11 +1092,7 @@ def g1(
             "relevant_volume": volume is not None,
             "thermal_path": thermal is not None,
         }
-        absence = WaypointAbsence(
-            "G1",
-            GapReason.MISSING_EVIDENCE,
-            tuple(label for label, is_present in g1_inputs.items() if not is_present),
-        )
+        absence = _result("G1", [], tuple(g1_inputs), present=g1_inputs).absence
     return SpeciesWaypoints(results, absence)
 
 
