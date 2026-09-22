@@ -2062,10 +2062,15 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert census.get("p_partial") == 18
     assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 12
-    assert census.get("evaporation_rate") == 21
-    assert census.get("mass_loss_fraction") == 9
+    # Re-pinned with the d-032 store regen. _series_census skips a source with no
+    # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
+    # files, so their series went uncounted: evaporation_rate 21->25,
+    # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
+    # data became visible, not because a check was relaxed - mismatches stays 0.
+    assert census.get("evaporation_rate") == 25
+    assert census.get("mass_loss_fraction") == 19
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 209, (n_numeric, census, n_unavailable)
+    assert n_numeric == 223, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:

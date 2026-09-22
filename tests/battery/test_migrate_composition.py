@@ -337,7 +337,8 @@ def test_mls_1a_case_duplicate_is_one_identity() -> None:
 
 
 _PLANTE_CHARGE_WT = {"K2O": "43.94", "SiO2": "56.06"}
-_PLANTE_EXPERIMENT_ID = "10.6028/nbs.sp.561v1::2"
+# The regen replaced bare ordinal experiment ids with descriptive slugs.
+_PLANTE_EXPERIMENT_ID = "10.6028/nbs.sp.561v1::experiment::k2o-sio2-effusion-series"
 
 
 def _plante_evolving_extract() -> dict:
@@ -457,7 +458,7 @@ def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
         row
         for row in (work_doc.get("experiments") or [])
         if isinstance(row, dict)
-        and str(row.get("experiment_id") or "").startswith("10.6028/nbs.sp.561v1::2")
+        and str(row.get("experiment_id") or "").startswith("10.6028/nbs.sp.561v1::")
     ]
     assert [row.get("experiment_id") for row in plante_experiments] == [
         _PLANTE_EXPERIMENT_ID
