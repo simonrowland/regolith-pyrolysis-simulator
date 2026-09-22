@@ -8079,11 +8079,14 @@ class Migrator:
             require_rail_if_stated(point)
             count.rows_in += 1
             source_id = str(point.get("source_id") or path.stem)
-            if source_id == "janaf" and path.name == "species_rail_differential_ledger.yaml":
-                # The ledger's "janaf" token names the compilation compared
-                # against, not a battery work; the work migrated here is the
-                # differential ledger itself. works/ALIASES.yaml pins this
-                # label to the existing work id so experiment ids are unchanged.
+            if path.name == "species_rail_differential_ledger.yaml":
+                # Every point's source_id names the compilation compared against
+                # (janaf, pankratz-1987-usbm-b689, …), not a battery work. The
+                # work migrated from this file is always the differential
+                # ledger. works/ALIASES.yaml pins species-rail-differential to
+                # citation_hash("janaf") so historical janaf-token experiment
+                # ids stay stable; pankratz-token ledger experiments move onto
+                # that same ledger work (off the real USBM B689 work).
                 source_id = "species-rail-differential"
             citation = source_id
             index_row = self.index.get(source_id)

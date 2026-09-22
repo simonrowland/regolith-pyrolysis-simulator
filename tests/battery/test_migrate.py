@@ -4934,6 +4934,49 @@ def test_committed_aliases_pin_species_rail_ledger_not_janaf() -> None:
     assert aliases["species-rail-differential"] == citation_hash("janaf")
     assert aliases["janaf-4th"] == aliases["nist-janaf-4th"]
 
+
+def test_species_rail_pankratz_token_also_files_under_ledger_label(tmp_path: Path) -> None:
+    """Comparison-compilation tokens other than janaf must not land ledger
+    residuals on the real compilation work (USBM B689)."""
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "metric_units": "kJ/mol",
+                "points": [
+                    {
+                        "key": "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol",
+                        "source_id": "pankratz-1987-usbm-b689",
+                        "observation_id": "page-0003",
+                        "species": "MgO",
+                        "comparison_quantity": "delta_fG_kJ_mol",
+                        "temperature_K": 298.15,
+                        "table_kJ_mol": -500.0,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    ledger_works = [
+        work for work in result.works.values()
+        if "species-rail-differential" in work.source_ids
+    ]
+    assert len(ledger_works) == 1
+    work = ledger_works[0]
+    assert all(
+        "pankratz-1987-usbm-b689" not in candidate.source_ids
+        for candidate in result.works.values()
+    )
+    observation = result.observations[
+        "pankratz-1987-usbm-b689::page-0003:T=298.15::nasa_cea_9::delta_fG_kJ_mol"
+    ]
+    assert observation.source_id == "species-rail-differential"
+    assert result.experiments_by_work[work.work_id] == [f"{work.work_id}::page-0003"]
+
 # ---------------------------------------------------------------------------
 # 2026-09-22 hardening (latent, none live in the corpus): cross-work
 # equipment FK refusal, extracts-v2 orphan siblings on delete/rename, and a
